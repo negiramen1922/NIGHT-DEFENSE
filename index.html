@@ -170,6 +170,7 @@ body.fullmap #right.open{transform:none}
   #right{position:fixed;left:0;right:0;bottom:0;width:100%;height:58vh;background:var(--bg);border-top:2px solid var(--amber);z-index:6;
     transform:translateY(calc(100% - 38px));transition:transform .25s;padding:0 6px 10px;overflow-y:auto;box-shadow:0 -6px 20px #000a}
   #right.open{transform:none}
+  #info{scroll-margin-top:42px}
   #sheetHandle{display:flex;justify-content:center;align-items:center;gap:8px;position:sticky;top:0;z-index:2;background:var(--bg);height:38px;color:var(--amber);font-weight:bold;cursor:pointer;user-select:none;border-bottom:1px solid var(--line);flex-shrink:0}
   #sheetHandle::before{content:'';width:40px;height:4px;border-radius:2px;background:#4a5a4d;position:absolute;top:5px}
 }
@@ -3904,7 +3905,7 @@ function affordSig(){return BUILD_ORDER.map(k=>canAfford(costOf(k),B[k].pop)?1:0
 let lastInfoKey='';
 function heroDetail(c){
   const sp=SPECS[c.spec],a=c.assign?findObj(c.assign):null,tr=TRAITS.find(t=>t.n===c.trait);
-  let h=`<div style="display:flex;gap:10px;align-items:center"><div style="background:#14110c;border:1px solid #5a4a2a;padding:4px;line-height:0">${icSvg('h_'+c.spec,64)}</div>
+  let h=`<div class="row" style="margin-bottom:4px"><b>英雄の詳細</b><button id="hvClose" style="padding:4px 14px;font-size:14px">× 閉じる</button></div><div style="display:flex;gap:10px;align-items:center"><div style="background:#14110c;border:1px solid #5a4a2a;padding:4px;line-height:0">${icSvg('h_'+c.spec,64)}</div>
     <div><b style="font-size:15px">${cmdName(c)}</b><div><span class="spec" style="color:${sp.color};border-color:${sp.color}">${c.spec}</span> <span class="muted">Lv${c.lv}</span></div>
     <div class="xpbar" style="width:140px;margin-top:4px"><i style="width:${Math.round(c.xp/xpNeed(c)*100)}%"></i></div><div class="muted" style="font-size:10px">経験 ${Math.floor(c.xp)} / ${xpNeed(c)}</div></div></div>`;
   h+=`<div class="muted" style="margin:6px 0">${sp.desc}</div>`;
@@ -3918,10 +3919,11 @@ function heroDetail(c){
   if(a)h+=`<button id="hvGo" style="margin-top:6px;width:100%">配属先を見る</button>`;
   return h;
 }
+function closeHeroView(){S.heroView=null;S.selCmd=null;renderInfo(true);renderCmds(true);}
 function renderInfo(force){
   const el=document.getElementById('infoBody');const o=S.sel;
   if(o)S.heroView=null;
-  if(!o&&S.heroView){const c=S.cmds.find(x=>x.id===S.heroView&&x.alive);if(c){const key='hv'+c.id+c.lv+Math.floor(c.xp)+c.assign+c.kills;if(!force&&key===lastInfoKey)return;lastInfoKey=key;el.innerHTML=heroDetail(c);const g=document.getElementById('hvGo');if(g)g.onclick=()=>{const t=findObj(c.assign);if(t){S.sel=t;renderInfo(true);}};return;}S.heroView=null;}
+  if(!o&&S.heroView){const c=S.cmds.find(x=>x.id===S.heroView&&x.alive);if(c){const key='hv'+c.id+c.lv+Math.floor(c.xp)+c.assign+c.kills;if(!force&&key===lastInfoKey)return;lastInfoKey=key;el.innerHTML=heroDetail(c);const hc=document.getElementById('hvClose');if(hc)hc.onclick=closeHeroView;const g=document.getElementById('hvGo');if(g)g.onclick=()=>{const t=findObj(c.assign);if(t){S.sel=t;renderInfo(true);}};return;}S.heroView=null;}
   if(S.buildMode&&!o){
     const key='bm'+S.buildMode;if(!force&&key===lastInfoKey)return;lastInfoKey=key;
     const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)}ターン　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。右クリック・Escで建設モードを終了</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div><button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
@@ -4111,9 +4113,11 @@ function renderCmds(force){
     el.innerHTML=h;
     el.querySelectorAll('.cmd').forEach(d=>d.onclick=()=>{
       const c=S.cmds.find(x=>x.id===d.dataset.id);if(!c)return;
-      S.selCmd=S.selCmd===c.id?null:c.id;
+      if(S.selCmd===c.id&&S.heroView===c.id){closeHeroView();return;}
+      S.selCmd=c.id;
       S.sel=null;S.selTile=null;S.heroView=c.id;renderInfo(true);
       renderCmds(true);
+      if(isNarrow()){const i=document.getElementById('info');if(i)i.scrollIntoView({block:'start',behavior:'smooth'});}
     });
   }
   el.querySelectorAll('.cmd').forEach(d=>{const c=S.cmds.find(x=>x.id===d.dataset.id);if(!c)return;
