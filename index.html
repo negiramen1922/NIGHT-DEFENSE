@@ -4406,7 +4406,7 @@ function showTitle(){const sv=saveInfo();
   const c=document.getElementById('tContinue');if(c)c.onclick=()=>{closeOverlay();if(!loadGame())toast('セーブデータを読み込めませんでした','bad');};
   document.getElementById('tNew').onclick=()=>{if(sv&&!confirmNew())return;showIntro();};
   document.getElementById('tHelp').onclick=()=>showHelp(true);
-  document.getElementById('tCredit').onclick=()=>openOverlay('title',`<h2>クレジット</h2><div style="line-height:1.9">${GAME_TITLE} — ${GAME_SUB}　ver ${GAME_VER}<br>企画・ゲームデザイン：あなた<br>プログラム・ドット絵・効果音・音楽：Claude と共同制作<br><span class="muted">すべてのドット絵と音はこのゲームのために作られたものです</span></div><div style="margin-top:12px"><button id="crBack">タイトルへ</button></div>`)&&(document.getElementById('crBack').onclick=showTitle);}
+  document.getElementById('tCredit').onclick=()=>openOverlay('title',`<h2>クレジット</h2><div style="line-height:1.9">${GAME_TITLE} — ${GAME_SUB}　ver ${GAME_VER}<br>企画・ゲームデザイン：ねぎらーめん<br>プログラム・ドット絵・効果音・音楽：Claude と共同制作<br><span class="muted">すべてのドット絵と音はこのゲームのために作られたものです</span></div><div style="margin-top:12px"><button id="crBack">タイトルへ</button></div>`)&&(document.getElementById('crBack').onclick=showTitle);}
 function confirmNew(){return true;}
 function showIntro(){
   const MAPL=[['t','廃村エルム','はじめての防衛','#8ad08a','入門','焼け落ちた村の跡。壊れた柵やバリスタが残っていて、半額ですぐに建て直せる。初心者タスクに沿って準備し、<b>6回の襲撃</b>を守り抜く。魔物は少なめ'],
