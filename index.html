@@ -1086,6 +1086,39 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
   #right>#sheetHandle{order:0}#right>#rtabs{order:1}#right>#info{order:2}#right>.box[data-rt]{order:3}
   #controls{z-index:9}
 }
+/* スマホ：左上の表示がPC用の幅制限でつぶれないように */
+@media (max-width:900px){
+  body:not(.fullmap) #modeBar,#modeBar{max-width:none}
+  #modeBar #modeTxt{overflow:hidden}
+}
+/* スマホ：下のボタンに「建設」 */
+#bBuild{display:none}
+@media (max-width:900px){
+  body:not(.night):not(.qnight):not(.sheetOpen) #controls{grid-template-columns:1.4fr repeat(5,1fr)}
+  body:not(.night):not(.qnight):not(.sheetOpen) #controls>#bBuild{display:flex!important}
+  body.night #controls>#bBuild,body.qnight #controls>#bBuild{display:none!important}
+  #controls>#bBuild.on{background:#2a2412;box-shadow:0 0 0 2px var(--amber);color:var(--amber)}
+}
+/* スマホ：仮置き＋十字キー */
+#bpad{display:none}
+@media (max-width:900px){
+  body.bpad #bpad{display:grid}
+  body.bpad #guide{display:none!important}
+  #bpad{position:fixed;left:6px;right:6px;bottom:124px;z-index:8;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px;background:rgba(18,15,10,.95);box-shadow:var(--px-amber)}
+  #bpad .bpL{display:flex;flex-direction:column;gap:6px;min-width:0}
+  #bpad .bpT{display:flex;align-items:center;gap:6px;min-width:0;font-size:12px}
+  #bpad .bpT b{font-family:var(--px-font);font-weight:400;font-size:14px;color:var(--amber);white-space:nowrap}
+  #bpad .bpS{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  #bpad .bpS.ok{color:var(--green)}#bpad .bpS.ng{color:var(--red)}
+  #bpad .bpB{display:grid;grid-template-columns:1.5fr 1fr;gap:6px}
+  #bpad .bpB button{height:46px;font-size:15px;justify-content:center}
+  #bpad #bpOk{background:var(--amber);color:#111}
+  #bpad #bpOk.ng{background:#3a3428;color:#8a7f68}
+  #bpad .bpX{display:grid;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,42px);gap:3px}
+  #bpad .bpX button{padding:0;justify-content:center;font-size:16px;touch-action:none;user-select:none;-webkit-user-select:none}
+  #bpad .bpX i{display:block}
+}
+
 
 /* 足りない費用は赤字 */
 .cst.lack,#build button small .cst.lack,#info button .cost .cst.lack{color:var(--red)!important}
@@ -1195,11 +1228,15 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
     <div id="pauseMsg"><b>一時停止中</b><small>指示はそのまま出せます・Space で再開</small></div>
     </div>
     <div id="toasts" style="position:fixed;z-index:40;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;transform:translateX(-50%)"></div>
+    <div id="bpad"><div class="bpL"><div class="bpT"><span id="bpIc"></span><b id="bpName"></b><span id="bpState" class="bpS"></span></div>
+      <div class="bpB"><button id="bpOk">決定</button><button id="bpCancel">取消</button></div></div>
+      <div class="bpX"><i></i><button data-d="0,-1" aria-label="上へ">▲</button><i></i><button data-d="-1,0" aria-label="左へ">◀</button><i></i><button data-d="1,0" aria-label="右へ">▶</button><i></i><button data-d="0,1" aria-label="下へ">▼</button><i></i></div></div>
     <div id="controls">
       <button id="mBack" class="mOnlyB">▼ マップに戻る</button>
       <button id="bNext" class="on"></button>
       <button id="bPause" class="nOnly"></button>
       <span class="sep dOnly"></span>
+      <button id="bBuild" class="sp-main"><span class="mic"></span><span>建設</span></button>
       <button id="bRes" class="sp-main"><span class="mic"></span><span>研究</span><kbd>R</kbd></button>
       <button id="bArmy" class="sp-main"><span class="mic"></span><span>部隊</span><kbd>K</kbd></button>
       <button id="bHire" class="sp-main"><span class="mic"></span><span>雇用</span><kbd>J</kbd></button>
@@ -4461,8 +4498,10 @@ function draw(){
     for(const [x,y] of wallLineCells(S.wline.a,S.wline.b)){const ok=placeOK(t,x,y);let pay=ok;if(ok){for(const k in c)if(have[k]<c[k])pay=false;if(pay){for(const k in c)have[k]-=c[k];n++;}}
       ctx.fillStyle=pay?'rgba(111,224,138,.45)':ok?'rgba(242,179,61,.35)':'rgba(255,90,78,.30)';ctx.fillRect(x*T,y*T,T,T);}
     const [bx,by]=S.wline.b;ctx.font='bold 11px sans-serif';ctx.lineWidth=3;ctx.strokeStyle='#000';const tt=`${B[t].name} ×${n}`;ctx.strokeText(tt,(bx+.5)*T,by*T-8);ctx.fillStyle='#ffe08a';ctx.fillText(tt,(bx+.5)*T,by*T-8);ctx.lineWidth=1;}
-  if(S.buildMode&&mouse.in&&!S.wline){
-    let NS=newSz(S.buildMode),gx=Math.floor(mouse.x/T-(NS-1)/2),gy=Math.floor(mouse.y/T-(NS-1)/2);{const ub=MOUNT_T.includes(S.buildMode)&&bastionAt(Math.floor(mouse.x/T),Math.floor(mouse.y/T));if(ub){gx=ub.x;gy=ub.y;NS=bsz(ub);}}const ok=canPlace(S.buildMode,gx,gy);
+  const gp=padMode()?(bGhost?{x:(bGhost.x+.5)*T,y:(bGhost.y+.5)*T}:null):(mouse.in?mouse:null);
+  if(S.buildMode&&gp&&!S.wline){
+    let {gx,gy,NS}=footAt(gp.x,gp.y);const ok=canPlace(S.buildMode,gx,gy);
+    if(padMode()){const pl=0.5+0.5*Math.sin(an*5);ctx.strokeStyle=ok?`rgba(255,224,138,${0.5+0.5*pl})`:`rgba(255,90,78,${0.5+0.5*pl})`;ctx.lineWidth=2;ctx.setLineDash([5,4]);ctx.strokeRect(gx*T-3,gy*T-3,NS*T+6,NS*T+6);ctx.setLineDash([]);ctx.lineWidth=1;}
     {const d=B[S.buildMode];ctx.globalAlpha=0.75;ctx.strokeStyle=ok?'#6fe08a':'#ff5a4e';ctx.lineWidth=2;ctx.strokeRect(gx*T+2,gy*T+2,NS*T-4,NS*T-4);ctx.lineWidth=1;
      ctx.fillStyle=ok?'#cfe3cf':'#ff8a7e';ctx.font='bold 13px sans-serif';ctx.fillText(d.glyph||(d.isMine?'雷':'壁'),(gx+NS/2)*T,(gy+NS/2)*T+1);
      ctx.font='bold 10px sans-serif';ctx.fillStyle=ok?'#6fe08a':'#ff8a7e';ctx.fillText(ok?d.name:'建設不可',(gx+NS/2)*T,gy*T-7);ctx.globalAlpha=1;}
@@ -5085,10 +5124,9 @@ function handleTap(ev,shift){
   const p=toCanvas(ev);if(inMini(p))return;const gx=Math.floor(p.x/T),gy=Math.floor(p.y/T);
   ev={shiftKey:shift};
   if(S.aimNaval){fireNaval(p.x,p.y);return;}
-  if(S.buildMode){let NS=newSz(S.buildMode),gx=Math.floor(p.x/T-(NS-1)/2),gy=Math.floor(p.y/T-(NS-1)/2);{const ub=MOUNT_T.includes(S.buildMode)&&bastionAt(Math.floor(p.x/T),Math.floor(p.y/T));if(ub){gx=ub.x;gy=ub.y;NS=bsz(ub);}}
-    if(!canPlace(S.buildMode,gx,gy)){se('error');const cb=capBlock(S.buildMode);if(cb)toast(cb,'warn');}
-    if(canPlace(S.buildMode,gx,gy)){placeB(S.buildMode,gx,gy);S.fx.push({x:(gx+NS/2)*T,y:(gy+NS/2)*T,r:T*0.8*NS,t:0,dur:0.35,c:'#6fe08a'});renderBuild();renderInfo(true);renderMode();}
-    return;
+  if(S.buildMode){
+    if(padMode()){setGhost(Math.floor(p.x/T),Math.floor(p.y/T));return;}
+    tryBuildAt(p.x,p.y);return;
   }
   const hitR=Math.max(20,(IS_TOUCH?34:24)/cam.z);
   if(S.sel&&S.sel.kind==='s'&&Math.hypot(S.sel.x-p.x,S.sel.y-p.y)<hitR*1.3){deselect();return;}
@@ -5258,7 +5296,7 @@ function showLegend(){
 document.querySelectorAll('.speed [data-spd]').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.spd;se('click');renderPauseUI();});
 {const px=(id,t)=>{const e=document.getElementById(id);if(e)e.onclick=()=>{document.getElementById('more').open=false;document.getElementById(t).click();};};px('mRep','bRepAll');px('mSup','bSupAll');px('mHist','bHist');px('mDex','bDex');
  document.getElementById('mLog').onclick=()=>{document.getElementById('more').open=false;openOverlay('log',`<h2>通信ログ<button id="ovClose" style="float:right">閉じる</button></h2><div class="logfull">${document.getElementById('log').innerHTML}</div>`,false);document.getElementById('ovClose').onclick=closeOverlay;};
- const mic=(id,n)=>{const e=document.querySelector('#'+id+' .mic');if(e)e.innerHTML=ui(n,'light',24);};mic('bRes','research');mic('bArmy','army');mic('bHire','hire');document.querySelector('#more .mic').innerHTML=ui('menu','light',24)+ui('gear','light',12);
+ const mic=(id,n)=>{const e=document.querySelector('#'+id+' .mic');if(e)e.innerHTML=ui(n,'light',24);};PXICON.ui.icons.build=PXICON.ui.icons.build||["............","...xxxxx....","..xxxxxxxx..","..xxxxxxxx..","...xxxxx....","......xx....",".....xx.....","....xx......","...xx.......","..xx........",".xx.........","............"];mic('bBuild','build');mic('bRes','research');mic('bArmy','army');mic('bHire','hire');document.querySelector('#more .mic').innerHTML=ui('menu','light',24)+ui('gear','light',12);
  document.querySelector('.logbox .lgic').innerHTML=ui('log','amber',12);document.querySelector('#mExit .xic').innerHTML=ui('close','dim',12);}
 document.getElementById('bNext').onclick=endTurn;
 document.getElementById('bRes').onclick=showResearch;
@@ -6494,13 +6532,62 @@ addEventListener('resize',resizeView);
 // ===== 指揮モード／建設モード =====
 function enterBuild(type){if(typeof setRT==='function')setRT('build');
   if(type&&capBlock(type)){toast(capBlock(type),'warn');se('error');type=null;}
-  S.buildMode=type||null;S.buildPick=!type;S.sel=null;S.selTile=null;S.aimNaval=false;
+  S.buildMode=type||null;S.buildPick=!type;S.sel=null;S.selTile=null;S.aimNaval=false;bGhost=null;
   renderBuild();renderInfo(true);
   if(!type){const bx=document.querySelector('#build');if(isNarrow()||isFull())openSheet();if(bx)bx.closest('.box').classList.remove('closed');setTimeout(()=>bx&&bx.scrollIntoView({block:'nearest',behavior:'smooth'}),50);}
   else if(isNarrow()){document.getElementById('right').classList.remove('open');setText(document.getElementById('sheetLbl'),'▲ 詳細・建設');}
   renderMode();
 }
-function exitBuild(){S.buildMode=null;S.buildPick=false;renderBuild();renderInfo(true);renderMode();}
+function exitBuild(){S.buildMode=null;S.buildPick=false;bGhost=null;renderBuild();renderInfo(true);renderMode();}
+// ===== スマホの建設：タップで仮置き → 十字キーで調整 → 決定 =====
+let bGhost=null;
+function padMode(){return isNarrow();}
+// 指した地点から、施設が占めるマス（左上と大きさ）を求める
+function footAt(px,py){let NS=newSz(S.buildMode),gx=Math.floor(px/T-(NS-1)/2),gy=Math.floor(py/T-(NS-1)/2);
+  const ub=MOUNT_T.includes(S.buildMode)&&bastionAt(Math.floor(px/T),Math.floor(py/T));if(ub){gx=ub.x;gy=ub.y;NS=bsz(ub);}return {gx,gy,NS};}
+function tryBuildAt(px,py){const {gx,gy,NS}=footAt(px,py);
+  if(!canPlace(S.buildMode,gx,gy)){se('error');const cb=capBlock(S.buildMode);if(cb)toast(cb,'warn');return false;}
+  placeB(S.buildMode,gx,gy);S.fx.push({x:(gx+NS/2)*T,y:(gy+NS/2)*T,r:T*0.8*NS,t:0,dur:0.35,c:'#6fe08a'});renderBuild();renderInfo(true);renderMode();return true;}
+function ghostReason(){if(!S.buildMode||!bGhost)return '';const t=S.buildMode,d=B[t];const {gx,gy}=footAt((bGhost.x+.5)*T,(bGhost.y+.5)*T);
+  if(canPlace(t,gx,gy))return '';
+  const cb=capBlock(t);if(cb)return cb;
+  if(S.waveActive||S.phase==='night')return '夜は建設できません';
+  if(!canAfford(costOf(t),d.pop))return '資源が足りません';
+  return 'ここには建てられません';}
+function setGhost(x,y){const first=!bGhost;bGhost={x:Math.max(0,Math.min(COLS-1,x)),y:Math.max(0,Math.min(ROWS-1,y))};se('click');
+  // 引いた地図だと小さくて調整しにくいので、最初の仮置きで少し寄る
+  if(first&&cam.z<GHOST_Z){const wx=(bGhost.x+.5)*T,wy=(bGhost.y+.5)*T;zoomAt(GHOST_Z,(wx-cam.x)*cam.z,(wy-cam.y)*cam.z);}
+  ghostIntoView();renderMode();}
+const GHOST_Z=1.8;
+function moveGhost(dx,dy){if(!bGhost)return;bGhost.x=Math.max(0,Math.min(COLS-1,bGhost.x+dx));bGhost.y=Math.max(0,Math.min(ROWS-1,bGhost.y+dy));ghostIntoView();renderPad();}
+// 仮置きが十字キーや上の表示に隠れないよう、地図を少し動かす
+function ghostIntoView(){if(!bGhost)return;document.body.classList.add('bpad');
+  const r=cv.getBoundingClientRect(),k=pxScale(),pad=document.getElementById('bpad').getBoundingClientRect(),mb=document.getElementById('modeBar').getBoundingClientRect();
+  const {gx,gy,NS}=footAt((bGhost.x+.5)*T,(bGhost.y+.5)*T);
+  const top=((mb.bottom||r.top)-r.top)*k+8,bot=(Math.min(pad.top||r.bottom,r.bottom)-r.top)*k-8;
+  const y0=(gy*T-cam.y)*cam.z,y1=((gy+NS)*T-cam.y)*cam.z,x0=(gx*T-cam.x)*cam.z,x1=((gx+NS)*T-cam.x)*cam.z;
+  if(y1>bot)cam.y+=(y1-bot)/cam.z;else if(y0<top)cam.y-=(top-y0)/cam.z;
+  if(x1>VW-8)cam.x+=(x1-VW+8)/cam.z;else if(x0<8)cam.x-=(8-x0)/cam.z;
+  clampCam();}
+function ghostConfirm(){if(!bGhost||!S.buildMode)return;
+  const why=ghostReason();if(why){se('error');toast(why,'warn');renderPad();return;}
+  if(tryBuildAt((bGhost.x+.5)*T,(bGhost.y+.5)*T)){bGhost=null;renderMode();}}
+let padKey='';
+function renderPad(){const on=!!(padMode()&&S&&S.buildMode&&bGhost);document.body.classList.toggle('bpad',on);if(!on){padKey='';return;}
+  const why=ghostReason(),key=S.buildMode+'|'+why;if(key===padKey)return;padKey=key;
+  document.getElementById('bpIc').innerHTML=icSvg(S.buildMode,20);setText(document.getElementById('bpName'),B[S.buildMode].name);
+  const st=document.getElementById('bpState');st.className='bpS '+(why?'ng':'ok');setText(st,why||'ここに建てられます');
+  document.getElementById('bpOk').classList.toggle('ng',!!why);}
+document.getElementById('bpOk').onclick=ghostConfirm;
+document.getElementById('bpCancel').onclick=()=>{bGhost=null;renderMode();};
+// 十字キー：押しっぱなしで連続して動く
+document.querySelectorAll('#bpad .bpX button').forEach(b=>{const [dx,dy]=b.dataset.d.split(',').map(Number);let t1=null,t2=null;
+  const stop=()=>{clearTimeout(t1);clearInterval(t2);t1=t2=null;};
+  b.addEventListener('pointerdown',ev=>{ev.preventDefault();stop();moveGhost(dx,dy);t1=setTimeout(()=>{t2=setInterval(()=>moveGhost(dx,dy),90);},350);});
+  ['pointerup','pointercancel','pointerleave'].forEach(n=>b.addEventListener(n,stop));
+  b.addEventListener('contextmenu',ev=>ev.preventDefault());});
+setInterval(()=>{try{if(S&&bGhost)renderPad();}catch(e){}},400);
+document.getElementById('bBuild').onclick=()=>{if(!S||S.waveActive||S.phase==='night'){se('error');return;}if(S.buildMode||S.buildPick)exitBuild();else enterBuild(null);};
 let modeKey='';
 function renderMode(){
   if(!S)return;const on=!!(S.buildMode||S.buildPick);
@@ -6510,7 +6597,7 @@ function renderMode(){
   const tap=IS_TOUCH?'タップ':'クリック';
   let t;
   if(S.buildMode){const d=B[S.buildMode],c=costOf(S.buildMode),ok=canAfford(c,d.pop),sz=newSz(S.buildMode);
-    t=`${icSvg(S.buildMode,24)}<b class="mn">${d.name}</b><span class="szt">${sz}×${sz}</span><span class="ms">・${ok?(WALL_TYPES.includes(S.buildMode)?`${tap}で1枚・ドラッグで一列に配置`:`マップを${tap}して配置（続けて置けます）`):'<span style="color:var(--red)">資源が足りません</span>'}</span><span class="mc">${costText(c,d.pop)}</span>`;}
+    t=`${icSvg(S.buildMode,24)}<b class="mn">${d.name}</b><span class="szt">${sz}×${sz}</span><span class="ms">・${ok?(padMode()?(bGhost?'十字キーで調整して「決定」':(WALL_TYPES.includes(S.buildMode)?'場所をタップ・なぞると一列に配置':'建てたい場所をタップ')):(WALL_TYPES.includes(S.buildMode)?`${tap}で1枚・ドラッグで一列に配置`:`マップを${tap}して配置（続けて置けます）`)):'<span style="color:var(--red)">資源が足りません</span>'}</span><span class="mc">${costText(c,d.pop)}</span>`;}
   else if(S.buildPick)t=`<b class="mn">建設モード</b><span class="ms">・建てる施設を「建設」の一覧から選んでください</span>`;
   else if(S.aimNaval)t='<b class="mn" style="color:#ffe38a">艦砲射撃</b><span class="ms">・目標地点をクリック（Escで取消）</span>';
   else if(S.multi&&S.multi.length)t=`<b class="mn">${S.multi.length}部隊</b><span class="ms">を選択中・地図を${tap}でまとめて移動・Shift+クリックで追加/除外</span>${X}`;
@@ -6519,6 +6606,9 @@ function renderMode(){
   else t=isNarrow()?'<span class="ms">指揮・タップで選択、2本指で拡大</span>':'';
   bar.classList.toggle('idle',!t);bar.classList.toggle('hint',!S.buildMode&&!S.buildPick&&!S.sel&&!(S.multi&&S.multi.length)&&!S.aimNaval);
   if(t!==modeKey){modeKey=t;document.getElementById('modeTxt').innerHTML=t;const d=document.getElementById('mDesel');if(d)d.onclick=deselect;}
+  {const bb=document.getElementById('bBuild');if(bb)bb.classList.toggle('on',on);}
+  if(!S.buildMode)bGhost=null;
+  renderPad();
 }
 document.getElementById('mExit').onclick=exitBuild;
 // ===== マップ全画面 =====
