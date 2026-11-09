@@ -1115,6 +1115,14 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 }
 /* スマホ：仮置き＋十字キー */
 #mRep.dim{opacity:.55}
+@media (max-width:900px){
+  .ov-res .tdet{position:sticky;bottom:0;z-index:3;margin:8px 0 0!important;background:var(--inset,#0e1510);box-shadow:0 -1px 0 var(--amber),0 -8px 16px #000c!important;padding:8px 12px!important;gap:8px!important}
+  .ov-res .tdl{min-width:0!important}
+  .ov-res .tde{font-size:12px}
+  .ov-res .tdr button.primary{padding:8px 16px!important;font-size:15px}
+  body.land .ov-res .tdet{flex-wrap:nowrap}
+  body.land .ov-res .tdl{flex:1 1 auto}
+}
 /* スマホ：たたんだ資源バーでも1日の増減（▲▼）を出す。縦持ちは数字の下、横持ちは横 */
 @media (max-width:900px){
   body.resMin #wrap #resbar .res .dl{display:block;font-size:10px;line-height:1.1;margin:0;white-space:nowrap}
@@ -1135,7 +1143,9 @@ body.needRotate #rotateMsg{display:flex}
 body.land{--rail:74px}
 body.land #topbar{flex-wrap:nowrap!important;min-height:0}
 body.land #resbar{height:32px!important;flex-wrap:nowrap!important;padding:0 6px!important}
-body.land:not(.resMin) #resbar{overflow-x:auto}
+body.land:not(.resMin) #wrap #resbar{height:auto!important;flex-wrap:wrap!important;overflow:visible!important;row-gap:6px;padding:5px 6px!important}
+body.land:not(.resMin) #topbar{align-items:flex-start}
+body.land:not(.resMin) #wrap #resbar .res .dl{display:inline;margin-left:3px}
 body.land #resbar .res b{font-size:14px!important}
 body.land #resbar{justify-content:flex-start!important;flex:1 1 auto!important;min-width:0}
 body.land #resbar .res{margin-right:14px!important}
@@ -1457,7 +1467,8 @@ function facCounted(t){return !FAC_FREE.has(t)&&!(B[t]&&B[t].isMine);}
 function facCount(){return S.blds.filter(b=>facCounted(b.type)).length;}
 function outpostN(){return S.blds.filter(b=>b.type==='outpost').length;}
 function outpostReadyN(){return S.blds.filter(b=>b.type==='outpost'&&ready(b)).length;}
-function facCap(){return 40+15*((S.baseLv||1)-1)+12*outpostReadyN();}
+const FAC_BASE=60,FAC_PER_LV=20,FAC_PER_OUTPOST=15;   // 施設の上限＝60＋20×(城Lv−1)＋15×前哨砦
+function facCap(){return FAC_BASE+FAC_PER_LV*((S.baseLv||1)-1)+FAC_PER_OUTPOST*outpostReadyN();}
 function outpostCap(){return (S.baseLv||1)+1;}
 function capBlock(t){if(t==='outpost'&&outpostN()>=outpostCap())return `前哨砦は城の強化で増やせます（いま ${outpostN()}/${outpostCap()}）`;
   if(facCounted(t)&&facCount()>=facCap())return `施設が上限です（${facCount()}/${facCap()}）。前哨砦か城の強化で上限が増えます`;return '';}
@@ -5721,7 +5732,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(PROD_BT.includes(o.type)&&!['barracks','apart','lab'].includes(o.type)){h+=`<div class="upg"><b>生産</b> <span style="color:${o.off?'var(--red)':'var(--green)'}">${o.off?'停止中':'稼働中'}</span><div class="muted" style="font-size:11px">止めている間は産出も消費もしません（材料を使う施設の節約に）</div><button id="prodOff" style="margin-top:4px">${o.off?'生産を再開する':'生産を止める'}</button></div>`;}
   if(o.type==='hq'){const gq=S.squads.filter(q=>q.ut==='guard');h+=`<div class="upg"><b>近衛兵</b><div class="muted" style="font-size:11px">城で編成できる精鋭（部隊画面 [K]）。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内で火力2倍・被害半分</div>${gq.length?gq.map(q=>`<div class="row" style="align-items:center"><span>${unitLabel(q)} ${q.members}/${UT.guard.members}人・${q.gar?'駐屯中':'出撃中'}</span>${q.gar?`<button data-gdout="${q.id}" style="padding:2px 8px">外に出す</button>`:''}</div>`).join(''):'<div class="muted" style="font-size:11px">まだいません</div>'}</div>`;}
   if(o.type==='hq'){const c=baseUpCost();h+=`<div class="upg"><div class="row"><b>拠点レベル ${S.baseLv}/${BASE_MAX}</b><span class="muted">英雄 ${S.cmds.length}/${maxCmd()}</span></div>
-    <div class="muted" style="font-size:11px">レベルが上がると：英雄の上限 +2・領地の半径 +6マス・城館に住める人数 +10・施設の上限 +15・前哨砦 +1。<b style="color:var(--text)">Lv2で施設のLv2と研究ランクⅡ、Lv3で施設のLv3と研究ランクⅢ</b>が解放。城の姿も 木→石→鉄→魔核合金 と変わり、<b style="color:#c48aff">Lv5で結界</b>（襲撃のたびに城への被害を1500まで防ぐ）。Lv3以上への強化には魔核が必要</div>
+    <div class="muted" style="font-size:11px">レベルが上がると：英雄の上限 +2・領地の半径 +6マス・城館に住める人数 +10・施設の上限 +${FAC_PER_LV}・前哨砦 +1。<b style="color:var(--text)">Lv2で施設のLv2と研究ランクⅡ、Lv3で施設のLv3と研究ランクⅢ</b>が解放。城の姿も 木→石→鉄→魔核合金 と変わり、<b style="color:#c48aff">Lv5で結界</b>（襲撃のたびに城への被害を1500まで防ぐ）。Lv3以上への強化には魔核が必要</div>
     ${S.baseUp?`<div class="gd" style="margin-top:4px">Lv${S.baseUp.to}に強化中…　残り${S.baseUp.left}ターン（強化中も城は普段どおり働きます）</div>`:S.baseLv<BASE_MAX?`<button id="iBaseUp" style="margin-top:4px;width:100%" ${canAfford(c)&&!S.waveActive?'':'disabled'}>拠点をLv${S.baseLv+1}に（${costText(c)}・${baseUpTurns()}ターン）</button>`:'<div class="gd">最大レベル</div>'}</div>`;}
   if(false)h+=`<div class="muted" style="margin-top:6px;font-size:11px">研究「城館防衛火器」で自衛火器を設置できます</div>`;
   if(!isS&&o.kind==='b'&&(WALL_TYPES.includes(o.type)||o.type==='gate'||o.type==='tower')&&ready(o)){const G=wallGroup(o);const dm=G.filter(damaged);const rc=dm.reduce((a,x)=>a+repairCost(x),0);
@@ -5995,6 +6006,8 @@ function resOrder(list){// 同じランク内で前提→派生の順に並べ�
   for(const t of list)if(!seen.has(t.id)){seen.add(t.id);out.push([t,1]);}
   return out;}
 function showResearch(){
+  // 開いたまま描き直すときは、カードと各列のスクロール位置を保つ（押すたびに一番上へ戻らないように）
+  let keep=null;if(S.overlay==='res'){const c0=document.getElementById('ovCard');if(c0){const rc=c0.querySelector('.rcols');keep={top:c0.scrollTop,cols:[...c0.querySelectorAll('.rcards')].map(x=>x.scrollTop),sx:rc?rc.scrollLeft:0,sy:rc?rc.scrollTop:0,tab:S.resTab};}}
   const slots=resSlots();
   if(!S.resTab)S.resTab='生産';
   const cat=S.resTab,L=treeLayout(cat);
@@ -6030,7 +6043,7 @@ function showResearch(){
   // 詳細
   const t=techOf(S.resSel),st=techState(t),r=S.research.find(x=>x.id===t.id),c=techCost(t),turns=r?r.total:techTurns(t);
   let act='';
-  if(st==='done')act='<span style="color:var(--green)">研究完了</span>';
+  if(st==='done')act=`<span style="color:var(--green);font-weight:bold">${ui('check','green',12)} 最大レベル（Lv${t.max||1}）・研究完了</span>`;
   else if(st==='active')act=`<span style="color:var(--cyan)">研究中 残り${r.left}ターン</span> <button data-cancel="${t.id}">中止（費用の半分を回収）</button>`;
   else if(st==='ready'){const need=techRes(t),rok=resBusy()+need<=resCap()&&S.pop>=need;const ok=canAfford(c)&&rok&&!S.waveActive;
     act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?(S.pop<need?'待機中の住民が足りません':'研究員が足りません（研究室を増やす・改築する）'):'資源が足りません'}</span>`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
@@ -6040,13 +6053,14 @@ function showResearch(){
   else if(!t.gate&&!rankOpen(cat,t.tier||1))act=`<span class="muted">ランク${RN[t.tier||1]}は未解放：<span style="color:var(--red)">城をLv${t.tier||1}</span>にすると研究できます</span>`;
   else act=`<span class="muted">前提：${(t.pre||[]).map(p=>`<span style="color:${has(p)?'var(--green)':'var(--red)'}">${techOf(p).name}${techOf(p).cat!==cat?`（${techOf(p).cat}）<button data-jump="${p}" style="padding:1px 8px">そこへ移動</button>`:''}</span>`).join('・')}${t.preSum?`${(t.pre||[]).length?'・':''}<span style="color:${preSumLv(t)>=t.preSum.n?'var(--green)':'var(--red)'}">${t.preSum.label}の合計Lv ${preSumLv(t)}/${t.preSum.n}</span>`:''}</span>`;
   const exo=t.excl?TECH.filter(o=>o.excl===t.excl&&o.id!==t.id).map(o=>o.name).join('・'):'';
-  h+=`<div class="tdet"><div class="tdl"><div><b class="tdn" style="color:${CAT_COLOR[cat]}">${t.name}</b><span class="tdlv">Lv ${lvl(t.id)}${lvl(t.id)<(t.max||1)?` → ${lvl(t.id)+1}`:''} ／ 最大 ${t.max||1}</span>${t.key?'<span style="color:var(--amber);margin-left:8px">重要</span>':''}</div>
+  h+=`<div class="tdet"><div class="tdl"><div><b class="tdn" style="color:${CAT_COLOR[cat]}">${t.name}</b><span class="tdlv">${lvl(t.id)>=(t.max||1)?`<b style="color:var(--green)">Lv ${lvl(t.id)}（最大）</b>`:`Lv ${lvl(t.id)} → ${lvl(t.id)+1} ／ 最大 ${t.max||1}`}</span>${t.key?'<span style="color:var(--amber);margin-left:8px">重要</span>':''}</div>
     <div class="tde">${t.eff}</div>${exo?`<div style="color:var(--amber);font-size:11px">分岐：「${exo}」とどちらか一方しか研究できません</div>`:''}</div>
     <div class="tdr">${act}</div></div>`;
   const card=openOverlay('res',h,true);
+  if(keep&&keep.tab===S.resTab){card.scrollTop=keep.top;card.querySelectorAll('.rcards').forEach((x,i)=>x.scrollTop=keep.cols[i]||0);const rc=card.querySelector('.rcols');if(rc){rc.scrollLeft=keep.sx;rc.scrollTop=keep.sy;}}
   document.getElementById('ovClose').onclick=closeOverlay;
   card.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{S.resTab=b.dataset.tab;S.resSel=null;showResearch();});
-  card.querySelectorAll('[data-node]').forEach(b=>b.onclick=()=>{S.resSel=b.dataset.node;const sc=[...card.querySelectorAll('.rcards')].map(x=>x.scrollTop),sx=card.querySelector('.rcols').scrollLeft;showResearch();card.querySelectorAll('.rcards').forEach((x,i)=>x.scrollTop=sc[i]||0);card.querySelector('.rcols').scrollLeft=sx;});
+  card.querySelectorAll('[data-node]').forEach(b=>b.onclick=()=>{S.resSel=b.dataset.node;showResearch();});
   card.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{startResearch(b.dataset.start);showResearch();renderResBox();});
   card.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{const tj=techOf(b.dataset.jump);S.resTab=tj.cat;S.resSel=tj.id;showResearch();const nd=card.querySelector(`[data-node="${tj.id}"]`);if(nd)nd.scrollIntoView({block:'nearest',inline:'center'});});
   card.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{cancelResearch(b.dataset.cancel);showResearch();renderResBox();});
@@ -6207,7 +6221,7 @@ function showIntro(){
   document.querySelectorAll('[data-tsk]').forEach(b=>b.onclick=()=>{setTasksOn(b.dataset.tsk==='1');upd();se('click');});
 }
 // ===== 初心者タスク（生産・防衛の目標）と画面の説明 =====
-(function(){const tg=document.getElementById('resTg');const ap=v=>{document.body.classList.toggle('resMin',v);tg.textContent=v?'全13 ▾':'▴ たたむ';};let v=true;try{const q=localStorage.getItem('nd_resmin');if(q!=null)v=q==='1';}catch(e){}ap(v);tg.onclick=()=>{v=!document.body.classList.contains('resMin');ap(v);try{localStorage.setItem('nd_resmin',v?'1':'0');}catch(e){}setTimeout(()=>{try{resizeView();}catch(e){}},0);};})();
+(function(){const tg=document.getElementById('resTg');const ap=v=>{document.body.classList.toggle('resMin',v);tg.textContent=v?'全13 ▾':'▴ たたむ';};let v=true;try{const q=localStorage.getItem('nd_resmin');if(q!=null)v=q==='1';}catch(e){}ap(v);tg.onclick=()=>{v=!document.body.classList.contains('resMin');ap(v);setTimeout(()=>{try{resizeView();}catch(e){}},0);try{localStorage.setItem('nd_resmin',v?'1':'0');}catch(e){}setTimeout(()=>{try{resizeView();}catch(e){}},0);};})();
 function tasksOn(){try{return localStorage.getItem('nd_tasks')!=='0';}catch(e){return true;}}
 function setTasksOn(v){try{localStorage.setItem('nd_tasks',v?'1':'0');}catch(e){}}
 function gCnt(type,lv){return S.blds.filter(b=>b.type===type&&ready(b)&&(b.lv||1)>=(lv||1)).length;}
