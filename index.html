@@ -2,10 +2,24 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+// 横持ちのスマホ（画面の低い辺が500px以下）で横幅が900pxを超えるときは、表示幅を900にしてスマホ用の画面にする
+(function(){function fit(){try{const m=document.querySelector('meta[name=viewport]');const a=screen.width,b=screen.height,lo=Math.min(a,b),hi=Math.max(a,b);
+  const land=matchMedia('(orientation: landscape)').matches;const want=(land&&lo<=500&&hi>880)?'width=880, viewport-fit=cover':'width=device-width, initial-scale=1, viewport-fit=cover';
+  if(m.getAttribute('content')!==want)m.setAttribute('content',want);}catch(e){}}
+  fit();addEventListener('orientationchange',()=>setTimeout(fit,50));addEventListener('resize',fit);})();
+</script>
 <title>ナイトディフェンス — シミュレーション型ディフェンスゲーム</title>
 <meta name="description" content="ナイトディフェンス：木材や石材、食料と住居を整え、兵士と防衛施設で夜ごとに押し寄せる魔物から街を守る、ドット絵のシミュレーション型ディフェンスゲーム。ブラウザですぐ遊べます。">
 <meta name="theme-color" content="#0b0f0c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ナイトディフェンス">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ナイトディフェンス — シミュレーション型ディフェンスゲーム">
 <meta property="og:description" content="街を育て、守りを固め、夜ごとの襲撃をしのぐドット絵のディフェンスゲーム。ブラウザですぐ遊べます。">
@@ -1101,6 +1115,55 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 }
 /* スマホ：仮置き＋十字キー */
 #mRep.dim{opacity:.55}
+#rotateMsg{display:none;position:fixed;inset:0;z-index:60;background:#0b0f0c;color:var(--text);flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center}
+body.needRotate #rotateMsg{display:flex}
+#rotateMsg .rph{width:56px;height:92px;border:4px solid var(--amber);border-radius:10px;position:relative;animation:rotPh 2.4s ease-in-out infinite}
+#rotateMsg .rph::after{content:'';position:absolute;left:50%;bottom:6px;width:12px;height:4px;margin-left:-6px;background:var(--amber);border-radius:2px}
+@keyframes rotPh{0%,25%{transform:rotate(0)}55%,100%{transform:rotate(-90deg)}}
+#rotateMsg b{font-family:var(--px-font);font-weight:400;font-size:18px;color:var(--amber)}
+#rotateMsg small{color:var(--dim);line-height:1.7;max-width:320px}
+#rotateMsg button{padding:8px 16px}
+/* ===== スマホ横持ち（body.land）：上は2行に圧縮、ボタンは右の縦一列、詳細は右から引き出す ===== */
+body.land{--rail:74px}
+body.land #topbar{flex-wrap:nowrap!important;min-height:0}
+body.land #resbar{height:32px!important;flex-wrap:nowrap!important;padding:0 6px!important}
+body.land:not(.resMin) #resbar{overflow-x:auto}
+body.land #resbar .res b{font-size:14px!important}
+body.land #resbar{justify-content:flex-start!important;flex:1 1 auto!important;min-width:0}
+body.land #resbar .res{margin-right:14px!important}
+body.land #wave{flex-shrink:0!important;white-space:nowrap}
+body.land #resTg{padding:2px 6px;font-size:11px}
+body.land #wave{order:2;flex-basis:auto!important;flex:0 0 auto;height:32px!important;border-top:none!important;border-left:1px solid var(--line);padding:0 8px!important}
+body.land #wave .daypips{display:none!important}
+body.land #wave .wvm{flex:0 0 auto!important}
+body.land #intel{min-height:32px!important}
+body.land #intel .iml{flex-direction:row!important;align-items:baseline;gap:8px}
+body.land.night #intel>.lbl{min-height:32px!important;flex-direction:row;align-items:center}
+body.land.night #intel .icell.remain{flex-direction:row!important;align-items:center;gap:10px;padding:0 8px}
+body.land.night #intel .icell.remain>small{display:none}
+body.land.night #intel .icell.remain .rr b{font-size:16px!important}
+body.land.night #intel .icell.remain .ebar{flex:1}
+body.land #left{margin-right:var(--rail)}
+body.land #controls{left:auto!important;right:0;top:0;bottom:0!important;width:var(--rail);height:auto!important;display:grid!important;grid-template-columns:1fr!important;grid-auto-rows:1fr;align-content:stretch;gap:4px;padding:4px!important;border-top:none!important;border-left:1px solid var(--line);padding-right:max(4px,env(safe-area-inset-right))!important;width:calc(var(--rail) + env(safe-area-inset-right))}
+body.land #controls>button,body.land #controls #more>summary{height:auto!important;min-height:0;flex-direction:column!important;font-size:11px!important;gap:2px;padding:2px!important}
+body.land #controls #more{min-height:0}body.land #controls #more>summary{height:100%!important}
+body.land #controls #bNext,body.land.night #controls>#bPause{font-size:13px!important;flex-direction:column!important;height:auto!important}
+body.land #controls .mic .pi{width:20px!important;height:20px!important}
+body.land #right{left:auto!important;right:var(--rail)!important;top:0!important;bottom:0!important;width:min(400px,60vw)!important;height:auto!important;transform:translateX(calc(100% + var(--rail)))!important;transition:transform .2s}
+body.land #right.open{transform:none!important}
+body.land #sheetHandle{display:none!important}
+body.land.sheetOpen #controls{grid-auto-rows:auto!important;align-content:start}
+body.land.sheetOpen #mBack{height:auto!important;min-height:72px;font-size:0!important;flex-direction:column!important}
+body.land.sheetOpen #mBack::after{content:'▶ 閉じる';font-size:13px;white-space:nowrap}
+body.land.sheetOpen #controls #bNext{min-height:72px}
+body.land .moreBody{left:auto!important;right:calc(var(--rail) + 6px)!important;bottom:6px!important;top:6px;width:300px!important;max-height:none!important}
+body.land #bpad{left:6px!important;right:auto!important;bottom:6px!important;width:min(420px,calc(100vw - var(--rail) - 12px))}
+body.land #bpad .bpX{grid-template-columns:repeat(3,38px);grid-template-rows:repeat(3,38px)}
+body.land #bpad .bpB button{height:40px}
+body.land #guide{max-width:min(330px,45vw)}
+body.land .plogo{width:min(240px,40%)!important}
+body.land #ovCard .tdesc{display:none}
+body.land #overlay .card{max-height:94vh;max-height:94dvh}
 #bpad{display:none}
 @media (max-width:900px){
   body.bpad #bpad{display:grid}
@@ -1214,6 +1277,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 </style>
 </head>
 <body>
+<div id="rotateMsg"><div class="rph"></div><b>スマホを横向きにしてください</b><small id="rotHint">このゲームは横持ちで遊ぶ画面になっています。</small><button id="rotFree" class="ghost">縦のまま遊ぶ</button></div>
 <div id="wrap">
   <div id="topbar">
     <div id="resbar"></div><button id="resTg" title="資源表示をたたむ／ひらく">全13 ▾</button>
@@ -1252,6 +1316,8 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
       <details id="more" class="more"><summary><span class="mic"></span><span class="mtx">表示・設定</span></summary><div class="moreBody">
       <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mSup">一括補給</button><button id="mHist">襲撃の記録</button><button id="mDex">モンスター図鑑</button><button id="mLog">通信ログ</button></div>
       <div class="mOnly mspeed"><span class="help">速度</span><div class="speed"><button data-spd="1">×1</button><button data-spd="2">×2</button><button data-spd="3">×3</button></div></div>
+      <button id="bOrient" style="display:none">画面の向き：横で固定</button>
+      <button id="bInstall2" style="display:none">ホーム画面に追加（アプリにする）</button>
       <button id="bLegend">地形の凡例 [L]</button>
       <button id="bFull">全画面 [Z]</button>
       <button id="bPanel" style="display:none">◀ パネル</button>
@@ -6073,26 +6139,28 @@ function pixelLogo(){const lines=['NIGHT','DEFENSE'],P=7,GAP=1,LG=3;const px=[];
   const nEnd=Math.round((W0-widthOf('NIGHT'))/2)+widthOf('NIGHT')+2;const mx=nEnd+3,my=1;
   const moon=[[1,0],[2,0],[3,0],[0,1],[1,1],[0,2],[0,3],[0,4],[1,4],[1,5],[2,5],[3,5]].map(([a,b])=>`<rect x="${(mx+a)*P}" y="${(my+b)*P}" width="${P}" height="${P}" fill="#d8e8ff"/>`).join('')+[[2,1],[1,2],[1,3],[2,4]].map(([a,b])=>`<rect x="${(mx+a)*P}" y="${(my+b)*P}" width="${P}" height="${P}" fill="#8aa8d8"/>`).join('');
   const stars=[[1,0.5],[W0+2,9],[-1,13],[W0-3,0]].map(([a,b])=>`<rect x="${a*P}" y="${b*P}" width="${P*0.5}" height="${P*0.5}" fill="#ffe8a8" opacity=".8"/>`).join('');
-  return `<svg viewBox="${-P*2} ${-P} ${(W+5)*P} ${(H+1)*P}" shape-rendering="crispEdges" style="width:min(460px,92%);height:auto;display:block;margin:4px auto 2px" xmlns="http://www.w3.org/2000/svg"><g fill="#3a0e08" opacity=".7">${sh}</g><g fill="#1c1210">${o}</g>${fg}${moon}${stars}</svg>`;}
+  return `<svg viewBox="${-P*2} ${-P} ${(W+5)*P} ${(H+1)*P}" shape-rendering="crispEdges" class="plogo" style="width:min(460px,92%);height:auto;display:block;margin:4px auto 2px" xmlns="http://www.w3.org/2000/svg"><g fill="#3a0e08" opacity=".7">${sh}</g><g fill="#1c1210">${o}</g>${fg}${moon}${stars}</svg>`;}
 // ===== タイトル画面 =====
 function showTitle(){const sv=saveInfo();
   const dt=sv?new Date(sv.date):null;const when=dt?`${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`:'';
   openOverlay('title',`<div style="text-align:center;padding:10px 6px 4px">
     ${pixelLogo()}
     <div style="color:#c8a070;letter-spacing:.08em;margin:4px 0 8px;font-size:13px">〜 ${GAME_SUB} 〜</div>
-    <div class="muted" style="font-size:12px;max-width:540px;margin:0 auto 16px;line-height:1.8">${GAME_DESC}</div>
+    <div class="muted tdesc" style="font-size:12px;max-width:540px;margin:0 auto 16px;line-height:1.8">${GAME_DESC}</div>
     <div style="display:flex;flex-direction:column;gap:8px;max-width:340px;margin:0 auto">
       ${sv?`<button id="tContinue" class="on" style="padding:10px;font-size:15px"><b>つづきから</b></button>`:''}
       <button id="tNew" ${sv?'':'class="on"'} style="padding:10px;font-size:15px"><b>はじめから</b></button>
       <button id="tHelp" style="padding:8px">遊び方</button>
       <button id="tCredit" style="padding:8px">クレジット</button>
+      ${isAppMode()?'':'<button id="tInstall" style="padding:8px">ホーム画面に追加（アプリにする）</button>'}
       <button id="tOld" style="padding:6px;font-size:12px" class="ghost">旧版（ver 0.9）で遊ぶ</button>
     </div>
-    <div class="muted" style="font-size:11px;margin-top:14px">ver ${GAME_VER}　・　PC推奨（スマホは簡易対応）　・　進行はブラウザに自動保存されます</div></div>`);
+    <div class="muted" style="font-size:11px;margin-top:14px">ver ${GAME_VER}　・　PC・スマホ（横持ち）で遊べます　・　進行はブラウザに自動保存されます</div></div>`);
   const c=document.getElementById('tContinue');if(c)c.onclick=()=>{closeOverlay();if(!loadGame())toast('セーブデータを読み込めませんでした','bad');};
   document.getElementById('tNew').onclick=()=>{if(sv&&!confirmNew())return;showIntro();};
   document.getElementById('tHelp').onclick=()=>showHelp(true);
   document.getElementById('tOld').onclick=()=>{location.href='v0.9/index.html';};
+  {const ti=document.getElementById('tInstall');if(ti)ti.onclick=()=>doInstall(true);}
   document.getElementById('tCredit').onclick=()=>openOverlay('title',`<h2>クレジット</h2><div style="line-height:1.9">${GAME_TITLE} — ${GAME_SUB}　ver ${GAME_VER}<br>企画・ゲームデザイン：ねぎらーめん<br>プログラム・ドット絵・効果音・音楽：Claude と共同制作<br><span class="muted">すべてのドット絵と音はこのゲームのために作られたものです</span></div><div style="margin-top:12px"><button id="crBack">タイトルへ</button></div>`)&&(document.getElementById('crBack').onclick=showTitle);}
 function confirmNew(){return true;}
 function showIntro(){
@@ -6170,7 +6238,7 @@ function renderGuide(){const el=document.getElementById('guide');const g=S&&S.gu
   const ovOn=document.getElementById('overlay').style.display&&document.getElementById('overlay').style.display!=='none';const show=g&&!g.hide&&!S.over&&!S.review&&!S.waveActive&&!ovOn;
   el.style.display=show?'block':'none';if(!show)return;gFix(g);
   const cv=document.getElementById('cv').getBoundingClientRect();
-  el.style.left=Math.max(6,cv.left+6)+'px';el.style.top='';{let bt=cv.bottom;if(isFull()||isNarrow()){const ct=document.getElementById('controls').getBoundingClientRect();if(ct.height)bt=Math.min(bt,ct.top-4);}if(isNarrow()){const sh=document.getElementById('sheetHandle').getBoundingClientRect();if(sh.height)bt=Math.min(bt,sh.top-4);}el.style.bottom=Math.max(6,innerHeight-bt+6)+'px';}
+  el.style.left=Math.max(6,cv.left+6)+'px';el.style.top='';{let bt=cv.bottom;if((isFull()||isNarrow())&&!isLand()){const ct=document.getElementById('controls').getBoundingClientRect();if(ct.height)bt=Math.min(bt,ct.top-4);}if(isNarrow()){const sh=document.getElementById('sheetHandle').getBoundingClientRect();if(sh.height)bt=Math.min(bt,sh.top-4);}el.style.bottom=Math.max(6,innerHeight-bt+6)+'px';}
   const steps=GUIDE[g.tab].steps;let key=(g.min?'m':'')+g.tab+g.open+JSON.stringify(g.done);
   for(const st of steps){try{key+=','+gProg(st);}catch(e){}}
   if(key===guideKey)return;guideKey=key;
@@ -6537,6 +6605,43 @@ document.addEventListener('click',ev=>{if(ev.target.closest&&ev.target.closest('
 
 // ===== スマホ用シート =====
 function isNarrow(){return innerWidth<=900;}
+// ===== 画面の向き：スマホは横で固定（できる端末だけ）。固定できないときは「横にしてください」 =====
+function isPhone(){return IS_TOUCH&&Math.min(screen.width,screen.height)<=500;}
+function isAppMode(){try{return matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches||navigator.standalone===true;}catch(e){return false;}}
+function orientPref(){try{return localStorage.getItem('nd_orient')||'land';}catch(e){return 'land';}}
+function setOrientPref(v){try{localStorage.setItem('nd_orient',v);}catch(e){}orientCheck();
+  try{const so=screen.orientation;if(v==='land')tryLockLand();else if(so){if(isAppMode()&&so.lock)so.lock('any').catch(()=>{});else if(so.unlock)so.unlock();}}catch(e){}}
+function orientCheck(){const need=isPhone()&&orientPref()==='land'&&innerHeight>innerWidth;document.body.classList.toggle('needRotate',need);
+  const bo=document.getElementById('bOrient');if(bo){bo.style.display=isPhone()?'':'none';setText(bo,orientPref()==='land'?'画面の向き：横で固定（タップで自由に）':'画面の向き：自由（タップで横に固定）');}
+  const bi=document.getElementById('bInstall2');if(bi)bi.style.display=isAppMode()?'none':'';}
+let lockTried=false;
+function tryLockLand(){if(!isPhone()||orientPref()!=='land')return;const so=screen.orientation;if(!so||!so.lock)return;
+  const go=()=>so.lock('landscape').catch(()=>{});
+  if(isAppMode()||document.fullscreenElement){go();return;}
+  const de=document.documentElement;if(de.requestFullscreen){try{de.requestFullscreen({navigationUI:'hide'}).then(go).catch(()=>{});}catch(e){}}}
+document.addEventListener('pointerdown',ev=>{if(ev.target.closest&&ev.target.closest('#rotFree,#bOrient'))return;if(!lockTried||document.body.classList.contains('needRotate')){lockTried=true;tryLockLand();}},true);
+document.getElementById('rotFree').onclick=()=>setOrientPref('free');
+document.getElementById('bOrient').onclick=()=>{document.getElementById('more').open=false;setOrientPref(orientPref()==='land'?'free':'land');};
+addEventListener('resize',orientCheck);addEventListener('orientationchange',()=>setTimeout(orientCheck,100));
+{const IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ if(IOS)setText(document.getElementById('rotHint'),'iPhoneは画面の向きを固定できないため、横に回してください（コントロールセンターの「画面縦向きのロック」はオフに）。');}
+// ===== アプリ化（ホーム画面に追加） =====
+let installEv=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEv=e;});
+addEventListener('appinstalled',()=>{installEv=null;toast('ホーム画面に追加しました','good');orientCheck();});
+function doInstall(fromTitle){
+  if(installEv){installEv.prompt();installEv.userChoice.finally(()=>{installEv=null;});return;}
+  const IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  openOverlay(fromTitle?'title':'help',`<h2>ホーム画面に追加</h2><div style="line-height:1.9">
+    ${IOS?'<b>iPhone・iPad（Safari）</b><br>① 画面下の <b>共有ボタン</b>（□に↑）を押す<br>② <b>「ホーム画面に追加」</b>を選ぶ<br>③ 右上の「追加」を押す':'<b>Android（Chrome）</b><br>① 右上の <b>︙</b>（メニュー）を押す<br>② <b>「アプリをインストール」</b>または<b>「ホーム画面に追加」</b>を選ぶ'}
+    <div class="muted" style="font-size:12px;margin-top:8px">ホーム画面のアイコンから開くと、アドレスバーのない全画面で遊べます${IOS?'':'（横向きで固定）'}。セーブはブラウザで遊んだものと共通です${IOS?'（iPhoneでは、ブラウザとアプリでセーブが別になることがあります）':''}。</div></div>
+    <div style="margin-top:12px"><button id="insBack">${fromTitle?'タイトルへ':'閉じる'}</button></div>`);
+  document.getElementById('insBack').onclick=()=>{if(fromTitle)showTitle();else closeOverlay();};}
+document.getElementById('bInstall2').onclick=()=>{document.getElementById('more').open=false;doInstall(false);};
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+setTimeout(orientCheck,0);
+// スマホ横持ち：スマホ用の画面で、横長かつ高さが低いとき
+function isLand(){return isNarrow()&&innerWidth>innerHeight&&innerHeight<=520;}
 // スマホでは空いている高さに合わせて地図の表示範囲を縦に伸ばす
 function isFull(){return document.body.classList.contains('fullmap');}
 function resizeView(){
@@ -6557,7 +6662,11 @@ function resizeView(){
     const w=Math.max(300,cv.getBoundingClientRect().width||document.getElementById('left').clientWidth);const avail=Math.max(200,innerHeight-used);
     vh=Math.round(Math.max(12*TU,Math.min(40*TU,VW*avail/w)));
   }
-  if(isNarrow()){
+  document.body.classList.toggle('land',isLand());
+  if(isLand()){
+    const r=cv.getBoundingClientRect();const used=document.getElementById('topbar').offsetHeight+document.getElementById('intel').offsetHeight+2;
+    const h=Math.max(160,innerHeight-used);vh=Math.round(Math.max(6*TU,Math.min(60*TU,VW*h/Math.max(1,r.width))));
+  }else if(isNarrow()){
     const r=cv.getBoundingClientRect();const used=document.getElementById('topbar').offsetHeight+document.getElementById('intel').offsetHeight+document.getElementById('controls').offsetHeight+document.getElementById('sheetHandle').offsetHeight+18;
     const h=Math.max(240,innerHeight-used);vh=Math.round(Math.max(10*TU,Math.min(60*TU,VW*h/Math.max(1,r.width))));
   }
@@ -6662,7 +6771,7 @@ function toggleFull(on){
 }
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&isFull())toggleFull(false);});
 function togglePanel(){const r=document.getElementById('right');r.classList.toggle('open');setText(document.getElementById('bPanel'),r.classList.contains('open')?'パネル ▶':'◀ パネル');}
-function openSheet(){if(isFull()&&!isNarrow()){const r=document.getElementById('right');if(!r.classList.contains('open'))togglePanel();return;}if(isNarrow()){document.getElementById('right').classList.add('open');setText(document.getElementById('sheetLbl'),'▼ 閉じる');}}
+function openSheet(){if(isFull()&&!isNarrow()){const r=document.getElementById('right');if(!r.classList.contains('open'))togglePanel();return;}if(isNarrow()){document.getElementById('right').classList.add('open');setText(document.getElementById('sheetLbl'),'▼ 閉じる');if((S.sel||S.selTile||S.heroView)&&!S.buildMode&&!S.buildPick&&typeof setRT==='function')setRT('info');}}
 document.getElementById('bFull').onclick=()=>toggleFull();
 new MutationObserver(()=>{const o=document.getElementById('right').classList.contains('open');document.body.classList.toggle('sheetOpen',o);}).observe(document.getElementById('right'),{attributes:true,attributeFilter:['class']});
 document.getElementById('mBack').onclick=()=>{document.getElementById('right').classList.remove('open');setText(document.getElementById('sheetLbl'),'▲ 詳細・建設');};
