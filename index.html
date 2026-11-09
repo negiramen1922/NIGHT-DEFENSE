@@ -1100,6 +1100,7 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
   #controls>#bBuild.on{background:#2a2412;box-shadow:0 0 0 2px var(--amber);color:var(--amber)}
 }
 /* スマホ：仮置き＋十字キー */
+#mRep.dim{opacity:.55}
 #bpad{display:none}
 @media (max-width:900px){
   body.bpad #bpad{display:grid}
@@ -1343,6 +1344,7 @@ function happyTarget(){return Math.max(0,Math.min(100,happyParts().reduce((a,p)=
 function happyMul(){const h=S.happy;return h>=75?1.15:h>=55?1:h>=35?0.85:0.7;}
 function happyName(){const h=S.happy;return h>=75?'上機嫌':h>=55?'ふつう':h>=35?'不満':'暴動寸前';}   // 住民1人あたりの食料消費（毎秒）
 const HQ_GOLD=12;   // 城館の収入（毎ターン）
+const WAVE_LEAD=3;   // 敵を全滅させてから次の波が来るまでの秒数
 const FINAL_WAVE_BASE=10, FIRST_PREP=10, NEXT_PREP=4, TURN_SEC=10;
 function maxCmd(){return 2+2*((S&&S.baseLv)||1);}
 const BASE_MAX=5;
@@ -2798,7 +2800,8 @@ function repairAllCost(){let n=0,c=0;for(const b of S.blds)if(damaged(b)){n++;c+
 function repairAll(){if(S.waveActive){se('error');toast('戦闘中は修理できない（昼に修理しよう）','warn');return;}
   const list=S.blds.filter(damaged).sort((a,b)=>(b.type==='hq')-(a.type==='hq')||(gunOf(b)?1:0)-(gunOf(a)?1:0)||a.hp/a.maxhp-b.hp/b.maxhp);
   let n=0,c=0;for(const b of list){const k=repairCost(b);if(repair(b,true)){n++;c+=k;}}
-  if(n){se('upgrade');log(`一括修理：${n}棟（木材${c}）`,'good');}else se('error');
+  if(n){se('upgrade');log(`一括修理：${n}棟（木材${c}）`,'good');toast(`一括修理：${n}棟（木材${c}）`,'good');}
+  else{se('error');toast(list.length?'木材が足りず、修理できません':'修理が必要な施設はありません','warn');}
   renderInfo(true);
 }
 function mineAt(x,y){return S.mines.find(m=>x>=m.x&&x<m.x+U&&y>=m.y&&y<m.y+U);}
@@ -3801,6 +3804,10 @@ function update(dt,sim){
   if(S.waveActive){
     S.waveT+=dt;const q=S.cur.q;
     while(S.qi<q.length&&q[S.qi].t<=S.waveT){const en=q[S.qi];if((en.sub||0)>(S.subShown??-1)){S.subShown=en.sub;if(S.cur.subs&&S.cur.subs.length>1){log(`${['第一','第二','第三','第四'][en.sub]}波 接近（${S.cur.subs[en.sub]}体）`,'warn');toast(`⚠ ${['第一','第二','第三','第四'][en.sub]}波 接近！（${S.cur.subs[en.sub]}体）`,'wave',4500);se('alarm');}}spawnEnemy(en);S.qi++;}
+    // 想定より早く敵を全滅させたら、次の波を前倒しで呼ぶ（待ち時間をなくす）
+    if(S.qi<q.length&&S.enemies.length===0){const gap=q[S.qi].t-S.waveT;
+      if(gap>WAVE_LEAD+0.5){const sh=gap-WAVE_LEAD;for(let i=S.qi;i<q.length;i++)q[i].t-=sh;
+        if((q[S.qi].sub||0)>(S.subShown??-1)){const nm=['第一','第二','第三','第四'][q[S.qi].sub]||'次';log(`敵を全滅させた — ${nm}波がまもなく来る`,'good');}}}
     if(S.qi>=q.length&&S.enemies.length===0){
       S.waveActive=false;se('clear');auMusicFor();
       log(`第${S.wave}襲撃 撃退（撃破${S.waveKills}）`,'good');
@@ -5312,7 +5319,7 @@ function showLegend(){
   openOverlay('legend',h,true);document.getElementById('lgClose').onclick=closeOverlay;
 }
 document.querySelectorAll('.speed [data-spd]').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.spd;se('click');renderPauseUI();});
-{const px=(id,t)=>{const e=document.getElementById(id);if(e)e.onclick=()=>{document.getElementById('more').open=false;document.getElementById(t).click();};};px('mRep','bRepAll');px('mSup','bSupAll');px('mHist','bHist');px('mDex','bDex');
+{const px=(id,t)=>{const e=document.getElementById(id);if(e)e.onclick=()=>{document.getElementById('more').open=false;const b=document.getElementById(t);if(b.onclick)b.onclick();else b.click();};};px('mRep','bRepAll');px('mSup','bSupAll');px('mHist','bHist');px('mDex','bDex');
  document.getElementById('mLog').onclick=()=>{document.getElementById('more').open=false;openOverlay('log',`<h2>通信ログ<button id="ovClose" style="float:right">閉じる</button></h2><div class="logfull">${document.getElementById('log').innerHTML}</div>`,false);document.getElementById('ovClose').onclick=closeOverlay;};
  const mic=(id,n)=>{const e=document.querySelector('#'+id+' .mic');if(e)e.innerHTML=ui(n,'light',24);};PXICON.ui.icons.build=PXICON.ui.icons.build||["............","...xxxxx....","..xxxxxxxx..","..xxxxxxxx..","...xxxxx....","......xx....",".....xx.....","....xx......","...xx.......","..xx........",".xx.........","............"];mic('bBuild','build');mic('bRes','research');mic('bArmy','army');mic('bHire','hire');document.querySelector('#more .mic').innerHTML=ui('menu','light',24)+ui('gear','light',12);
  document.querySelector('.logbox .lgic').innerHTML=ui('log','amber',12);document.querySelector('#mExit .xic').innerHTML=ui('close','dim',12);}
@@ -5802,6 +5809,7 @@ function renderTop(){
   bn.classList.toggle('last',!S.waveActive&&S.phase!=='night'&&S.turnsLeft===1);renderPauseUI();
   {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,sq.length?`一括補給 ${sq.length}部隊（${supCostText(supCost(sq))}）<kbd>N</kbd>`:'一括補給');const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
   const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${ra2.n}棟（${ic('steel',12)}${ra2.c}）<kbd>X</kbd>`:'一括修理');const dA=!ra2.n||S.steel<1||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
+  {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${ra2.n}棟（木材${ra2.c}）`:'一括修理');mr.classList.toggle('dim',dA);}}
   const bnv=document.getElementById('bNaval');bnv.style.display=has('naval')?'':'none';setText(bnv,S.aimNaval?'目標を指定…（Escで取消）':`艦砲射撃 残り${S.waveActive?S.navalLeft:(has('navalre')?2:1)} [V]`);
   {const dn=!S.waveActive||S.navalLeft<=0;if(bnv.disabled!==dn)bnv.disabled=dn;bnv.classList.toggle('on',!!S.aimNaval);}
 
