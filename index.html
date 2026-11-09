@@ -1170,6 +1170,10 @@ body.land.sheetOpen #wrap #controls>#mBack,body.land.sheetOpen #wrap #controls>#
 body.land.sheetOpen.night #wrap #controls>#bBuild,body.land.sheetOpen.qnight #wrap #controls>#bBuild{display:none!important}
 body.land.sheetOpen #mBack{order:-1;height:auto!important;font-size:0!important;flex-direction:column!important;background:#2a2412;box-shadow:0 0 0 2px var(--amber)}
 body.land.sheetOpen #mBack::after{content:'▶ 閉じる';font-size:12px;white-space:nowrap;color:var(--amber)}
+body.land #rtabs{display:none!important}
+body.land #right{padding-top:6px!important}
+body.land:not(.sheetOpen) #controls>#bInfoTab{display:none!important}
+body.land.sheetOpen.hasSel #wrap #controls>#bInfoTab{display:flex!important}
 body.land.sheetOpen #controls>button.tabOn{background:#1e2a20;box-shadow:inset 3px 0 0 var(--amber);color:var(--amber)}
 body.land .moreBody{left:auto!important;right:calc(var(--rail) + 6px)!important;bottom:6px!important;top:6px;width:300px!important;max-height:none!important}
 body.land #bpad{left:6px!important;right:auto!important;bottom:6px!important;width:min(420px,calc(100vw - var(--rail) - 12px))}
@@ -1316,6 +1320,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
       <button id="bNext" class="on"></button>
       <button id="bPause" class="nOnly"></button>
       <span class="sep dOnly"></span>
+      <button id="bInfoTab" class="sp-main lOnly" data-rtb="info"><span class="mic"></span><span>選択中</span></button>
       <button id="bBuild" class="sp-main" data-rtb="build"><span class="mic"></span><span>建設</span></button>
       <button id="bTown" class="sp-main lOnly" data-rtb="econ"><span class="mic"></span><span>街</span></button>
       <button id="bArmyTab" class="sp-main lOnly" data-rtb="army"><span class="mic"></span><span>部隊</span></button>
@@ -5407,7 +5412,8 @@ document.querySelectorAll('.speed [data-spd]').forEach(b=>b.onclick=()=>{S.speed
  document.getElementById('mLog').onclick=()=>{document.getElementById('more').open=false;openOverlay('log',`<h2>通信ログ<button id="ovClose" style="float:right">閉じる</button></h2><div class="logfull">${document.getElementById('log').innerHTML}</div>`,false);document.getElementById('ovClose').onclick=closeOverlay;};
  const mic=(id,n)=>{const e=document.querySelector('#'+id+' .mic');if(e)e.innerHTML=ui(n,'light',24);};PXICON.ui.icons.build=PXICON.ui.icons.build||["............","...xxxxx....","..xxxxxxxx..","..xxxxxxxx..","...xxxxx....","......xx....",".....xx.....","....xx......","...xx.......","..xx........",".xx.........","............"];PXICON.ui.icons.town=PXICON.ui.icons.town||["............",".....xx.....","....xxxx....","...xxxxxx...","..xxxxxxxx..",".xxxxxxxxxx.","..xxxxxxxx..","..xx.xx.xx..","..xx.xx.xx..","..xxxxxxxx..","..xxxxxxxx..","............"];
 PXICON.ui.icons.crown=PXICON.ui.icons.crown||["............","............",".x...x...x..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..","............","............","............"];
-mic('bBuild','build');mic('bTown','town');mic('bArmyTab','army');mic('bHero','crown');mic('bRes','research');mic('bArmy','army');mic('bHire','hire');document.querySelector('#more .mic').innerHTML=ui('menu','light',24)+ui('gear','light',12);
+PXICON.ui.icons.target=PXICON.ui.icons.target||["............","....xxxx....","..xx....xx..","..x......x..",".x...xx...x.",".x..xxxx..x.",".x..xxxx..x.",".x...xx...x.","..x......x..","..xx....xx..","....xxxx....","............"];
+mic('bInfoTab','target');mic('bBuild','build');mic('bTown','town');mic('bArmyTab','army');mic('bHero','crown');mic('bRes','research');mic('bArmy','army');mic('bHire','hire');document.querySelector('#more .mic').innerHTML=ui('menu','light',24)+ui('gear','light',12);
  document.querySelector('.logbox .lgic').innerHTML=ui('log','amber',12);document.querySelector('#mExit .xic').innerHTML=ui('close','dim',12);}
 document.getElementById('bNext').onclick=endTurn;
 document.getElementById('bRes').onclick=showResearch;
@@ -5577,7 +5583,7 @@ function detailsify(root){let st={};try{st=JSON.parse(localStorage.getItem('nd_i
     const sm=document.createElement('summary');sm.innerHTML=`<span class="st">${title}</span><span class="sv">${svHTML}</span>`;
     const body=document.createElement('div');body.className='sb';while(u.firstChild)body.appendChild(u.firstChild);
     d.append(sm,body);d.addEventListener('toggle',()=>{st[key]=d.open;try{localStorage.setItem('nd_info_open',JSON.stringify(st));}catch(e){}});u.replaceWith(d);});}
-function renderInfo(force){
+function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel||S.selTile||S.heroView||(S.multi&&S.multi.length)));
   const el=document.getElementById('infoBody');const o=S.sel;
   if(o)S.heroView=null;
   if(!o&&S.heroView){const c=S.cmds.find(x=>x.id===S.heroView&&x.alive);if(c){const key='hv'+c.id+c.lv+Math.floor(c.xp)+c.assign+c.kills;if(!force&&key===lastInfoKey)return;lastInfoKey=key;el.innerHTML=heroDetail(c);const hc=document.getElementById('hvClose');if(hc)hc.onclick=closeHeroView;const g=document.getElementById('hvGo');if(g)g.onclick=()=>{const t=findObj(c.assign);if(t){S.sel=t;renderInfo(true);}};return;}S.heroView=null;}
@@ -6754,6 +6760,7 @@ document.querySelectorAll('#bpad .bpX button').forEach(b=>{const [dx,dy]=b.datas
 setInterval(()=>{try{if(S&&bGhost)renderPad();}catch(e){}},400);
 function openTab(t){openSheet();setRT(t);}
 document.getElementById('bTown').onclick=()=>openTab('econ');
+document.getElementById('bInfoTab').onclick=()=>openTab('info');
 document.getElementById('bArmyTab').onclick=()=>openTab('army');
 document.getElementById('bHero').onclick=()=>openTab('res');
 document.getElementById('bBuild').onclick=()=>{if(!S||S.waveActive||S.phase==='night'){se('error');return;}
