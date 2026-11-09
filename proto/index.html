@@ -1115,6 +1115,15 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 }
 /* スマホ：仮置き＋十字キー */
 #mRep.dim{opacity:.55}
+#controls>#bHire,#controls>#bHero{display:none!important}
+.asubs{display:flex;gap:0;margin:0 0 8px;box-shadow:0 0 0 1px var(--line)}
+.asubs button{flex:1;padding:6px 2px;font-size:12px;border:none;box-shadow:none;border-right:1px solid var(--line);background:transparent}
+.asubs button:last-child{border-right:none}
+.asubs button.on{background:#2a2412;color:var(--amber);box-shadow:inset 0 -2px 0 var(--amber)}
+.asubs .tcnt{margin-left:4px;font-size:10px;color:var(--dim)}
+#armyBox .cands{grid-template-columns:1fr!important}
+#armyBox [data-train]{min-width:0!important;width:100%}
+@media (max-width:900px){body:not(.sheetOpen) #controls{grid-template-columns:1.4fr repeat(4,1fr)!important}}
 /* 夜（静かな夜・襲撃中）に使えない機能は灰色に */
 body.night #controls>#bBuild,body.qnight #controls>#bBuild{opacity:.38;filter:grayscale(1)}
 body.night #build .bg button,body.qnight #build .bg button{opacity:.38;filter:grayscale(1)}
@@ -1174,6 +1183,7 @@ body.land #controls #bNext,body.land.night #controls>#bPause{font-size:13px!impo
 body.land #controls .mic .pi{width:20px!important;height:20px!important}
 body.land #right{left:auto!important;right:var(--rail)!important;top:0!important;bottom:0!important;width:min(400px,60vw)!important;height:auto!important;transform:translateX(calc(100% + var(--rail)))!important;transition:transform .2s}
 body.land #right.open{transform:none!important}
+body.land #right{z-index:10!important}
 body.land #sheetHandle{display:none!important}
 /* 右列：横持ちだけのボタン（街・部隊＝軍タブ・英雄）。雇用は軍タブの中へ */
 .lOnly{display:none!important}
@@ -1183,7 +1193,7 @@ body.land:not(.night) #wrap #controls>#bSpd{display:none!important}
 body.land #controls>#bSpd.fast{color:var(--amber);box-shadow:inset 0 0 0 2px var(--amber)}
 /* パネルを開いている間：夜へは隠し、いちばん上に「閉じる」。タブのボタンはそのまま（今のタブを光らせる） */
 body.land.sheetOpen #controls>*{display:none!important}
-body.land.sheetOpen #wrap #controls>#mBack,body.land.sheetOpen #wrap #controls>#bBuild,body.land.sheetOpen #wrap #controls>#bTown,body.land.sheetOpen #wrap #controls>#bArmyTab,body.land.sheetOpen #wrap #controls>#bRes,body.land.sheetOpen #wrap #controls>#bHero{display:flex!important}
+body.land.sheetOpen #wrap #controls>#mBack,body.land.sheetOpen #wrap #controls>#bBuild,body.land.sheetOpen #wrap #controls>#bTown,body.land.sheetOpen #wrap #controls>#bArmyTab,body.land.sheetOpen #wrap #controls>#bRes{display:flex!important}
 
 body.land.sheetOpen #wrap #controls>#mBack{grid-row:span 2;align-self:stretch;height:auto!important;min-height:0;max-height:none}
 body.land.sheetOpen #mBack{order:-1;height:auto!important;font-size:0!important;flex-direction:column!important;background:#2a2412;box-shadow:0 0 0 2px var(--amber)}
@@ -1342,8 +1352,8 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
       <button id="bInfoTab" class="sp-main lOnly" data-rtb="info"><span class="mic"></span><span>選択中</span></button>
       <button id="bBuild" class="sp-main" data-rtb="build"><span class="mic"></span><span>建設</span></button>
       <button id="bRes" class="sp-main"><span class="mic"></span><span>研究</span><kbd>R</kbd></button>
-      <button id="bArmyTab" class="sp-main lOnly" data-rtb="army"><span class="mic"></span><span>軍</span></button>
-      <button id="bArmy" class="sp-main"><span class="mic"></span><span>部隊</span><kbd>K</kbd></button>
+      <button id="bArmyTab" class="sp-main lOnly" data-rtb="army"><span class="mic"></span><span>軍事</span></button>
+      <button id="bArmy" class="sp-main"><span class="mic"></span><span>軍事</span><kbd>K</kbd></button>
       <button id="bHire" class="sp-main"><span class="mic"></span><span>雇用</span><kbd>J</kbd></button>
       <button id="bHero" class="sp-main lOnly" data-rtb="hero"><span class="mic"></span><span>英雄</span></button>
       <button id="bTown" class="sp-main lOnly" data-rtb="econ"><span class="mic"></span><span>街</span></button>
@@ -1379,16 +1389,15 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
   <div id="right">
     <div id="sheetHandle"><span id="sheetSel"></span><span id="sheetLbl">▲ 詳細・建設</span></div>
     <div class="box" id="info"><h3>選択中</h3><div id="infoBody" class="muted">施設か部隊をクリック</div></div>
-    <div id="rtabs"><button data-rt="info" class="tabInfo">選択中</button><button data-rt="build" class="on">建設</button><button data-rt="res">研究</button><button data-rt="army">軍</button><button data-rt="hero">英雄</button><button data-rt="econ">街</button></div>
+    <div id="rtabs"><button data-rt="info" class="tabInfo">選択中</button><button data-rt="build" class="on">建設</button><button data-rt="res">研究</button><button data-rt="army">軍事</button><button data-rt="econ">街</button></div>
     <div class="box" data-rt="econ" style="display:none"><h3>街の状況</h3><div id="econ"></div></div>
     <div class="box" data-rt="build"><h3>建設</h3><div id="facCapBox"></div><div id="build"></div></div>
-    <div class="box" data-rt="army" style="display:none"><h3>軍</h3><div id="armyBox"></div></div>
+    <div class="box" data-rt="army" style="display:none"><h3>軍事</h3><div id="armySubs" class="asubs"></div><div id="armyBox"></div></div>
     <div class="box" data-rt="res" style="display:none"><h3>研究</h3><div id="resBox"></div></div>
-    <div class="box" data-rt="hero" style="display:none"><h3>英雄</h3><div id="cmds"></div><button id="bHire2" style="width:100%;margin-top:2px">英雄を雇う</button></div>
   </div>
   </div>
 </div>
-<div id="guide"></div><div id="reviewBar"><span>振り返り中：研究 [R]・部隊 [K] などで最後の状態を見られます</span><button id="rvBack" class="primary">結果に戻る</button></div><div id="coach"><div id="coachHole"></div><div id="coachBox"></div></div>
+<div id="guide"></div><div id="reviewBar"><span>振り返り中：研究 [R]・軍事 [K] などで最後の状態を見られます</span><button id="rvBack" class="primary">結果に戻る</button></div><div id="coach"><div id="coachHole"></div><div id="coachBox"></div></div>
 <div id="overlay"><div class="card" id="ovCard"></div></div>
 
 <script>
@@ -4220,7 +4229,7 @@ const TUT_STEPS=[
   ['伐採所か石切り場を建てる（建て直しでも可）',()=>S.blds.filter(b=>b.type==='miner'||b.type==='quarry').length>=2],
   ['篝火を置いて、柵の外を照らす',()=>S.blds.some(b=>b.type==='brazier')],
   ['研究を1つ始める（研究 [R]）',()=>S.research.length>0||Object.keys(S.tech).length>0],
-  ['兵舎で兵士か弓兵を訓練する（部隊 [K]）',()=>S.squads.some(q=>q.ut!=='mil'&&q.ut!=='guard')],
+  ['兵舎で兵士か弓兵を訓練する（軍事 [K] の「訓練」）',()=>S.squads.some(q=>q.ut!=='mil'&&q.ut!=='guard')],
   ['「夜へ」で準備を終え、最初の襲撃を迎え撃つ',()=>S.wave>=1],
 ];
 function tutHTML(){return '';let h='<div class="upg" style="border-color:#c8a070;margin-bottom:6px"><b style="color:#e8c070">手引き</b>';for(const [txt,f] of TUT_STEPS){let ok=false;try{ok=f();}catch(e){}h+=`<div style="font-size:12px;${ok?'color:var(--green)':''}">${ok?ui('check','green',12):'□'} ${txt}</div>`;}return h+'</div>';}
@@ -4711,7 +4720,7 @@ function draw(){
     ctx.fillStyle='#000d';ctx.fillRect(sx,sy,tw,th);L.forEach((l,k)=>{ctx.font=(k?'':'bold ')+'11px sans-serif';ctx.fillStyle=l[1]||'#cfe3cf';ctx.fillText(l[0],sx+7,sy+14+k*15);});ctx.textAlign='center';}}
   if(S.skirm){const c=campById(S.skirm.id);if(c){const n=S.enemies.filter(e=>e.camp===c.id&&e.hp>0).length;const tx=`⚔ ${campName(c)}と交戦中　残り${n}体　（部隊が駐留地から${CAMP_LEASH*U}マスより離れると、魔物は陣へ戻る）`;
     ctx.font='bold 12px sans-serif';ctx.textAlign='center';const w=ctx.measureText(tx).width+20;ctx.fillStyle='rgba(40,6,4,.85)';ctx.fillRect(VW/2-w/2,VH-58,w,22);ctx.fillStyle='#ff9a86';ctx.fillText(tx,VW/2,VH-43);}}
-  if(S.over&&S.review){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,VW,40);ctx.fillStyle='#f2b33d';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText('振り返り中 — 研究 [R]・部隊 [K] などで最後の状態を見られます。襲撃ごとの記録は「記録」ボタン',VW/2,25);}
+  if(S.over&&S.review){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,VW,40);ctx.fillStyle='#f2b33d';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText('振り返り中 — 研究 [R]・軍事 [K] などで最後の状態を見られます。襲撃ごとの記録は「記録」ボタン',VW/2,25);}
   if(S.paused&&!S.over){ctx.fillStyle='rgba(0,0,0,.22)';ctx.fillRect(0,0,VW,VH);}
 }
 // 施設の描画（稼働アニメーション付き）
@@ -5342,9 +5351,9 @@ document.addEventListener('keydown',ev=>{
   if(ev.key==='Escape'){if(['res','hire','army','retry','legend','dex'].includes(S.overlay)){closeOverlay();return;}if(S.buildMode||S.buildPick){exitBuild();return;}S.multi=[];S.sel=null;S.selTile=null;renderBuild();renderInfo(true);}
   if(ev.key==='Tab'&&!S.overlay){ev.preventDefault();if(S.buildMode||S.buildPick)exitBuild();else enterBuild(S.lastBuild||null);return;}
   if(ev.key==='r'||ev.key==='R'){if(S.overlay==='res')closeOverlay();else if(!S.overlay)showResearch();return;}
-  if(ev.key==='k'||ev.key==='K'){if(S.overlay==='army')closeOverlay();else if(!S.overlay)showArmy();return;}
+  if(ev.key==='k'||ev.key==='K'){if(!S.overlay)openArmyTab(null,true);return;}
   if(ev.key==='e'||ev.key==='E'){if(S.overlay==='dex')closeOverlay();else if(!S.overlay)showDex();return;}
-  if(ev.key==='j'||ev.key==='J'){if(S.overlay==='hire')closeOverlay();else if(!S.overlay)showHire();return;}
+  if(ev.key==='j'||ev.key==='J'){if(!S.overlay)openArmyTab('hero');return;}
   if(S.overlay==='report'&&(ev.key==='Enter'||ev.key==='Escape'||ev.code==='Space')){ev.preventDefault();closeOverlay();return;}
   if(S.overlay==='confirm'&&ev.key==='Escape'){closeOverlay();return;}
   if(S.overlay==='night'&&ev.key==='Enter'){ev.preventDefault();closeOverlay();morning();return;}
@@ -5438,15 +5447,14 @@ mic('bInfoTab','target');mic('bSpd','play');mic('bBuild','build');mic('bTown','t
  document.querySelector('.logbox .lgic').innerHTML=ui('log','amber',12);document.querySelector('#mExit .xic').innerHTML=ui('close','dim',12);}
 document.getElementById('bNext').onclick=endTurn;
 document.getElementById('bRes').onclick=showResearch;
-document.getElementById('bHire').onclick=showHire;
-document.getElementById('bArmy').onclick=()=>showArmy();
-function setRT(t){if(t==='info'&&!isNarrow())t='build';document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyBox(true);if(t==='hero')try{renderCmds(true);}catch(e){}for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
+document.getElementById('bHire').onclick=()=>openArmyTab('hero');
+document.getElementById('bArmy').onclick=()=>openArmyTab('list',true);
+function setRT(t){if(t==='info'&&!isNarrow())t='build';document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
 document.getElementById('bRepAll').onclick=repairAll;document.getElementById('bSupAll').onclick=supplyAll;
 document.getElementById('bHelp').onclick=()=>{if(!S.overlay)showHelp(false);};
 document.getElementById('bNaval').onclick=toggleNaval;
-document.getElementById('bHire2').onclick=showHire;
 document.getElementById('bMute').onclick=auToggle;
 document.getElementById('vBgm').oninput=e=>auSetBgm(+e.target.value);
 document.getElementById('vSe').oninput=e=>auSetSe(+e.target.value);
@@ -5561,7 +5569,7 @@ function heroBlock(o){const c=cmdOf(o),isS=o.kind==='s',want=specOfTarget(o);con
       for(const x of sorted){const m=match(x,o)===1,fx=heroFx(o,x.id),at=x.assign?findObj(x.assign):null;
         h+=`<button class="hopt" data-hero="${x.id}">${heroIc(x,32)}<span class="hm"><span class="hn"><b>${cmdName(x)}</b><span class="spec" style="color:${SPECS[x.spec].color};border-color:${SPECS[x.spec].color}">${x.spec}</span>${m?'<span class="gd">★適任</span>':'<span class="muted">不得意</span>'}</span><span class="hfxs">${fxHTML(fx,cur)}</span>${at?`<span class="hat">いま：${objName(at)}（移すと外れます）</span>`:''}</span></button>`;}
       h+=`</div>`;}}
-  else if(!c)h+=`<div class="muted" style="font-size:11px">雇える英雄は「雇用 [J]」から。上限 ${maxCmd()}人</div>`;
+  else if(!c)h+=`<div class="muted" style="font-size:11px">雇える英雄は「軍事」の「英雄」から（J）。上限 ${maxCmd()}人</div>`;
   if(c)h+=`<div class="hft"><button data-hero="" class="ghost">外す</button><span class="muted">※この${isS?'部隊':'施設'}が失われると英雄は戦死します</span></div>`;
   return h+`</div>`;}
 // ===== 選択中パネル（UI v2）の部品 =====
@@ -5759,7 +5767,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   el.querySelectorAll('[data-sellr]').forEach(b=>b.onclick=()=>{const k=b.dataset.sellr,bp=TRADE.find(x=>x[0]===k)[1],g=Math.round(bp*20*0.25);if(S[k]<20)return;S[k]-=20;S.silver=(S.silver||0)+g;se('click');S.tradeN=(S.tradeN||0)+1;log(`交易：${RES_NAME[k]}20を銀貨${g}で売った`);renderInfo(true);});
   el.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{const n=b.dataset.sell==='all'?Math.floor(S.mat):Math.min(10,Math.floor(S.mat));if(n<=0)return;const g=n*matPrice();S.mat-=n;S.gold+=g;se('click');S.tradeN=(S.tradeN||0)+1;log(`魔核${n}個を売った（金貨+${g}）`,'good');renderInfo(true);});
   el.querySelectorAll('[data-qcancel]').forEach(b=>b.onclick=()=>{cancelTrain(o,+b.dataset.qcancel);renderInfo(true);});
-  {const ia=document.getElementById('iArmy');if(ia)ia.onclick=()=>showArmy();}
+  {const ia=document.getElementById('iArmy');if(ia)ia.onclick=()=>openArmyTab('train');}
   el.querySelectorAll('[data-wmode]').forEach(b=>b.onclick=()=>{o.mode=b.dataset.wmode==='sword'?'sword':null;renderInfo(true);});
   el.querySelectorAll('[data-gar]').forEach(b=>b.onclick=()=>{garrison(S.squads.find(x=>x.id==b.dataset.gar),o);renderInfo(true);});
   el.querySelectorAll('[data-gartower]').forEach(b=>b.onclick=()=>{garrison(o,S.blds.find(x=>x.id==b.dataset.gartower));renderInfo(true);});
@@ -5788,7 +5796,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
 }
 let lastCmdKey='';
 function renderCmds(force){
-  const el=document.getElementById('cmds');
+  const el=document.getElementById('cmds');if(!el)return;
   const key=S.cmds.map(c=>c.id+c.lv+c.assign).join()+S.selCmd+S.fallen.length;
   if(force||key!==lastCmdKey){
     lastCmdKey=key;
@@ -5815,7 +5823,7 @@ function renderCmds(force){
   el.querySelectorAll('.cmd').forEach(d=>{const c=S.cmds.find(x=>x.id===d.dataset.id);if(!c)return;
     setText(d.querySelector('[data-f=st]'),`Lv${c.lv}　攻${c.atk} 防${c.def} 技${c.tec}　撃破${c.kills}`);
     d.querySelector('[data-f=xp]').style.width=(c.lv>=HERO_MAX?100:c.xp/xpNeed(c)*100)+'%';});
-  setText(document.getElementById('bHire2'),`英雄を雇う（${S.cmds.length}/${maxCmd()}）`);
+  {const b2=document.getElementById('bHire2');if(b2)setText(b2,`英雄を雇う（${S.cmds.length}/${maxCmd()}）`);}
 }
 let lastResKey='';
 function renderResBox(){
@@ -6079,12 +6087,12 @@ function trainSlots(){const o={};for(const bt in UNIT_HOME){const bs=S.blds.filt
 function trainModel(mk){const m=MTC[mk],bt=UT[m.ut].home;const bs=S.blds.filter(b=>b.type===bt&&!(b.bt>0)&&unitsOf(b).length+(b.queue||0)<capOf(b)).sort((a,b)=>(a.queue||0)-(b.queue||0));
   if(!bs.length||!canAfford(m.cost,m.popEach*m.members))return false;const b=bs[0];for(const k in m.cost)S[k]-=m.cost[k];S.pop-=m.popEach*m.members;b.queue++;(b.qm=b.qm||[]).push(mk);return true;}
 function cancelTrain(b,i){const mk=b.qm[i];const m=MTC[mk];for(const k in m.cost)S[k]+=m.cost[k];S.pop+=m.popEach*m.members;b.qm.splice(i,1);b.queue--;if(i===0)b.qt=0;log(`${m.name}の訓練を取り消した（費用を返却）`);}
-function showArmy(){
+function showArmy(target){
   const sl=trainSlots();
-  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">部隊</h2><button id="ovClose">閉じる [K]</button></div>`;
+  let h=target?'':`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">部隊</h2><button id="ovClose">閉じる [K]</button></div>`;
   h+=`<div class="help">部隊の数は施設の数で決まります。どの施設で訓練するかは自動で選ばれます。</div><div style="display:flex;flex-wrap:wrap;gap:6px 14px;margin:6px 0">`;
   for(const bt in UNIT_HOME){const o=sl[bt];if(!o.n&&B[bt].req&&!has(B[bt].req))continue;h+=`<span>${icSvg(bt,18)} ${B[bt].name}×${o.n}　<b>${o.used}/${o.cap}</b>部隊</span>`;}
-  h+=`</div><div class="help" style="margin:4px 0">金貨ですぐ雇える<b>冒険者</b>（人員を使わない）：<button id="armyAdv" style="padding:1px 10px">冒険者ギルドへ（雇用 [J]）</button></div>`;
+  h+=`</div>`;
   h+=`<h3 style="margin:8px 0 4px">訓練する</h3><div style="display:flex;flex-wrap:wrap;gap:6px">`;
   for(const bt in UNIT_HOME)for(const mk of modelsAt(bt)){const m=MTC[mk],o=sl[bt],ok=o.used<o.cap&&canAfford(m.cost,m.popEach*m.members)&&!S.waveActive;
     h+=`<button data-train="${mk}" ${ok?'':'disabled'} style="text-align:left;min-width:190px"><span style="display:flex;gap:6px;align-items:center">${icSvg(mk,26)}<span><b style="color:${m.color}">${m.name}</b> <span class="muted" style="font-size:10px">${B[bt].name}</span><br><span style="font-size:11px">${costText(m.cost,m.popEach*m.members)}・${Math.ceil(unitTime(mk)/TURN_SEC)}T</span></span></span></button>`;}
@@ -6093,19 +6101,19 @@ function showArmy(){
   qs.sort((a,b)=>(b.p-a.p)||(a.i-b.i));
   h+=`<h3 style="margin:10px 0 4px">訓練の順番待ち（${qs.length}）</h3>`;
   h+=qs.length?qs.map((q,j)=>`<div class="row" style="align-items:center"><span>${j===0?'<b style="color:var(--green)">次 </b>':''}${icSvg(q.mk,18)} ${MTC[q.mk].name}　<span class="muted" style="font-size:11px">${B[q.b.type].name}${q.i===0?`・${Math.round(q.p*100)}%`:'・待機中'}</span></span><button data-cancel="${q.b.id}:${q.i}" style="padding:2px 8px">取り消す</button></div>`).join(''):'<div class="muted">なし</div>';
-  h+=`<h3 style="margin:10px 0 4px">全部隊（${S.squads.length}）</h3><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px"><button data-all="sel">全部隊を選択</button><button data-all="sup">一括補給（${supCostText(supCost(S.squads))}）</button>${['guard','hold','return'].map(m=>`<button data-all="${m}">全部隊：${MODE_NAME[m]}</button>`).join('')}</div>`;
+  if(!target){  h+=`<h3 style="margin:10px 0 4px">全部隊（${S.squads.length}）</h3><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px"><button data-all="sel">全部隊を選択</button><button data-all="sup">一括補給（${supCostText(supCost(S.squads))}）</button>${['guard','hold','return'].map(m=>`<button data-all="${m}">全部隊：${MODE_NAME[m]}</button>`).join('')}</div>`;
   h+=S.squads.length?S.squads.map(u=>`<div class="row" style="align-items:center"><span>${icSvg(u.model||defModel(u.ut),18)} <b>${unitLabel(u)}</b> <span class="muted" style="font-size:11px">${u.members}/${UT[u.ut].members}${UT[u.ut].unit}・体力${Math.round(u.hp/u.maxhp*100)}%${SUP[u.ut]?`・<span style="color:${u.sup/SUP[u.ut].max<0.25?'var(--red)':'inherit'}">${SUP[u.ut].name}${Math.round(supOf(u)&&u.sup/SUP[u.ut].max*100)}%</span>`:''}・${u.gar?'物見櫓':MODE_NAME[u.mode]}</span></span><span><button data-pick="${u.id}" style="padding:2px 8px">選ぶ</button></span></div>`).join(''):'<div class="muted">部隊がいません</div>';
-  const card=openOverlay('army',h,true);
-  document.getElementById('ovClose').onclick=closeOverlay;
-  {const aa=document.getElementById('armyAdv');if(aa)aa.onclick=()=>{closeOverlay();showHire();setTimeout(()=>{const g=[...document.querySelectorAll('h3')].find(x=>x.textContent==='冒険者ギルド');if(g)g.scrollIntoView({block:'start'});},50);};}
-  card.querySelectorAll('[data-train]').forEach(b=>b.onclick=()=>{if(trainModel(b.dataset.train))se('click');showArmy();});
-  card.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{const [id,i]=b.dataset.cancel.split(':');const bb=S.blds.find(x=>x.id==id);if(bb)cancelTrain(bb,+i);showArmy();});
+  }
+  let card;if(target){target.innerHTML=h;card=target;}else{card=openOverlay('army',h,true);document.getElementById('ovClose').onclick=closeOverlay;}
+  card.querySelectorAll('[data-train]').forEach(b=>b.onclick=()=>{if(trainModel(b.dataset.train))se('click');showArmy(target);});
+  card.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{const [id,i]=b.dataset.cancel.split(':');const bb=S.blds.find(x=>x.id==id);if(bb)cancelTrain(bb,+i);showArmy(target);});
   card.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{const u=S.squads.find(x=>x.id==b.dataset.pick);if(!u)return;closeOverlay();S.multi=[];S.sel=u.gar?S.blds.find(x=>x.id===u.gar)||u:u;cam.x=u.x-VW/cam.z/2;cam.y=u.y-VH/cam.z/2;clampCam();renderInfo(true);renderMode();});
-  card.querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{const m=b.dataset.all;if(m==='sup'){supplyAll();return;}if(m==='sel'){S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;closeOverlay();renderInfo(true);renderMode();return;}for(const u of S.squads)if(!u.gar)setMode(u,m,true);showArmy();});
+  card.querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{const m=b.dataset.all;if(m==='sup'){supplyAll();return;}if(m==='sel'){S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;closeOverlay();renderInfo(true);renderMode();return;}for(const u of S.squads)if(!u.gar)setMode(u,m,true);showArmy(target);});
 }
-function showHire(){
-  const full=S.cmds.length>=maxCmd();
-  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">人事・英雄の雇用</h2><button id="ovClose">閉じる [J]</button></div>
+function showHire(target,mode){
+  const full=S.cmds.length>=maxCmd();const showH=mode!=='adv',showA=mode!=='hero';
+  let h=target?'':`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">人事・英雄の雇用</h2><button id="ovClose">閉じる [J]</button></div>`;
+  if(showH){h+=`<h3 style="margin:0 0 4px">英雄の候補者</h3>
   <div class="help" style="margin-bottom:8px">候補者は襲撃を撃退するたびに入れ替わります。雇用には人員3名が必要です（副官・幕僚として）。在籍 <b style="color:var(--text)">${S.cmds.length}/${maxCmd()}</b>　／　木材 ${Math.floor(S.steel)}　人員 ${S.pop}
   ${full?'<br><span style="color:var(--amber)">定員に達しています</span>':''}</div><div class="cands">`;
   for(const c of S.cands){const sp=SPECS[c.spec];const cost=hireCost(c);const tr=TRAITS.find(t=>t.n===c.trait);
@@ -6116,15 +6124,17 @@ function showHire(){
     <div style="font-size:11px;margin:4px 0">${skillLine(c,true)}</div>
     <button data-hire="${c.id}" style="margin-top:6px;width:100%" ${canAfford(cost,3)&&!full?'':'disabled'}>雇用（${costText(cost,3)}）</button></div>`;}
   if(!S.cands.length)h+='<div class="muted">候補者がいません。次の撃退後に補充されます</div>';
-  h+=`</div><h3 style="margin:12px 0 4px">冒険者ギルド</h3><div class="help">金貨で雇える即戦力。人員を使わないが、倒れた仲間は補充できず、毎ターン給金がかかる</div><div class="cands">`;
+  h+=`</div>`;}
+  if(showA){h+=`<h3 style="margin:${showH?12:0}px 0 4px">冒険者ギルド</h3><div class="help">金貨で雇える即戦力。人員を使わないが、倒れた仲間は補充できず、毎ターン給金がかかる</div><div class="cands">`;
   for(const k of ['advSword','advBow','advMage']){const m=MTC[k];h+=`<div class="cand"><div style="display:flex;gap:6px;align-items:center">${icSvg(k==='advBow'?'archer':k==='advMage'?'wizard':'pawn',28)}<b style="color:${m.color}">${m.name}</b></div><div class="muted" style="margin:4px 0">${m.desc}</div><button data-adv="${k}" style="width:100%" ${canAfford(m.cost)&&!S.waveActive?'':'disabled'}>雇う（${costText(m.cost)}）</button></div>`;}
-  h+=`</div><div style="margin-top:10px;display:flex;gap:8px;align-items:center"><button id="hReroll" ${S.gold>=30&&!S.waveActive?'':'disabled'}>候補者を探し直す（${ic('gold',12)}30）</button><span class="help">夜・襲撃中は探し直せません</span></div>`;
-  if(S.fallen.length)h+=`<div class="help" style="margin-top:10px">戦没者：${S.fallen.map(c=>`${cmdName(c)}（第${c.diedWave}襲撃）`).join('、')}</div>`;
-  const card=openOverlay('hire',h,true);
-  document.getElementById('ovClose').onclick=closeOverlay;
-  card.querySelectorAll('[data-adv]').forEach(b=>b.onclick=()=>{const m=MTC[b.dataset.adv];if(!canAfford(m.cost)||S.waveActive)return;for(const k in m.cost)S[k]-=m.cost[k];const hq=S.blds.find(x=>x.type==='hq');spawnUnit(hq,'adv',b.dataset.adv);log(`冒険者ギルドから${m.name}を雇った`,'good');showHire();});
-  card.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{hire(b.dataset.hire);showHire();renderCmds(true);});
-  document.getElementById('hReroll').onclick=()=>{S.gold-=30;genCands();showHire();};
+  h+=`</div>`;}
+  if(showH){h+=`<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button id="hReroll" ${S.gold>=30&&!S.waveActive?'':'disabled'}>候補者を探し直す（${ic('gold',12)}30）</button><span class="help">夜・襲撃中は探し直せません</span></div>`;
+  if(S.fallen.length)h+=`<div class="help" style="margin-top:10px">戦没者：${S.fallen.map(c=>`${cmdName(c)}（第${c.diedWave}襲撃）`).join('、')}</div>`;}
+  let card;if(target){target.innerHTML=h;card=target;}else{card=openOverlay('hire',h,true);document.getElementById('ovClose').onclick=closeOverlay;}
+  const again=()=>{if(target&&mode)renderArmyPanel(true);else showHire(target,mode);};
+  card.querySelectorAll('[data-adv]').forEach(b=>b.onclick=()=>{const m=MTC[b.dataset.adv];if(!canAfford(m.cost)||S.waveActive)return;for(const k in m.cost)S[k]-=m.cost[k];const hq=S.blds.find(x=>x.type==='hq');spawnUnit(hq,'adv',b.dataset.adv);log(`冒険者ギルドから${m.name}を雇った`,'good');again();});
+  card.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{hire(b.dataset.hire);again();renderCmds(true);});
+  {const rr=card.querySelector('#hReroll');if(rr)rr.onclick=()=>{S.gold-=30;genCands();again();};}
 }
 function recordWave(ws,ok){S.hist=S.hist||[];ws=ws||S.waveStart||{};S.hist.push({n:S.wave,day:S.turn,blood:!!(S.cur&&S.cur.blood),kills:S.waveKills,bld:S.bldLost-(ws.bld||0),kia:S.kia-(ws.kia||0),mat:S.mat-(ws.mat||0),heroes:S.fallen.length-(ws.fallen||0),ok,pop:popTotal(),tech:TECH.filter(t=>has(t.id)).length});}
 // 大きな損害を受けた翌朝の立て直し：避難民がすぐ来て、王都の援助は2ターン後に届く
@@ -6254,7 +6264,7 @@ const GUIDE={
   {t:'バリスタを建てる',b:'mg',n:1,d:'矢を撃つ防衛施設。空の敵も撃てます。柵の内側、敵が来る方向に。',rw:{ammo:40}},
   {t:'篝火を置く',b:'brazier',n:1,d:'夜を照らします。暗いところの敵は狙いにくいので、柵の外を照らしましょう。耐久が低いので、通り道に置くと壊されます。',rw:{fuel:30}},
   {t:'兵舎を建てる',b:'train',n:1,d:'兵士や弓兵などの部隊を編成する施設です。',rw:{sword:20}},
-  {t:'兵士か弓兵を2部隊つくる',c:()=>S.squads.filter(q=>q.ut==='inf'||q.ut==='arch').length,n:2,hi:'#bArmy',d:'下の「部隊 [K]」から編成します。兵士は剣、弓兵は矢を使います。',rw:{gold:40}},
+  {t:'兵士か弓兵を2部隊つくる',c:()=>S.squads.filter(q=>q.ut==='inf'||q.ut==='arch').length,n:2,hi:'#bArmy',d:'「軍事 [K]」の「訓練」から編成します。兵士は剣、弓兵は矢を使います。',rw:{gold:40}},
   {t:'研究を1つ完了する',c:()=>gTechDone(),n:1,hi:'#bRes',d:'下の「研究 [R]」で研究を選びます。研究員として住民が必要です。完了すると新しい施設や強化が使えます。',rw:{gold:40}},
   {t:'投石機を建てる',b:'how',n:1,d:'研究「投石機」（防衛タブ）で解放。石を飛ばして、壁の向こうの敵をまとめて攻撃します。',rw:{stone:60}},
   {t:'研究「斥候」で駐留地の場所をつかむ',c:()=>lvl('scout'),n:1,hi:'#bRes',d:'次の襲撃の魔物は、街とアビスのあいだの<b>駐留地</b>で待っています。研究「斥候」（部隊タブ）をすると、地図に<b>駐留地のだいたいの場所</b>（赤い点線の円）が出ます。',rw:{fuel:40}},
@@ -6268,8 +6278,8 @@ const COACH=[
  ['#intel','敵情予測','次の襲撃の規模と、どの方角から来るか。研究「斥候」で詳しくなります。'],
  ['#cv','マップ','<b>ドラッグ</b>（またはWASD）で移動、<b>ホイール</b>で拡大縮小。マスや施設をクリックすると詳しく見られます。'],
  ['#info','選択中','選んだ施設・部隊の情報と操作ボタン（改修・作る物の切り替え・行動など）がここに出ます。'],
- ['#rtabs','右のタブ','<b>建設</b>：施設を建てる／<b>研究</b>：研究の進み具合／<b>軍</b>：部隊の一覧／<b>英雄</b>：英雄の一覧と雇用／<b>街</b>：資源の出入り'],
- ['#controls','下のボタン','<b>夜へ [Enter]</b> で1日を進めます。研究 [R]・部隊 [K]・一括修理・一括補給などもここ。「表示・設定」からセーブや全画面。'],
+ ['#rtabs','右のタブ','<b>建設</b>：施設を建てる／<b>研究</b>：研究の進み具合／<b>軍事</b>：部隊・訓練・英雄・冒険者／<b>街</b>：資源の出入り'],
+ ['#controls','下のボタン','<b>夜へ [Enter]</b> で1日を進めます。研究 [R]・軍事 [K]・一括修理・一括補給などもここ。「表示・設定」からセーブや全画面。'],
  ['#guide','初心者タスク','生産と防衛の<b>目標</b>が出ます。<b>場所を示す</b>を押すと場所を教えてくれます。好きな順に進められます。'],
 ];
 function guideInit(){if(S.guide)return;const on=tasksOn();S.guide={tab:'prod',open:-1,min:true,hide:!on,coach:on&&S.mapId==='t'?0:-1,t0:Object.keys(S.tech||{}),done:{prod:[],def:[]}};}
@@ -6490,10 +6500,26 @@ function drawRuins(){for(const r of (S.ruins||[])){const x=r.x*T,y=r.y*T,RS=T*(r
   ctx.fillStyle='#5a5248';ctx.fillRect(x+5,y+17,6,5);ctx.fillRect(x+16,y+19,7,4);ctx.fillStyle='#7a7266';ctx.fillRect(x+6,y+16,4,2);ctx.fillRect(x+17,y+18,5,2);
   ctx.fillStyle='#2a1e16';ctx.save();ctx.translate(x+14,y+16);ctx.rotate(-0.5);ctx.fillRect(-8,-1.5,16,3);ctx.restore();ctx.fillStyle='#3a2a1e';ctx.fillRect(x+9,y+22,10,2);}}
 let armyKey='';
-function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el)return;const box=el.closest('.box');if(box&&box.style.display==='none'&&!force)return;
+// 軍事タブ：部隊（一覧・指揮）／訓練／英雄（一覧・雇用）／冒険者
+const ASUBS=[['list','部隊'],['train','訓練'],['hero','英雄'],['adv','冒険者']];
+function openArmyTab(sub,toggle){if(sub)S.armySub=sub;
+  const open=document.body.classList.contains('sheetOpen')||!isNarrow();
+  if(toggle&&!sub&&isNarrow()&&document.body.classList.contains('sheetOpen')&&curTab()==='army'){closeSheet();return;}
+  if(isNarrow()||isFull())openSheet();setRT('army');}
+function renderArmyPanel(force){if(!S)return;const sub=S.armySub||'list';
+  const sb=document.getElementById('armySubs');
+  if(sb){const cnt={list:S.squads.length,hero:`${S.cmds.length}/${maxCmd()}`};
+    sb.innerHTML=ASUBS.map(([k,n])=>`<button data-asub="${k}" class="${k===sub?'on':''}">${n}${cnt[k]!=null&&cnt[k]!==0?`<span class="tcnt">${cnt[k]}</span>`:''}</button>`).join('');
+    sb.querySelectorAll('[data-asub]').forEach(b=>b.onclick=()=>{S.armySub=b.dataset.asub;se('click');renderArmyPanel(true);});}
+  const el=document.getElementById('armyBox');if(!el)return;
+  if(sub==='list'){armyKey='';renderArmyBox(true);}
+  else if(sub==='train')showArmy(el);
+  else if(sub==='hero'){el.innerHTML='<div id="cmds"></div><div id="heroHire" style="margin-top:10px"></div>';lastCmdKey='';renderCmds(true);showHire(document.getElementById('heroHire'),'hero');}
+  else if(sub==='adv')showHire(el,'adv');}
+function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el)return;if((S.armySub||'list')!=='list')return;const box=el.closest('.box');if(box&&box.style.display==='none'&&!force)return;
   const sq=S.squads.filter(needsSupply);
   const key=S.squads.map(s=>s.id+':'+Math.round(s.hp/s.maxhp*20)+':'+s.members+(s.gar?'g':'')+(s.mode||'')+(s.supPend?'s':'')).join()+'|'+sq.length+'|'+S.waveActive+'|'+(S.sel&&S.sel.kind==='s'?S.sel.id:'');if(key===armyKey&&!force)return;armyKey=key;
-  let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length?'':'disabled'}>一括補給${sq.length?`（${sq.length}）`:''}</button><button id="abArmy">訓練・一覧<kbd>K</kbd></button><button id="abHire">雇用<kbd>J</kbd></button><button id="abAdv">冒険者</button></div>`;
+  let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length?'':'disabled'}>一括補給${sq.length?`（${sq.length}）`:''}</button></div>`;
   if(!S.squads.length)h+='<div class="muted">部隊がいません。兵舎などで訓練しましょう</div>';
   else h+=`<div class="sqhd"><span>部隊 ${S.squads.length}・英雄 ${S.cmds.length}</span><span>クリックで指揮／Q で順に選択</span></div><div class="sqlist">`+S.squads.map(s=>{const r=Math.max(0,s.hp/s.maxhp),hc=cmdOf(s),ik=hc&&WICON['h_'+hc.spec]&&s.ut!=='drake'?'h_'+hc.spec:sqKey(s);
       const stt=s.gar?['配置中','gd']:s.supPend||s.eqPend?['補給へ','wn']:s.mode==='guard'?['迎撃','cy']:s.mode==='hold'?['固守','wn']:s.mode==='return'?['帰還','dm']:['待機','dm'];
@@ -6502,11 +6528,9 @@ function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el
   el.querySelectorAll('[data-sq]').forEach(b=>b.onclick=()=>{const q0=S.squads.find(s=>s.id==b.dataset.sq);if(S.sel===q0){deselect();return;}S.sel=q0;S.multi=[];renderInfo(true);const q=S.sel;if(q&&!q.gar){cam.x=q.x-VW/2/cam.z;cam.y=q.y-VH/2/cam.z;clampCam();}});
   document.getElementById('abSel').onclick=()=>{S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;renderInfo(true);renderMode();};
   document.getElementById('abSup').onclick=()=>{supplyAll();renderArmyBox(true);};
-  document.getElementById('abArmy').onclick=()=>showArmy();
-  document.getElementById('abHire').onclick=()=>showHire();
-  document.getElementById('abAdv').onclick=()=>{showHire();setTimeout(()=>{const g=[...document.querySelectorAll('h3')].find(x=>x.textContent==='冒険者ギルド');if(g)g.scrollIntoView({block:'start'});},50);};}
+}
 function tabBadges(){const t=document.querySelector('#rtabs button[data-rt="econ"]');if(!t)return;let n=0;try{n=econWarnings(econ(),ammoForecast()).filter(w=>w[0]==='bd').length;}catch(e){}const lab='街'+(n?'<i class="ndot red"></i>':'');if(t.dataset.l!==lab){t.dataset.l=lab;t.innerHTML=lab;}
-  const a=document.querySelector('#rtabs button[data-rt="army"]');const w=S.squads.filter(q=>q.hp/q.maxhp<0.4).length;const la='軍'+(S.squads.length?`<span class="tcnt">${S.squads.length}</span>`:'')+(w?'<i class="ndot amber"></i>':'');if(a.dataset.l!==la){a.dataset.l=la;a.innerHTML=la;}}
+  const a=document.querySelector('#rtabs button[data-rt="army"]');const w=S.squads.filter(q=>q.hp/q.maxhp<0.4).length;const la='軍事'+(S.squads.length?`<span class="tcnt">${S.squads.length}</span>`:'')+(w?'<i class="ndot amber"></i>':'');if(a.dataset.l!==la){a.dataset.l=la;a.innerHTML=la;}}
 function renderAll(){renderArmyBox(true);renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(true);renderCmds(true);renderTop();}
 
 // ===== サウンド（Web Audio で合成。外部ファイルなし） =====
@@ -6788,8 +6812,8 @@ function openTab(t){if(document.body.classList.contains('sheetOpen')&&curTab()==
 document.getElementById('bTown').onclick=()=>openTab('econ');
 document.getElementById('bSpd').onclick=()=>{S.speed=(S.speed||1)>=3?1:(S.speed||1)+1;se('click');renderPauseUI();};
 document.getElementById('bInfoTab').onclick=()=>openTab('info');
-document.getElementById('bArmyTab').onclick=()=>openTab('army');
-document.getElementById('bHero').onclick=()=>openTab('hero');
+document.getElementById('bArmyTab').onclick=()=>openArmyTab(null,true);
+document.getElementById('bHero').onclick=()=>openArmyTab('hero');
 document.getElementById('bBuild').onclick=()=>{if(!S)return;if(S.waveActive||S.phase==='night'){se('error');toast(S.waveActive?'襲撃中は建設できません':'夜は建設できません。朝になると建てられます','warn');return;}
   const onBuildTab=document.querySelector('#rtabs button[data-rt="build"]')?.classList.contains('on');
   if(isLand()&&document.body.classList.contains('sheetOpen')){if(!onBuildTab){enterBuild(S.buildMode||null);return;}if(S.buildPick&&!S.buildMode)exitBuild();closeSheet();return;}
