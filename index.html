@@ -1115,6 +1115,14 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 }
 /* スマホ：仮置き＋十字キー */
 #mRep.dim{opacity:.55}
+/* スマホ：たたんだ資源バーでも1日の増減（▲▼）を出す。縦持ちは数字の下、横持ちは横 */
+@media (max-width:900px){
+  body.resMin #wrap #resbar .res .dl{display:block;font-size:10px;line-height:1.1;margin:0;white-space:nowrap}
+  body.resMin:not(.land) #wrap #resbar .res.key{display:inline-grid!important;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:4px;align-items:center;align-content:center}
+  body.resMin:not(.land) #wrap #resbar .res>.pi{grid-row:1 / span 2}
+  body.resMin:not(.land) #wrap #resbar .res>b{line-height:1}
+  body.resMin.land #wrap #resbar .res .dl{display:inline;margin-left:3px}
+}
 #rotateMsg{display:none;position:fixed;inset:0;z-index:60;background:#0b0f0c;color:var(--text);flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center}
 body.needRotate #rotateMsg{display:flex}
 #rotateMsg .rph{width:56px;height:92px;border:4px solid var(--amber);border-radius:10px;position:relative;animation:rotPh 2.4s ease-in-out infinite}
