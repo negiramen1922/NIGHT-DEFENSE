@@ -1545,6 +1545,11 @@ function buyModels(ut){return Object.keys(MODEL).filter(k=>MODEL[k].ut===ut&&MOD
 // 建設に必要なターン数（記載なしは1ターン）
 const BUILD_T={power:2,lab:2,hangar:2,rail:2,reactor:3,elecf:2,tankf:2,outpost:2};
 function buildTurns(type){return Math.max(1,(BUILD_T[type]||1)-(has('prefab')?1:0));}
+// 強化にかかるターン数（数字はここで調整）
+const BASE_UP_T={1:2,2:3,3:4,4:5};   // 城：Lv2へ2T・Lv3へ3T・Lv4へ4T・Lv5へ5T（強化中も城は普段どおり働く）
+const ENCH_T=[1,2,3];                 // 魔核強化：★1へ1T・★2へ2T・★3へ3T（強化中の施設は停止）
+const MAT_T=[0,1,2];                  // 造り替え：石へ1T・鉄へ2T（造り替え中の施設は停止）
+function baseUpTurns(){return BASE_UP_T[S.baseLv]||5;}
 function upgTurns(b){return Math.max(1,(b.lv===1?1:2)+(BUILD_T[b.type]&&b.lv===2?1:0)-(has('prefab')?1:0));}
 function ready(b){return !(b.bt>0);}
 
@@ -1563,7 +1568,7 @@ const HOW_FAM=['how','hvy'];
 // 要員充足率（必要人数に対する現員の割合）
 // 生産施設は改築するとそのぶん働き手が増える（Lv2:+1人・Lv3:+2人）
 const CREW_UP=['miner','quarry','ironmine','farm','fishery','well','ammo','market'];
-function crewNeed(b){const p=B[b.type].pop;return p&&CREW_UP.includes(b.type)&&!(b.upg&&b.bt>0)?p+(b.lv-1):p;}
+function crewNeed(b){const p=B[b.type].pop;return p&&CREW_UP.includes(b.type)&&!(b.upg===true&&b.bt>0)?p+(b.lv-1):p;}
 function eff(b){const p=crewNeed(b);return p?Math.max(0,Math.min(1,(b.crew||0)/p)):1;}
 const MODE_NAME={guard:'迎撃',hold:'固守',return:'帰還・補給'};
 const SIDE_NAME={E:'東',W:'西',N:'北',S:'南'};
@@ -2994,8 +2999,10 @@ function findObj(id){return S.blds.find(b=>b.id===id)||S.squads.find(s=>s.id===i
 // 魔核の強化（★1〜★3）：防衛施設は火力、生産施設は生産量 +15%／★、耐久 +20%／★
 function canEnch(b){return b&&b.kind==='b'&&b.type!=='hq'&&!B[b.type].isMine;}
 function enchCost(b){const n=(b.ench||0);return {mat:[15,40,90][n]*bsz(b)};}
-function enchUp(b){if(!canEnch(b)||(b.ench||0)>=3||!has('enchant')||S.waveActive||(b.bt>0)){se('error');return;}const c=enchCost(b);if(!canAfford(c)){se('error');return;}for(const k in c)S[k]-=c[k];b.ench=(b.ench||0)+1;const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;se('upgrade');S.fx.push({x:bcx(b),y:bcy(b),r:T*0.9*bsz(b),t:0,dur:0.6,c:'#a070ff'});log(`${B[b.type].name} を魔核で強化した（★${b.ench}）`,'good');renderInfo(true);}
-function matUp(b){const m=(b.mat||0)+1;if(!MAT_HP[b.type]||m>bestMat())return;const c=MAT_COST[b.type][m];if(!canAfford(c)||S.waveActive){se('error');return;}for(const k in c)S[k]-=c[k];b.mat=m;const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;se('upgrade');log(`${MAT_NAME[b.type][m]}に造り替えた`,'good');renderInfo(true);}
+function enchUp(b){if(!canEnch(b)||(b.ench||0)>=3||!has('enchant')||S.waveActive||(b.bt>0)){se('error');return;}const c=enchCost(b);if(!canAfford(c)){se('error');return;}for(const k in c)S[k]-=c[k];
+  const n=ENCH_T[b.ench||0];b.upg='ench';b.bt=b.btTotal=n*TURN_SEC;se('upgrade');S.fx.push({x:bcx(b),y:bcy(b),r:T*0.9*bsz(b),t:0,dur:0.6,c:'#a070ff'});log(`${B[b.type].name} の魔核強化を開始（★${(b.ench||0)+1}・${n}ターン、強化中は停止）`);renderInfo(true);}
+function matUp(b){const m=(b.mat||0)+1;if(!MAT_HP[b.type]||m>bestMat())return;const c=MAT_COST[b.type][m];if(!canAfford(c)||S.waveActive||b.bt>0){se('error');return;}for(const k in c)S[k]-=c[k];
+  const n=MAT_T[m]||1;b.upg='mat';b.bt=b.btTotal=n*TURN_SEC;se('upgrade');log(`${MAT_NAME[b.type][m]}への造り替えを開始（${n}ターン、その間は停止）`);renderInfo(true);}
 function objName(o){return o.kind==='s'?unitLabel(o):B[o.type].name+(o.lv>1?' Lv'+o.lv:'');}
 function killCmd(o,cause){
   const c=cmdOf(o);if(!c)return;
@@ -3172,7 +3179,10 @@ function makeCamps(){
     S.camps.push({id:sd,side:sd,x:best[0],y:best[1],hx:best[0]+Math.cos(a)*hd,hy:best[1]+Math.sin(a)*hd,hr,found:false,state:'idle',killed:0});
   }
 }
-function campSync(){if(S.waveActive||S.mode!=='campaign')return;if(S.campWave!==S.wave+1||!S.camps)makeCamps();}
+function campSync(){if(S.waveActive||S.mode!=='campaign')return;if(S.campWave!==S.wave+1||!S.camps)makeCamps();
+  if(!S.campHint&&S.wave>=1&&S.camps&&S.camps.length&&!S.overlay){S.campHint=true;
+    toast('次の襲撃の魔物が、街とアビスのあいだの「駐留地」に集まっています。研究「斥候」で場所の目安が分かり、昼に部隊で叩くと次の襲撃が減ります','warn',9000);
+    log('【駐留地】次の襲撃の魔物は、街とアビスのあいだの駐留地で待っている。研究「斥候」で場所の目安、斥候で正確な場所が分かる。昼に部隊で攻め込むと、倒した分だけ次の襲撃の敵が減る','warn');}}
 function campName(c){return `${sideShort(c.side)}駐留地`;}
 function campTag(sd){const c=S.camps&&S.camps.find(x=>x.side===sd);if(!c||S.waveActive)return '';
   return c.state==='gone'?' <span class="ctag gone">駐留地 壊滅</span>':c.found?' <span class="ctag found">駐留地 発見</span>':' <span class="ctag">駐留地 未発見</span>';}
@@ -3183,7 +3193,7 @@ function campLoss(e){const w=S.next,c=campById(e.camp);if(!w||!c)return;const i=
 function campSpot(c){const a=Math.random()*6.283,r=Math.sqrt(Math.random())*2.6*TU;for(let k=0;k<10;k++){const x=c.x+Math.cos(a+k)*r,y=c.y+Math.sin(a+k)*r;if(!eBlock(terAt(x,y)))return [x,y];}return [c.x,c.y];}
 function startSkirm(c){
   const {u,n}=campUnits(c);if(!n){c.state='gone';return;}
-  c.found=true;c.state='fight';S.skirm={id:c.id,away:0,t:0,n0:n};
+  if(!c.found)S.campFoundN=(S.campFoundN||0)+1;c.found=true;c.state='fight';S.skirm={id:c.id,away:0,t:0,n0:n};
   const hm=(S.next.blood?1.25:1)*(S.next.hpMul||1);
   for(const ty in u)for(let i=0;i<u[ty];i++){const d=E[ty];if(!d)continue;const [x,y]=campSpot(c);const hp=Math.round(d.hp*hm);
     S.enemies.push({type:ty,x,y,hp,maxhp:hp,cd:0.5+Math.random(),target:null,retarget:0,camp:c.id,hx:x-c.x,hy:y-c.y});dexMark(ty);}
@@ -3222,7 +3232,7 @@ function campWatch(){
   campSync();if(S.waveActive||!S.camps||!S.camps.length)return;
   for(const c of S.camps){if(c.state!=='idle')continue;
     for(const s of S.squads){if(s.gar)continue;const d=Math.hypot(s.x-c.x,s.y-c.y);
-      if(!c.found&&MT(s).scoutEye&&d<=((MT(s).vision||6)+lvl('scout'))*T){c.found=true;s.tx=null;s.ax=s.x;s.ay=s.y;
+      if(!c.found&&MT(s).scoutEye&&d<=((MT(s).vision||6)+lvl('scout'))*T){c.found=true;S.campFoundN=(S.campFoundN||0)+1;s.tx=null;s.ax=s.x;s.ay=s.y;
         const {u,n}=campUnits(c);se('upgrade');toast(`${unitLabel(s)}が${campName(c)}を発見！（約${n}体）`,'good',4500);
         log(`${unitLabel(s)}が${campName(c)}を発見：${Object.keys(u).map(k=>E[k].name+'×'+u[k]).join('・')}。${CAMP_TRIG*U}マス以内に近づくと戦闘になる`,'good');}
       if(S.phase!=='night'&&!S.skirm&&d<CAMP_TRIG*TU){startSkirm(c);return;}}}
@@ -3378,6 +3388,7 @@ function doEndTurn(){
   se('turn');const t0=S.turn;S.rep=[];S.before={};for(const k of ['steel','fuel','ammo','elec','pop'])S.before[k]=S[k];S.doneCnt={};S.gross={steel:0,ammo:0,pop:0,used:0};
   for(let i=0;i<TURN_SEC*10;i++)update(0.1,true);
   advanceResearch();
+  tickBaseUp();
   // 欠員補充（防衛施設を優先）
   let filled=0,short=0;
   const order=S.blds.filter(b=>B[b.type].pop&&b.crew<crewNeed(b)).sort((a,b)=>(gunOf(b)?1:0)-(gunOf(a)?1:0));
@@ -3394,6 +3405,9 @@ function doEndTurn(){
   if(S.overlay==='res')showResearch();
   renderAll();
 }
+function tickBaseUp(){if(!S.baseUp)return;S.baseUp.left--;if(S.baseUp.left>0)return;
+  S.baseLv=Math.min(BASE_MAX,S.baseUp.to);S.baseUp=null;se('upgrade');
+  const m=`城がLv${S.baseLv}になった（英雄の上限${maxCmd()}名・領地拡大・施設の上限${facCap()}）`;log(m,'good');if(S.rep)S.rep.push({msg:m,cls:'good'});revealAll();}
 function turnReport(t0,ev){
   const L=[];
   L.push(`<div class="grid">${['steel','fuel','ammo','elec','pop'].map(k=>{const d=Math.round(S[k]-S.before[k]);return `<span title="${RES_NAME[k]}">${ic(k)}${Math.floor(S[k])} <b class="${d<0?'bd':d>0?'gd':''}" style="font-size:11px">${d>=0?'+':''}${d}</b></span>`;}).join('')}</div>`);
@@ -3402,8 +3416,9 @@ function turnReport(t0,ev){
   for(const e of done)L.push(`<div class="gd">◆ ${e.msg}</div>`);
   for(const e of other)L.push(`<div class="${e.cls==='good'?'gd':e.cls==='kia'?'bd':''}">・${e.msg}</div>`);
   const bc=S.blds.filter(b=>b.bt>0);
-  if(bc.length){const m={};for(const b of bc){const k=B[b.type].name+(b.upg?'(改修)':'')+' 残り'+Math.ceil(b.bt/TURN_SEC-0.01)+'T';m[k]=(m[k]||0)+1;}
+  if(bc.length){const m={};for(const b of bc){const k=B[b.type].name+(b.upg==='ench'?'(魔核強化)':b.upg==='mat'?'(造り替え)':b.upg?'(改修)':'')+' 残り'+Math.ceil(b.bt/TURN_SEC-0.01)+'T';m[k]=(m[k]||0)+1;}
     L.push(`<div class="muted">建設中：${Object.entries(m).map(([k,v])=>k+(v>1?' ×'+v:'')).join('　')}</div>`);}
+  if(S.baseUp)L.push(`<div class="muted">城の強化中：Lv${S.baseUp.to} 残り${S.baseUp.left}T</div>`);
   if(S.research.length)L.push(`<div class="muted">研究中：${S.research.map(r=>`${techOf(r.id).name} 残り${r.left}T`).join('　')}</div>`);
   const warn=[];
   {const e=econ(),f=ammoForecast();for(const [c,t] of econWarnings(e,f))if(c==='bd')L.push(`<div class="bd">${ui('close','red',12)} ${t}</div>`);
@@ -3628,7 +3643,9 @@ function update(dt,sim){
       b.bt-=dt;if(!b.upg)b.hp=Math.min(b.maxhp,b.hp+b.maxhp*0.6*dt/b.btTotal);
       if(b.bt<=0.01){
         b.bt=0;S.fx.push({x:bcx(b),y:bcy(b),r:TU,t:0,dur:0.6,c:'#6fe08a'});
-        if(b.upg){b.upg=false;b.lv++;const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${d.name} の改修完了（Lv${b.lv}）`,'good');if(!S.rep)se('upgrade');}
+        if(b.upg==='ench'){b.upg=false;b.ench=Math.min(3,(b.ench||0)+1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${d.name} の魔核強化が完了（★${b.ench}）`,'good');if(!S.rep)se('upgrade');}
+        else if(b.upg==='mat'){b.upg=false;b.mat=Math.min(2,(b.mat||0)+1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${MAT_NAME[b.type][b.mat]}への造り替えが完了`,'good');if(!S.rep)se('upgrade');}
+        else if(b.upg){b.upg=false;b.lv++;const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${d.name} の改修完了（Lv${b.lv}）`,'good');if(!S.rep)se('upgrade');}
         else if(S.rep){S.doneCnt[d.name]=(S.doneCnt[d.name]||0)+1;}
         else log(`${d.name} 完成`,'good');
       }
@@ -5546,14 +5563,14 @@ function renderInfo(force){
     if(o.ut==='guard')h+=`<div class="upg"><b>近衛</b><div class="muted" style="font-size:11px">城から14マス以内：火力2倍・受ける被害半分（${nearCastle(o)?'<span style="color:var(--green)">効果発揮中</span>':'範囲外'}）</div><button id="gdHome" style="margin-top:4px">${o.stayOut?'城に戻って駐屯する':'城に駐屯中（自動で打って出る）'}</button></div>`;
     h+=`<details style="font-size:11px"><summary class="muted" style="cursor:pointer">行動の説明</summary><div class="muted">地図をクリックで移動（移動先が待機地点になります）。<br>迎撃：待機地点の周囲12マスに来た敵を自動で迎え撃つ（柵や壁の向こうの敵には回り込んで向かう）　固守：その場を動かない（近接部隊は柵・壁越しに敵を突ける）　帰還・補給：所属施設へ戻り、手当て・欠員の補充・矢や武具の補給</div></details>`;
   }
-  if(!isS&&o.bt>0)h+=`<div style="margin:4px 0;color:${o.upg?'var(--green)':'var(--amber)'}">${o.upg?'改修中':'建設中'}　残り <b id="iBt">${Math.ceil(o.bt/TURN_SEC-0.01)}</b> ターン <span class="muted" style="font-size:11px">（戦闘中は10秒＝1ターン）${o.upg?'改修中は機能停止':''}</span></div>`;
+  if(!isS&&o.bt>0)h+=`<div style="margin:4px 0;color:${o.upg?'var(--green)':'var(--amber)'}">${o.upg==='ench'?'魔核強化中':o.upg==='mat'?'造り替え中':o.upg?'改修中':'建設中'}　残り <b id="iBt">${Math.ceil(o.bt/TURN_SEC-0.01)}</b> ターン <span class="muted" style="font-size:11px">（戦闘中は10秒＝1ターン）${o.upg?'その間は機能停止':''}</span></div>`;
   // 改修
   if(!isS&&d.grp){
     const mx=maxLvOf(o.type);const pips='◆'.repeat(o.lv)+'◇'.repeat(3-o.lv);
     h+=`<div class="upg"><div class="row"><b>施設改修</b><span class="pips">${pips}</span></div><div class="muted" style="font-size:11px">${UPG_EFF[o.type]||''}</div>`;
     if(o.lv>=3)h+=`<div class="muted" style="margin-top:3px">最大まで改修済み</div>`;
     else if(o.lv>=mx)h+=`<div class="muted" style="margin-top:3px">城を<span style="color:var(--amber)">Lv${o.lv+1}</span>にすると改修できます（施設のLvは城のLvまで）</div>`;
-    else if(o.bt>0)h+=`<div class="muted" style="margin-top:3px">${o.upg?'改修中':'建設完了後に改修できます'}</div>`;
+    else if(o.bt>0)h+=`<div class="muted" style="margin-top:3px">${o.upg==='ench'?'魔核強化中':o.upg==='mat'?'造り替え中':o.upg?'改修中':'建設完了後に改修できます'}（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</div>`;
     else h+=`<button id="iUpg" class="on wide" ${canAfford(uc)?'':'disabled'} title="[U]"><span>Lv${o.lv+1} に改修</span><span class="cost">${costText(uc)}<span class="t">${upgTurns(o)}T</span></span></button>`;
     h+=`</div>`;
   }
@@ -5586,10 +5603,10 @@ function renderInfo(force){
   if(!isS&&canEnch(o)&&!(o.bt>0&&!o.upg)){const e=o.ench||0;const what=B[o.type].range?'火力':PROD_BT.includes(o.type)?'生産量':'';
     h+=`<div class="upg"><b>魔核の強化</b><span><span class="star">${'★'.repeat(e)}${'☆'.repeat(3-e)}</span> ${e}/3</span>`;
     if(!has('enchant'))h+=`<div class="muted" style="font-size:11px">研究「魔核の強化」（魔核タブ）で使えるようになる</div>`;
-    else if(e<3){const c=enchCost(o);h+=`<div style="margin-top:3px"><button onclick="enchUp(S.sel)" ${canAfford(c)&&!S.waveActive?'':'disabled'}>★${e+1}に強化（${costText(c)}）</button></div><div class="muted" style="font-size:11px">★ごとに ${what?what+' +15%・':''}耐久 +20%</div>`;}
+    else if(e<3){const c=enchCost(o);h+=`<div style="margin-top:3px">${o.upg==='ench'?`<span class="muted">★${e+1}に強化中（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</span>`:`<button onclick="enchUp(S.sel)" ${canAfford(c)&&!S.waveActive&&!(o.bt>0)?'':'disabled'}>★${e+1}に強化（${costText(c)}・${ENCH_T[e]}ターン）</button>`}</div><div class="muted" style="font-size:11px">★ごとに ${what?what+' +15%・':''}耐久 +20%</div>`;}
     else h+=`<div class="muted" style="font-size:11px">最大まで強化済み</div>`;
     h+='</div>';}
-  if(!isS&&MAT_HP[o.type]){const m=o.mat||0;h+=`<div class="row"><span class="muted">材質</span><span>${MAT_NAME[o.type][m]}</span></div>`;if(m<bestMat()){const c=MAT_COST[o.type][m+1];h+=`<div><button onclick="matUp(S.sel)" ${canAfford(c)&&!S.waveActive?'':'disabled'}>${MAT_NAME[o.type][m+1]}に造り替える（${costText(c)}）</button></div>`;}else if(m<2)h+=`<div class="muted" style="font-size:11px">研究「${m===0?'石積み':'築城術'}」で${MAT_NAME[o.type][m+1]}に造り替えられる</div>`;}
+  if(!isS&&MAT_HP[o.type]){const m=o.mat||0;h+=`<div class="row"><span class="muted">材質</span><span>${MAT_NAME[o.type][m]}</span></div>`;if(m<bestMat()){const c=MAT_COST[o.type][m+1];h+=`<div>${o.upg==='mat'?`<span class="muted">${MAT_NAME[o.type][m+1]}に造り替え中（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</span>`:`<button onclick="matUp(S.sel)" ${canAfford(c)&&!S.waveActive&&!(o.bt>0)?'':'disabled'}>${MAT_NAME[o.type][m+1]}に造り替える（${costText(c)}・${MAT_T[m+1]||1}ターン）</button>`}</div>`;}else if(m<2)h+=`<div class="muted" style="font-size:11px">研究「${m===0?'石積み':'築城術'}」で${MAT_NAME[o.type][m+1]}に造り替えられる</div>`;}
   if(!isS&&B[o.type].garrison&&!(o.bt>0)){const gs=garOf(o);
     const gu=B[o.type].garUt,gn=UT[gu].name;
     if(gs)h+=`<div class="upg"><b>配置中：${unitLabel(gs)}</b>（${gs.members}/${UT[gs.ut].members}人）<div class="muted" style="font-size:11px">人数が多いほど火力が上がる。部隊の英雄はここからスキルを使う</div><button id="iUngar" style="margin-top:4px">${gn}を降ろす</button></div>`;
@@ -5605,7 +5622,7 @@ function renderInfo(force){
   if(o.type==='hq'){const gq=S.squads.filter(q=>q.ut==='guard');h+=`<div class="upg"><b>近衛兵</b><div class="muted" style="font-size:11px">城で編成できる精鋭（部隊画面 [K]）。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内で火力2倍・被害半分</div>${gq.length?gq.map(q=>`<div class="row" style="align-items:center"><span>${unitLabel(q)} ${q.members}/${UT.guard.members}人・${q.gar?'駐屯中':'出撃中'}</span>${q.gar?`<button data-gdout="${q.id}" style="padding:2px 8px">外に出す</button>`:''}</div>`).join(''):'<div class="muted" style="font-size:11px">まだいません</div>'}</div>`;}
   if(o.type==='hq'){const c=baseUpCost();h+=`<div class="upg"><div class="row"><b>拠点レベル ${S.baseLv}/${BASE_MAX}</b><span class="muted">英雄 ${S.cmds.length}/${maxCmd()}</span></div>
     <div class="muted" style="font-size:11px">レベルが上がると：英雄の上限 +2・領地の半径 +6マス・城館に住める人数 +10・施設の上限 +15・前哨砦 +1。<b style="color:var(--text)">Lv2で施設のLv2と研究ランクⅡ、Lv3で施設のLv3と研究ランクⅢ</b>が解放。城の姿も 木→石→鉄→魔核合金 と変わり、<b style="color:#c48aff">Lv5で結界</b>（襲撃のたびに城への被害を1500まで防ぐ）。Lv3以上への強化には魔核が必要</div>
-    ${S.baseLv<BASE_MAX?`<button id="iBaseUp" style="margin-top:4px;width:100%" ${canAfford(c)&&!S.waveActive?'':'disabled'}>拠点をLv${S.baseLv+1}に（${costText(c)}）</button>`:'<div class="gd">最大レベル</div>'}</div>`;}
+    ${S.baseUp?`<div class="gd" style="margin-top:4px">Lv${S.baseUp.to}に強化中…　残り${S.baseUp.left}ターン（強化中も城は普段どおり働きます）</div>`:S.baseLv<BASE_MAX?`<button id="iBaseUp" style="margin-top:4px;width:100%" ${canAfford(c)&&!S.waveActive?'':'disabled'}>拠点をLv${S.baseLv+1}に（${costText(c)}・${baseUpTurns()}ターン）</button>`:'<div class="gd">最大レベル</div>'}</div>`;}
   if(false)h+=`<div class="muted" style="margin-top:6px;font-size:11px">研究「城館防衛火器」で自衛火器を設置できます</div>`;
   if(!isS&&o.kind==='b'&&(WALL_TYPES.includes(o.type)||o.type==='gate'||o.type==='tower')&&ready(o)){const G=wallGroup(o);const dm=G.filter(damaged);const rc=dm.reduce((a,x)=>a+repairCost(x),0);
     const WR=['fence','swall','wall'],nx=WR[WR.indexOf(o.type)+1];const up=nx&&(!B[nx].req||has(B[nx].req))?G.filter(x=>x.type===o.type&&placeOK(nx,x.x,x.y)):[];const uc={};for(const k in costOf(nx||'fence'))uc[k]=(costOf(nx||'fence')[k]||0)*up.length;
@@ -5617,7 +5634,7 @@ function renderInfo(force){
   const sel=document.getElementById('iCmd');
   if(sel)sel.onchange=()=>{const v=sel.value;if(v)assign(S.cmds.find(x=>x.id===v),o);else if(c){assign(c,null);o.cmd=null;}renderInfo(true);renderCmds(true);};
   el.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>setMode(o,b.dataset.mode));
-  {const bu=document.getElementById('iBaseUp');if(bu)bu.onclick=()=>{const c=baseUpCost();if(!canAfford(c)||S.waveActive)return;for(const k in c)S[k]-=c[k];S.baseLv++;se('upgrade');log(`拠点がLv${S.baseLv}になった（英雄の上限${maxCmd()}名・領地拡大）`,'good');revealAll();renderInfo(true);};}
+  {const bu=document.getElementById('iBaseUp');if(bu)bu.onclick=()=>{const c=baseUpCost();if(!canAfford(c)||S.waveActive||S.baseUp||S.baseLv>=BASE_MAX)return;for(const k in c)S[k]-=c[k];const n=baseUpTurns();S.baseUp={to:S.baseLv+1,left:n};se('upgrade');log(`城の強化を開始（Lv${S.baseUp.to}・${n}ターン）`);renderInfo(true);};}
   el.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const k=b.dataset.buy,bp=TRADE.find(x=>x[0]===k)[1],g=Math.round(bp*20);if((S.silver||0)<g||buyLeft(k)<20)return;S.silver-=g;S.buyToday=S.buyToday||{};S.buyToday[k]=(S.buyToday[k]||0)+20;S[k]+=20;se('click');S.tradeN=(S.tradeN||0)+1;log(`交易：${RES_NAME[k]}20を銀貨${g}で買った`);renderInfo(true);});
   el.querySelectorAll('[data-sellr]').forEach(b=>b.onclick=()=>{const k=b.dataset.sellr,bp=TRADE.find(x=>x[0]===k)[1],g=Math.round(bp*20*0.25);if(S[k]<20)return;S[k]-=20;S.silver=(S.silver||0)+g;se('click');S.tradeN=(S.tradeN||0)+1;log(`交易：${RES_NAME[k]}20を銀貨${g}で売った`);renderInfo(true);});
   el.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{const n=b.dataset.sell==='all'?Math.floor(S.mat):Math.min(10,Math.floor(S.mat));if(n<=0)return;const g=n*matPrice();S.mat-=n;S.gold+=g;se('click');S.tradeN=(S.tradeN||0)+1;log(`魔核${n}個を売った（金貨+${g}）`,'good');renderInfo(true);});
@@ -5742,6 +5759,8 @@ function renderIntel(){
     if(it.sideComp)det.push(`<span style="display:flex;flex-wrap:wrap;gap:4px 14px">${it.sides.map(sd=>`<span><b style="color:var(--red)">${sideName(sd)} ${it.perSide[sd]}</b>　${Object.keys(E).filter(k=>it.sideComp[sd][k]).map(k=>`<span title="${E[k].desc}">${dotE(k)}${E[k].name}${it.sideComp[sd][k]}</span>`).join(' ')}</span>`).join('')}</span>`);
     if(w.subs&&w.subs.length>1)det.push(`<span><b>襲撃は${w.subs.length}つの波</b>：${w.subs.map((v,i)=>`${['第一','第二','第三'][i]}波 約${v}体`).join('　→　')}</span>`);
     det.push(`<span class="muted">偵察Lv${it.L}${it.L<3?'（研究「斥候」で精度向上）':''}</span>`);
+    if(S.camps&&S.camps.length){const st=S.camps.map(c=>`${campName(c)}：${c.state==='gone'?'壊滅':c.found?'発見済み':'未発見'}`).join('　');
+      det.push(`<span><b style="color:var(--amber)">駐留地</b>　${st}<br><span class="muted">魔物は駐留地で夜を待っています。${lvl('scout')<1?'研究「斥候」で地図に場所の目安が出ます。':'地図の赤い点線の円が目安。'}斥候で見つけて昼に部隊で叩くと、倒した分だけ次の襲撃が減ります</span></span>`);}
     {const r=recOf(w),c=curDev(),sh=[['人口',c.pop,r.pop],['防衛施設',c.def,r.def],['部隊',c.sq,r.sq]].filter(x=>x[1]<x[2]);
      h+=`<div class="imob"><div class="iml"><small>敵情予測</small><b>${it.total}・${it.sides.map(sd=>{const m=sideName(sd).match(/（(.+?)）/);return (m?m[1]:SIDE_NAME[sd]||'')+' '+(S.hives&&S.hives[sd]?S.hives[sd].s:'');}).join('・')}</b></div>${pipsHTML(dg,5,'danger-pips')}<span class="mrec">${sh.map(x=>`<span class="rtg">${x[0]} ${x[1]}/${x[2]}</span>`).join('')}</span></div>`;}
     h+=`<button id="intelTg" class="ghost">${S.intelOpen?'▴ たたむ':'▾ 詳しく'}</button>`;
@@ -6093,7 +6112,7 @@ function gTechDone(){return Object.keys(S.tech||{}).filter(k=>S.tech[k]>0&&!(S.g
 const GUIDE={
  prod:{name:'生産',steps:[
   {t:'伐採所を3つ建てる',b:'miner',n:3,d:'<b>森</b>のマスに建てると木材が採れます。森が深いほど多く採れます。',rw:{gold:30}},
-  {t:'伐採所を1つ Lv2 にする',c:()=>gCnt('miner',2),n:1,ping:'miner',hi:'#iUpg',castle:2,d:'施設のレベルは<b>城のレベルまで</b>上げられます。まず城をクリックして<b>城をLv2に強化</b>。そのあと伐採所をクリックし、選択中パネルの「Lv2 に改修 [U]」を押します。生産量が上がります。',rw:{steel:40}},
+  {t:'伐採所を1つ Lv2 にする',c:()=>gCnt('miner',2),n:1,ping:'miner',hi:'#iUpg',castle:2,d:'施設のレベルは<b>城のレベルまで</b>上げられます。まず城をクリックして<b>城をLv2に強化</b>（2ターンかかります）。そのあと伐採所をクリックし、選択中パネルの「Lv2 に改修 [U]」を押します。生産量が上がります。',rw:{steel:40}},
   {t:'石切り場を建てる',b:'quarry',n:1,d:'<b>岩場</b>（灰色の岩があるマス）に建てると石材が採れます。',rw:{gold:20}},
   {t:'鉱山を建てる',b:'ironmine',n:1,d:'<b>鉄鉱脈</b>のマスに建てると鉄が採れます。バリスタや大砲に使います。',rw:{stone:30}},
   {t:'住居を建てる',b:'barracks',n:1,d:'住民がふえ、税で金貨が入ります。住民は施設で働きます。',rw:{gold:30}},
@@ -6112,6 +6131,8 @@ const GUIDE={
   {t:'兵士か弓兵を2部隊つくる',c:()=>S.squads.filter(q=>q.ut==='inf'||q.ut==='arch').length,n:2,hi:'#bArmy',d:'下の「部隊 [K]」から編成します。兵士は剣、弓兵は矢を使います。',rw:{gold:40}},
   {t:'研究を1つ完了する',c:()=>gTechDone(),n:1,hi:'#bRes',d:'下の「研究 [R]」で研究を選びます。研究員として住民が必要です。完了すると新しい施設や強化が使えます。',rw:{gold:40}},
   {t:'投石機を建てる',b:'how',n:1,d:'研究「投石機」（防衛タブ）で解放。石を飛ばして、壁の向こうの敵をまとめて攻撃します。',rw:{stone:60}},
+  {t:'研究「斥候」で駐留地の場所をつかむ',c:()=>lvl('scout'),n:1,hi:'#bRes',d:'次の襲撃の魔物は、街とアビスのあいだの<b>駐留地</b>で待っています。研究「斥候」（部隊タブ）をすると、地図に<b>駐留地のだいたいの場所</b>（赤い点線の円）が出ます。',rw:{fuel:40}},
+  {t:'斥候で駐留地を見つける',c:()=>S.campFoundN||0,n:1,hi:'#bArmy',d:'研究「斥候隊」で<b>斥候</b>を編成し、赤い点線の円へ向かわせます。見つけた駐留地へ<b>昼のうちに部隊で攻め込む</b>と、倒した分だけ次の襲撃の敵が減ります。',rw:{gold:60}},
  ]},
 };
 const COACH=[
@@ -6263,6 +6284,11 @@ function showHelp(fromTitle){
   <section><h3>襲撃の夜</h3>
   <p>部隊を選んでマップをクリックすると移動。${K('迎撃')}＝近づく敵に向かう、${K('固守')}＝その場（壁ぎわ）で守る、${K('帰還・補給')}＝街へ戻って補給。${K('一時停止 [Space]')}中も指示が出せます。</p>
   <p>戦闘後は<b>戦闘報告</b>で、撃破数・被害・使った資源が確認できます。</p></section>
+
+  <section><h3>駐留地（敵の待機場所）</h3>
+  <p>次の襲撃で来る魔物は、街とアビスのあいだの<b>駐留地</b>で夜を待っています。襲撃の夜は、ここから出発します。</p>
+  <p>研究${K('斥候')}をすると、地図に駐留地の<b>だいたいの場所</b>（赤い点線の円）が出ます。研究「斥候隊」で編成できる<b>斥候</b>を近くへ向かわせると、正確な場所と中の魔物が分かります。</p>
+  <p>昼のうちに部隊で駐留地へ攻め込むと戦闘になり、<b>倒した分だけ次の襲撃の敵が減ります</b>。部隊が離れると、魔物は陣に戻って傷を癒やします。</p></section>
 
   <section><h3>うまくいかないとき</h3>
   <p>壊された施設は<b>廃墟</b>として残り、半額で建て直せます。大きな被害のあとは<b>避難民</b>や<b>王都からの援助</b>が来ることも。${K('記録')} で過去の襲撃を振り返れます。</p></section>
