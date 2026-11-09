@@ -1144,8 +1144,8 @@ body.needRotate #rotateMsg{display:flex}
 body.land{--rail:74px}
 body.land #topbar{flex-wrap:nowrap!important;min-height:0}
 body.land #resbar{height:32px!important;flex-wrap:nowrap!important;padding:0 6px!important}
-body.land:not(.resMin) #wrap #resbar{height:auto!important;flex-wrap:wrap!important;overflow:visible!important;row-gap:6px;padding:5px 6px!important}
-body.land:not(.resMin) #topbar{align-items:flex-start}
+body.land #topbar{position:relative;z-index:8;margin-right:var(--rail)!important;height:36px!important;min-height:0!important;overflow:visible;align-items:flex-start!important}
+body.land:not(.resMin) #wrap #resbar{height:auto!important;flex-wrap:wrap!important;overflow:visible!important;row-gap:6px;padding:5px 6px 8px!important;align-self:flex-start;background:var(--panel);box-shadow:0 6px 16px #000c,0 1px 0 var(--line)}
 body.land:not(.resMin) #wrap #resbar .res .dl{display:inline;margin-left:3px}
 body.land #resbar .res b{font-size:14px!important}
 body.land #resbar{justify-content:flex-start!important;flex:1 1 auto!important;min-width:0}
@@ -1462,13 +1462,13 @@ function bcxT(b){return b.x+(bsz(b)-1)/2;}
 function bcyT(b){return b.y+(bsz(b)-1)/2;}
 function bCells(x,y,n){const a=[];for(let dy=0;dy<n;dy++)for(let dx=0;dx<n;dx++)a.push([x+dx,y+dy]);return a;}
 function gridSet(b,v){for(const [cx,cy] of bCells(b.x,b.y,bsz(b)))if(cy>=0&&cy<ROWS&&cx>=0&&cx<COLS&&(v||S.grid[cy][cx]===b))S.grid[cy][cx]=v?b:null;}
-// 施設の上限：柵・壁・門・罠・城・前哨砦は数えない
-const FAC_FREE=new Set(['hq','outpost','fence','swall','wall','gate','landmine','spike','pit','bomb']);
+// 施設の上限：柵・壁・門・罠・篝火・城・前哨砦は数えない
+const FAC_FREE=new Set(['hq','outpost','brazier','fence','swall','wall','gate','landmine','spike','pit','bomb']);
 function facCounted(t){return !FAC_FREE.has(t)&&!(B[t]&&B[t].isMine);}
 function facCount(){return S.blds.filter(b=>facCounted(b.type)).length;}
 function outpostN(){return S.blds.filter(b=>b.type==='outpost').length;}
 function outpostReadyN(){return S.blds.filter(b=>b.type==='outpost'&&ready(b)).length;}
-const FAC_BASE=60,FAC_PER_LV=20,FAC_PER_OUTPOST=15;   // 施設の上限＝60＋20×(城Lv−1)＋15×前哨砦
+const FAC_BASE=50,FAC_PER_LV=20,FAC_PER_OUTPOST=15;   // 施設の上限＝50＋20×(城Lv−1)＋15×前哨砦
 function facCap(){return FAC_BASE+FAC_PER_LV*((S.baseLv||1)-1)+FAC_PER_OUTPOST*outpostReadyN();}
 function outpostCap(){return (S.baseLv||1)+1;}
 function capBlock(t){if(t==='outpost'&&outpostN()>=outpostCap())return `前哨砦は城の強化で増やせます（いま ${outpostN()}/${outpostCap()}）`;
@@ -5456,7 +5456,7 @@ function renderBuild(){
   const el=document.getElementById('build');
   {const fb=document.getElementById('facCapBox');if(fb&&S&&S.blds){const n=facCount(),cp=facCap(),full=n>=cp;
     const bar=(lab,v,m)=>`<div class="cap${v>=m?' full':''}"><div class="row"><span>${lab}</span><b>${v} / ${m}</b></div><div class="ebar"><i style="width:${Math.round(Math.min(1,v/Math.max(1,m))*100)}%"></i></div></div>`;
-    setHTML(fb,`<div class="fcap${full?' full':n>=cp-5?' near':''}" title="柵・壁・門・罠は数えません。前哨砦か城の強化で上限が増えます">${bar('施設',n,cp)}${S.mode==='campaign'?bar('前哨砦',outpostN(),outpostCap()):''}${full?'<small>上限です。前哨砦か城の強化で増えます</small>':''}</div>`);}}
+    setHTML(fb,`<div class="fcap${full?' full':n>=cp-5?' near':''}" title="柵・壁・門・罠・篝火は数えません。前哨砦か城の強化で上限が増えます">${bar('施設',n,cp)}${S.mode==='campaign'?bar('前哨砦',outpostN(),outpostCap()):''}${full?'<small>上限です。前哨砦か城の強化で増えます</small>':''}</div>`);}}
   const sig=BUILD_GROUPS.map(g=>groupList(g).join()).join('|');
   if(sig!==buildSig){
     buildSig=sig;el.innerHTML='';
