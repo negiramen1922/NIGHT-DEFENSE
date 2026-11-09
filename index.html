@@ -3123,9 +3123,10 @@ function genWave(n){
   return{n,q,sides,main:sides[0],tactic,blood,blizzard:S&&S.mapId==='s'&&[8,13,20].includes(n),hpMul:1+Math.max(0,n-10)*0.12,king:n===finalWave(),subs:subs.map((c,i)=>Object.values(c).reduce((a,b)=>a+b,0)+(n===finalWave()&&i===subs.length-1?1:0)),perSide,sideComp,noise0:0.6+Math.random()*0.8,noise1:0.85+Math.random()*0.3};
 }
 function phaseReset(){try{if(S.buildMode||S.buildPick){S.buildMode=null;S.buildPick=false;renderBuild();}S.aimNaval=false;if(S.sel&&S.sel.kind!=='s')S.sel=null;S.selTile=null;renderInfo(true);renderMode();}catch(e){}}
-// ===== 行軍：街から遠く、まだ見えていない敵は速く進む（マップが広いので到着までの待ち時間を短くする） =====
+// ===== 行軍：街から遠く、まだ見えていない敵は少し速く進む（駐留地からの道のりの待ち時間を少し短くする） =====
 // 施設・部隊から MARCH_R（防衛施設は射程+2）以内に入ると通常の速さに戻る。e.far は速さの倍率（0=通常）
-let MARCH_R=8,MARCH_MUL=4,MARCH_SEEN=3;   // 見えていても遠いうちは少し速く
+// 見えている敵はいつも通常の速さ（画面の中で急に速く動かないように）
+let MARCH_R=8,MARCH_MUL=2,MARCH_SEEN=1;
 function marchMap(){
   if(S._mmT!=null&&S.waveT-S._mmT<1&&S._mm)return;S._mmT=S.waveT;
   const gw=Math.ceil(W/TU),gh=Math.ceil(H/TU);
