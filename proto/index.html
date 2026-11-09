@@ -277,7 +277,7 @@ body.fullmap #right.open{transform:none}
   body:not(.fullmap) #info{flex:0 1 auto;max-height:58vh;overflow-y:auto}
   body:not(.fullmap) #rtabs{flex-shrink:0;margin-bottom:0}
   body:not(.fullmap) #right .box[data-rt]{flex:1 1 0;min-height:80px;overflow-y:auto}
-  body:not(.fullmap) #right .box[data-rt="res"]{flex:1 1 0}
+  body:not(.fullmap) #right .box[data-rt="res"],body:not(.fullmap) #right .box[data-rt="hero"]{flex:1 1 0}
   #info .art{max-height:92px;width:auto;max-width:100%;margin:0 auto 6px}
   #topbar{padding:5px 10px}
   #controls{margin-top:4px}
@@ -1175,6 +1175,8 @@ body.land #sheetHandle{display:none!important}
 .lOnly{display:none!important}
 body.land #controls>.lOnly{display:flex!important}
 body.land #controls>#bArmy,body.land #controls>#bHire{display:none!important}
+body.land:not(.night) #wrap #controls>#bSpd{display:none!important}
+body.land #controls>#bSpd.fast{color:var(--amber);box-shadow:inset 0 0 0 2px var(--amber)}
 /* パネルを開いている間：夜へは隠し、いちばん上に「閉じる」。タブのボタンはそのまま（今のタブを光らせる） */
 body.land.sheetOpen #controls>*{display:none!important}
 body.land.sheetOpen #wrap #controls>#mBack,body.land.sheetOpen #wrap #controls>#bBuild,body.land.sheetOpen #wrap #controls>#bTown,body.land.sheetOpen #wrap #controls>#bArmyTab,body.land.sheetOpen #wrap #controls>#bRes,body.land.sheetOpen #wrap #controls>#bHero{display:flex!important}
@@ -1330,16 +1332,17 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
     <div id="controls">
       <button id="mBack" class="mOnlyB">▼ マップに戻る</button>
       <button id="bNext" class="on"></button>
+      <button id="bSpd" class="sp-main lOnly"><span class="mic"></span><span id="bSpdT">速度 ×1</span></button>
       <button id="bPause" class="nOnly"></button>
       <span class="sep dOnly"></span>
       <button id="bInfoTab" class="sp-main lOnly" data-rtb="info"><span class="mic"></span><span>選択中</span></button>
       <button id="bBuild" class="sp-main" data-rtb="build"><span class="mic"></span><span>建設</span></button>
-      <button id="bTown" class="sp-main lOnly" data-rtb="econ"><span class="mic"></span><span>街</span></button>
-      <button id="bArmyTab" class="sp-main lOnly" data-rtb="army"><span class="mic"></span><span>部隊</span></button>
       <button id="bRes" class="sp-main"><span class="mic"></span><span>研究</span><kbd>R</kbd></button>
+      <button id="bArmyTab" class="sp-main lOnly" data-rtb="army"><span class="mic"></span><span>軍</span></button>
       <button id="bArmy" class="sp-main"><span class="mic"></span><span>部隊</span><kbd>K</kbd></button>
       <button id="bHire" class="sp-main"><span class="mic"></span><span>雇用</span><kbd>J</kbd></button>
-      <button id="bHero" class="sp-main lOnly" data-rtb="res"><span class="mic"></span><span>英雄</span></button>
+      <button id="bHero" class="sp-main lOnly" data-rtb="hero"><span class="mic"></span><span>英雄</span></button>
+      <button id="bTown" class="sp-main lOnly" data-rtb="econ"><span class="mic"></span><span>街</span></button>
       <span class="sep"></span>
       <button id="bRepAll">一括修理</button>
       <button id="bSupAll">一括補給</button>
@@ -1372,12 +1375,12 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
   <div id="right">
     <div id="sheetHandle"><span id="sheetSel"></span><span id="sheetLbl">▲ 詳細・建設</span></div>
     <div class="box" id="info"><h3>選択中</h3><div id="infoBody" class="muted">施設か部隊をクリック</div></div>
-    <div id="rtabs"><button data-rt="info" class="tabInfo">選択中</button><button data-rt="build" class="on">建設</button><button data-rt="econ">街</button><button data-rt="army">軍</button><button data-rt="res">研究・英雄</button></div>
+    <div id="rtabs"><button data-rt="info" class="tabInfo">選択中</button><button data-rt="build" class="on">建設</button><button data-rt="res">研究</button><button data-rt="army">軍</button><button data-rt="hero">英雄</button><button data-rt="econ">街</button></div>
     <div class="box" data-rt="econ" style="display:none"><h3>街の状況</h3><div id="econ"></div></div>
     <div class="box" data-rt="build"><h3>建設</h3><div id="facCapBox"></div><div id="build"></div></div>
     <div class="box" data-rt="army" style="display:none"><h3>軍</h3><div id="armyBox"></div></div>
     <div class="box" data-rt="res" style="display:none"><h3>研究</h3><div id="resBox"></div></div>
-    <div class="box" data-rt="res" style="display:none"><h3>英雄</h3><div id="cmds"></div><button id="bHire2" style="width:100%;margin-top:2px">英雄を雇う</button></div>
+    <div class="box" data-rt="hero" style="display:none"><h3>英雄</h3><div id="cmds"></div><button id="bHire2" style="width:100%;margin-top:2px">英雄を雇う</button></div>
   </div>
   </div>
 </div>
@@ -5363,7 +5366,8 @@ function togglePause(){if(S.over)return;S.paused=!S.paused;renderPauseUI();}
 function renderPauseUI(){if(!S)return;const p=!!S.paused&&!S.over;const b=document.getElementById('bPause');b.classList.toggle('primary',!!S.paused);setHTML(b,S.paused?`${ui('play','dark',24)}<span>再開</span><kbd>Space</kbd>`:`${ui('pause','light',12)}<span>一時停止</span><kbd>Space</kbd>`);
   const ps=document.getElementById('bPauseSeg');ps.classList.toggle('on',!!S.paused);setHTML(ps,ui(S.paused?'play':'pause',S.paused?'amber':'dim',12));
   document.body.classList.toggle('paused',p);
-  document.querySelectorAll('.speed [data-spd]').forEach(x=>x.classList.toggle('on',+x.dataset.spd===(S.speed||1)));}
+  document.querySelectorAll('.speed [data-spd]').forEach(x=>x.classList.toggle('on',+x.dataset.spd===(S.speed||1)));
+  {const t=document.getElementById('bSpdT');if(t)setText(t,'速度 ×'+(S.speed||1));const sb=document.getElementById('bSpd');if(sb)sb.classList.toggle('fast',(S.speed||1)>1);}}
 // 表示の切り替え（通常／土地レベル／狙われやすさ。どれか1つ）
 let viewKey='';
 function curView(){return S.showLv?'lv':S.heat?'heat':'n';}
@@ -5426,13 +5430,13 @@ document.querySelectorAll('.speed [data-spd]').forEach(b=>b.onclick=()=>{S.speed
  const mic=(id,n)=>{const e=document.querySelector('#'+id+' .mic');if(e)e.innerHTML=ui(n,'light',24);};PXICON.ui.icons.build=PXICON.ui.icons.build||["............","...xxxxx....","..xxxxxxxx..","..xxxxxxxx..","...xxxxx....","......xx....",".....xx.....","....xx......","...xx.......","..xx........",".xx.........","............"];PXICON.ui.icons.town=PXICON.ui.icons.town||["............",".....xx.....","....xxxx....","...xxxxxx...","..xxxxxxxx..",".xxxxxxxxxx.","..xxxxxxxx..","..xx.xx.xx..","..xx.xx.xx..","..xxxxxxxx..","..xxxxxxxx..","............"];
 PXICON.ui.icons.crown=PXICON.ui.icons.crown||["............","............",".x...x...x..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..","............","............","............"];
 PXICON.ui.icons.target=PXICON.ui.icons.target||["............","....xxxx....","..xx....xx..","..x......x..",".x...xx...x.",".x..xxxx..x.",".x..xxxx..x.",".x...xx...x.","..x......x..","..xx....xx..","....xxxx....","............"];
-mic('bInfoTab','target');mic('bBuild','build');mic('bTown','town');mic('bArmyTab','army');mic('bHero','crown');mic('bRes','research');mic('bArmy','army');mic('bHire','hire');document.querySelector('#more .mic').innerHTML=ui('menu','light',24)+ui('gear','light',12);
+mic('bInfoTab','target');mic('bSpd','play');mic('bBuild','build');mic('bTown','town');mic('bArmyTab','army');mic('bHero','crown');mic('bRes','research');mic('bArmy','army');mic('bHire','hire');document.querySelector('#more .mic').innerHTML=ui('menu','light',24)+ui('gear','light',12);
  document.querySelector('.logbox .lgic').innerHTML=ui('log','amber',12);document.querySelector('#mExit .xic').innerHTML=ui('close','dim',12);}
 document.getElementById('bNext').onclick=endTurn;
 document.getElementById('bRes').onclick=showResearch;
 document.getElementById('bHire').onclick=showHire;
 document.getElementById('bArmy').onclick=()=>showArmy();
-function setRT(t){if(t==='info'&&!isNarrow())t='build';document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyBox(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
+function setRT(t){if(t==='info'&&!isNarrow())t='build';document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyBox(true);if(t==='hero')try{renderCmds(true);}catch(e){}for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
 document.getElementById('bRepAll').onclick=repairAll;document.getElementById('bSupAll').onclick=supplyAll;
@@ -6260,7 +6264,7 @@ const COACH=[
  ['#intel','敵情予測','次の襲撃の規模と、どの方角から来るか。研究「斥候」で詳しくなります。'],
  ['#cv','マップ','<b>ドラッグ</b>（またはWASD）で移動、<b>ホイール</b>で拡大縮小。マスや施設をクリックすると詳しく見られます。'],
  ['#info','選択中','選んだ施設・部隊の情報と操作ボタン（改修・作る物の切り替え・行動など）がここに出ます。'],
- ['#rtabs','右のタブ','<b>建設</b>：施設を建てる／<b>街</b>：資源の出入り／<b>軍</b>：部隊の一覧／<b>研究・英雄</b>'],
+ ['#rtabs','右のタブ','<b>建設</b>：施設を建てる／<b>研究</b>：研究の進み具合／<b>軍</b>：部隊の一覧／<b>英雄</b>：英雄の一覧と雇用／<b>街</b>：資源の出入り'],
  ['#controls','下のボタン','<b>夜へ [Enter]</b> で1日を進めます。研究 [R]・部隊 [K]・一括修理・一括補給などもここ。「表示・設定」からセーブや全画面。'],
  ['#guide','初心者タスク','生産と防衛の<b>目標</b>が出ます。<b>場所を示す</b>を押すと場所を教えてくれます。好きな順に進められます。'],
 ];
@@ -6778,9 +6782,10 @@ function curTab(){const b=document.querySelector('#rtabs button.on');return b?b.
 function closeSheet(){document.getElementById('right').classList.remove('open');setText(document.getElementById('sheetLbl'),'▲ 詳細・建設');}
 function openTab(t){if(document.body.classList.contains('sheetOpen')&&curTab()===t){closeSheet();return;}openSheet();setRT(t);}
 document.getElementById('bTown').onclick=()=>openTab('econ');
+document.getElementById('bSpd').onclick=()=>{S.speed=(S.speed||1)>=3?1:(S.speed||1)+1;se('click');renderPauseUI();};
 document.getElementById('bInfoTab').onclick=()=>openTab('info');
 document.getElementById('bArmyTab').onclick=()=>openTab('army');
-document.getElementById('bHero').onclick=()=>openTab('res');
+document.getElementById('bHero').onclick=()=>openTab('hero');
 document.getElementById('bBuild').onclick=()=>{if(!S||S.waveActive||S.phase==='night'){se('error');return;}
   const onBuildTab=document.querySelector('#rtabs button[data-rt="build"]')?.classList.contains('on');
   if(isLand()&&document.body.classList.contains('sheetOpen')){if(!onBuildTab){enterBuild(S.buildMode||null);return;}if(S.buildPick&&!S.buildMode)exitBuild();closeSheet();return;}
