@@ -1108,13 +1108,17 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 /* スマホ：下のボタンに「建設」 */
 #bBuild{display:none}
 @media (max-width:900px){
-  body:not(.night):not(.qnight):not(.sheetOpen) #controls{grid-template-columns:1.4fr repeat(5,1fr)}
-  body:not(.night):not(.qnight):not(.sheetOpen) #controls>#bBuild{display:flex!important}
-  body.night #controls>#bBuild,body.qnight #controls>#bBuild{display:none!important}
+  body:not(.sheetOpen) #controls{grid-template-columns:1.4fr repeat(5,1fr)}
+  body:not(.sheetOpen) #controls>#bBuild{display:flex!important}
   #controls>#bBuild.on{background:#2a2412;box-shadow:0 0 0 2px var(--amber);color:var(--amber)}
 }
 /* スマホ：仮置き＋十字キー */
 #mRep.dim{opacity:.55}
+/* 夜（静かな夜・襲撃中）に使えない機能は灰色に */
+body.night #controls>#bBuild,body.qnight #controls>#bBuild{opacity:.38;filter:grayscale(1)}
+body.night #build .bg button,body.qnight #build .bg button{opacity:.38;filter:grayscale(1)}
+body.night #build .bchips,body.qnight #build .bchips{opacity:.5}
+body.night #build::before,body.qnight #build::before{content:'夜は建設できません（朝になると建てられます）';display:block;margin:0 0 8px;padding:6px 10px;background:#1a1a2a;color:#b8c0e8;font-size:12px;box-shadow:inset 3px 0 0 #6a7ad8}
 @media (max-width:900px){
   .ov-res .tdet{position:sticky;bottom:0;z-index:3;margin:8px 0 0!important;background:var(--inset,#0e1510);box-shadow:0 -1px 0 var(--amber),0 -8px 16px #000c!important;padding:8px 12px!important;gap:8px!important}
   .ov-res .tdl{min-width:0!important}
@@ -1179,7 +1183,7 @@ body.land #controls>#bSpd.fast{color:var(--amber);box-shadow:inset 0 0 0 2px var
 /* パネルを開いている間：夜へは隠し、いちばん上に「閉じる」。タブのボタンはそのまま（今のタブを光らせる） */
 body.land.sheetOpen #controls>*{display:none!important}
 body.land.sheetOpen #wrap #controls>#mBack,body.land.sheetOpen #wrap #controls>#bBuild,body.land.sheetOpen #wrap #controls>#bTown,body.land.sheetOpen #wrap #controls>#bArmyTab,body.land.sheetOpen #wrap #controls>#bRes,body.land.sheetOpen #wrap #controls>#bHero{display:flex!important}
-body.land.sheetOpen.night #wrap #controls>#bBuild,body.land.sheetOpen.qnight #wrap #controls>#bBuild{display:none!important}
+
 body.land.sheetOpen #wrap #controls>#mBack{grid-row:span 2;align-self:stretch;height:auto!important;min-height:0;max-height:none}
 body.land.sheetOpen #mBack{order:-1;height:auto!important;font-size:0!important;flex-direction:column!important;background:#2a2412;box-shadow:0 0 0 2px var(--amber)}
 body.land.sheetOpen #mBack::after{content:'▶\A閉じる';font-size:15px;line-height:1.5;text-align:center;white-space:pre;color:var(--amber)}
@@ -5686,7 +5690,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     if(o.lv>=3)h+=`<div class="muted" style="margin-top:3px">最大まで改修済み</div>`;
     else if(o.lv>=mx)h+=`<div class="muted" style="margin-top:3px">城を<span style="color:var(--amber)">Lv${o.lv+1}</span>にすると改修できます（施設のLvは城のLvまで）</div>`;
     else if(o.bt>0)h+=`<div class="muted" style="margin-top:3px">${o.upg==='ench'?'魔核強化中':o.upg==='mat'?'造り替え中':o.upg?'改修中':'建設完了後に改修できます'}（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</div>`;
-    else h+=`<button id="iUpg" class="on wide" ${canAfford(uc)?'':'disabled'} title="[U]"><span>Lv${o.lv+1} に改修</span><span class="cost">${costText(uc)}<span class="t">${upgTurns(o)}T</span></span></button>`;
+    else h+=`<button id="iUpg" class="on wide" ${canAfford(uc)&&!S.waveActive?'':'disabled'} title="${S.waveActive?'襲撃中は改修できません':'[U]'}"><span>${S.waveActive?'襲撃中は改修できません':`Lv${o.lv+1} に改修`}</span><span class="cost">${costText(uc)}<span class="t">${upgTurns(o)}T</span></span></button>`;
     h+=`</div>`;
   }
   if(UNIT_HOME[o.type]){
@@ -6785,7 +6789,7 @@ document.getElementById('bSpd').onclick=()=>{S.speed=(S.speed||1)>=3?1:(S.speed|
 document.getElementById('bInfoTab').onclick=()=>openTab('info');
 document.getElementById('bArmyTab').onclick=()=>openTab('army');
 document.getElementById('bHero').onclick=()=>openTab('hero');
-document.getElementById('bBuild').onclick=()=>{if(!S||S.waveActive||S.phase==='night'){se('error');return;}
+document.getElementById('bBuild').onclick=()=>{if(!S)return;if(S.waveActive||S.phase==='night'){se('error');toast(S.waveActive?'襲撃中は建設できません':'夜は建設できません。朝になると建てられます','warn');return;}
   const onBuildTab=document.querySelector('#rtabs button[data-rt="build"]')?.classList.contains('on');
   if(isLand()&&document.body.classList.contains('sheetOpen')){if(!onBuildTab){enterBuild(S.buildMode||null);return;}if(S.buildPick&&!S.buildMode)exitBuild();closeSheet();return;}
   if(S.buildMode||S.buildPick)exitBuild();else enterBuild(null);};
