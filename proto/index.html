@@ -885,6 +885,8 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 .ov-res .rnow .rnc b{font-weight:400;white-space:nowrap}.ov-res .rnow .rnc span{font-size:11px;color:var(--cyan);white-space:nowrap}
 .ov-res .rnow .rnc .tpips{grid-column:1/-1}
 .ov-res .rnow .rnf{flex:0 0 auto;color:var(--amber);font-size:12px}
+.mkrow.hi{background:#3a1410;box-shadow:inset 3px 0 0 var(--red)}.mktb{padding:2px 8px!important;font-size:12px;display:inline-flex;align-items:center;gap:3px;margin-left:6px;vertical-align:middle}
+.wsum{margin:0 0 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}.wchips{display:flex;flex-wrap:wrap;gap:4px;margin:5px 0 3px}.wchips button{padding:3px 8px;font-size:12px;display:inline-flex;align-items:center;gap:4px}.wchips small{color:var(--dim)}
 .hparty{margin:6px 0 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}
 .hmeter{position:relative;height:8px;background:#22303a;margin:6px 0 2px}.hmeter i{display:block;height:100%}.hmeter u{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--dim)}
 .tpips{display:flex;gap:2px;width:100%}.tpips i{flex:1;height:4px;max-width:22px;background:#22303a}.tpips i.on{background:var(--cyan)}
@@ -1852,7 +1854,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  // 生産
  set('mine',{cat:'生産',tier:1,name:'伐採技術',max:2,cost:{steel:40},t:1,pre:[],eff:'伐採所の産出 +30%（Lvごと・最大2）'});
  set('quarrying',{cat:'生産',tier:1,name:'石工技術',max:2,cost:{steel:30,stone:20},t:1,pre:[],eff:'石切り場の産出 +30%（Lvごと・最大2）'});
- set('farming',{cat:'生産',tier:1,name:'農業技術',max:2,cost:{steel:30,fuel:20},t:1,pre:[],eff:'農場の産出 +30%（Lvごと・最大2）'});
+ set('farming',{cat:'生産',tier:1,name:'土の改良',max:2,cost:{steel:30,fuel:20},t:1,pre:[],eff:'畑に堆肥をすき込み、土を肥やす。農場の産出 +30%（Lvごと・最大2）'});
  set('fishing',{cat:'生産',tier:1,name:'漁業技術',max:2,cost:{steel:30,fuel:20},t:1,pre:[],icon:'fishery',eff:'漁場の産出 +30%（Lvごと・最大2）'});
  set('autoammo',{cat:'生産',tier:1,name:'工房改良',max:3,cost:{steel:50,iron:20},t:2,pre:['mine'],eff:'武器工房の生産 +30%（Lvごと・最大3）'});
  set('prefab',{cat:'生産',tier:1,name:'大工組合',cost:{steel:60,stone:20},t:2,pre:['mine'],eff:'建設・改築にかかるターン −1（最低1ターン）'});
@@ -1860,7 +1862,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('upg_prod1',{cat:'生産',tier:2,name:'改築・生産Ⅱ',cost:{steel:100,stone:40},t:2,pre:[],preSum:{ids:['mine','quarrying','farming','fishing'],n:5,label:'伐採・石工・農業・漁業技術'},eff:'生産施設をLv2まで改築できる'});
  set('mine2',{cat:'生産',tier:2,name:'伐採技術Ⅱ',max:2,cost:{steel:90,iron:20},t:2,pre:['upg_prod1'],icon:'miner',eff:'伐採所の産出 さらに+30%（Lvごと・最大2）'});
  set('quarry2',{cat:'生産',tier:2,name:'石工技術Ⅱ',max:2,cost:{steel:80,stone:40},t:2,pre:['upg_prod1'],icon:'quarry',eff:'石切り場の産出 さらに+30%（Lvごと・最大2）'});
- set('farm2',{cat:'生産',tier:2,name:'農業技術Ⅱ',max:2,cost:{steel:80,fuel:60},t:2,pre:['upg_prod1'],icon:'farm',eff:'農場の産出 さらに+30%（Lvごと・最大2）'});
+ set('farm2',{cat:'生産',tier:2,name:'品種改良',max:2,cost:{steel:80,fuel:60},t:2,pre:['upg_prod1'],icon:'farm',eff:'よく実る麦を選んで育てる。農場の産出 さらに+30%（Lvごと・最大2）'});
  set('fish2',{cat:'生産',tier:2,name:'漁業技術Ⅱ',max:2,cost:{steel:80,fuel:60},t:2,pre:['upg_prod1'],icon:'fishery',eff:'漁場の産出 さらに+30%（Lvごと・最大2）'});
  set('upg_prod2',{cat:'生産',tier:3,name:'改築・生産Ⅲ',cost:{steel:200,stone:80,gold:80},t:3,pre:['upg_prod1'],preSum:{ids:['mine2','quarry2','farm2','fish2'],n:5,label:'Ⅱの生産技術'},eff:'生産施設をLv3まで改築できる'});
  // 内政
@@ -2967,6 +2969,15 @@ function countB(type){let n=0;for(const b of S.blds)if(b.type===type)n++;return 
 // 足りない資源を「木材が12・石材が5足りません」の形で返す（足りていれば空）
 function lackText(c,pop){const L=[];for(const k in (c||{})){const need=(c[k]||0)-(S[k]||0);if(need>0.5)L.push(`${RES_NAME[k]||k}が${Math.ceil(need)}`);}
   if(pop&&S.pop<pop)L.push(`待機中の住民が${pop-S.pop}人`);return L.length?L.join('・')+'足りません':'';}
+// 市場で買えるもの（銀貨）で、足りないもの
+function lackTrade(c){const L=[];for(const [k] of TRADE)if(c&&(c[k]||0)-(S[k]||0)>0.5)L.push(k);return L;}
+function marketOf(){return S.blds.find(b=>b.type==='market'&&!(b.bt>0));}
+function mktBtn(c){const L=lackTrade(c);if(!L.length||!marketOf())return '';return ` <button class="mktb" data-mkt="${L.join(',')}">${ic('silver',12)}市場で買う</button>`;}
+function goMarket(keys){const m=marketOf();if(!m){toast('市場がありません（建設 → 生産）','warn');return;}
+  if(S.overlay)closeOverlay();if(S.buildMode&&typeof exitBuild==='function')exitBuild();
+  S.mktHi=keys||[];S.mktHiT=nowS();S.sel=m;S.selTile=null;se('click');renderInfo(true);renderMode&&renderMode();
+  gPingAt(m.x+bsz(m)/2,m.y+bsz(m)/2,'市場：選択中の画面で資材を売り買いできます');if(isNarrow())openSheet();}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-mkt]');if(!b)return;e.preventDefault();e.stopPropagation();goMarket(b.dataset.mkt.split(','));},true);
 function lackNames(c,pop){const L=[];for(const k in (c||{}))if((c[k]||0)-(S[k]||0)>0.5)L.push(RES_NAME[k]||k);if(pop&&S.pop<pop)L.push('住民');return L.length?L.join('・')+'が足りません':'';}
 function costOf(type){return B[type].cost;}
 function maxLvOf(type){const g=B[type].grp;if(g!=='prod'&&g!=='def')return 1;return Math.min(3,(S&&S.baseLv)||1);}
@@ -3073,6 +3084,7 @@ function piURL(name,col){const key=name+'|'+(col||'');if(PI_CACHE[key])return PI
   const N=PXICON.size,c=document.createElement('canvas');c.width=N;c.height=N;const g=c.getContext('2d');
   rows.forEach((r,y)=>{for(let x=0;x<N;x++){const ch=r[x];if(!ch||ch==='.')continue;g.fillStyle=it?PXICON.palette[ch]:(PI_COL[col]||col||PI_COL.light);g.fillRect(x,y,1,1);}});
   return PI_CACHE[key]=c.toDataURL();}
+const ITEM_IMG={};function itemImg(k){if(!ITEM_IMG[k]){const u=piURL(k);if(!u)return null;const im=new Image();im.src=u;ITEM_IMG[k]=im;}return ITEM_IMG[k];}
 function piSz(sz){return sz<=18?12:sz<=36?24:48;}
 // 操作アイコン（1色）：name=sun/moon/research/army/hire/menu/lock/check/pause/play/gear/close/log
 function ui(name,col,sz){sz=piSz(sz||12);return `<img class="pi" src="${piURL(name,col)}" width="${sz}" height="${sz}" alt="" style="width:${sz}px;height:${sz}px">`;}
@@ -3206,7 +3218,7 @@ function skillTick(dt){
 }
 
 function cmdOf(o){return o.cmd?S.cmds.find(c=>c.id===o.cmd&&c.alive):null;}
-const NO_HERO=['fence','swall','wall','gate','bastion','brazier'];
+const NO_HERO=['fence','swall','wall','gate','bastion','brazier','market'];   // 市場は英雄の配属なし（詳細は売り買いの情報に使う）
 function canHostHero(o){return !o||o.kind==='s'||(!NO_HERO.includes(o.type)&&!(B[o.type]&&B[o.type].isMine));}
 function assign(c,target){
   if(target&&!canHostHero(target)){toast('壁・門・柵・篝火には英雄を置けません','warn');return;}
@@ -4727,6 +4739,10 @@ function draw(){
   if(S.dust&&S.dust.length){S.dust=S.dust.filter(d=>(d.t+=1/60)<0.6);for(const d of S.dust){ctx.globalAlpha=0.5*(1-d.t/0.6);ctx.fillStyle='#b89a6a';ctx.beginPath();ctx.arc(d.x,d.y,3+d.t*10,0,7);ctx.fill();}ctx.globalAlpha=1;}
   // 照明矢の光
   for(const f of (S.flares||[])){const k=f.t/f.T;ctx.save();ctx.globalAlpha=0.18*Math.min(1,k*3);const g=ctx.createRadialGradient(f.x,f.y,2,f.x,f.y,f.r);g.addColorStop(0,'#fff6c0');g.addColorStop(1,'rgba(255,240,160,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,7);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle='#fff6c0';ctx.beginPath();ctx.arc(f.x,f.y-6-3*Math.sin(f.t*6),2.5,0,7);ctx.fill();ctx.restore();}
+  // 武器工房の上に、作っているもの（矢か剣）を出す
+  for(const b of S.blds){if(b.type!=='ammo'||b.ruin)continue;const im=itemImg(b.mode==='sword'?'sword':'arrow');if(!im||!im.complete)continue;
+    const n=bsz(b),x=(b.x+n/2)*T,y=b.y*T+3;ctx.save();ctx.fillStyle='rgba(10,8,14,.82)';ctx.fillRect(x-8,y-8,16,16);ctx.strokeStyle=b.bt>0?'#56685a':'#f2b33d';ctx.lineWidth=1;ctx.strokeRect(x-7.5,y-7.5,15,15);
+    ctx.imageSmoothingEnabled=false;ctx.globalAlpha=b.bt>0?.5:1;ctx.drawImage(im,x-6,y-6,12,12);ctx.restore();}
   // 効いている間のバッジ（スキルアイコン＋残り秒）・突撃の勢い
   {const badge=(x,y,ic,t,col)=>{ctx.save();ctx.font='bold 9px sans-serif';ctx.textAlign='left';const tx=t!=null?Math.ceil(t)+'':'',w=14+(tx?ctx.measureText(tx).width+3:0);ctx.fillStyle='rgba(10,8,14,.85)';ctx.fillRect(x-w/2,y-7,w,13);ctx.strokeStyle=col;ctx.lineWidth=1;ctx.strokeRect(x-w/2+.5,y-6.5,w-1,12);
       if(PXI[ic]){ctx.imageSmoothingEnabled=false;ctx.drawImage(PXI[ic],x-w/2+2,y-5,10,10);ctx.imageSmoothingEnabled=true;}if(tx){ctx.fillStyle=col;ctx.fillText(tx,x-w/2+14,y+3);}ctx.restore();};
@@ -5691,6 +5707,14 @@ function heroFx(o,cid){// その英雄を配属した時の効果（一時的に
   return L.filter(x=>x[1]);}
 function fxHTML(L,base){return L.map(([k,v])=>{const b0=base&&base.find(x=>x[0]===k);const d=b0?v-b0[1]:null;return `<span class="hfx">${k}<b class="${v<0&&k!=='被害'?'bd':'gd'}">${v>0?'+':''}${v}%</b>${d!=null&&d!==0?`<i class="${d>0===(k!=='被害')?'up':'dn'}">${d>0?'▲':'▼'}${Math.abs(d)}</i>`:''}</span>`;}).join('');}
 function hcdText(c){const k=heroSkills(c).find(q=>q.cd);if(!k)return '';const left=(c.cdk&&c.cdk[k.id])||0;if(c.fired&&nowS()-c.fired<1.2)return '発動！';return left>0.05?`あと${Math.ceil(left)}秒`:'準備完了';}
+function marketHTML(o){let h='';
+  {const n=econ().net,hi=S.mktHiT&&nowS()-S.mktHiT<120?(S.mktHi||[]):[];
+    h+=`<div class="upg"><b>買い物の目安</b><span class="muted" style="font-size:11px">　在庫・1日の増減</span>`+TRADE.map(([k])=>{const d=n[k]||0,v=Math.floor(S[k]||0),days=d<-0.5?Math.floor(v/-d):null;
+      const st=hi.includes(k)?'<b style="color:var(--red)">足りない</b>':days!=null&&days<=3?`<span style="color:var(--amber)">あと${days}日で尽きる</span>`:d<-0.5?`<span class="muted">${days}日分</span>`:d>0.5?'<span style="color:var(--green)">増えている</span>':'<span class="muted">変わらない</span>';
+      return `<div class="row mkrow${hi.includes(k)?' hi':''}" style="align-items:center"><span>${ic(k,12)} ${RES_NAME[k]} <b>${v}</b> <span class="muted" style="font-size:11px">${Math.abs(d)<0.5?'±0':(d>0?'+':'−')+Math.round(Math.abs(d))}/日</span></span><span style="font-size:11px">${st}</span></div>`;}).join('')+`</div>`;}
+  {const tc=Math.floor(S.silver||0);h+=`<div class="upg"><b>交易</b> <span class="muted" style="font-size:11px">20ずつ売り買い・1日に各${buyLimit()}まで買える</span><div style="font-size:11.5px;margin:2px 0 4px">${ic('silver',12)} 銀貨 <b style="color:#dde4ec">${tc}</b> <span class="muted" style="font-size:10.5px">（資材を売ると銀貨が入り、資材は銀貨で買う。金貨では買えない）</span></div>`+TRADE.map(([k,bp])=>{const g=Math.round(bp*20),left=buyLeft(k);return `<div class="row" style="align-items:center"><span>${ic(k,12)} ${RES_NAME[k]} <span class="muted" style="font-size:11px">買 ${ic('silver',10)}${g}／売 ${ic('silver',10)}${Math.round(bp*20*0.25)}・今日あと${left}</span></span><span><button data-buy="${k}" style="padding:1px 8px" ${tc>=g&&left>=20?'':'disabled'}>買う</button> <button data-sellr="${k}" style="padding:1px 8px" ${S[k]>=20?'':'disabled'}>売る</button></span></div>`;}).join('')+`</div>`;}
+  {const pr=matPrice();h+=`<div class="upg"><b>魔核の買い取り</b>　<span class="muted">1つ ${ic('gold',12)}${pr}</span><div style="display:flex;gap:4px;margin-top:4px"><button data-sell="10" ${S.mat>=10?'':'disabled'}>10個売る（+${10*pr}）</button><button data-sell="all" ${S.mat>=1?'':'disabled'}>全部売る（${Math.floor(S.mat)}個 → +${Math.floor(S.mat)*pr}）</button></div><div class="muted" style="font-size:11px;margin-top:3px">市場が2棟以上あると高く売れる。研究に使う分は残しておこう</div></div>`;}
+  return h;}
 function heroBlock(o){const c=cmdOf(o),isS=o.kind==='s',want=specOfTarget(o);const cur=c?heroFx(o,c.id):null;
   let h=`<div class="hsec"><div class="hhd"><span>配属英雄</span><small>向いている：${want}</small></div>`;
   if(c){const m=match(c,o)===1;
@@ -5727,7 +5751,7 @@ function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
   if(gunOf(o))tiles.push(`<small>射程</small><b>${(rangeOf(o)*U).toFixed(1)}<span>マス</span></b>`);
   if(d.pop)tiles.push(`<div id="iCrew" class="tl">${crewTile(o)}</div>`);
   tiles.push(`<small>狙われやすさ</small><b>${heatName(o)}</b>`);
-  if(tiles.length<3)tiles.push(`<small>向いている英雄</small><b>${specOfTarget(o)}</b>`);
+  if(tiles.length<3&&canHostHero(o))tiles.push(`<small>向いている英雄</small><b>${specOfTarget(o)}</b>`);
   if(tiles.length<3&&o.type==='hq')tiles.push(`<small>城のレベル</small><b>${S.baseLv}<span>/ ${BASE_MAX}</span></b>`);
   if(tiles.length<3){const pr=prodOf(o);const k=pr&&Object.keys(pr).find(x=>pr[x]>0);if(k)tiles.push(`<small>つくる</small><b>${ic(k,12)}+${pr[k].toFixed(1)}<span>/T</span></b>`);}
   h+=`<div class="stats">${tiles.slice(0,3).map(t=>t.startsWith('<div id="iCrew"')?t:`<div>${t}</div>`).join('')}</div>`;
@@ -5742,7 +5766,7 @@ function detailsify(root){let st={};try{st=JSON.parse(localStorage.getItem('nd_i
     else if(first.classList.contains('row')&&first.querySelector('b')){const b=first.querySelector('b');title=b.innerHTML;b.remove();svHTML=first.innerHTML;first.remove();}
     else return;
     const key=title.replace(/<[^>]+>/g,'').replace(/[：:].*$/,'').trim();
-    const d=document.createElement('details');d.className='isec';d.open=key in st?!!st[key]:/施設改修|拠点レベル|部隊の編成|配置中|がいません|つながった壁/.test(key);
+    const d=document.createElement('details');d.className='isec';d.open=key in st?!!st[key]:/施設改修|拠点レベル|部隊の編成|配置中|がいません|つながった壁|買い物の目安|交易|作るもの/.test(key);
     const sm=document.createElement('summary');sm.innerHTML=`<span class="st">${title}</span><span class="sv">${svHTML}</span>`;
     const body=document.createElement('div');body.className='sb';while(u.firstChild)body.appendChild(u.firstChild);
     d.append(sm,body);d.addEventListener('toggle',()=>{st[key]=d.open;try{localStorage.setItem('nd_info_open',JSON.stringify(st));}catch(e){}});u.replaceWith(d);});}
@@ -5792,6 +5816,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   const d=isS?null:B[o.type];
   let h=infoHead(o);
   if(isS||canHostHero(o))h+=heroBlock(o);
+  if(!isS&&o.type==='market'&&!(o.bt>0))h+=marketHTML(o);
   if(!isS&&gunOf(o)&&o.type!=='hq'&&!(o.bt>0&&!o.upg))h+=brkHTML('火力（1発）',dmgBaseB(o),dmgPctB(o));
   if(!isS&&!gunOf(o)&&!(o.bt>0)){const po=prodOf(o);if(po){const k=Object.keys(po).find(x=>po[x]>0&&x!=='pop');if(k){const L=prodPctB(o);const base=po[k]/(1+pctSum(L));h+=brkHTML(`生産（${RES_NAME[k]||k}）`,base,L,'/T');}}}
   if(!isS&&gunOf(o)&&(elevRange(o)||wallRange(o)||elevAP(o))){const er=elevRange(o),wr=wallRange(o);h+=`<div class="row"><span class="muted">射程の内訳</span><span>${(rangeOf(o)*U).toFixed(1)}マス${er||wr?`<span class="muted" style="font-size:11px">（${[er?'標高+'+(er*U).toFixed(1):'',wr?(o.wall&&o.wall.bastion?'櫓台+':'城壁+')+(wr*U).toFixed(1).replace(/\.0$/,''):''].filter(x=>x).join('・')}）</span>`:''}${elevAP(o)?`・<span class="muted" style="font-size:11px">高所：硬い敵に+${Math.round(elevAP(o)*100)}%</span>`:''}</span></div>`;}
@@ -5859,8 +5884,6 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
       if(o.wuse)h+=`<div class="row"><span class="muted">${S.waveActive?'今夜の消費':'前回の夜の消費'}</span><span class="bd">${Object.entries(o.wuse).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;
       else if(o.wlast)h+=`<div class="row"><span class="muted">前回の夜の消費</span><span class="bd">${Object.entries(o.wlast).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;}}
     if(o.res!=null&&o.res!==Infinity)h+=`<div class="row"><span class="muted">残りの埋蔵量</span><span class="${o.dep?'bd':o.res<150?'wn':''}">${o.dep?'枯渇（もう採れない）':Math.floor(o.res)}</span></div>`;}
-  if(!isS&&o.type==='market'&&!(o.bt>0)){const tc=Math.floor(S.silver||0);h+=`<div class="upg"><b>交易</b> <span class="muted" style="font-size:11px">20ずつ売り買い・1日に各${buyLimit()}まで買える</span><div style="font-size:11.5px;margin:2px 0 4px">${ic('silver',12)} 銀貨 <b style="color:#dde4ec">${tc}</b> <span class="muted" style="font-size:10.5px">（資材を売ると銀貨が入り、資材は銀貨で買う。金貨では買えない）</span></div>`+TRADE.map(([k,bp])=>{const g=Math.round(bp*20),left=buyLeft(k);return `<div class="row" style="align-items:center"><span>${ic(k,12)} ${RES_NAME[k]} <span class="muted" style="font-size:11px">買 ${ic('silver',10)}${g}／売 ${ic('silver',10)}${Math.round(bp*20*0.25)}・今日あと${left}</span></span><span><button data-buy="${k}" style="padding:1px 8px" ${tc>=g&&left>=20?'':'disabled'}>買う</button> <button data-sellr="${k}" style="padding:1px 8px" ${S[k]>=20?'':'disabled'}>売る</button></span></div>`;}).join('')+`</div>`;}
-  if(!isS&&o.type==='market'&&!(o.bt>0)){const pr=matPrice();h+=`<div class="upg"><b>魔核の買い取り</b>　<span class="muted">1つ ${ic('gold',12)}${pr}</span><div style="display:flex;gap:4px;margin-top:4px"><button data-sell="10" ${S.mat>=10?'':'disabled'}>10個売る（+${10*pr}）</button><button data-sell="all" ${S.mat>=1?'':'disabled'}>全部売る（${Math.floor(S.mat)}個 → +${Math.floor(S.mat)*pr}）</button></div><div class="muted" style="font-size:11px;margin-top:3px">市場が2棟以上あると高く売れる。研究に使う分は残しておこう</div></div>`;}
   if(!isS&&o.type==='ammo'){const sw=o.mode==='sword';h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-wmode="arrow" class="${sw?'':'on'}">${ic('ammo',14)} 矢</button><button data-wmode="sword" class="${sw?'on':''}">${ic('sword',14)} 剣</button></div><div class="muted" style="font-size:11px;margin-top:3px">${sw?'剣：兵士・重装歩兵・騎兵の編成と補充に使う':'矢：バリスタ・物見櫓・弓兵が使う'}</div></div>`;}
   if(!isS&&canEnch(o)&&!(o.bt>0&&!o.upg)){const e=o.ench||0;const what=B[o.type].range?'火力':PROD_BT.includes(o.type)?'生産量':'';
     h+=`<div class="upg"><b>魔核の強化</b><span><span class="star">${'★'.repeat(e)}${'☆'.repeat(3-e)}</span> ${e}/3</span>`;
@@ -6212,7 +6235,7 @@ function showResearch(){
   if(st==='done')act=`<span style="color:var(--green);font-weight:bold">${ui('check','green',12)} 最大レベル（Lv${t.max||1}）・研究完了</span>`;
   else if(st==='active')act=`<span style="color:var(--cyan)">研究中 残り${r.left}ターン</span> <button data-cancel="${t.id}">中止（費用の半分を回収）</button>`;
   else if(st==='ready'){const need=techRes(t),rok=resBusy()+need<=resCap()&&S.pop>=need;const ok=canAfford(c)&&rok&&!S.waveActive;
-    act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?(S.pop<need?'待機中の住民が足りません':'研究員が足りません（研究室を増やす・改築する）'):'資源が足りません'}</span>`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
+    act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?(S.pop<need?'待機中の住民が足りません':'研究員が足りません（研究室を増やす・改築する）'):'資源が足りません'}</span>${rok?mktBtn(c):''}`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
   else if(st==='excluded')act='<span class="muted">もう一方の分岐を選んだため研究できません</span>';
   else if(st==='maplock')act='<span class="muted">このマップでは第三段階の研究はできません（2マップ目以降で解禁）</span>';
   else if(t.gate&&!(rankOpen(cat,t.gate-1)&&rankSum(cat,t.gate-1)>=gateNeed(cat,t.gate)))act=`<span class="muted">条件：${!rankOpen(cat,t.gate-1)?`<span style="color:var(--red)">${gateOf(cat,t.gate-1).name}</span>・`:''}<span style="color:${rankSum(cat,t.gate-1)>=gateNeed(cat,t.gate)?'var(--green)':'var(--red)'}">ランク${RN[t.gate-1]}の研究を合計Lv${gateNeed(cat,t.gate)}以上（今 ${rankSum(cat,t.gate-1)}）</span></span>`;
@@ -6668,13 +6691,17 @@ function renderArmyPanel(force){if(!S)return;const sub=S.armySub||'list';
   else if(sub==='adv')showHire(el,'adv');}
 function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el)return;if((S.armySub||'list')!=='list')return;const box=el.closest('.box');if(box&&box.style.display==='none'&&!force)return;
   const sq=S.squads.filter(needsSupply);
-  const key=S.squads.map(s=>s.id+':'+Math.round(s.hp/s.maxhp*20)+':'+(supOf(s)?Math.round(s.sup/supOf(s).max*20):'')+':'+s.members+(s.gar?'g':'')+(s.mode||'')+(s.supPend?'s':'')).join()+'|'+sq.length+'|'+S.waveActive+'|'+(S.sel&&S.sel.kind==='s'?S.sel.id:'')+'|'+['sword','ammo','elec','powder','iron','fuel','pop'].map(k=>Math.floor(S[k]||0)).join(',');if(key===armyKey&&!force)return;armyKey=key;
+  const key=S.squads.map(s=>s.id+':'+Math.round(s.hp/s.maxhp*20)+':'+(supOf(s)?Math.round(s.sup/supOf(s).max*20):'')+':'+s.members+(s.gar?'g':'')+(s.mode||'')+(s.supPend?'s':'')).join()+'|'+sq.length+'|'+S.waveActive+'|'+(S.sel&&S.sel.kind==='s'?S.sel.id:'')+'|'+['sword','ammo','elec','powder','iron','fuel','pop'].map(k=>Math.floor(S[k]||0)).join(',')+'|'+S.blds.filter(b=>b.type==='ammo').map(b=>(b.mode||'a')+(b.bt>0?'b':'')).join('');if(key===armyKey&&!force)return;armyKey=key;
   let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length&&!S.waveActive?'':'disabled'}>${sq.length?`一括補給（${sq.length}部隊）<span class="supc">${supCostHTML(sq)}</span>`:'一括補給（必要なし）'}</button></div>`;
+  // 武器工房：何を作っているか・切り替え（建物を探さなくても変えられるように）
+  {const ws=S.blds.filter(b=>b.type==='ammo');
+   h+=`<div class="wsum"><div class="row" style="align-items:center"><b>武器工房</b><span class="muted" style="font-size:11px">在庫 ${ic('ammo',12)}矢 ${Math.floor(S.ammo||0)}　${ic('sword',12)}剣 ${Math.floor(S.sword||0)}</span></div>`+
+     (ws.length?`<div class="wchips">${ws.map((b,i)=>`<button data-wsw="${b.id}" title="押すと矢と剣を切り替え">${ic(b.mode==='sword'?'sword':'ammo',14)}工房${i+1}：${b.mode==='sword'?'剣':'矢'}${b.bt>0?'<small>（建設中）</small>':''}</button>`).join('')}</div><div class="muted" style="font-size:10.5px">押すと矢と剣が切り替わる。矢は弓兵・物見櫓、剣は剣を使う部隊の補給に使う</div>`:'<div class="muted" style="font-size:11px">武器工房がありません（建設 → 生産）</div>')+`</div>`;}
   if(!S.squads.length)h+='<div class="muted">部隊がいません。兵舎などで訓練しましょう</div>';
   else h+=`<div class="sqhd"><span>部隊 ${S.squads.length}・英雄 ${S.cmds.length}</span><span>クリックで指揮／Q で順に選択</span></div><div class="sqlist">`+S.squads.map(s=>{const r=Math.max(0,s.hp/s.maxhp),hc=cmdOf(s),ik=hc&&WICON['h_'+hc.spec]&&s.ut!=='drake'?'h_'+hc.spec:sqKey(s);
       const stt=s.gar?['配置中','gd']:s.supPend||s.eqPend?['補給へ','wn']:s.mode==='guard'?['迎撃','cy']:s.mode==='hold'?['固守','wn']:s.mode==='return'?['帰還','dm']:['待機','dm'];
       return `<button data-sq="${s.id}" class="sqrow${S.sel===s?' cur':''}">${icSvg(ik,32)}<span class="sqm"><span class="sqn"><b>${unitLabel(s)}</b><span class="${stt[1]}">${stt[0]}</span><span class="sqc">兵 ${s.members}/${UT[s.ut].members}</span></span><span class="hpbar${r<0.3?' low':r<0.6?' mid':''}"><i style="width:${Math.round(r*100)}%"></i></span>${(()=>{const sp=supOf(s);if(!sp)return '';const q=Math.max(0,Math.min(1,s.sup/sp.max));const col={sword:'#c8d0dc',ammo:'#f2b33d',elec:'#62c6d9',powder:'#b0a090',fuel:'#e89040'}[sp.key]||'#c8d0dc';return `<span class="sbrow"><span class="supbar${q<0.25?' low':''}"><i style="width:${Math.round(q*100)}%;background:${col}"></i></span><small style="color:${q<0.25?'var(--red)':col}">${sp.name} ${Math.round(q*100)}%</small></span>`;})()}</span></button>`;}).join('')+'</div>';
-  el.innerHTML=h;
+  el.innerHTML=h;el.querySelectorAll('[data-wsw]').forEach(b=>b.onclick=()=>{const w=S.blds.find(x=>x.id==b.dataset.wsw);if(!w)return;w.mode=w.mode==='sword'?null:'sword';se('click');renderArmyBox(true);if(S.sel===w)renderInfo(true);});
   el.querySelectorAll('[data-sq]').forEach(b=>b.onclick=()=>{const q0=S.squads.find(s=>s.id==b.dataset.sq);if(S.sel===q0){deselect();return;}S.sel=q0;S.multi=[];renderInfo(true);const q=S.sel;if(q&&!q.gar){cam.x=q.x-VW/2/cam.z;cam.y=q.y-VH/2/cam.z;clampCam();}});
   document.getElementById('abSel').onclick=()=>{S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;renderInfo(true);renderMode();};
   document.getElementById('abSup').onclick=()=>{supplyAll();renderArmyBox(true);};
@@ -6945,7 +6972,7 @@ let padKey='',padShownAt=0;
 function renderPad(){const on=!!(padMode()&&S&&S.buildMode&&bGhost);if(on&&!document.body.classList.contains('bpad'))padShownAt=performance.now();document.body.classList.toggle('bpad',on);if(!on){padKey='';return;}
   const why=ghostReason(),key=S.buildMode+'|'+why;if(key===padKey)return;padKey=key;
   document.getElementById('bpIc').innerHTML=icSvg(S.buildMode,20);setText(document.getElementById('bpName'),B[S.buildMode].name);
-  const st=document.getElementById('bpState');st.className='bpS '+(why?'ng':'ok');setText(st,why||'ここに建てられます');
+  const st=document.getElementById('bpState');st.className='bpS '+(why?'ng':'ok');const mb=why?mktBtn(costOf(S.buildMode)):'';if(mb)st.innerHTML=`${why}${mb}`;else setText(st,why||'ここに建てられます');
   document.getElementById('bpOk').classList.toggle('ng',!!why);}
 // 十字キーの欄が出た直後の押しは無視（地図をタップした指がそのまま「決定」に当たって、勝手に建つのを防ぐ）
 const padFresh=()=>performance.now()-padShownAt<450;
@@ -6979,7 +7006,7 @@ function renderMode(){
   const tap=IS_TOUCH?'タップ':'クリック';
   let t;
   if(S.buildMode){const d=B[S.buildMode],c=costOf(S.buildMode),ok=canAfford(c,d.pop),sz=newSz(S.buildMode);
-    t=`${icSvg(S.buildMode,24)}<b class="mn">${d.name}</b><span class="szt">${sz}×${sz}</span><span class="ms">・${ok?(padMode()?(bGhost?'十字キーで調整して「決定」':(WALL_TYPES.includes(S.buildMode)?'場所をタップ・なぞると一列に配置':'建てたい場所をタップ')):(WALL_TYPES.includes(S.buildMode)?`${tap}で1枚・ドラッグで一列に配置`:`マップを${tap}して配置（続けて置けます）`)):`<span style="color:var(--red)">${lackNames(c,d.pop)||'資源が足りません'}</span>`}</span><span class="mc">${costText(c,d.pop)}</span>`;}
+    t=`${icSvg(S.buildMode,24)}<b class="mn">${d.name}</b><span class="szt">${sz}×${sz}</span>${!ok&&isNarrow()?mktBtn(c):''}<span class="ms">・${ok?(padMode()?(bGhost?'十字キーで調整して「決定」':(WALL_TYPES.includes(S.buildMode)?'場所をタップ・なぞると一列に配置':'建てたい場所をタップ')):(WALL_TYPES.includes(S.buildMode)?`${tap}で1枚・ドラッグで一列に配置`:`マップを${tap}して配置（続けて置けます）`)):`<span style="color:var(--red)">${lackNames(c,d.pop)||'資源が足りません'}</span>${isNarrow()?'':mktBtn(c)}`}</span><span class="mc">${costText(c,d.pop)}</span>`;}
   else if(S.buildPick)t=`<b class="mn">建設モード</b><span class="ms">・建てる施設を「建設」の一覧から選んでください</span>`;
   else if(S.aimNaval)t='<b class="mn" style="color:#ffe38a">艦砲射撃</b><span class="ms">・目標地点をクリック（Escで取消）</span>';
   else if(S.multi&&S.multi.length)t=`<b class="mn">${S.multi.length}部隊</b><span class="ms">を選択中・地図を${tap}でまとめて移動・Shift+クリックで追加/除外</span>${X}`;
