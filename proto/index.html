@@ -909,12 +909,16 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 .nplan{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:6px 8px;text-align:left;min-height:52px}
 .nplan.on{box-shadow:inset 0 0 0 2px var(--amber);background:#2a2210}.nph{display:flex;align-items:center;gap:5px}.nph b{font-weight:400}
 .npd{font-size:11px;color:var(--dim);line-height:1.4}.nplan[disabled] .npd{color:var(--off)}
+.nfoot{position:sticky;bottom:-20px;z-index:2;display:flex;justify-content:flex-end;gap:8px;margin:12px -4px -20px;padding:8px 4px 20px;background:var(--panel,#121a14);box-shadow:0 -1px 0 var(--line),0 -8px 12px rgba(0,0,0,.35)}
+.nfoot button{padding:8px 16px}
+@media (max-width:900px){.nfoot{bottom:-14px;margin-bottom:-14px;padding-bottom:14px}}   /* カードの下の余白ぶん下げて、すき間から中身が見えないように */
 .nfest{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#2a2210;box-shadow:inset 0 0 0 1px var(--amber)}.nfest>div{flex:1}
 body.fwOn #overlay{visibility:hidden}
 #saveMark{position:fixed;right:12px;bottom:12px;z-index:90;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;background:rgba(10,14,11,.92);box-shadow:inset 0 0 0 1px var(--line);font-size:12px;color:var(--text);opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;pointer-events:none}
 #saveMark.on{opacity:1;transform:none}#saveMark.busy .pi{animation:saveBlink .5s steps(2) infinite}#saveMark.ng{color:var(--red)}
 @keyframes saveBlink{50%{opacity:.3}}
-body.land #saveMark{right:calc(var(--rail) + 8px)}
+body.land #saveMark{right:calc(var(--rail) + 8px);bottom:auto;top:44px}   /* スマホ横持ちは右上（下のボタンに重ならないように） */
+@media (max-width:900px){body:not(.land) #saveMark{bottom:auto;top:60px}}
 /* PCの下のボタン：夜へ・一括修理・一括補給 ／ 図鑑・記録・倍速（押すたびに×1→×2→×3）・一時停止・歯車 */
 @media (min-width:901px){
   body:not(.land) #controls>.sep,body:not(.land) #controls>.speed{display:none!important}
@@ -3678,11 +3682,11 @@ function churchN(){return Math.min(2,S.blds.filter(b=>b.type==='church'&&!(b.bt>
 function prayGain(){return 3+5*churchN();}
 // 今夜の過ごし方
 const NPLAN=[
-  {id:'rest',name:'休む',ic:'moon',d:()=>'ゆっくり休む。幸福度 +2'},
+  {id:'rest',name:'休む',ic:'bed',d:()=>'ゆっくり休む。幸福度 +2'},
   {id:'feast',name:'宴',ic:'ev_fest',need:()=>S.blds.some(b=>b.type==='tavern'&&!(b.bt>0))?'':'酒場が必要',cost:{gold:15,fuel:20},d:()=>'酒場で宴を開く。幸福度 +6（2日続く）'},
   {id:'pray',name:'祈り',ic:'sun',d:()=>`みんなで祈る。幸福度 +${prayGain()}${churchN()?`（教会×${churchN()}）`:'（教会があるともっと上がる）'}`},
   {id:'watch',name:'夜警を厚く',ic:'eye',cost:{gold:10},d:()=>'見張りを増やす。今夜は事件が起きない'},
-  {id:'overtime',name:'夜なべ',ic:'gear',need:()=>has('overtime')?'':'研究「延長シフト」が必要',d:()=>`夜も働く。生産 ${has('allnight')?'昼と同じ':'昼の半分'}・幸福度 −${has('allnight')?15:8}`},
+  {id:'overtime',name:'夜なべ',ic:'moon',need:()=>has('overtime')?'':'研究「延長シフト」が必要',d:()=>`夜も働く。生産 ${has('allnight')?'昼と同じ':'昼の半分'}・幸福度 −${has('allnight')?15:8}`},
 ];
 function planOf(id){return NPLAN.find(p=>p.id===id);}
 function planBlock(p){if(p.need){const w=p.need();if(w)return w;}if(p.cost&&!canAfford(p.cost))return lackNames(p.cost)||'資源が足りません';return '';}
@@ -3743,7 +3747,7 @@ function showNight(){phaseReset();
   if(S.phase!=='night')return;
   if(!S.night)nightStart();const N=S.night;
   const list=S.squads.filter(q=>!q.gar);
-  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} ${N.plan==='fest'?'祭りの夜':'静かな夜'}</h2><span style="display:flex;gap:6px"><button id="toMorningTop" class="on" style="padding:6px 14px">朝へ [Enter]</button><button id="ovClose">地図を見る</button></span></div>
+  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} ${N.plan==='fest'?'祭りの夜':'静かな夜'}</h2></div>
   <div class="row" style="align-items:center;margin:2px 0 6px"><span class="muted">街の機嫌</span><span style="display:inline-flex;align-items:center;gap:6px">${happyIc(24)}<b>${Math.round(S.happy)}</b> ${happyName()}</span></div>`;
   if(N.plan==='fest'&&!N.fwShown){N.fwShown=true;setTimeout(()=>fireworks(4500),250);}
   if(N.visit)h+=visitHTML(N);
@@ -3761,11 +3765,10 @@ function showNight(){phaseReset();
   h+=list.length?list.map(q=>`<div class="row" style="align-items:center"><span>${icSvg(q.model||defModel(q.ut),18)} <b>${unitLabel(q)}</b> <span class="muted" style="font-size:11px">${q.members}/${UT[q.ut].members}${UT[q.ut].unit}・体力${Math.round(q.hp/q.maxhp*100)}%</span></span><button data-hunt="${q.id}" class="${q.hunt?'on':''}" style="min-width:86px">${q.hunt?'狩りへ '+ui('check','amber',12):'夜警'}</button></div>`).join(''):'<div class="muted">部隊がいません（城館で農兵を集められます）</div>';
   // 研究の入れ忘れ
   {const free=resCap()-resBusy();if(free>0)h+=`<div class="row nres" style="align-items:center;margin-top:10px"><span style="color:var(--amber)">${ui('research','amber',14)} 研究員が${free}人空いています</span><button id="nRes">研究を開く</button></div>`;}
-  h+=`<div style="margin-top:12px;text-align:right"><button id="toMorning" class="on" style="padding:8px 16px">朝へ [Enter]</button></div>`;
+  h+=`<div class="nfoot"><button id="ovClose">地図を見る</button><button id="toMorning" class="on">朝へ [Enter]</button></div>`;
   const card=openOverlay('night',h,true);
   document.getElementById('ovClose').onclick=closeOverlay;
   document.getElementById('toMorning').onclick=()=>{closeOverlay();morning();};
-  document.getElementById('toMorningTop').onclick=()=>{closeOverlay();morning();};
   {const b=document.getElementById('nRes');if(b)b.onclick=()=>showResearch();}
   {const b=document.getElementById('nFw');if(b)b.onclick=()=>fireworks(4500);}
   card.querySelectorAll('[data-plan]').forEach(b=>b.onclick=()=>{N.plan=b.dataset.plan;se('click');showNight();});
@@ -5841,6 +5844,7 @@ PXICON.ui.icons.ev_scout=["............", "x..........x", "xx........xx", "xxx.x
 PXICON.ui.icons.ev_moon=["....xxxx....", "..xxxxxxxx..", ".xxx.xxxxxx.", ".xxxxxxx.xx.", "xxxxxxxxxxxx", "xx.xxxxxxxxx", "xxxxxxx.xxxx", "xxxxxxxxxxxx", ".xxxx.xxxxx.", ".xxxxxxxxxx.", "..xxxxxxxx..", "....xxxx...."];
 PXICON.ui.icons.eye=["............","............","...xxxxxx...",".xx......xx.","x...xxxx...x","x..xx..xx..x","x..xx..xx..x","x...xxxx...x",".xx......xx.","...xxxxxx...","............","............"];
 PXICON.ui.icons.disk=["xxxxxxxxxx..","x..xxxxx..x.","x..xx.xx..xx","x..xx.xx...x","x..xxxxx...x","x..........x","x.xxxxxxxx.x","x.x......x.x","x.x......x.x","x.x......x.x","x.x......x.x","xxxxxxxxxxxx"];
+PXICON.ui.icons.bed=["............","............","x...........","x.xx.xxxxxx.","x.xx.xxxxxxx","xxxxxxxxxxxx","xxxxxxxxxxxx","x..........x","x..........x","............","............","............"];
 PXICON.ui.icons.sage=["...####.....","..######....","..#.##.#....","..######....","...####..##.",".######..##.","#######.####","#######.####","#######.####","#######..##.","#######.....","#######....."];
 PXICON.ui.icons.crown=PXICON.ui.icons.crown||["............","............",".x...x...x..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..","............","............","............"];
 PXICON.ui.icons.target=PXICON.ui.icons.target||["............","....xxxx....","..xx....xx..","..x......x..",".x...xx...x.",".x..xxxx..x.",".x..xxxx..x.",".x...xx...x.","..x......x..","..xx....xx..","....xxxx....","............"];
