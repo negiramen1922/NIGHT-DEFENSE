@@ -878,6 +878,15 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 .ov-res .rres span{display:inline-flex;align-items:center;gap:3px;font-variant-numeric:tabular-nums}
 .ov-res #ovClose{margin-left:auto}
 .ov-res .rtabsrow{display:flex;align-items:flex-end;gap:16px;padding:12px 24px 0;flex-shrink:0}
+.ov-res .rnow{display:flex;align-items:center;gap:8px;padding:8px 24px;border-bottom:1px solid var(--line);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.ov-res .rnow::-webkit-scrollbar{display:none}
+.ov-res .rnow>small{color:var(--dim);flex-shrink:0}
+.ov-res .rnow .rnc{flex:0 0 auto;display:grid;grid-template-columns:auto auto;align-items:baseline;column-gap:10px;row-gap:3px;padding:4px 10px;text-align:left;border-left:3px solid var(--tc)}
+.ov-res .rnow .rnc b{font-weight:400;white-space:nowrap}.ov-res .rnow .rnc span{font-size:11px;color:var(--cyan);white-space:nowrap}
+.ov-res .rnow .rnc .tbar{grid-column:1/-1;width:100%;margin-top:0}
+.ov-res .rnow .rnf{flex:0 0 auto;color:var(--amber);font-size:12px}
+.ov-res .ttabs .tact{display:inline-block;width:6px;height:6px;background:var(--cyan);margin-left:5px;vertical-align:middle}
+@media (max-width:900px){.ov-res .rnow{padding:4px 14px}.ov-res .rnow .rnc{padding:2px 8px;row-gap:2px}}
 .ov-res .ttabs{margin:0;gap:4px}
 .ov-res .ttabs button{padding:6px 14px;font-size:12px;box-shadow:inset 0 -3px 0 var(--tc)}
 .ov-res .ttabs button.on{background:var(--head);color:var(--text)}
@@ -6103,7 +6112,10 @@ function showResearch(){
   const cap=resCap(),busy=resBusy();
   let h=`<div class="rhead"><span class="rtt">研究</span><div class="rstat"><small>研究員</small><b>${busy} / ${cap}</b>${pipsHTML(busy,Math.min(cap,16),'rpips')}</div><div class="rstat"><small>襲撃まで</small><b>${S.waveActive?'交戦中':S.turnsLeft+' ターン'}</b></div>
     <div class="rres">${['steel','stone','iron','fuel','ammo','elec','gold','mat'].map(k=>`<span>${ic(k,12)}${Math.floor(S[k])}</span>`).join('')}<span>${ic('pop',12)}${S.pop}</span></div><button id="ovClose">閉じる<kbd>R</kbd></button></div>`;
-  h+=`<div class="rtabsrow"><div class="ttabs">${RES_TABS.map(c=>{const ts=TECH.filter(t=>t.cat===c);const dn=ts.filter(t=>techState(t)==='done').length;return `<button data-tab="${c}" class="${c===cat?'on':''}" style="--tc:${CAT_COLOR[c]}">${c}<span class="tcnt">${dn}/${ts.length}</span></button>`;}).join('')}</div>
+  // 研究中のもの（どのタブにあっても見えるように）。押すとそのタブのその研究へ移動
+  {const free=cap-busy;
+   h+=`<div class="rnow"><small>研究中</small>${S.research.length?S.research.map(r=>{const t=techOf(r.id);return `<button class="rnc" data-goto="${t.id}" style="--tc:${CAT_COLOR[t.cat]}"><b>${t.name}${t.max>1?' Lv'+(lvl(t.id)+1):''}</b><span>残り${r.left}ターン</span><div class="tbar"><i style="width:${(r.total-r.left)/r.total*100}%"></i></div></button>`;}).join(''):'<span class="muted" style="font-size:12px">なし</span>'}${free>0?`<span class="rnf">研究員が${free}人空いています</span>`:''}</div>`;}
+  h+=`<div class="rtabsrow"><div class="ttabs">${RES_TABS.map(c=>{const ts=TECH.filter(t=>t.cat===c);const dn=ts.filter(t=>techState(t)==='done').length;return `<button data-tab="${c}" class="${c===cat?'on':''}" style="--tc:${CAT_COLOR[c]}">${c}<span class="tcnt">${dn}/${ts.length}</span>${S.research.some(r=>techOf(r.id).cat===c)?'<i class="tact" title="研究中あり"></i>':''}</button>`;}).join('')}</div>
     <div class="rlegend"><span><i class="lg done"></i>完了</span><span><i class="lg active"></i>研究中</span><span><i class="lg ready"></i>研究できる</span><span><i class="lg locked"></i>前提が足りない</span><span>${ui('lock','dim',12)}城Lvで解放</span></div></div>`;
   const maxR=Math.max(...L.list.map(techRank));
   h+=`<div class="rcols" style="grid-template-columns:repeat(${maxR},minmax(250px,1fr))">`;
@@ -6148,6 +6160,7 @@ function showResearch(){
   document.getElementById('ovClose').onclick=closeOverlay;
   card.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{S.resTab=b.dataset.tab;S.resSel=null;showResearch();});
   card.querySelectorAll('[data-node]').forEach(b=>b.onclick=()=>{S.resSel=b.dataset.node;showResearch();});
+  card.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>{const tj=techOf(b.dataset.goto);S.resTab=tj.cat;S.resSel=tj.id;showResearch();const nd=card.querySelector(`[data-node="${tj.id}"]`);if(nd)nd.scrollIntoView({block:'nearest',inline:'center'});});
   card.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{startResearch(b.dataset.start);showResearch();renderResBox();});
   card.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{const tj=techOf(b.dataset.jump);S.resTab=tj.cat;S.resSel=tj.id;showResearch();const nd=card.querySelector(`[data-node="${tj.id}"]`);if(nd)nd.scrollIntoView({block:'nearest',inline:'center'});});
   card.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{cancelResearch(b.dataset.cancel);showResearch();renderResBox();});
