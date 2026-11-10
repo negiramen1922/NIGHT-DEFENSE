@@ -116,7 +116,8 @@ button.on{border-color:var(--amber);background:#2a2412;color:var(--amber)}
 #infoSplit .grip{position:relative;width:36px;height:10px;background:#2f3f33;box-shadow:inset 0 0 0 1px #4a5e4e}   /* 真ん中の四角（つまみ） */
 #infoSplit:hover .grip,#infoSplit.drag .grip{background:var(--amber);box-shadow:none}
 #infoSplit:hover::before,#infoSplit.drag::before{background:#6d5a2a}
-#infoClose{display:none;position:absolute;z-index:4;width:26px;height:26px;padding:0;align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer}
+#infoClose{display:none;position:absolute;z-index:4;width:26px;height:26px;padding:0;align-items:center;justify-content:center;line-height:0;cursor:pointer}
+#infoClose .pi{display:block;width:12px;height:12px;image-rendering:pixelated}
 .row{display:flex;justify-content:space-between;margin:2px 0}
 .muted{color:var(--dim)}
 select{background:#0e1510;color:var(--text);border:1px solid var(--line);font:inherit;padding:3px;width:100%}
@@ -5633,7 +5634,7 @@ function deselect(){S.multi=[];S.sel=null;S.selTile=null;renderInfo(true);render
 {const sp=document.getElementById('infoSplit'),rt=document.getElementById('right'),inf=document.getElementById('info');
  const setH=h=>{if(h==null){document.body.classList.remove('infoSized');rt.style.removeProperty('--infoH');return;}const max=Math.max(120,rt.clientHeight-200);h=Math.max(90,Math.min(max,Math.round(h)));rt.style.setProperty('--infoH',h+'px');document.body.classList.add('infoSized');};
  try{const v=+localStorage.getItem('nd_info_h');if(v)setH(v);}catch(e){}
- document.getElementById('infoClose').onclick=e=>{e.stopPropagation();se('click');deselect();};
+ {const ic=document.getElementById('infoClose');ic.innerHTML=ui('close','light',12);ic.onclick=e=>{e.stopPropagation();se('click');deselect();};}   // 文字の×は下に寄るので、ドット絵の×アイコンにする
  sp.addEventListener('dblclick',e=>{if(e.target.closest('button'))return;setH(null);try{localStorage.removeItem('nd_info_h');}catch(e){}});
  sp.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;e.preventDefault();const y0=e.clientY,h0=inf.getBoundingClientRect().height;sp.classList.add('drag');sp.setPointerCapture(e.pointerId);
    const mv=ev=>setH(h0+ev.clientY-y0);
