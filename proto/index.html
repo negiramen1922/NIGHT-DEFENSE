@@ -3172,8 +3172,8 @@ function repairAll(){if(S.waveActive){se('error');toast('戦闘中は修理で�
   renderInfo(true);
 }
 function mineAt(x,y){return S.mines.find(m=>{const n=m.sz||U;return x>=m.x&&x<m.x+n&&y>=m.y&&y<m.y+n;});}
-// 罠の数の上限（施設の上限とは別。ゆるめ）：60＋20×(城Lv−1)
-const TRAP_BASE=60,TRAP_PER_LV=20;
+// 罠の数の上限（施設の上限とは別。ゆるめ）：150＋50×(城Lv−1)。1×1 なので、前の2×2で数えると約4分の1の広さ
+const TRAP_BASE=150,TRAP_PER_LV=50;
 function trapCap(){return TRAP_BASE+TRAP_PER_LV*((S.baseLv||1)-1);}
 function trapCount(){return (S.mines||[]).length;}
 // トゲ床の耐久：踏まれている時間（敵1体×1秒で1減る）。0で壊れ、一括修理（木材6）で直す
