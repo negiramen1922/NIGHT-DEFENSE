@@ -964,6 +964,7 @@ body.land #saveMark{right:calc(var(--rail) + 8px);bottom:auto;top:44px}   /* ス
 .mksum{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}
 .mksum span{display:inline-flex;align-items:center;gap:3px}.mksum b{font-family:var(--px-font);font-weight:400;font-size:16px}
 .mkout b{color:var(--amber)}.mkin b{color:var(--green)}.mkarr{color:var(--dim)}.mksum small{flex-basis:100%;font-size:10.5px}
+.mmb{display:inline-flex;gap:3px;margin-left:8px}.mmb button{padding:2px 8px;font-size:12px}.mmb button.on{box-shadow:inset 0 0 0 2px var(--amber);color:var(--amber)}
 .wsum{margin:0 0 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}.wchips{display:flex;flex-wrap:wrap;gap:4px;margin:5px 0 3px}.wchips button{padding:3px 8px;font-size:12px;display:inline-flex;align-items:center;gap:4px}.wchips small{color:var(--dim)}
 .hparty{margin:6px 0 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}
 .hmeter{position:relative;height:8px;background:#22303a;margin:6px 0 2px}.hmeter i{display:block;height:100%}.hmeter u{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--dim)}
@@ -5050,6 +5051,9 @@ function draw(){
   if(S.dust&&S.dust.length){S.dust=S.dust.filter(d=>(d.t+=1/60)<0.6);for(const d of S.dust){ctx.globalAlpha=0.5*(1-d.t/0.6);ctx.fillStyle='#b89a6a';ctx.beginPath();ctx.arc(d.x,d.y,3+d.t*10,0,7);ctx.fill();}ctx.globalAlpha=1;}
   // 照明矢の光
   for(const f of (S.flares||[])){const k=f.t/f.T;ctx.save();ctx.globalAlpha=0.18*Math.min(1,k*3);const g=ctx.createRadialGradient(f.x,f.y,2,f.x,f.y,f.r);g.addColorStop(0,'#fff6c0');g.addColorStop(1,'rgba(255,240,160,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,7);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle='#fff6c0';ctx.beginPath();ctx.arc(f.x,f.y-6-3*Math.sin(f.t*6),2.5,0,7);ctx.fill();ctx.restore();}
+  // 範囲選択の四角
+  if(S.boxSel){const {a,b}=S.boxSel;ctx.save();ctx.strokeStyle='#62c6d9';ctx.lineWidth=1.5/Math.max(0.5,cam.z);ctx.setLineDash([5,3]);ctx.fillStyle='rgba(98,198,217,.12)';
+    ctx.fillRect(Math.min(a[0],b[0]),Math.min(a[1],b[1]),Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]));ctx.strokeRect(Math.min(a[0],b[0]),Math.min(a[1],b[1]),Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]));ctx.restore();}
   // 武器工房の上に、作っているもの（矢か剣）を出す
   for(const b of S.blds){if(b.type!=='ammo'||b.ruin)continue;const im=itemImg(b.mode==='sword'?'sword':'arrow');if(!im||!im.complete)continue;
     const n=bsz(b),x=(b.x+n/2)*T,y=b.y*T+3;ctx.save();ctx.fillStyle='rgba(10,8,14,.82)';ctx.fillRect(x-8,y-8,16,16);ctx.strokeStyle=b.bt>0?'#56685a':'#f2b33d';ctx.lineWidth=1;ctx.strokeRect(x-7.5,y-7.5,15,15);
@@ -5651,6 +5655,8 @@ cv.addEventListener('pointerdown',ev=>{
   if(ptrs.size===1){
     if(inMini(p)){gest={mode:'mini'};const m=inMini(p);cam.x=m.x-VW/cam.z/2;cam.y=m.y-VH/cam.z/2;clampCam();return;}
     gest={mode:ev.button===1?'pan':'tap',sx:ev.clientX,sy:ev.clientY,cx:cam.x,cy:cam.y,shift:ev.shiftKey};
+    // 範囲で部隊を選ぶ：PCは Shift＋ドラッグ、スマホは「範囲選択」を押してからドラッグ
+    if(ev.button===0&&(ev.shiftKey||S.boxMode)&&!S.buildMode&&!S.buildPick){gest.mode='box0';gest.a=[p.x,p.y];}
     // 柵・壁の建設中は、ドラッグで一列にまとめて置く
     if(ev.button!==1&&S.buildMode&&WALL_TYPES.includes(S.buildMode)&&!S.waveActive&&S.phase!=='night'){gest.mode='wline';gest.a=[Math.floor(p.x/T),Math.floor(p.y/T)];gest.b=gest.a;S.wline=gest;}
     if(ev.button===1)ev.preventDefault();
@@ -5665,6 +5671,8 @@ cv.addEventListener('pointermove',ev=>{
   if(!gest)return;
   if(gest.mode==='mini'){const m=inMini(toCanvas(ev));if(m){cam.x=m.x-VW/cam.z/2;cam.y=m.y-VH/cam.z/2;clampCam();}return;}
   if(gest.mode==='wline'){const q=toCanvas(ev);gest.b=[Math.floor(q.x/T),Math.floor(q.y/T)];return;}
+  if(gest.mode==='box0'&&Math.hypot(ev.clientX-gest.sx,ev.clientY-gest.sy)>8){gest.mode='box';}
+  if(gest.mode==='box'){const q=toCanvas(ev);gest.b=[q.x,q.y];S.boxSel={a:gest.a,b:gest.b};return;}
   if(gest.mode==='tap'&&Math.hypot(ev.clientX-gest.sx,ev.clientY-gest.sy)>8)gest.mode='pan';
   if(gest.mode==='pan'){const k=pxScale()/cam.z;cam.x=gest.cx-(ev.clientX-gest.sx)*k;cam.y=gest.cy-(ev.clientY-gest.sy)*k;clampCam();}
   if(gest.mode==='pinch'&&ptrs.size>=2){
@@ -5678,6 +5686,8 @@ function ptrEnd(ev){
   if(!ptrs.has(ev.pointerId))return;ptrs.delete(ev.pointerId);
   if(gest&&gest.mode==='wline'){const g=gest;S.wline=null;if(ev.type==='pointerup'&&ptrs.size===0){if(g.a[0]===g.b[0]&&g.a[1]===g.b[1])handleTap(ev,g.shift);else placeWallLine(g.a,g.b);}}
   if(gest&&gest.mode==='tap'&&ev.type==='pointerup'&&ptrs.size===0)handleTap(ev,gest.shift);
+  if(gest&&gest.mode==='box0'&&ev.type==='pointerup'&&ptrs.size===0){if(S.boxMode){S.boxMode=false;renderMode();}else handleTap(ev,gest.shift);}
+  if(gest&&gest.mode==='box'){S.boxSel=null;if(ev.type==='pointerup')boxSelect(gest.a,gest.b,gest.shift);S.boxMode=false;}
   if(ptrs.size===0||(gest&&gest.mode==='pinch'))gest=null;
 }
 cv.addEventListener('pointerup',ptrEnd);cv.addEventListener('pointercancel',ptrEnd);
@@ -5705,6 +5715,17 @@ function popCapOf(){let c=0;for(const b of S.blds)c+=houseOf(b);return c;}
 function popTotal(){let t=S.pop;for(const b of S.blds){t+=b.crew||0;if(b.qm)for(const m of b.qm){const u=MTC[m];t+=u.popEach*u.members;}}
   for(const s of S.squads)t+=s.members*MT(s).popEach;for(const r of S.research)t+=(r.paid&&r.paid.pop)||0;return t;}
 function deselect(){S.multi=[];S.sel=null;S.selTile=null;renderInfo(true);renderMode();}
+// 範囲の中の部隊をまとめて選ぶ（Shift を押していたら今の選択に足す）
+function boxSelect(a,b,add){const x0=Math.min(a[0],b[0]),x1=Math.max(a[0],b[0]),y0=Math.min(a[1],b[1]),y1=Math.max(a[1],b[1]);
+  const ids=S.squads.filter(s=>!s.gar&&s.x>=x0&&s.x<=x1&&s.y>=y0&&s.y<=y1).map(s=>s.id);
+  const prev=add?(S.multi&&S.multi.length?S.multi.slice():(S.sel&&S.sel.kind==='s'?[S.sel.id]:[])):[];
+  const all=[...new Set(prev.concat(ids))];S.selTile=null;
+  if(!all.length){toast('範囲の中に部隊がいません','warn');S.multi=[];S.sel=null;}
+  else if(all.length===1){S.multi=[];S.sel=S.squads.find(s=>s.id===all[0]);}
+  else{S.multi=all;S.sel=null;}
+  se('click');renderInfo(true);renderMode();renderArmyBox(true);}
+// 選んだ部隊にまとめて指示（迎撃・固守・帰還）
+function multiMode(m){const us=S.squads.filter(x=>S.multi.includes(x.id)&&!x.gar);for(const u of us)setMode(u,m,true);se('click');log(`${us.length}部隊：${MODE_NAME[m]}`);renderInfo(true);renderMode();}
 // 詳細の高さ（PC）：仕切りをドラッグ。localStorage に覚える
 {const sp=document.getElementById('infoSplit'),rt=document.getElementById('right'),inf=document.getElementById('info');
  const setH=h=>{if(h==null){document.body.classList.remove('infoSized');rt.style.removeProperty('--infoH');return;}const max=Math.max(120,rt.clientHeight-200);h=Math.max(90,Math.min(max,Math.round(h)));rt.style.setProperty('--infoH',h+'px');document.body.classList.add('infoSized');};
@@ -7403,12 +7424,16 @@ function renderMode(){
     t=`${icSvg(S.buildMode,24)}<b class="mn">${d.name}</b><span class="szt">${sz}×${sz}</span>${!ok&&isNarrow()?mktBtn(c):''}<span class="ms">・${ok?(padMode()?(bGhost?'十字キーで調整して「決定」':(WALL_TYPES.includes(S.buildMode)?'場所をタップ・なぞると一列に配置':'建てたい場所をタップ')):(WALL_TYPES.includes(S.buildMode)?`${tap}で1枚・ドラッグで一列に配置`:`マップを${tap}して配置（続けて置けます）`)):`<span style="color:var(--red)">${lackNames(c,d.pop)||'資源が足りません'}</span>${isNarrow()?'':mktBtn(c)}`}</span><span class="mc">${costText(c,d.pop)}</span>`;}
   else if(S.buildPick)t=`<b class="mn">建設モード</b><span class="ms">・建てる施設を「建設」の一覧から選んでください</span>`;
   else if(S.aimNaval)t='<b class="mn" style="color:#ffe38a">艦砲射撃</b><span class="ms">・目標地点をクリック（Escで取消）</span>';
-  else if(S.multi&&S.multi.length)t=`<b class="mn">${S.multi.length}部隊</b><span class="ms">を選択中・地図を${tap}でまとめて移動・Shift+クリックで追加/除外</span>${X}`;
+  else if(S.multi&&S.multi.length){const us=S.squads.filter(x=>S.multi.includes(x.id)&&!x.gar);const md=us.length&&us.every(u=>u.mode===us[0].mode)?us[0].mode:null;
+    t=`<b class="mn">${S.multi.length}部隊</b>${isNarrow()?'':`<span class="ms">を選択中・地図を${tap}でまとめて移動</span>`}<span class="mmb">${['guard','hold','return'].map(m=>`<button data-mm="${m}" class="${md===m?'on':''}">${MODE_NAME[m]}</button>`).join('')}</span>${X}`;}
   else if(S.sel&&S.sel.kind==='s')t=`${icSvg(S.sel.model||defModel(S.sel.ut),24)}<b class="mn">${unitLabel(S.sel)}</b><span class="ms">を指揮中・${tap}で移動</span>${X}`;
   else if(S.sel)t=`${icSvg(S.sel.type,24)}<b class="mn">${B[S.sel.type]?B[S.sel.type].name:''}</b><span class="ms">を選択中${gunOf(S.sel)?'・射程を表示':''}</span>${X}`;
-  else t=isNarrow()?'<span class="ms">指揮・タップで選択、2本指で拡大</span>':'';
+  else if(S.boxMode)t=`<b class="mn">範囲選択</b><span class="ms">・選びたい部隊を囲むようにドラッグ</span><button id="mBoxX" class="ghost">やめる</button>`;
+  else t=isNarrow()?'<span class="ms">指揮・タップで選択、2本指で拡大</span><button id="mBox" class="ghost">範囲選択</button>':(S.squads.length>1?'<span class="ms">Shift＋ドラッグで部隊を範囲選択</span>':'');
   bar.classList.toggle('idle',!t);bar.classList.toggle('hint',!S.buildMode&&!S.buildPick&&!S.sel&&!(S.multi&&S.multi.length)&&!S.aimNaval);
-  if(t!==modeKey){modeKey=t;document.getElementById('modeTxt').innerHTML=t;const d=document.getElementById('mDesel');if(d)d.onclick=deselect;}
+  if(t!==modeKey){modeKey=t;document.getElementById('modeTxt').innerHTML=t;const d=document.getElementById('mDesel');if(d)d.onclick=deselect;
+    document.querySelectorAll('#modeTxt [data-mm]').forEach(b=>b.onclick=e=>{e.stopPropagation();multiMode(b.dataset.mm);});
+    {const mb=document.getElementById('mBox');if(mb)mb.onclick=e=>{e.stopPropagation();S.boxMode=true;se('click');renderMode();};const mx=document.getElementById('mBoxX');if(mx)mx.onclick=e=>{e.stopPropagation();S.boxMode=false;renderMode();};}}
   {const bb=document.getElementById('bBuild');if(bb)bb.classList.toggle('on',on);}
   if(!S.buildMode)bGhost=null;
   renderPad();
