@@ -886,6 +886,19 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 .ov-res .rnow .rnc .tpips{grid-column:1/-1}
 .ov-res .rnow .rnf{flex:0 0 auto;color:var(--amber);font-size:12px}
 .mkrow.hi{background:#3a1410;box-shadow:inset 3px 0 0 var(--red)}.mktb{padding:2px 8px!important;font-size:12px;display:inline-flex;align-items:center;gap:3px;margin-left:6px;vertical-align:middle}
+.nvisit{margin:6px 0;padding:8px 10px;background:var(--inset,#0e1510);box-shadow:inset 3px 0 0 var(--vc),inset 0 0 0 1px var(--line)}
+.nvh{display:flex;align-items:center;gap:8px;font-size:15px}.nvh b{color:var(--vc);font-weight:400;font-family:var(--px-font)}
+.nvt{font-size:12.5px;margin:4px 0 6px;line-height:1.6}.nvr{color:var(--green);font-size:12.5px}
+.nvops{display:flex;flex-wrap:wrap;gap:6px}.nvops button{padding:6px 12px}
+.nshop .row{padding:3px 0;border-top:1px solid var(--line)}.nshop button{padding:3px 10px;font-size:12px}
+.cst2{display:inline-flex;gap:6px;margin-left:6px;font-size:11px}
+.nplans{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
+.nplan{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:6px 8px;text-align:left;min-height:52px}
+.nplan.on{box-shadow:inset 0 0 0 2px var(--amber);background:#2a2210}.nph{display:flex;align-items:center;gap:5px}.nph b{font-weight:400}
+.npd{font-size:11px;color:var(--dim);line-height:1.4}.nplan[disabled] .npd{color:var(--off)}
+.nfest{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#2a2210;box-shadow:inset 0 0 0 1px var(--amber)}.nfest>div{flex:1}
+body.fwOn #overlay{visibility:hidden}
+#fwCv{position:fixed;inset:0;z-index:80;cursor:pointer;background:rgba(4,6,14,.45)}
 .wsum{margin:0 0 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}.wchips{display:flex;flex-wrap:wrap;gap:4px;margin:5px 0 3px}.wchips button{padding:3px 8px;font-size:12px;display:inline-flex;align-items:center;gap:4px}.wchips small{color:var(--dim)}
 .hparty{margin:6px 0 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}
 .hmeter{position:relative;height:8px;background:#22303a;margin:6px 0 2px}.hmeter i{display:block;height:100%}.hmeter u{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--dim)}
@@ -1546,6 +1559,7 @@ function happyParts(){
   if(cnt('church'))P.push([`教会×${cnt('church')}`,4*cnt('church')]);
   if(S.unpaid)P.push(['給金の未払い',-20]);
   if(S.recentLoss)P.push(['夜の被害',-Math.min(20,S.recentLoss*2)]);
+  for(const m of (S.moods||[]))P.push([`${m.n}（あと${m.d}日）`,m.v]);
   return P;
 }
 function wages(){let w=S.cmds.length*3;for(const s of S.squads)w+=MT(s).wage!=null?MT(s).wage:s.members*0.5;return w;}
@@ -1555,7 +1569,7 @@ function buyLimit(){const n=S.blds.filter(b=>b.type==='market'&&!(b.bt>0)).lengt
 function buyLeft(k){return Math.max(0,buyLimit()-((S.buyToday||{})[k]||0));}
 function matPrice(){const n=S.blds.filter(b=>b.type==='market'&&!(b.bt>0)).length;return (n>=2?5:3)+(has('trade')?3:0);}
 function happyTarget(){return Math.max(0,Math.min(100,happyParts().reduce((a,p)=>a+p[1],0)));}
-function happyMul(){const h=S.happy;return h>=75?1.15:h>=55?1:h>=35?0.85:0.7;}
+function happyMul(){const h=S.happy;return (h>=75?1.15:h>=55?1:h>=35?0.85:0.7)*(S.starBoost===1?1.1:1);}
 function happyIc(sz){const h=S.happy;const [k,c]=h>=75?['h_joy','green']:h>=55?['h_ok','light']:h>=35?['h_bad','amber']:['h_riot','red'];return ui(k,c,sz||14);}
 function happyName(){const h=S.happy;return h>=75?'上機嫌':h>=55?'ふつう':h>=35?'不満':'暴動寸前';}   // 住民1人あたりの食料消費（毎秒）
 const HQ_GOLD=12;   // 城館の収入（毎ターン）
@@ -1852,7 +1866,7 @@ const TECH=[
 ];
 // ===== 研究ツリーの組み直し（生産・内政・部隊・魔核） =====
 function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*(L('mine')+L('mine2'))+(L('boneaxe')?0.25:0)+(L('craft')?0.15:0);case 'quarry':return 1+0.3*(L('quarrying')+L('quarry2'))+(L('bonepick')?0.25:0)+(L('craft')?0.15:0);case 'ironmine':return 1+0.3*L('smelt')+(L('bonepick')?0.25:0)+(L('craft')?0.15:0);
-  case 'farm':return 1+0.3*(L('farming')+L('farm2'))+(L('bonehoe')?0.25:0)+(L('craft')?0.15:0);case 'fishery':return 1+0.3*(L('fishing')+L('fish2'))+(L('bonehoe')?0.25:0)+(L('craft')?0.15:0);case 'ammo':return 1+0.3*(L('autoammo')+L('autoammo2'))+(L('craft')?0.15:0);}return 1;}
+  case 'farm':return 1+(S.seedT>0?0.2:0)+0.3*(L('farming')+L('farm2'))+(L('bonehoe')?0.25:0)+(L('craft')?0.15:0);case 'fishery':return 1+0.3*(L('fishing')+L('fish2'))+(L('bonehoe')?0.25:0)+(L('craft')?0.15:0);case 'ammo':return 1+0.3*(L('autoammo')+L('autoammo2'))+(L('craft')?0.15:0);}return 1;}
 (function(){const T=id=>TECH.find(t=>t.id===id);
  const set=(id,o)=>{const t=T(id);if(t){Object.assign(t,o);}else TECH.push(Object.assign({id},o));};
  const del=id=>{const i=TECH.findIndex(t=>t.id===id);if(i>=0)TECH.splice(i,1);};
@@ -3573,9 +3587,12 @@ function endTurn(){
   if(S.phase==='night'){morning();return;}
   if(S.turnsLeft===1){doEndTurn();return;}
   doEndTurn();
-  if(!S.waveActive&&!S.over&&S.turnsLeft>0){S.phase='night';for(const q of S.squads)q.hunt=false;calcLights();log('日が暮れた。静かな夜だ','warn');if(!nightHasActions()){morning();}else if(S.overlay==='report')S.nightPending=true;else showNight();}
+  if(!S.waveActive&&!S.over&&S.turnsLeft>0){S.phase='night';S.night=null;for(const q of S.squads)q.hunt=false;calcLights();log('日が暮れた。静かな夜だ','warn');if(!nightHasActions()){morning();}else if(S.overlay==='report')S.nightPending=true;else showNight();}
 }
-function nightHasActions(){return S.squads.some(q=>!q.gar)||has('overtime');}
+// ===== 夜（試作）：街の過ごし方・夜狩り・訪ねてくる出来事・夜中の事件 =====
+// 夜の画面1枚で「訪ねてくる出来事（選ぶ）」「今夜の過ごし方」「夜狩りに出す部隊」を決める → 朝へ → 朝の報告に「夜中の事件」も出る
+// 夜狩りに出さなかった部隊は街に残って夜警になる。夜警が多いほど事件の被害が小さい。幸福度が低いほど事件が起きやすい
+function nightHasActions(){return true;}
 function huntDanger(){return 18+S.wave*14+(S.turn*0.6);}
 function huntPower(q){return unitDmg(q)/MT(q).rate*MT(q).members*0.6+q.hp*0.05;}
 // 夜狩りは、参加する部隊をまとめて1つの一団で出す。危険は一団の戦力で決まる（まとめるほど安全）
@@ -3583,30 +3600,130 @@ function huntParty(){return S.squads.filter(q=>q.hunt&&!q.gar);}
 function huntRatio(qs){return qs.reduce((a,q)=>a+huntPower(q),0)/huntDanger();}
 function huntMatCap(n){return 1.5+n;}   // 魔核の上限（1部隊なら今までどおり2.5倍）
 function huntPreview(qs){const r=huntRatio(qs),n=qs.length;return {n,men:qs.reduce((a,q)=>a+q.members,0),r,mat:n?Math.round((3+S.wave*1.5)*Math.max(0.3,Math.min(huntMatCap(n),r))):0,risk:r>1.6?'低い':r>0.9?'ふつう':'高い',rc:r>1.6?'var(--green)':r>0.9?'var(--amber)':'var(--red)'};}
+function nightGuards(){return S.squads.filter(q=>!q.hunt).length;}
+// 幸福度の「気分」：何日か続く上乗せ（祭り・宴など）。happyParts に出る
+function addMood(n,v,d){S.moods=(S.moods||[]).filter(m=>m.n!==n);S.moods.push({n,v,d});S.happy=Math.max(0,Math.min(100,S.happy+v));}
+function churchN(){return Math.min(2,S.blds.filter(b=>b.type==='church'&&!(b.bt>0)).length);}
+function prayGain(){return 3+5*churchN();}
+// 今夜の過ごし方
+const NPLAN=[
+  {id:'rest',name:'休む',ic:'moon',d:()=>'ゆっくり休む。幸福度 +2'},
+  {id:'feast',name:'宴',ic:'ev_fest',need:()=>S.blds.some(b=>b.type==='tavern'&&!(b.bt>0))?'':'酒場が必要',cost:{gold:15,fuel:20},d:()=>'酒場で宴を開く。幸福度 +6（2日続く）'},
+  {id:'pray',name:'祈り',ic:'sun',d:()=>`みんなで祈る。幸福度 +${prayGain()}${churchN()?`（教会×${churchN()}）`:'（教会があるともっと上がる）'}`},
+  {id:'watch',name:'夜警を厚く',ic:'eye',cost:{gold:10},d:()=>'見張りを増やす。今夜は事件が起きない'},
+  {id:'overtime',name:'夜なべ',ic:'gear',need:()=>has('overtime')?'':'研究「延長シフト」が必要',d:()=>`夜も働く。生産 ${has('allnight')?'昼と同じ':'昼の半分'}・幸福度 −${has('allnight')?15:8}`},
+];
+function planOf(id){return NPLAN.find(p=>p.id===id);}
+function planBlock(p){if(p.need){const w=p.need();if(w)return w;}if(p.cost&&!canAfford(p.cost))return lackNames(p.cost)||'資源が足りません';return '';}
+// 訪ねてくる出来事
+const VISIT={
+  trav:{name:'旅人の一家',ic:'ev_trav',col:'#cfe3cf',t:'寒さに震える旅人の一家が、一晩泊めてほしいと門をたたいた。',
+    ops:[{l:'食料を分けて泊める',cost:{fuel:5},f:()=>{S.pop+=2;addMood('旅人をもてなした',3,2);return '一家は街に残ることにした。住民 +2・幸福度 +3';}},
+         {l:'追い返す',f:()=>{addMood('旅人を追い返した',-2,2);return '一家は暗い森へ去っていった。幸福度 −2';}}]},
+  fest:{name:'祭りの企画',ic:'ev_fest',col:'#f2b33d',t:'住民たちが「明日の夜、祭りをやりたい」と相談に来た。',
+    ops:[{l:'金貨を出して企画する',cost:()=>({gold:30+Math.round(popTotal()*0.5)}),f:()=>{S.festNext=true;return '次の静かな夜は祭り！ 準備が始まった';}},
+         {l:'今は見送る',f:()=>{addMood('祭りを見送った',-3,2);return '住民はがっかりした。幸福度 −3';}}]},
+  shop:{name:'行商人',ic:'ev_shop',col:'#f2b33d',t:'荷車を引いた行商人がやってきた。「珍しい品がありますよ」',shop:true},
+  star:{name:'流れ星',ic:'ev_star',col:'#ffe08a',t:'夜空を大きな流れ星が横切った。',
+    ops:[{l:'願いごとをする',f:()=>starWish()},{l:'眺めるだけ',f:()=>'きれいな流れ星だった'}]},
+  moon:{name:'赤い月の予告',ic:'ev_moon',col:'#ff5a4e',t:'月が赤くにじんでいる。明日の夜はブラッドムーン——住民がおびえている。',
+    ops:[{l:'祈りを捧げる',cost:()=>churchN()?{}:{gold:20},f:()=>{addMood('祈りで心が落ち着いた',2,1);return '祈りで住民の心が落ち着いた';}},
+         {l:'そのままにする',f:()=>{addMood('赤い月におびえる',-5,2);return '住民はおびえている。幸福度 −5';}}]},
+};
+function visitCost(o){return typeof o.cost==='function'?o.cost():(o.cost||{});}
+// 行商人の品（毎回この中から3つ）
+const SHOP=[
+  {id:'book',n:'古い研究書',ic:'research',g:60,d:'研究中のもの1つ、残り −1ターン',ok:()=>S.research.some(r=>r.left>1)?'':'研究中のもの（残り2ターン以上）がない',f:()=>{const r=S.research.filter(x=>x.left>1).sort((a,b)=>b.left-a.left)[0];r.left--;return `「${techOf(r.id).name}」が1ターン早まった`;}},
+  {id:'map',n:'宝の地図',ic:'target',g:40,d:'見つけていない駐留地の場所が1つ分かる',ok:()=>(S.camps||[]).some(c=>!c.found&&c.state==='idle')?'':'見つけていない駐留地がない',f:()=>{const c=S.camps.find(c=>!c.found&&c.state==='idle');c.found=true;S.campFoundN=(S.campFoundN||0)+1;return `${campName(c)}の場所が分かった`;}},
+  {id:'arrow',n:'矢のたば',ic:'arrow',g:20,d:'矢 +40',f:()=>{S.ammo+=40;return '矢 +40';}},
+  {id:'sword',n:'剣のたば',ic:'sword',g:30,d:'剣 +10',f:()=>{S.sword=(S.sword||0)+10;return '剣 +10';}},
+  {id:'ether',n:'エーテル結晶',ic:'ether',g:35,d:'エーテル +15',f:()=>{S.elec+=15;return 'エーテル +15';}},
+  {id:'fire',n:'花火',ic:'ev_star',g:15,d:'次の祭りが大成功（幸福度 さらに +5）',ok:()=>S.fireworks?'もう持っている':'',f:()=>{S.fireworks=true;return '花火を手に入れた（次の祭りで打ち上げる）';}},
+  {id:'seed',n:'珍しい種',ic:'food',g:40,d:'5日のあいだ、農場の産出 +20%',f:()=>{S.seedT=6;return '珍しい種をまいた（5日間 農場 +20%）';}},
+];
+function starWish(){const L=[];
+  if(S.research.some(r=>r.left>1))L.push(()=>{const r=S.research.filter(x=>x.left>1)[0];r.left--;return `願いが届いた！「${techOf(r.id).name}」が1ターン早まった`;});
+  L.push(()=>{S.starBoost=2;return '願いが届いた！ 明日の生産 +10%';});
+  L.push(()=>{addMood('流れ星に願った',5,2);return '願いが届いた！ 街に明るい気分が広がった。幸福度 +5';});
+  if(S.cmds.length)L.push(()=>{const c=S.cmds[Math.floor(Math.random()*S.cmds.length)];gainXp(c,20);return `願いが届いた！ ${cmdName(c)}が何かをつかんだ（経験 +20）`;});
+  L.push(()=>{const g=10+Math.floor(Math.random()*11);S.gold+=g;return `願いが届いた！ 星のかけらが金貨に変わった（金貨 +${g}）`;});
+  return L[Math.floor(Math.random()*L.length)]();}
+// 夜のはじまり：出来事を決める
+function nightStart(){
+  const N={plan:S.festNext?'fest':'rest',visit:null,done:null,bought:[]};S.festNext=false;
+  const bloodNext=BLOOD_NIGHTS.includes(S.wave+1)&&S.turnsLeft===1;
+  if(bloodNext)N.visit='moon';
+  else if(N.plan!=='fest'&&Math.random()<0.35){const pool=['trav','trav','shop','shop','star'];if(!S.festNext)pool.push('fest','fest');N.visit=pool[Math.floor(Math.random()*pool.length)];}
+  if(N.visit==='shop'){const ids=SHOP.map(x=>x.id).sort(()=>Math.random()-0.5).slice(0,3);N.shop=ids;}
+  S.night=N;if(N.visit){se('bell');log(`夜の訪問：${VISIT[N.visit].name}`,'warn');}
+}
+function visitHTML(N){const v=VISIT[N.visit];if(!v)return '';
+  let h=`<div class="nvisit" style="--vc:${v.col}"><div class="nvh">${ui(v.ic,v.col,24)}<b>${v.name}</b></div><div class="nvt">${v.t}</div>`;
+  if(v.shop){h+=`<div class="nshop">${N.shop.map(id=>{const it=SHOP.find(x=>x.id===id),got=N.bought.includes(id),w=it.ok?it.ok():'';const c={gold:it.g};
+      return `<div class="row" style="align-items:center"><span>${ui(it.ic,'amber',14)} <b>${it.n}</b> <span class="muted" style="font-size:11px">${it.d}</span></span>${got?'<span style="color:var(--green)">買った</span>':`<button data-shop="${id}" ${w||!canAfford(c)?'disabled':''} title="${w}">${costText(c)} 買う</button>`}</div>`;}).join('')}</div>`;
+    if(N.done)h+=`<div class="nvr">${N.done}</div>`;}
+  else if(N.done)h+=`<div class="nvr">${N.done}</div>`;
+  else h+=`<div class="nvops">${v.ops.map((o,i)=>{const c=visitCost(o);const ok=canAfford(c);return `<button data-vop="${i}" ${ok?'':'disabled'}>${o.l}${Object.keys(c).length?' <span class="cst2">'+costText(c)+'</span>':''}</button>`;}).join('')}</div>`;
+  return h+`</div>`;}
 function showNight(){phaseReset();
   if(S.phase!=='night')return;
+  if(!S.night)nightStart();const N=S.night;
   const list=S.squads.filter(q=>!q.gar);
-  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} 静かな夜</h2><span style="display:flex;gap:6px"><button id="toMorningTop" class="on" style="padding:6px 14px">朝へ [Enter]</button><button id="ovClose">地図を見る</button></span></div>
-  <div class="help">今夜は襲撃がありません。夜は建設・生産・訓練ができない代わりに、夜にしかできないことがあります。</div>
-  <div class="row" style="align-items:center;margin:4px 0"><span class="muted">街の機嫌</span><span style="display:inline-flex;align-items:center;gap:6px">${happyIc(24)}<b>${Math.round(S.happy)}</b> ${happyName()}</span></div>
-  <h3 style="margin:10px 0 4px">夜狩り</h3><div class="help">部隊を森へ出して、はぐれ魔物を狩ります。参加する部隊は<b>1つの一団</b>になって出るので、まとめて出すほど危険が下がります。翌朝、魔核を持ち帰りますが、負傷や戦死の危険があります。</div>`;
-  {const pv=huntPreview(huntParty());const pct=Math.min(100,pv.r/2*100);
+  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} ${N.plan==='fest'?'祭りの夜':'静かな夜'}</h2><span style="display:flex;gap:6px"><button id="toMorningTop" class="on" style="padding:6px 14px">朝へ [Enter]</button><button id="ovClose">地図を見る</button></span></div>
+  <div class="row" style="align-items:center;margin:2px 0 6px"><span class="muted">街の機嫌</span><span style="display:inline-flex;align-items:center;gap:6px">${happyIc(24)}<b>${Math.round(S.happy)}</b> ${happyName()}</span></div>`;
+  if(N.plan==='fest'&&!N.fwShown){N.fwShown=true;setTimeout(()=>fireworks(4500),250);}
+  if(N.visit)h+=visitHTML(N);
+  // 今夜の過ごし方
+  h+=`<h3 style="margin:10px 0 4px">今夜の過ごし方</h3>`;
+  if(N.plan==='fest')h+=`<div class="nfest">${ui('ev_fest','#f2b33d',24)}<div><b>今夜は祭り！</b><div class="muted" style="font-size:12px">幸福度 +15（3日続く）${S.fireworks?'・花火で さらに +5':''}</div></div><button id="nFw">花火を見る</button></div>`;
+  else h+=`<div class="nplans">${NPLAN.map(p=>{const w=planBlock(p),on=N.plan===p.id;return `<button class="nplan${on?' on':''}" data-plan="${p.id}" ${w&&!on?'disabled':''}><span class="nph">${ui(p.ic,on?'amber':'light',14)}<b>${p.name}</b>${p.cost?`<span class="cst2">${costText(p.cost)}</span>`:''}</span><span class="npd">${w||p.d()}</span></button>`;}).join('')}</div>`;
+  // 夜狩り
+  h+=`<h3 style="margin:12px 0 4px">夜狩り</h3><div class="help">参加する部隊は<b>1つの一団</b>で森へ出ます（まとめるほど安全）。残った部隊は街の<b>夜警</b>になり、夜中の事件の被害を小さくします。</div>`;
+  {const pv=huntPreview(huntParty());const pct=Math.min(100,pv.r/2*100),g=nightGuards();
    h+=`<div class="hparty"><div class="row" style="align-items:center"><span><b>今夜の狩り</b> <span class="muted" style="font-size:12px">${pv.n?`${pv.n}部隊・${pv.men}人`:'参加する部隊を選んでください'}</span></span>${pv.n?`<span>危険 <b style="color:${pv.rc}">${pv.risk}</b>　${ic('mat',12)}魔核 約${pv.mat}</span>`:''}</div>
      <div class="hmeter" title="一団の戦力（右ほど安全）"><i style="width:${pct}%;background:${pv.n?pv.rc:'transparent'}"></i><u style="left:45%"></u><u style="left:80%"></u></div>
-     <div class="muted" style="font-size:10.5px;display:flex;justify-content:space-between"><span>危険</span><span>ふつう</span><span>安全</span></div></div>`;}
-  h+=list.length?list.map(q=>`<div class="row" style="align-items:center"><span>${icSvg(q.model||defModel(q.ut),18)} <b>${unitLabel(q)}</b> <span class="muted" style="font-size:11px">${q.members}/${UT[q.ut].members}${UT[q.ut].unit}・体力${Math.round(q.hp/q.maxhp*100)}%</span></span><button data-hunt="${q.id}" class="${q.hunt?'on':''}" style="min-width:86px">${q.hunt?'参加 '+ui('check','amber',12):'待機'}</button></div>`).join(''):'<div class="muted">部隊がいません（城館で農兵を集められます）</div>';
-  if(has('overtime'))h+=`<h3 style="margin:12px 0 4px">深夜残業</h3><div class="row" style="align-items:center"><span class="muted" style="font-size:12px">今夜も生産を続ける（${has('allnight')?'昼と同じ量。幸福度 −15':'昼の半分。幸福度 −8'}）</span><button id="otTg" class="${S.overtime?'on':''}">${S.overtime?'残業させる '+ui('check','amber',12):'させない'}</button></div>`;
+     <div class="muted" style="font-size:10.5px;display:flex;justify-content:space-between"><span>危険</span><span>ふつう</span><span>安全</span></div>
+     <div class="row" style="margin-top:4px"><span class="muted">街の夜警</span><span>${ui('eye',g?'green':'red',12)} ${g}部隊${g?'':'（だれも残っていない）'}</span></div></div>`;}
+  h+=list.length?list.map(q=>`<div class="row" style="align-items:center"><span>${icSvg(q.model||defModel(q.ut),18)} <b>${unitLabel(q)}</b> <span class="muted" style="font-size:11px">${q.members}/${UT[q.ut].members}${UT[q.ut].unit}・体力${Math.round(q.hp/q.maxhp*100)}%</span></span><button data-hunt="${q.id}" class="${q.hunt?'on':''}" style="min-width:86px">${q.hunt?'狩りへ '+ui('check','amber',12):'夜警'}</button></div>`).join(''):'<div class="muted">部隊がいません（城館で農兵を集められます）</div>';
+  // 研究の入れ忘れ
+  {const free=resCap()-resBusy();if(free>0)h+=`<div class="row nres" style="align-items:center;margin-top:10px"><span style="color:var(--amber)">${ui('research','amber',14)} 研究員が${free}人空いています</span><button id="nRes">研究を開く</button></div>`;}
   h+=`<div style="margin-top:12px;text-align:right"><button id="toMorning" class="on" style="padding:8px 16px">朝へ [Enter]</button></div>`;
   const card=openOverlay('night',h,true);
   document.getElementById('ovClose').onclick=closeOverlay;
   document.getElementById('toMorning').onclick=()=>{closeOverlay();morning();};
   document.getElementById('toMorningTop').onclick=()=>{closeOverlay();morning();};
-  const ot=document.getElementById('otTg');if(ot)ot.onclick=()=>{S.overtime=!S.overtime;showNight();};
+  {const b=document.getElementById('nRes');if(b)b.onclick=()=>showResearch();}
+  {const b=document.getElementById('nFw');if(b)b.onclick=()=>fireworks(4500);}
+  card.querySelectorAll('[data-plan]').forEach(b=>b.onclick=()=>{N.plan=b.dataset.plan;se('click');showNight();});
+  card.querySelectorAll('[data-vop]').forEach(b=>b.onclick=()=>{const o=VISIT[N.visit].ops[+b.dataset.vop];const c=visitCost(o);if(!canAfford(c))return;for(const k in c)S[k]-=c[k];N.done=o.f();log(`${VISIT[N.visit].name}：${N.done}`,'good');se('click');renderAll();showNight();});
+  card.querySelectorAll('[data-shop]').forEach(b=>b.onclick=()=>{const it=SHOP.find(x=>x.id===b.dataset.shop);if(!it||(it.ok&&it.ok())||S.gold<it.g)return;S.gold-=it.g;N.bought.push(it.id);N.done=it.f();log(`行商人から「${it.n}」を買った：${N.done}`,'good');se('upgrade');renderAll();showNight();});
   card.querySelectorAll('[data-hunt]').forEach(b=>b.onclick=()=>{const q=S.squads.find(x=>x.id==b.dataset.hunt);if(q){q.hunt=!q.hunt;se('click');}showNight();});
 }
+// 夜中の事件（朝の報告に出る）。起きる確率は幸福度しだい。夜警が多いほど被害が小さい
+function incidentChance(){const h=S.happy;return h>=75?0.08:h>=55?0.15:h>=35?0.28:0.45;}
+function nightIncident(N){
+  if(N.plan==='watch'||N.plan==='fest')return null;
+  if(S.mapId==='t'&&S.turn<=5)return null;   // 入門マップは最初の5日は起きない
+  if(Math.random()>=incidentChance())return null;
+  const g=nightGuards(),L=['fire','rat','scout'];if(S.happy<45)L.push('flee','flee');
+  const k=L[Math.floor(Math.random()*L.length)];
+  if(k==='fire'){const bs=S.blds.filter(b=>PROD_TYPES.includes(b.type)&&!(b.bt>0));if(!bs.length)return null;const b=bs[Math.floor(Math.random()*bs.length)];const r=g>=2?0.15:0.5;b.hp=Math.max(1,b.hp-b.maxhp*r);
+    return {ic:'ev_fire',col:'#ff8a3a',n:'夜中の火事',t:g>=2?`${B[b.type].name}で火が出たが、夜警がすぐに消した（小火で済んだ）`:`${B[b.type].name}が燃えた！ 耐久 −${Math.round(r*100)}%（夜警が少なかった）`,bad:g<2};}
+  if(k==='rat'){const loss=Math.min(60,Math.round(S.fuel*(g>=1?0.06:0.15)));S.fuel-=loss;
+    return {ic:'ev_rat',col:'#8aa48d',n:'倉庫のネズミ',t:`ネズミが食料を食い荒らした。食料 −${loss}${g>=1?'（夜警が追い払ったので少しで済んだ）':''}`,bad:g<1};}
+  if(k==='scout'){if(g>=2){S.mat+=3;return {ic:'ev_scout',col:'#d48cff',n:'魔物の斥候',t:'街をのぞいていた魔物の斥候を、夜警が仕留めた。魔核 +3',bad:false};}
+    addMood('魔物の影におびえる',-4,2);return {ic:'ev_scout',col:'#d48cff',n:'魔物の斥候',t:'魔物の斥候が街をうろついていた。住民がおびえている。幸福度 −4（夜警が2部隊以上いれば追い払える）',bad:true};}
+  if(k==='flee'){const n=g>=3?1:2+Math.floor(Math.random()*3);const m=Math.min(n,Math.max(0,S.pop-1));S.pop-=m;
+    return {ic:'ev_flee',col:'#8aa48d',n:'住民の脱走',t:`暮らしに不満な住民が夜のうちに街を出ていった。住民 −${m}${g>=3?'（夜警が引き止めて1人で済んだ）':''}`,bad:true};}
+  return null;}
 function morning(){
   if(S.phase!=='night')return;phaseReset();S.buyToday={};
-  const D=huntDanger();let tot=0;const res=[];let ot=null;
+  const N=S.night||{plan:'rest'};S.night=null;
+  // 気分（何日か続く幸福度）の日数を減らす
+  S.moods=(S.moods||[]).map(m=>({...m,d:m.d-1})).filter(m=>m.d>0);
+  if(S.seedT>0)S.seedT--;
+  if(S.starBoost>0)S.starBoost--;
+  const D=huntDanger();let tot=0;const res=[];let ot=null;const pl=[];
   const party=huntParty(),P=party.reduce((a,q)=>a+huntPower(q),0),ye=party.some(q=>heroSk(q,'yome'));
   if(party.length){tot=Math.max(0,Math.round((3+S.wave*1.5)*Math.max(0.3,Math.min(huntMatCap(party.length),P/D))*(0.6+Math.random()*0.8)*(has('nighthunt')?1.5:1)*(ye?2:1)));S.mat+=tot;}
   for(const q of party){
@@ -3614,21 +3731,46 @@ function morning(){
     const loss=Math.min(0.9,(0.08+Math.random()*0.3)*D/(D+P)*(has('nighthunt')?0.6:1)*(ye?0.4:1));q.hp-=q.maxhp*loss;let dead=0;
     const mh=memberHp(q)*bonus(q).hp;while(q.members>1&&q.hp<mh*(q.members-1)){q.members--;dead++;S.kia++;}
     if(q.hp<1)q.hp=1;if(supOf(q))q.sup=Math.max(0,q.sup-12);
-    q.hunt=false;
     if(dead||loss>0.25)log(`夜狩り：${unitLabel(q)}${dead?` 戦死${dead}人`:' 負傷'}`,dead?'kia':'warn');
     res.push({q:unitLabel(q),m:MT(q).key,mat,dead,hp:Math.round(q.hp/q.maxhp*100),loss});
   }
   if(party.length)log(`夜狩りの一団（${party.length}部隊）が戻った：魔核+${tot}`,'good');
-  if(S.overtime&&has('overtime')){const full=has('allnight');const before={steel:S.steel,fuel:S.fuel};S.gross={steel:0,ammo:0,pop:0,used:0};for(let i=0;i<(full?100:50);i++)update(0.1,true);S.happy=Math.max(0,S.happy-(full?15:8));ot={wood:Math.round(S.steel-before.steel),food:Math.round(S.fuel-before.fuel)};log(`深夜残業：木材+${ot.wood}・幸福度−${has('allnight')?15:8}`,'warn');}
+  // 事件は、狩りの部隊が戻る前（夜警の数で決まる）
+  const inc=nightIncident(N);
+  for(const q of S.squads)q.hunt=false;
+  // 過ごし方の結果
+  const p=N.plan;
+  if(p==='rest'){addMood('よく休んだ',2,1);pl.push('ゆっくり休んだ。幸福度 +2');}
+  if(p==='feast'){const c=planOf('feast').cost;if(canAfford(c)){for(const k in c)S[k]-=c[k];addMood('宴',6,2);pl.push(`酒場で宴を開いた。幸福度 +6（2日）　${resTxt({gold:-c.gold,fuel:-c.fuel},true)}`);}}
+  if(p==='pray'){const v=prayGain();addMood('祈り',v,1);pl.push(`みんなで祈った。幸福度 +${v}`);}
+  if(p==='watch'){if(S.gold>=10){S.gold-=10;pl.push('見張りを増やした。事件は起きなかった（金貨 −10）');}}
+  if(p==='fest'){const v=15+(S.fireworks?5:0);addMood('祭り',v,3);pl.push(`祭りの夜！ 幸福度 +${v}（3日続く）${S.fireworks?'・花火が大成功':''}`);S.fireworks=false;}
+  if(p==='overtime'&&has('overtime')){const full=has('allnight');const before={steel:S.steel,fuel:S.fuel};S.gross={steel:0,ammo:0,pop:0,used:0};for(let i=0;i<(full?100:50);i++)update(0.1,true);addMood('夜なべの疲れ',-(full?15:8),1);ot={wood:Math.round(S.steel-before.steel),food:Math.round(S.fuel-before.fuel)};log(`夜なべ：木材+${ot.wood}・幸福度−${full?15:8}`,'warn');}
+  if(inc){log(`${inc.n}：${inc.t}`,inc.bad?'warn':'good');if(inc.bad)se('error');}
   tickAid();
   S.phase='day';setTimeout(()=>saveGame(true),0);log(`朝になった。ターン${S.turn}　第${S.wave+1}襲撃まで残り${S.turnsLeft}ターン`);
   renderAll();
-  if(res.length||ot){let h=`<h2 style="margin:0 0 8px">${ui('sun','amber',24)} 夜明け — 夜の結果</h2>`;
-    if(res.length){h+=`<h3 style="margin:6px 0 4px">夜狩り</h3>`+res.map(r=>`<div class="row" style="align-items:center"><span>${icSvg(r.m,20)} <b>${r.q}</b></span><span>体力 ${r.hp}%${r.dead?`　<b style="color:var(--red)">戦死 ${r.dead}人</b>`:r.loss>0.25?'　<span style="color:var(--amber)">負傷</span>':'　<span style="color:var(--green)">無事</span>'}</span></div>`).join('')+`<div class="row" style="margin-top:4px"><span class="muted">合計</span><b style="color:#c08aff">魔核 +${tot}</b></div>`;}
-    if(ot)h+=`<h3 style="margin:10px 0 4px">深夜残業</h3><div>${resTxt({steel:ot.wood,fuel:ot.food},true)}<span style="color:var(--amber)">幸福度 −${has('allnight')?15:8}</span></div>`;
-    h+=`<div style="text-align:right;margin-top:10px"><button id="mnOk" class="on">閉じる [Enter]</button></div>`;
-    openOverlay('report',h,true);document.getElementById('mnOk').onclick=closeOverlay;}
+  let h=`<h2 style="margin:0 0 8px">${ui('sun','amber',24)} 夜明け — 夜の結果</h2>`;
+  if(inc)h+=`<div class="nvisit" style="--vc:${inc.col}"><div class="nvh">${ui(inc.ic,inc.col,24)}<b>${inc.n}</b></div><div class="nvt">${inc.t}</div></div>`;
+  if(pl.length)h+=`<h3 style="margin:6px 0 4px">今夜の過ごし方</h3>`+pl.map(t=>`<div>${t}</div>`).join('');
+  if(ot)h+=`<h3 style="margin:10px 0 4px">夜なべ</h3><div>${resTxt({steel:ot.wood,fuel:ot.food},true)}<span style="color:var(--amber)">幸福度 −${has('allnight')?15:8}</span></div>`;
+  if(res.length){h+=`<h3 style="margin:10px 0 4px">夜狩り</h3>`+res.map(r=>`<div class="row" style="align-items:center"><span>${icSvg(r.m,20)} <b>${r.q}</b></span><span>体力 ${r.hp}%${r.dead?`　<b style="color:var(--red)">戦死 ${r.dead}人</b>`:r.loss>0.25?'　<span style="color:var(--amber)">負傷</span>':'　<span style="color:var(--green)">無事</span>'}</span></div>`).join('')+`<div class="row" style="margin-top:4px"><span class="muted">合計</span><b style="color:#c08aff">魔核 +${tot}</b></div>`;}
+  h+=`<div class="row" style="align-items:center;margin-top:8px"><span class="muted">街の機嫌</span><span style="display:inline-flex;align-items:center;gap:6px">${happyIc(24)}<b>${Math.round(S.happy)}</b> ${happyName()}</span></div>`;
+  h+=`<div style="text-align:right;margin-top:10px"><button id="mnOk" class="on">閉じる [Enter]</button></div>`;
+  openOverlay('report',h,true);document.getElementById('mnOk').onclick=closeOverlay;
 }
+// 祭りの花火（画面いっぱい。タップで終わる）
+function fireworks(ms){const cv=document.createElement('canvas');cv.id='fwCv';document.body.appendChild(cv);const g=cv.getContext('2d');
+  const fit=()=>{cv.width=innerWidth;cv.height=innerHeight;};fit();
+  const COLS=['#ffd060','#ff5a4e','#6fe08a','#62c6d9','#d48cff','#fff2b0'];const P=[],R=[];let t0=performance.now(),last=t0,nextR=0,stop=false;
+  const end=()=>{stop=true;cv.remove();document.body.classList.remove('fwOn');};cv.onclick=end;document.body.classList.add('fwOn');
+  (function loop(now){if(stop)return;const dt=Math.min(0.05,(now-last)/1000);last=now;const el=now-t0;
+    if(el<ms-1200&&now>nextR){R.push({x:cv.width*(0.15+Math.random()*0.7),y:cv.height,vy:-(cv.height*(0.9+Math.random()*0.35)),ty:cv.height*(0.15+Math.random()*0.3),c:COLS[Math.floor(Math.random()*COLS.length)]});nextR=now+280+Math.random()*420;}
+    g.clearRect(0,0,cv.width,cv.height);
+    for(let i=R.length-1;i>=0;i--){const r=R[i];r.y+=r.vy*dt;g.fillStyle='#fff2b0';g.fillRect(r.x-1,r.y,3,6);g.globalAlpha=.35;g.fillRect(r.x-1,r.y+6,3,22);g.globalAlpha=1;
+      if(r.y<=r.ty){R.splice(i,1);se('pop');const n=36+Math.floor(Math.random()*20),sp=120+Math.random()*120;for(let k=0;k<n;k++){const a=k/n*Math.PI*2;P.push({x:r.x,y:r.y,vx:Math.cos(a)*sp*(0.6+Math.random()*0.5),vy:Math.sin(a)*sp*(0.6+Math.random()*0.5),l:1,c:r.c});}}}
+    for(let i=P.length-1;i>=0;i--){const q=P[i];q.vy+=90*dt;q.vx*=0.985;q.x+=q.vx*dt;q.y+=q.vy*dt;q.l-=dt*0.7;if(q.l<=0){P.splice(i,1);continue;}g.fillStyle=q.c;g.globalAlpha=q.l*0.35;g.fillRect(Math.round((q.x-q.vx*0.05)/3)*3,Math.round((q.y-q.vy*0.05)/3)*3,3,3);g.globalAlpha=q.l;g.fillRect(Math.round(q.x/3)*3,Math.round(q.y/3)*3,3,3);}
+    g.globalAlpha=1;if(el>ms&&!P.length&&!R.length){end();return;}requestAnimationFrame(loop);})(t0);}
 function doEndTurn(){
   {let n=0;for(const m of S.mines)if(m.kind==='pit'){if(!m.armed&&S.steel>=8){S.steel-=8;m.armed=true;m.used=false;n++;}if(m.armed)m.uses=null;}if(n)log(`落とし穴 ${n}個を掘り直した（木材−${n*8}）`);}
   if(!S.waveActive&&S.recentLoss)S.recentLoss=Math.max(0,S.recentLoss-1);
@@ -5596,6 +5738,7 @@ PXICON.ui.icons.ev_fire=[".....x......", "....xx......", "....xxx..x..", "...xxx
 PXICON.ui.icons.ev_flee=[".......xx...", ".......xx...", "....xxxx....", "...x.xxx.x..", "..x..xxxx...", ".....xx.....", "....xx.x....", "...xx...x...", "..xx....xx..", ".x........x.", "x...........", "............"];
 PXICON.ui.icons.ev_scout=["............", "x..........x", "xx........xx", "xxx.xxxx.xxx", ".xxxxxxxxxx.", ".xx.xxxx.xx.", ".xxxxxxxxxx.", "..xxx..xxx..", "...xxxxxx...", "....x..x....", "............", "............"];
 PXICON.ui.icons.ev_moon=["....xxxx....", "..xxxxxxxx..", ".xxx.xxxxxx.", ".xxxxxxx.xx.", "xxxxxxxxxxxx", "xx.xxxxxxxxx", "xxxxxxx.xxxx", "xxxxxxxxxxxx", ".xxxx.xxxxx.", ".xxxxxxxxxx.", "..xxxxxxxx..", "....xxxx...."];
+PXICON.ui.icons.eye=["............","............","...xxxxxx...",".xx......xx.","x...xxxx...x","x..xx..xx..x","x..xx..xx..x","x...xxxx...x",".xx......xx.","...xxxxxx...","............","............"];
 PXICON.ui.icons.sage=["...####.....","..######....","..#.##.#....","..######....","...####..##.",".######..##.","#######.####","#######.####","#######.####","#######..##.","#######.....","#######....."];
 PXICON.ui.icons.crown=PXICON.ui.icons.crown||["............","............",".x...x...x..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..","............","............","............"];
 PXICON.ui.icons.target=PXICON.ui.icons.target||["............","....xxxx....","..xx....xx..","..x......x..",".x...xx...x.",".x..xxxx..x.",".x..xxxx..x.",".x...xx...x.","..x......x..","..xx....xx..","....xxxx....","............"];
@@ -6769,6 +6912,8 @@ function se(name){
     case 'build':noise(t,0.12,{f:500,vol:0.2});tone(220,t+0.06,0.08,{type:'square',vol:0.04,lp:1200});noise(t+0.13,0.1,{f:700,vol:0.12});break;
     case 'upgrade':[0,4,7,12].forEach((n,i)=>tone(mtof(72+n),t+i*0.06,0.25,{type:'triangle',vol:0.07,send:true}));noise(t,0.2,{ft:'highpass',f:4000,vol:0.03});break;
     case 'error':tone(130,t,0.08,{type:'square',vol:0.05,lp:800});tone(110,t+0.1,0.1,{type:'square',vol:0.05,lp:800});break;
+    case 'bell':for(let i=0;i<2;i++){const s0=t+i*0.32;[1,2.76,5.4].forEach((m,j)=>tone(988*m*(i?0.94:1),s0,0.9-j*0.25,{type:'sine',vol:0.07/(j+1),send:true}));tone(2400,s0,0.03,{type:'square',vol:0.015});}break;
+    case 'pop':noise(t,0.25,{f:1400,fTo:200,vol:0.18});for(let i=0;i<5;i++)noise(t+0.12+i*0.05,0.03,{ft:'highpass',f:3500,vol:0.05});break;
     case 'turn':tone(660,t,0.05,{type:'sine',vol:0.06});tone(990,t+0.06,0.08,{type:'sine',vol:0.04});noise(t,0.5,{ft:'bandpass',f:300,fTo:1200,vol:0.03});break;
     case 'resStart':tone(mtof(72),t,0.18,{type:'triangle',vol:0.06});tone(mtof(79),t+0.09,0.3,{type:'triangle',vol:0.06,send:true});noise(t,0.12,{ft:'highpass',f:3500,vol:0.04});break;
     case 'b_wood':for(let i=0;i<3;i++){noise(t+i*0.09,0.05,{ft:'bandpass',f:900,q:3,vol:0.25});tone(180,t+i*0.09,0.05,{type:'triangle',vol:0.06});}break;
