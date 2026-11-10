@@ -6629,7 +6629,9 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   computeElev();renderTerrain();rebuildFog();document.getElementById('log').innerHTML='';buildSig='';
   const hq=hqOf();if(hq){cam.z=1;cam.x=bcx(hq)-VW/2;cam.y=bcy(hq)-VH/2;clampCam();}
   log(`${MAPS[CUR_MAP]?MAPS[CUR_MAP].name:''}：セーブから再開（${S.turn}日目・第${S.wave+1}襲撃の前）`,'good');
-  renderAll();resizeView();auMusicFor&&auMusicFor();return true;}
+  renderAll();resizeView();auMusicFor&&auMusicFor();
+  if(S.phase==='night'&&!S.waveActive&&!S.over){calcLights();setTimeout(()=>{if(!S.overlay)showNight();},0);}   // 夜にセーブしたものを再開したら、夜の画面を出し直す（暗い地図のままにしない）
+  return true;}
 function delSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
 addEventListener('beforeunload',()=>{if(canSave())saveGame(true);});
 // ===== ロゴ（ドット文字） =====
