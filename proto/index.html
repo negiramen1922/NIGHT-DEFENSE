@@ -905,6 +905,20 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 .npd{font-size:11px;color:var(--dim);line-height:1.4}.nplan[disabled] .npd{color:var(--off)}
 .nfest{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#2a2210;box-shadow:inset 0 0 0 1px var(--amber)}.nfest>div{flex:1}
 body.fwOn #overlay{visibility:hidden}
+#saveMark{position:fixed;right:12px;bottom:12px;z-index:90;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;background:rgba(10,14,11,.92);box-shadow:inset 0 0 0 1px var(--line);font-size:12px;color:var(--text);opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;pointer-events:none}
+#saveMark.on{opacity:1;transform:none}#saveMark.busy .pi{animation:saveBlink .5s steps(2) infinite}#saveMark.ng{color:var(--red)}
+@keyframes saveBlink{50%{opacity:.3}}
+body.land #saveMark{right:calc(var(--rail) + 8px)}
+/* PCの下のボタン：夜へ・一括修理・一括補給 ／ 図鑑・記録・倍速（押すたびに×1→×2→×3）・一時停止・歯車 */
+@media (min-width:901px){
+  body:not(.land) #controls>.sep,body:not(.land) #controls>.speed{display:none!important}
+  body:not(.land) #controls>#bSpd{display:inline-flex!important;flex-direction:row}
+  body:not(.land) #controls>#bPause{display:inline-flex!important;flex-direction:row;height:auto;font-size:inherit}
+  body:not(.land) #controls>#bNext{order:1}body:not(.land) #controls>#bRepAll{order:2}body:not(.land) #controls>#bSupAll{order:3}body:not(.land) #controls>#bNaval{order:4}
+  body:not(.land) #controls>.grow{order:5}body:not(.land) #controls>#bDex{order:6}body:not(.land) #controls>#bHist{order:7}body:not(.land) #controls>#bSpd{order:8}body:not(.land) #controls>#bPause{order:9}body:not(.land) #controls>#more{order:10}
+  body:not(.land) #controls>#bSpd .mic,body:not(.land) #controls>#bSpd .pi{display:none}
+  body:not(.land) #controls>#bPause .pi{width:12px!important;height:12px!important}
+}
 #fwCv{position:fixed;inset:0;z-index:80;cursor:pointer;background:rgba(4,6,14,.45)}
 .wsum{margin:0 0 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}.wchips{display:flex;flex-wrap:wrap;gap:4px;margin:5px 0 3px}.wchips button{padding:3px 8px;font-size:12px;display:inline-flex;align-items:center;gap:4px}.wchips small{color:var(--dim)}
 .hparty{margin:6px 0 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}
@@ -3707,6 +3721,7 @@ function nightStart(){
   else if(N.plan!=='fest'&&Math.random()<0.35){const pool=['trav','trav','shop','shop','star'];if(!S.festNext)pool.push('fest','fest');N.visit=pool[Math.floor(Math.random()*pool.length)];}
   if(N.visit==='shop'){const ids=SHOP.map(x=>x.id).sort(()=>Math.random()-0.5).slice(0,3);N.shop=ids;}
   S.night=N;if(N.visit){se('bell');log(`夜の訪問：${VISIT[N.visit].name}`,'warn');}
+  setTimeout(()=>saveGame(true),0);   // 昼→夜の切り替えでオートセーブ（訪問が決まったあと。読み直しで変わらないように）
 }
 function visitHTML(N){const v=VISIT[N.visit];if(!v)return '';
   let h=`<div class="nvisit" style="--vc:${v.col}"><div class="nvh">${ui(v.ic,v.col,24)}<b>${v.name}</b></div><div class="nvt">${v.t}</div>`;
@@ -5817,6 +5832,7 @@ PXICON.ui.icons.ev_flee=[".......xx...", ".......xx...", "....xxxx....", "...x.x
 PXICON.ui.icons.ev_scout=["............", "x..........x", "xx........xx", "xxx.xxxx.xxx", ".xxxxxxxxxx.", ".xx.xxxx.xx.", ".xxxxxxxxxx.", "..xxx..xxx..", "...xxxxxx...", "....x..x....", "............", "............"];
 PXICON.ui.icons.ev_moon=["....xxxx....", "..xxxxxxxx..", ".xxx.xxxxxx.", ".xxxxxxx.xx.", "xxxxxxxxxxxx", "xx.xxxxxxxxx", "xxxxxxx.xxxx", "xxxxxxxxxxxx", ".xxxx.xxxxx.", ".xxxxxxxxxx.", "..xxxxxxxx..", "....xxxx...."];
 PXICON.ui.icons.eye=["............","............","...xxxxxx...",".xx......xx.","x...xxxx...x","x..xx..xx..x","x..xx..xx..x","x...xxxx...x",".xx......xx.","...xxxxxx...","............","............"];
+PXICON.ui.icons.disk=["xxxxxxxxxx..","x..xxxxx..x.","x..xx.xx..xx","x..xx.xx...x","x..xxxxx...x","x..........x","x.xxxxxxxx.x","x.x......x.x","x.x......x.x","x.x......x.x","x.x......x.x","xxxxxxxxxxxx"];
 PXICON.ui.icons.sage=["...####.....","..######....","..#.##.#....","..######....","...####..##.",".######..##.","#######.####","#######.####","#######.####","#######..##.","#######.....","#######....."];
 PXICON.ui.icons.crown=PXICON.ui.icons.crown||["............","............",".x...x...x..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..","............","............","............"];
 PXICON.ui.icons.target=PXICON.ui.icons.target||["............","....xxxx....","..xx....xx..","..x......x..",".x...xx...x.",".x..xxxx..x.",".x..xxxx..x.",".x...xx...x.","..x......x..","..xx....xx..","....xxxx....","............"];
@@ -6577,9 +6593,14 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
 const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.1 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over;}
+// セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
+function saveMark(ok){let el=document.getElementById('saveMark');if(!el){el=document.createElement('div');el.id='saveMark';document.body.appendChild(el);}
+  clearTimeout(el._t1);clearTimeout(el._t2);el.className='on busy';el.innerHTML=`${ui('disk','amber',24)}<span>セーブしています…</span>`;
+  el._t1=setTimeout(()=>{el.className='on'+(ok?'':' ng');el.innerHTML=`${ui('disk',ok?'green':'red',24)}<span>${ok?'セーブしました':'セーブできませんでした'}</span>`;
+    el._t2=setTimeout(()=>{el.className='';},1600);},500);}
 function saveGame(quiet){if(!canSave())return false;try{const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}
   o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:MAPS[CUR_MAP]?MAPS[CUR_MAP].name:''};
-  localStorage.setItem(SAVE_KEY,JSON.stringify({meta,S:o}));if(!quiet){toast('セーブしました','good',1800);}return true;}catch(e){if(!quiet)toast('セーブできませんでした（ブラウザの保存領域）','bad');return false;}}
+  localStorage.setItem(SAVE_KEY,JSON.stringify({meta,S:o}));saveMark(true);return true;}catch(e){saveMark(false);if(!quiet)toast('セーブできませんでした（ブラウザの保存領域）','bad');return false;}}
 function saveInfo(){try{const r=localStorage.getItem(SAVE_KEY);if(!r)return null;return JSON.parse(r).meta;}catch(e){return null;}}
 function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catch(e){return false;}if(!d||!d.S)return false;
   const m=d.meta;CUR_MAP=m.map;BLOOD_MODE=!!m.blood;setDims('campaign');upDims();squadNo=m.squadNo||1;tankNo=m.tankNo||1;
