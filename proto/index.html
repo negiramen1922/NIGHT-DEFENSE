@@ -988,8 +988,6 @@ body.land #build .bchips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}b
 #build .bchips::-webkit-scrollbar{display:none}
 #build .bchips button{flex:0 0 auto;padding:4px 9px;font-size:12px;min-height:0!important}
 #build .bchips button.on{background:var(--head);box-shadow:inset 0 -2px 0 var(--amber);color:var(--amber)}
-#build .bsub{grid-column:1/-1;font-size:11px;color:var(--dim);letter-spacing:.1em;margin:6px 0 0;padding-left:6px;border-left:3px solid var(--amber)}
-#build .bsub:first-child{margin-top:0}
 /* PC：夜への隣の研究・軍事は出さない（右のタブとキー R・K で開ける）。設定は歯車だけ */
 @media (min-width:901px){#controls>#bRes,#controls>#bArmy{display:none!important}#more>summary .mtx{display:none}#more>summary{padding:0 10px}}
 @media (max-width:900px){
@@ -1072,7 +1070,8 @@ body.land #build .bchips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}b
   #rtabs button{height:40px;padding:0 2px;font-size:12px;justify-content:center}
   #right .box[data-rt]{flex:1 1 auto;min-height:0;overflow-y:auto}
   /* 建設：分類チップ＋カード2列 */
-  #build .bh{display:none}
+  #build .bh{margin:10px 0 6px}
+  #build .bh small{display:none}
   #build .bg{gap:8px}
   #build button{min-height:60px;padding:8px}
   #build button .bic{width:36px;height:36px}
@@ -5806,17 +5805,14 @@ function setText(el,v){if(el&&el.textContent!==v)el.textContent=v;}
 const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','spike','pit','bomb','brazier','totem','outpost']},
   {id:'prod',name:'生産・街',keys:'⇧',list:['miner','quarry','ironmine','farm','fishery','well','ammo','powder','furnace','barracks','apart','market','tavern','church','lab']},
   {id:'unit',name:'部隊',keys:'-',list:['train','stable','magic','aerie']}];
-// 建設の小分類（上のタブを押すと、その見出しまで一覧をスクロールする）
-const BUILD_SUB=[['wall','壁・門',['fence','gate','swall','wall','bastion']],['gun','防衛施設',['mg','how','cannon','mortar','mabou','hisou','tower','magetower']],['trap','罠・明かり',['spike','pit','bomb','brazier','totem']],['base','拠点',['outpost']],
-  ['res','資源',['miner','quarry','ironmine','farm','fishery','well']],['work','工房',['ammo','powder','furnace']],['town','街',['barracks','apart','market','tavern','church','lab']],['unit','部隊',['train','stable','magic','aerie']]];
-function subOf(k){const s=BUILD_SUB.find(x=>x[2].includes(k));return s?s[0]:'etc';}
+// 建設の分類タブ（防衛・生産・街・部隊）。押すとその見出しまで一覧をスクロールする
 function buildScroller(el){for(let p=el.parentElement;p;p=p.parentElement){const o=getComputedStyle(p).overflowY;if((o==='auto'||o==='scroll')&&p.scrollHeight>p.clientHeight+1)return p;}return document.scrollingElement;}
-function buildJump(id){const el=document.getElementById('build'),h=el&&el.querySelector(`.bsub[data-sub="${id}"]`);if(!h)return;
-  const bh=h.closest('.bg')&&h.closest('.bg').previousElementSibling;if(bh&&bh.classList.contains('closed')){bh.classList.remove('closed');}
+function buildJump(id){const el=document.getElementById('build'),h=el&&el.querySelector(`.bh[data-g="${id}"]`);if(!h)return;
+  if(h.classList.contains('closed')){h.classList.remove('closed');bgClosed[id]=false;}
   const sc=buildScroller(el),ch=el.querySelector('.bchips');const top=h.getBoundingClientRect().top-sc.getBoundingClientRect().top-(ch?ch.offsetHeight:0)-6;sc.scrollTop+=top;buildSpy();}
 function buildSpy(){const el=document.getElementById('build');if(!el)return;const ch=el.querySelector('.bchips');if(!ch)return;const lim=ch.getBoundingClientRect().bottom+12;let cur=null;
-  el.querySelectorAll('.bsub').forEach(h=>{if(h.getBoundingClientRect().top<=lim)cur=h.dataset.sub;});if(!cur){const f=el.querySelector('.bsub');cur=f&&f.dataset.sub;}
-  ch.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.sub===cur));
+  el.querySelectorAll('.bh').forEach(h=>{if(h.getBoundingClientRect().top<=lim)cur=h.dataset.g;});if(!cur){const f=el.querySelector('.bh');cur=f&&f.dataset.g;}
+  ch.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.g===cur));
   if(ch.scrollWidth>ch.clientWidth+1&&ch._cur!==cur){ch._cur=cur;const b=ch.querySelector('button.on');if(b)ch.scrollLeft=b.offsetLeft-ch.offsetLeft-(ch.clientWidth-b.offsetWidth)/2;}}
 function visibleBuilds(){return BUILD_ORDER.filter(k=>!B[k].req||has(B[k].req));}
 function groupList(g){return g.list.filter(k=>!B[k].req||has(B[k].req));}
@@ -5830,16 +5826,15 @@ function renderBuild(){
   if(sig!==buildSig){
     buildSig=sig;el.innerHTML='';
     if(!S.bgTab||!BUILD_GROUPS.some(g=>g.id===S.bgTab))S.bgTab=BUILD_GROUPS[0].id;
-    {const ch=document.createElement('div');ch.className='bchips';const vis=new Set(BUILD_GROUPS.flatMap(groupList));
-     for(const [id,nm,ks] of BUILD_SUB){if(!ks.some(k=>vis.has(k)))continue;const b=document.createElement('button');b.textContent=nm;b.dataset.sub=id;b.onclick=()=>{se('click');buildJump(id);};ch.appendChild(b);}
+    {const ch=document.createElement('div');ch.className='bchips';
+     for(const g of BUILD_GROUPS){if(!groupList(g).length)continue;const b=document.createElement('button');b.textContent=g.name;b.dataset.g=g.id;b.onclick=()=>{se('click');buildJump(g.id);};ch.appendChild(b);}
      el.appendChild(ch);}
     for(const g of BUILD_GROUPS){
       const h=document.createElement('div');h.className='bh'+(bgClosed[g.id]?' closed':'');const nk=Math.min(10,groupList(g).length);h.innerHTML=`<span>${g.name}</span>${g.keys==='-'?'':`<small>${g.keys?'Shift＋':''}数字キー 1–${nk%10}</small>`}`;
       h.onclick=()=>{h.classList.toggle('closed');bgClosed[g.id]=h.classList.contains('closed');try{localStorage.setItem('bd_bgrp',JSON.stringify(bgClosed));}catch(e){}};
       const box=document.createElement('div');box.className='bg'+(S.bgTab===g.id?' cur':'');box.dataset.g=g.id;
-      let lastSub=null;
-      groupList(g).forEach((k,i)=>{const sb=subOf(k);if(sb!==lastSub){lastSub=sb;const sn=BUILD_SUB.find(x=>x[0]===sb);const hd=document.createElement('div');hd.className='bsub';hd.dataset.sub=sb;hd.textContent=sn?sn[1]:'そのほか';box.appendChild(hd);}
-        const bt=document.createElement('button');bt.dataset.k=k;bt.dataset.lab=(g.keys!=='-'&&i<10?(g.keys?'⇧':'')+((i+1)%10):'');const sz=newSz(k);bt.innerHTML=`<i class="bic">${icSvg(k,30)}</i><span class="bm"><span class="bt">${bt.dataset.lab?`<span class="key">${bt.dataset.lab}</span>`:''}<span class="bn"></span>${sz!==U?`<span class="sz${sz>U?' big':''}">${sz}×${sz}</span>`:''}</span><small></small></span>`;
+      h.dataset.g=g.id;
+      groupList(g).forEach((k,i)=>{const bt=document.createElement('button');bt.dataset.k=k;bt.dataset.lab=(g.keys!=='-'&&i<10?(g.keys?'⇧':'')+((i+1)%10):'');const sz=newSz(k);bt.innerHTML=`<i class="bic">${icSvg(k,30)}</i><span class="bm"><span class="bt">${bt.dataset.lab?`<span class="key">${bt.dataset.lab}</span>`:''}<span class="bn"></span>${sz!==U?`<span class="sz${sz>U?' big':''}">${sz}×${sz}</span>`:''}</span><small></small></span>`;
         bt.title=B[k].desc;
         bt.onclick=()=>{if(S.buildMode===k)exitBuild();else{S.lastBuild=k;enterBuild(k);}};
         box.appendChild(bt);});
