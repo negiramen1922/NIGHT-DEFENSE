@@ -981,7 +981,17 @@ body.fwOn #overlay{visibility:hidden}
 .efallen{margin:12px 0!important}
 
 /* ===== スマホ（1f・1g） ===== */
-#rtabs .tabInfo,.mOnlyB,.bchips,#intel .imob,#sheetSel{display:none}
+#rtabs .tabInfo,.mOnlyB,#intel .imob,#sheetSel{display:none}
+#build .bchips{display:flex;flex-wrap:wrap;gap:4px;position:sticky;top:-1px;z-index:3;background:var(--panel,#0f1611);padding:4px 0 6px;margin:0 0 4px;box-shadow:0 1px 0 var(--line)}
+body.land #build .bchips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}body.land #build .bchips::-webkit-scrollbar{display:none}
+#build::after{content:'';display:block;height:45vh}   /* 下の方の分類も、タブで飛んだとき一番上に来るように */
+#build .bchips::-webkit-scrollbar{display:none}
+#build .bchips button{flex:0 0 auto;padding:4px 9px;font-size:12px;min-height:0!important}
+#build .bchips button.on{background:var(--head);box-shadow:inset 0 -2px 0 var(--amber);color:var(--amber)}
+#build .bsub{grid-column:1/-1;font-size:11px;color:var(--dim);letter-spacing:.1em;margin:6px 0 0;padding-left:6px;border-left:3px solid var(--amber)}
+#build .bsub:first-child{margin-top:0}
+/* PC：夜への隣の研究・軍事は出さない（右のタブとキー R・K で開ける）。設定は歯車だけ */
+@media (min-width:901px){#controls>#bRes,#controls>#bArmy{display:none!important}#more>summary .mtx{display:none}#more>summary{padding:0 10px}}
 @media (max-width:900px){
   html,body{overflow:hidden}
   #wrap{padding:0;gap:0;height:100vh;height:100dvh}
@@ -1062,11 +1072,8 @@ body.fwOn #overlay{visibility:hidden}
   #rtabs button{height:40px;padding:0 2px;font-size:12px;justify-content:center}
   #right .box[data-rt]{flex:1 1 auto;min-height:0;overflow-y:auto}
   /* 建設：分類チップ＋カード2列 */
-  #build .bchips{display:flex;gap:6px;margin:0 0 10px}
-  #build .bchips button{padding:6px 12px;font-size:12px}
   #build .bh{display:none}
-  #build .bg{display:none!important}
-  #build .bg.cur{display:grid!important;gap:8px}
+  #build .bg{gap:8px}
   #build button{min-height:60px;padding:8px}
   #build button .bic{width:36px;height:36px}
   #build button .bic svg{width:36px;height:36px}
@@ -1436,9 +1443,20 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 #boot .bbar{width:min(240px,60vw);height:6px;background:#1a221c;overflow:hidden;box-shadow:0 0 0 1px #2f3f33}
 #boot .bbar i{display:block;height:100%;width:35%;background:#f2b33d;animation:bootMv 1.1s ease-in-out infinite}
 @keyframes bootMv{0%{transform:translateX(-100%)}100%{transform:translateX(290%)}}
-#boot small{color:#8aa48d;font-size:12px}</style>
+#boot small{color:#8aa48d;font-size:12px}
+/* 読み込み中に左下を歩く、英雄たちと逃げるゴブリン（ゲームの歩くドット絵） */
+#boot .bwalk{position:absolute;left:12px;bottom:14px;width:min(360px,70vw);height:60px;overflow:hidden;border-bottom:2px solid #1a221c}
+#boot .bgrp{position:absolute;left:0;bottom:2px;width:242px;height:56px;animation:bootMarch 7s linear infinite}
+#boot .bw{position:absolute;bottom:0;image-rendering:pixelated;background-repeat:no-repeat;animation:bootStep .6s steps(4) infinite}
+@keyframes bootStep{from{background-position:0 0}to{background-position:calc(-1 * var(--fw)) 0}}
+@keyframes bootMarch{from{transform:translateX(-242px)}to{transform:translateX(min(360px,70vw))}}
+#boot .bw.h_arch{width:48px;height:48px;left:0px;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAQCAYAAACm53kpAAACSUlEQVR4nNWWz2vTYBzGnzcGHPuFLTJCCdKWEETBg+tp9eSpRfEgtcqO4m7qaaKnHHL25v8wbPUkg3nqSTyMetLiKFkbNIauyhrbrUjBvR6qNc37plYTFnwu4X3zfT7P+837El7AR5/W1qiZy1G/95Nk5nL0ZTZLZUn5J/9x5hM/wE6vhzu7e7BaBrfGq2mbnYZ3nPmjQZAGZEmh6euz09gxN4jj7abFcKLKJ0EB3oXUt3Rfr5rXcCLVw/fmwpg/ynxmF/4WUNYLtKg9J26/mtfg5rjHal7zPdZR5AtlvcAcPTWvccf1LZ3ZPadlAgA6dnXE8TYxqamo84WgALeslkG8i3eLt/tR54scgO8xnHR8AeDq+ipt2CbUvIYLt+MAgKfXZnHrRX9Uc251haYTSWw+3mA4UeSLQQFuNWwT3UobVx5exMfPJrPA5WIKb8pNNC6H10DQfMEPwNNyMYVupY2GPQ7v2FV6cq+O6oO7AICvfYfrb1q73Pko80UvQK1ofwAIzHwskSEdu0qz6/cBAN1DB8ntIePRtoPkzzprcfj85vTH/FHmi2E0EFRR5hPt5nmql2qkY1dpLJEhsqTQS/fS6B46TLG18wX7r4WxH1FQvywpNL5yBPnsaaZ+ce4UXj1pwGoZI/6vvLD8ol6qkbJeoLFEhvmp9Nq/v/TCEv+mFtQ/bX0skSHuS09YfhEA3tXejxV/KFnDZ3sAq2UQWVLomaUjzGMG+xgwwUH988YMHOOAqXdwMDEnDL/3a97gJvD1jDP33/l/AKs8i6141h/JAAAAAElFTkSuQmCC);background-size:192px 48px;--fw:192px}
+#boot .bw.pawn{width:54px;height:54px;left:54px;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAAASCAYAAAD4+JjWAAACdUlEQVR4nO2XQWjTUBjH/ymtQ8egJ8khuCIRPIyxww4iIVQFKTvooXOGHcVDD4Iy9FI99FB6LCIiu+jZzXkQdUjRMaSWHXoYPZShmaQjsiCKY7OUevB5GItN85K+0Le2iB8E0ry8X37/75FXAgQsSZRJ0Dk0Bg9OL3xCQUH5ydNdSUmiTIoTMq4d+911uF74hIOCnlSrCNJX2kOVdR1ACKalC8ygPvl4CvqtCmswSZTJm/er1LHCSgn5TDoQqx8+VDCPYH4MnqzD9nG9Yp1AF8+fBZBDPpMmNClJlB3XZ6amPVmLy0vIZ3yd++5jN4hHMEmUSeXzJ4yfPEVMSxcSatwRbmZqGovLS/bvwkrJ8xmD4hPmHYylEmrcFQT4u5cMkg/zv1gnEO3+g3BzmRwA4PrtOTvMiwsTaNQMAMDR0Rguv1sPotIzH2qDeAWTRJloNx+gvLHrGmvUDIw/VAAAlRtFT0a/fagN6ibYbuEcivMSAIkoKRN7P5vO+fUfAGAz7PPEK67BePmEeYGA/ZVWUiCXxkJ49PajIIky2as3kYvPO1jKy/0wh91oHj5h3sFYKxKN2vM36w3H2CD5OF6x7y2rNDI8hPRqqg1zzzcYK8e0NCFZBnk+GcPGl23c3W46NlZJlImqZbEDYHYMZGR4CK8f30Hsvi5cPTNKPhgRqFq2ow8rx8/H/ogxLV1YWKu5dv+db1v2oWpZJMsGItEoNusNVzBWzuytp8S0dCFZNqiM1vvba2GtJpiWLrD6sHD8fDw/NU4cPwIA2Pr6C6alC+3XDppBm8/KKVWqged7jfn5sHJoPjTgFT/ptnrmM/avcv5Xa/0BXUPYk2a7+KgAAAAASUVORK5CYII=);background-size:216px 54px;--fw:216px}
+#boot .bw.h_inf{width:48px;height:48px;left:114px;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAQCAYAAACm53kpAAACL0lEQVR4nNWUMWgTURjHfylHu5QSsJYQwhHhAqEEp7RYB+noIG5KNh0zFDXg0KGUUjqIQpXiLBUcQlw6JEFUQkgHY8jUISgNeJ4hhFClaAjxludgcySXu4i5w8Nvevfd+/9/3//Be3R0ITq6EExYHV2IzKvyxB5e8yWAfOE9HV2I2Wmf728NZqd9vo4uhNkjFFBsB2q06kMcL/mSGwHMHlE5Qu0gZKktlFTWdhXR9/CaLzk1sBrisFrmq83w7WAFuDPU85IvuRGgX1E5wu7+C84vnGN5ccXGwbq84kuDH04CfEgkBMBMTCEqR7gem+Jh/qPhkytmAXhTrLB93/0DnJQ/NWjwdjXO0pnBavgbldo7Y2OumCVXzHJva9MS3lNVeqoKwGG1DMDy4gpbT58YcICG9sk2gBd8adAAYObM4NHty4bBUkwZG6CnqrxutbgwN0cqfonaQYgHO0HWN5pc9a9D4/e+Qknl2Z408oh5yZfcCNCvVLtL4u4eyfR3APxskkwnjf9a/QjIuH6ATviSUwNz/ej8NNanse2xe90I4JQvmRuTBDjudo31l8/HpNfyI3sGg4yrf82XnBq4UV7yjbuUCgbFLVnmmnrClcSOraCU3rC8g071oYAi/qTLhud5rmk8bjZd0w8ZmU1OTzRj7Z+X0epHqNWM7SPkRB8KKCIcv4msXBzRDYYYx55EbzmIvDANgNbWabTqPque1RBO9F5xzY0bdgCLemnR++/0vwDQWqXzT8Sf7wAAAABJRU5ErkJggg==);background-size:192px 48px;--fw:192px}
+#boot .bw.e_gobarcher{width:48px;height:48px;left:188px;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAQCAYAAACm53kpAAACR0lEQVR4nO2WQWjTYBiG378ED7OOHkRyqFAh5FIZVTzsJMh2GAgbDPGwQQ7z0l16cTiw0MNAweEuvdjLcigqTGQglLGDCPMgMqQtpUMoOZQaNOgCcW2D1dHfw/hrkiY6SG0Y7IVC+/V7n/f78pekwKlONRBFeYFGeYEet291buyfvcPID/kFsJqUE3F1YQSMwfqs3Cgv0OnlOKSciOwbE+tLM9TJHXY+ZwVUd1VAFqiqKcQ5DKtNL8cRufQL2WQN60sz9M7jV0TVFJJPgko5ETcmLmJtHvTuswnb4GvzR9+/K3yE8qgLVVOI/nmEBp3PMbifBayMRXkUUk7Et+Ynm58tqBS6+PD+KfjYOJzeIPJDdkANZud7D2B9OQFeav88wIMrXO8ze59P1nD/9iZebm+jbpzv8wWVH/ILcOrsmVGkS4dIJTJIJTJIlw4BHJ3AwxezuDU1hVhkf2AL+M3n3AEHSCUyAIB0acUGKMqm5wmomkKeLIAuyteQLa/06tVdFQBQlE2omkIAUAD4YvzwWGB4+ZxfgFVRXqDXZy9gr9Cw1cMIo1H/c9X52DhZnRuj955XSND5xA3gpkZ9H/Vilw0A5wLsTp5P1nBTEtFsGa5+tqhbRhD5ISfg7eZXnAtHXIdgfQDgPD2/Ciq/7ylglaGbMHTzWKBB+veqSp8/fln4L37bU8D60zB0E5WdFrY2ysTQTbSbnb4etyEG4W83OzB0E1sbZVLZadku4qD9fTDrPzDW7Fbz0knzO2GTf4Nb9NqjfuL8vwHKitNeW9JbwQAAAABJRU5ErkJggg==);background-size:192px 48px;--fw:192px}
+</style>
 <script>addEventListener('error',function(){var b=document.getElementById('boot');if(b)b.classList.add('off');});</script>
-<div id="boot"><div class="btt">ナイトディフェンス</div><div class="bbar"><i></i></div><small id="bootMsg">読み込み中…</small></div>
+<div id="boot"><div class="btt">ナイトディフェンス</div><div class="bbar"><i></i></div><small id="bootMsg">読み込み中…</small><div class="bwalk"><div class="bgrp"><i class="bw h_arch"></i><i class="bw pawn"></i><i class="bw h_inf"></i><i class="bw e_gobarcher"></i></div></div></div>
 <div id="rotateMsg"><div class="rph"></div><b>スマホを横向きにしてください</b><small id="rotHint">このゲームは横持ちで遊ぶ画面になっています。</small><button id="rotFree" class="ghost">縦のまま遊ぶ</button></div>
 <div id="wrap">
   <div id="topbar">
@@ -1480,7 +1498,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
       <div class="speed"><button id="bPauseSeg" class="dOnly" title="一時停止 [Space]"></button><button data-spd="1">×1</button><button data-spd="2">×2</button><button data-spd="3">×3</button></div>
       <span class="grow"></span>
       <button id="bDex" class="dOnly">図鑑<kbd>E</kbd></button><button id="bHist" class="dOnly">記録</button>
-      <details id="more" class="more"><summary><span class="mic"></span><span class="mtx">表示・設定</span></summary><div class="moreBody">
+      <details id="more" class="more"><summary title="表示・設定"><span class="mic"></span><span class="mtx">表示・設定</span></summary><div class="moreBody">
       <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mSup">一括補給</button><button id="mHist">襲撃の記録</button><button id="mDex">モンスター図鑑</button><button id="mLog">通信ログ</button></div>
       <div class="mOnly mspeed"><span class="help">速度</span><div class="speed"><button data-spd="1">×1</button><button data-spd="2">×2</button><button data-spd="3">×3</button></div></div>
       <button id="bOrient" style="display:none">画面の向き：横で固定</button>
@@ -5788,6 +5806,18 @@ function setText(el,v){if(el&&el.textContent!==v)el.textContent=v;}
 const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','spike','pit','bomb','brazier','totem','outpost']},
   {id:'prod',name:'生産・街',keys:'⇧',list:['miner','quarry','ironmine','farm','fishery','well','ammo','powder','furnace','barracks','apart','market','tavern','church','lab']},
   {id:'unit',name:'部隊',keys:'-',list:['train','stable','magic','aerie']}];
+// 建設の小分類（上のタブを押すと、その見出しまで一覧をスクロールする）
+const BUILD_SUB=[['wall','壁・門',['fence','gate','swall','wall','bastion']],['gun','防衛施設',['mg','how','cannon','mortar','mabou','hisou','tower','magetower']],['trap','罠・明かり',['spike','pit','bomb','brazier','totem']],['base','拠点',['outpost']],
+  ['res','資源',['miner','quarry','ironmine','farm','fishery','well']],['work','工房',['ammo','powder','furnace']],['town','街',['barracks','apart','market','tavern','church','lab']],['unit','部隊',['train','stable','magic','aerie']]];
+function subOf(k){const s=BUILD_SUB.find(x=>x[2].includes(k));return s?s[0]:'etc';}
+function buildScroller(el){for(let p=el.parentElement;p;p=p.parentElement){const o=getComputedStyle(p).overflowY;if((o==='auto'||o==='scroll')&&p.scrollHeight>p.clientHeight+1)return p;}return document.scrollingElement;}
+function buildJump(id){const el=document.getElementById('build'),h=el&&el.querySelector(`.bsub[data-sub="${id}"]`);if(!h)return;
+  const bh=h.closest('.bg')&&h.closest('.bg').previousElementSibling;if(bh&&bh.classList.contains('closed')){bh.classList.remove('closed');}
+  const sc=buildScroller(el),ch=el.querySelector('.bchips');const top=h.getBoundingClientRect().top-sc.getBoundingClientRect().top-(ch?ch.offsetHeight:0)-6;sc.scrollTop+=top;buildSpy();}
+function buildSpy(){const el=document.getElementById('build');if(!el)return;const ch=el.querySelector('.bchips');if(!ch)return;const lim=ch.getBoundingClientRect().bottom+12;let cur=null;
+  el.querySelectorAll('.bsub').forEach(h=>{if(h.getBoundingClientRect().top<=lim)cur=h.dataset.sub;});if(!cur){const f=el.querySelector('.bsub');cur=f&&f.dataset.sub;}
+  ch.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.sub===cur));
+  if(ch.scrollWidth>ch.clientWidth+1&&ch._cur!==cur){ch._cur=cur;const b=ch.querySelector('button.on');if(b)ch.scrollLeft=b.offsetLeft-ch.offsetLeft-(ch.clientWidth-b.offsetWidth)/2;}}
 function visibleBuilds(){return BUILD_ORDER.filter(k=>!B[k].req||has(B[k].req));}
 function groupList(g){return g.list.filter(k=>!B[k].req||has(B[k].req));}
 let buildSig='',bgClosed={};try{bgClosed=JSON.parse(localStorage.getItem('bd_bgrp')||'{}');}catch(e){}
@@ -5800,17 +5830,22 @@ function renderBuild(){
   if(sig!==buildSig){
     buildSig=sig;el.innerHTML='';
     if(!S.bgTab||!BUILD_GROUPS.some(g=>g.id===S.bgTab))S.bgTab=BUILD_GROUPS[0].id;
-    {const ch=document.createElement('div');ch.className='bchips';for(const g of BUILD_GROUPS){if(!groupList(g).length)continue;const b=document.createElement('button');b.textContent=g.name;b.dataset.g=g.id;b.className=S.bgTab===g.id?'on':'';b.onclick=()=>{S.bgTab=g.id;el.querySelectorAll('.bchips button').forEach(x=>x.classList.toggle('on',x.dataset.g===g.id));el.querySelectorAll('.bg').forEach(x=>x.classList.toggle('cur',x.dataset.g===g.id));};ch.appendChild(b);}el.appendChild(ch);}
+    {const ch=document.createElement('div');ch.className='bchips';const vis=new Set(BUILD_GROUPS.flatMap(groupList));
+     for(const [id,nm,ks] of BUILD_SUB){if(!ks.some(k=>vis.has(k)))continue;const b=document.createElement('button');b.textContent=nm;b.dataset.sub=id;b.onclick=()=>{se('click');buildJump(id);};ch.appendChild(b);}
+     el.appendChild(ch);}
     for(const g of BUILD_GROUPS){
       const h=document.createElement('div');h.className='bh'+(bgClosed[g.id]?' closed':'');const nk=Math.min(10,groupList(g).length);h.innerHTML=`<span>${g.name}</span>${g.keys==='-'?'':`<small>${g.keys?'Shift＋':''}数字キー 1–${nk%10}</small>`}`;
       h.onclick=()=>{h.classList.toggle('closed');bgClosed[g.id]=h.classList.contains('closed');try{localStorage.setItem('bd_bgrp',JSON.stringify(bgClosed));}catch(e){}};
       const box=document.createElement('div');box.className='bg'+(S.bgTab===g.id?' cur':'');box.dataset.g=g.id;
-      groupList(g).forEach((k,i)=>{const bt=document.createElement('button');bt.dataset.k=k;bt.dataset.lab=(g.keys!=='-'&&i<10?(g.keys?'⇧':'')+((i+1)%10):'');const sz=newSz(k);bt.innerHTML=`<i class="bic">${icSvg(k,30)}</i><span class="bm"><span class="bt">${bt.dataset.lab?`<span class="key">${bt.dataset.lab}</span>`:''}<span class="bn"></span>${sz!==U?`<span class="sz${sz>U?' big':''}">${sz}×${sz}</span>`:''}</span><small></small></span>`;
+      let lastSub=null;
+      groupList(g).forEach((k,i)=>{const sb=subOf(k);if(sb!==lastSub){lastSub=sb;const sn=BUILD_SUB.find(x=>x[0]===sb);const hd=document.createElement('div');hd.className='bsub';hd.dataset.sub=sb;hd.textContent=sn?sn[1]:'そのほか';box.appendChild(hd);}
+        const bt=document.createElement('button');bt.dataset.k=k;bt.dataset.lab=(g.keys!=='-'&&i<10?(g.keys?'⇧':'')+((i+1)%10):'');const sz=newSz(k);bt.innerHTML=`<i class="bic">${icSvg(k,30)}</i><span class="bm"><span class="bt">${bt.dataset.lab?`<span class="key">${bt.dataset.lab}</span>`:''}<span class="bn"></span>${sz!==U?`<span class="sz${sz>U?' big':''}">${sz}×${sz}</span>`:''}</span><small></small></span>`;
         bt.title=B[k].desc;
         bt.onclick=()=>{if(S.buildMode===k)exitBuild();else{S.lastBuild=k;enterBuild(k);}};
         box.appendChild(bt);});
       el.appendChild(h);el.appendChild(box);
     }
+    {const sc=buildScroller(el);if(sc&&!sc._bspy){sc._bspy=1;sc.addEventListener('scroll',()=>buildSpy(),{passive:true});}setTimeout(buildSpy,0);}
   }
   el.querySelectorAll('button[data-k]').forEach(bt=>{const k=bt.dataset.k,d=B[k],c=costOf(k);
     setText(bt.querySelector('.bn'),d.name);
