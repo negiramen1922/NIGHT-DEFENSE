@@ -3769,7 +3769,7 @@ function showNight(){phaseReset();
   const card=openOverlay('night',h,true);
   document.getElementById('ovClose').onclick=closeOverlay;
   document.getElementById('toMorning').onclick=()=>{closeOverlay();morning();};
-  {const b=document.getElementById('nRes');if(b)b.onclick=()=>showResearch();}
+  {const b=document.getElementById('nRes');if(b)b.onclick=()=>{S.resFromNight=true;showResearch();};}   // 研究を閉じたら夜の画面に戻る（closeOverlay）
   {const b=document.getElementById('nFw');if(b)b.onclick=()=>fireworks(4500);}
   card.querySelectorAll('[data-plan]').forEach(b=>b.onclick=()=>{N.plan=b.dataset.plan;se('click');showNight();});
   card.querySelectorAll('[data-vop]').forEach(b=>b.onclick=()=>{const o=VISIT[N.visit].ops[+b.dataset.vop];const c=visitCost(o);if(!canAfford(c))return;for(const k in c)S[k]-=c[k];N.done=o.f();log(`${VISIT[N.visit].name}：${N.done}`,'good');se('click');renderAll();showNight();});
@@ -6376,7 +6376,7 @@ function openOverlay(kind,html,wide){
   S.overlay=kind;document.getElementById('overlay').classList.toggle('home',kind==='title'||kind==='intro'||(kind==='help'&&/タイトルへ/.test(html)));const card=document.getElementById('ovCard');card.className='card'+(wide?' wide':'')+' ov-'+kind;card.innerHTML=html;
   document.getElementById('overlay').style.display='flex';document.body.classList.add('ov');card.scrollTop=0;return card;
 }
-function closeOverlay(){const was=S&&S.overlay;if(S)S.overlay=null;if(was==='report'&&S.phase==='night'&&S.nightPending){S.nightPending=false;setTimeout(showNight,0);}document.getElementById('overlay').style.display='none';document.body.classList.remove('ov');}
+function closeOverlay(){const was=S&&S.overlay;if(S)S.overlay=null;if(was==='res'&&S.resFromNight){S.resFromNight=false;if(S.phase==='night'&&!S.waveActive)setTimeout(()=>{if(!S.overlay)showNight();},0);}if(was==='report'&&S.phase==='night'&&S.nightPending){S.nightPending=false;setTimeout(showNight,0);}document.getElementById('overlay').style.display='none';document.body.classList.remove('ov');}
 // ===== モンスター図鑑 =====
 const DEX_ORDER=['swarm','charger','gobarcher','spitter','grappler','troll','harpy','heavy','wyvern','wolf','tiger','mammoth','redcap','king'];
 function dexFirst(){// このマップで初めて出てくる襲撃（genWave の決まりから）
