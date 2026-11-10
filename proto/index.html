@@ -1550,6 +1550,7 @@ function buyLeft(k){return Math.max(0,buyLimit()-((S.buyToday||{})[k]||0));}
 function matPrice(){const n=S.blds.filter(b=>b.type==='market'&&!(b.bt>0)).length;return (n>=2?5:3)+(has('trade')?3:0);}
 function happyTarget(){return Math.max(0,Math.min(100,happyParts().reduce((a,p)=>a+p[1],0)));}
 function happyMul(){const h=S.happy;return h>=75?1.15:h>=55?1:h>=35?0.85:0.7;}
+function happyIc(sz){const h=S.happy;const [k,c]=h>=75?['h_joy','green']:h>=55?['h_ok','light']:h>=35?['h_bad','amber']:['h_riot','red'];return ui(k,c,sz||14);}
 function happyName(){const h=S.happy;return h>=75?'上機嫌':h>=55?'ふつう':h>=35?'不満':'暴動寸前';}   // 住民1人あたりの食料消費（毎秒）
 const HQ_GOLD=12;   // 城館の収入（毎ターン）
 const WAVE_LEAD=3;   // 敵を全滅させてから次の波が来るまでの秒数
@@ -3569,6 +3570,7 @@ function showNight(){phaseReset();
   const list=S.squads.filter(q=>!q.gar);
   let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} 静かな夜</h2><span style="display:flex;gap:6px"><button id="toMorningTop" class="on" style="padding:6px 14px">朝へ [Enter]</button><button id="ovClose">地図を見る</button></span></div>
   <div class="help">今夜は襲撃がありません。夜は建設・生産・訓練ができない代わりに、夜にしかできないことがあります。</div>
+  <div class="row" style="align-items:center;margin:4px 0"><span class="muted">街の機嫌</span><span style="display:inline-flex;align-items:center;gap:6px">${happyIc(24)}<b>${Math.round(S.happy)}</b> ${happyName()}</span></div>
   <h3 style="margin:10px 0 4px">夜狩り</h3><div class="help">部隊を森へ出して、はぐれ魔物を狩ります。参加する部隊は<b>1つの一団</b>になって出るので、まとめて出すほど危険が下がります。翌朝、魔核を持ち帰りますが、負傷や戦死の危険があります。</div>`;
   {const pv=huntPreview(huntParty());const pct=Math.min(100,pv.r/2*100);
    h+=`<div class="hparty"><div class="row" style="align-items:center"><span><b>今夜の狩り</b> <span class="muted" style="font-size:12px">${pv.n?`${pv.n}部隊・${pv.men}人`:'参加する部隊を選んでください'}</span></span>${pv.n?`<span>危険 <b style="color:${pv.rc}">${pv.risk}</b>　${ic('mat',12)}魔核 約${pv.mat}</span>`:''}</div>
@@ -4557,7 +4559,7 @@ function renderEcon(){
     h+=`<div class="muted" style="font-size:11px">必要 約${f.need} ／ ${S.waveActive?'残り（夜は作れない）':'開戦時の見込み'} 約${f.have}</div>`;
   }
   {const hp=Math.round(S.happy),tg=Math.round(happyTarget()),col=S.happy>=55?'var(--green)':S.happy>=35?'var(--amber)':'var(--red)';
-   h+=`<div style="margin-top:6px" class="er" title="${happyParts().map(p=>p[0]+' '+(p[1]>=0?'+':'')+p[1]).join('／')}"><span class="muted">幸福度</span><span style="color:${col}"><b>${hp}</b> ${happyName()}${tg!==hp?`（→${tg}）`:''}　生産×${happyMul()}</span></div>`;
+   h+=`<div style="margin-top:6px" class="er" title="${happyParts().map(p=>p[0]+' '+(p[1]>=0?'+':'')+p[1]).join('／')}"><span class="muted">幸福度</span><span style="color:${col};display:inline-flex;align-items:center;gap:4px">${happyIc(14)}<b>${hp}</b> ${happyName()}${tg!==hp?`（→${tg}）`:''}　生産×${happyMul()}</span></div>`;
    h+=`<div class="ebar"><i style="width:${hp}%;background:${col}"></i></div>`;
    h+=`<div class="muted" style="font-size:10.5px">${happyParts().slice(1).map(p=>`${p[0]} <span style="color:${p[1]>=0?'var(--green)':'var(--red)'}">${p[1]>=0?'+':''}${p[1]}</span>`).join('・')}</div>`;
    h+=`<div style="display:flex;gap:3px;align-items:center;margin-top:4px;font-size:11px"><span class="muted">税率</span>${TAX.map((t,i)=>`<button data-tax="${i}" class="${S.tax===i?'on':''}" style="padding:2px 6px;font-size:11px">${t.n}</button>`).join('')}</div>`;}
@@ -5558,6 +5560,20 @@ document.querySelectorAll('.speed [data-spd]').forEach(b=>b.onclick=()=>{S.speed
 {const px=(id,t)=>{const e=document.getElementById(id);if(e)e.onclick=()=>{document.getElementById('more').open=false;const b=document.getElementById(t);if(b.onclick)b.onclick();else b.click();};};px('mRep','bRepAll');px('mSup','bSupAll');px('mHist','bHist');px('mDex','bDex');
  document.getElementById('mLog').onclick=()=>{document.getElementById('more').open=false;openOverlay('log',`<h2>通信ログ<button id="ovClose" style="float:right">閉じる</button></h2><div class="logfull">${document.getElementById('log').innerHTML}</div>`,false);document.getElementById('ovClose').onclick=closeOverlay;};
  const mic=(id,n)=>{const e=document.querySelector('#'+id+' .mic');if(e)e.innerHTML=ui(n,'light',24);};PXICON.ui.icons.build=PXICON.ui.icons.build||["............","...xxxxx....","..xxxxxxxx..","..xxxxxxxx..","...xxxxx....","......xx....",".....xx.....","....xx......","...xx.......","..xx........",".xx.........","............"];PXICON.ui.icons.town=PXICON.ui.icons.town||["............",".....xx.....","....xxxx....","...xxxxxx...","..xxxxxxxx..",".xxxxxxxxxx.","..xxxxxxxx..","..xx.xx.xx..","..xx.xx.xx..","..xxxxxxxx..","..xxxxxxxx..","............"];
+// 幸福度の顔（h_*）と夜の出来事（ev_*）のアイコン
+PXICON.ui.icons.h_joy=["...xxxxxx...", ".xx......xx.", ".x........x.", "x..x....x..x", "x..x....x..x", "x..........x", "x.x......x.x", "x..x....x..x", ".x..xxxx..x.", ".x........x.", "..xx....xx..", "....xxxx...."];
+PXICON.ui.icons.h_ok=["...xxxxxx...", ".xx......xx.", ".x........x.", "x..x....x..x", "x..x....x..x", "x..........x", "x..........x", "x...xxxx...x", ".x........x.", ".x........x.", "..xx....xx..", "....xxxx...."];
+PXICON.ui.icons.h_bad=["...xxxxxx...", ".xx......xx.", ".x........x.", "x..........x", "x..x....x..x", "x..x....x..x", "x..........x", "x...xxxx...x", ".x.x....x.x.", ".x........x.", "..xx....xx..", "....xxxx...."];
+PXICON.ui.icons.h_riot=["...xxxxxx...", ".xx......xx.", ".xx......xx.", "x..xx..xx..x", "x...x..x...x", "x..........x", "x..xxxxxx..x", "x.x.x..x.x.x", ".x.xxxxxx.x.", ".x........x.", "..xx....xx..", "....xxxx...."];
+PXICON.ui.icons.ev_trav=[".....xx.x...", "....xxxx.x..", "....xxxx.x..", ".....xx..x..", "...xxxxxxx..", "..xxxxxx.x..", "..x.xxxx.x..", "....xxxx.x..", "....x..x.x..", "....x..x.x..", "...xx..xxx..", "............"];
+PXICON.ui.icons.ev_fest=[".....xx.....", "....x..x....", "...xxxxxx...", "..xxxxxxxx..", ".xx......xx.", ".xxxxxxxxxx.", ".xx......xx.", ".xxxxxxxxxx.", "..xxxxxxxx..", "...xxxxxx...", "....x..x....", ".....xx....."];
+PXICON.ui.icons.ev_shop=["............", "..xxx.xxx...", "..x.x.x.x...", "..xxx.xxx...", ".xxxxxxxxx..", ".x.......x..", ".xxxxxxxxxxx", "..xx....xx..", ".x..x..x..x.", ".x..x..x..x.", "..xx....xx..", "............"];
+PXICON.ui.icons.ev_star=["...........x", "..........x.", ".........x..", "...x....x...", "...x...x....", "xxxxxxx.....", ".xxxxx......", "..xxx.......", ".xx.xx......", ".x...x......", "............", "............"];
+PXICON.ui.icons.ev_rat=["............", "............", "..xx........", ".xxxx.......", "xx.xxxxxx...", "xxxxxxxxxx..", ".xxxxxxxxx..", "..xxxxxxxxx.", "..x.x..x.x.x", "...........x", "..........x.", "............"];
+PXICON.ui.icons.ev_fire=[".....x......", "....xx......", "....xxx..x..", "...xxxx.xx..", "..xxx.xxxx..", "..xx..xxxx..", ".xx....xxxx.", ".xx.....xxx.", ".xx..x..xxx.", "..xx.xx.xx..", "...xxxxxx...", "....xxxx...."];
+PXICON.ui.icons.ev_flee=[".......xx...", ".......xx...", "....xxxx....", "...x.xxx.x..", "..x..xxxx...", ".....xx.....", "....xx.x....", "...xx...x...", "..xx....xx..", ".x........x.", "x...........", "............"];
+PXICON.ui.icons.ev_scout=["............", "x..........x", "xx........xx", "xxx.xxxx.xxx", ".xxxxxxxxxx.", ".xx.xxxx.xx.", ".xxxxxxxxxx.", "..xxx..xxx..", "...xxxxxx...", "....x..x....", "............", "............"];
+PXICON.ui.icons.ev_moon=["....xxxx....", "..xxxxxxxx..", ".xxx.xxxxxx.", ".xxxxxxx.xx.", "xxxxxxxxxxxx", "xx.xxxxxxxxx", "xxxxxxx.xxxx", "xxxxxxxxxxxx", ".xxxx.xxxxx.", ".xxxxxxxxxx.", "..xxxxxxxx..", "....xxxx...."];
 PXICON.ui.icons.sage=["...####.....","..######....","..#.##.#....","..######....","...####..##.",".######..##.","#######.####","#######.####","#######.####","#######..##.","#######.....","#######....."];
 PXICON.ui.icons.crown=PXICON.ui.icons.crown||["............","............",".x...x...x..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..","............","............","............"];
 PXICON.ui.icons.target=PXICON.ui.icons.target||["............","....xxxx....","..xx....xx..","..x......x..",".x...xx...x.",".x..xxxx..x.",".x..xxxx..x.",".x...xx...x.","..x......x..","..xx....xx..","....xxxx....","............"];
