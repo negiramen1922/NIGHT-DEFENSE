@@ -871,7 +871,7 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 .ov-res .rtt{font-family:var(--px-font);font-size:24px;color:var(--amber)}
 .ov-res .rstat{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--dim)}
 .ov-res .rstat b{font-family:var(--px-font);font-weight:400;font-size:16px;color:var(--text)}
-.ov-res .rstat:first-of-type{display:grid;grid-template-columns:auto auto;column-gap:16px;align-items:center}
+.ov-res .rstat:first-of-type{display:grid;grid-template-columns:auto auto;column-gap:16px;row-gap:3px;align-items:center}
 .ov-res .rstat:first-of-type small{grid-column:1}.ov-res .rstat:first-of-type b{grid-column:2;grid-row:1;justify-self:end;font-size:12px}
 .ov-res .rpips{grid-column:1/-1;display:flex;gap:3px}.ov-res .rpips i{width:18px;height:4px;background:#22303a}.ov-res .rpips i.on{background:var(--cyan)}
 .ov-res .rres{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--dim)}
@@ -883,8 +883,13 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 .ov-res .rnow>small{color:var(--dim);flex-shrink:0}
 .ov-res .rnow .rnc{flex:0 0 auto;display:grid;grid-template-columns:auto auto;align-items:baseline;column-gap:10px;row-gap:3px;padding:4px 10px;text-align:left;border-left:3px solid var(--tc)}
 .ov-res .rnow .rnc b{font-weight:400;white-space:nowrap}.ov-res .rnow .rnc span{font-size:11px;color:var(--cyan);white-space:nowrap}
-.ov-res .rnow .rnc .tbar{grid-column:1/-1;width:100%;margin-top:0}
+.ov-res .rnow .rnc .tpips{grid-column:1/-1}
 .ov-res .rnow .rnf{flex:0 0 auto;color:var(--amber);font-size:12px}
+.hparty{margin:6px 0 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}
+.hmeter{position:relative;height:8px;background:#22303a;margin:6px 0 2px}.hmeter i{display:block;height:100%}.hmeter u{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--dim)}
+.tpips{display:flex;gap:2px;width:100%}.tpips i{flex:1;height:4px;max-width:22px;background:#22303a}.tpips i.on{background:var(--cyan)}
+.sages{display:inline-flex;align-items:center;gap:2px;flex-wrap:wrap}.sages .pi{width:16px!important;height:16px!important;image-rendering:pixelated}body.land .sages .pi{width:14px!important;height:14px!important}.sages small{font-size:10px;color:var(--dim);margin-left:2px}
+#resBox .rbi{display:block;width:100%;text-align:left;padding:4px 6px;margin:3px 0;border-left:3px solid var(--tc)}#resBox .rbi .tpips{margin-top:3px}
 .ov-res .ttabs .tact{display:inline-block;width:6px;height:6px;background:var(--cyan);margin-left:5px;vertical-align:middle}
 @media (max-width:900px){.ov-res .rnow{padding:4px 14px}.ov-res .rnow .rnc{padding:2px 8px;row-gap:2px}}
 .ov-res .ttabs{margin:0;gap:4px}
@@ -1192,6 +1197,31 @@ body.night #build::before,body.qnight #build::before{content:'夜は建設でき
   .ov-res .tde{font-size:12px}
   .ov-res .tdr button.primary{padding:8px 16px!important;font-size:15px}
   body.land .ov-res .tdet{flex-wrap:nowrap}
+  body.land #overlay .card.ov-res{width:100vw!important;max-width:none!important;height:100vh!important;height:100dvh!important;max-height:none!important;border-width:1px!important}
+  body.land .ov-res .rhead{flex-wrap:nowrap;gap:10px;padding:4px 8px}
+  body.land .ov-res .rtt{font-size:15px}
+  body.land .ov-res .rstat.rwave{display:none}
+  body.land .ov-res .rstat:first-of-type{column-gap:6px}
+  body.land .ov-res .rhead .rnow{flex:1;min-width:0;padding:0;border:none;gap:6px}
+  body.land .ov-res .rhead .rnow>small,body.land .ov-res .rnow .rnf{display:none}
+  body.land .ov-res .rnow .rnc{padding:2px 8px;font-size:12px}
+  body.land .ov-res #ovClose{padding:6px 12px;flex-shrink:0}
+  body.land .ov-res #ovClose kbd{display:none}
+  body.land .ov-res .rtabsrow{padding:4px 8px 0}
+  body.land .ov-res .ttabs button{padding:5px 9px;font-size:12px}
+  body.land .ov-res .ttabs .tcnt{margin-left:4px;font-size:10px}
+  body.land .ov-res .rcols{margin:4px 8px 0;min-height:0}
+  body.land .ov-res .rcols{grid-auto-rows:max-content}   /* 列の高さを中身に合わせる（ランクの見出しが上に残るように） */
+  body.land #overlay .card.ov-res .rcols{grid-template-columns:repeat(var(--nr,3),minmax(230px,1fr))!important}
+  body.land .ov-res .rankhead{font-size:12px;padding:4px 8px}
+  body.land .ov-res .rcards{gap:6px;padding:6px 8px}
+  body.land .ov-res .tnode{padding:5px 8px;gap:2px}
+  body.land .ov-res .tnode .te{-webkit-line-clamp:1}
+  body.land .ov-res .tdet{margin:4px 0 0!important;padding:5px 10px!important}
+  body.land .ov-res .tdn{font-size:14px}
+  body.land .ov-res .tde{font-size:11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  body.land .ov-res .tdr{gap:8px}
+  body.land .ov-res .tdr button.primary{padding:6px 14px!important;font-size:14px}
   body.land .ov-res .tdl{flex:1 1 auto}
 }
 /* スマホ：たたんだ資源バーでも1日の増減（▲▼）を出す。縦持ちは数字の下、横持ちは横 */
@@ -3529,14 +3559,22 @@ function endTurn(){
 function nightHasActions(){return S.squads.some(q=>!q.gar)||has('overtime');}
 function huntDanger(){return 18+S.wave*14+(S.turn*0.6);}
 function huntPower(q){return unitDmg(q)/MT(q).rate*MT(q).members*0.6+q.hp*0.05;}
-function huntPreview(q){const D=huntDanger(),pw=huntPower(q),r=pw/D;return {mat:Math.round((3+S.wave*1.5)*Math.max(0.3,Math.min(2.5,r))),risk:r>1.6?'低い':r>0.9?'ふつう':'高い',rc:r>1.6?'var(--green)':r>0.9?'var(--amber)':'var(--red)'};}
+// 夜狩りは、参加する部隊をまとめて1つの一団で出す。危険は一団の戦力で決まる（まとめるほど安全）
+function huntParty(){return S.squads.filter(q=>q.hunt&&!q.gar);}
+function huntRatio(qs){return qs.reduce((a,q)=>a+huntPower(q),0)/huntDanger();}
+function huntMatCap(n){return 1.5+n;}   // 魔核の上限（1部隊なら今までどおり2.5倍）
+function huntPreview(qs){const r=huntRatio(qs),n=qs.length;return {n,men:qs.reduce((a,q)=>a+q.members,0),r,mat:n?Math.round((3+S.wave*1.5)*Math.max(0.3,Math.min(huntMatCap(n),r))):0,risk:r>1.6?'低い':r>0.9?'ふつう':'高い',rc:r>1.6?'var(--green)':r>0.9?'var(--amber)':'var(--red)'};}
 function showNight(){phaseReset();
   if(S.phase!=='night')return;
   const list=S.squads.filter(q=>!q.gar);
   let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} 静かな夜</h2><span style="display:flex;gap:6px"><button id="toMorningTop" class="on" style="padding:6px 14px">朝へ [Enter]</button><button id="ovClose">地図を見る</button></span></div>
   <div class="help">今夜は襲撃がありません。夜は建設・生産・訓練ができない代わりに、夜にしかできないことがあります。</div>
-  <h3 style="margin:10px 0 4px">夜狩り</h3><div class="help">部隊を森へ出して、はぐれ魔物を狩ります。翌朝、魔核を持ち帰りますが、負傷や戦死の危険があります。</div>`;
-  h+=list.length?list.map(q=>{const pv=huntPreview(q);return `<div class="row" style="align-items:center"><span>${icSvg(q.model||defModel(q.ut),18)} <b>${unitLabel(q)}</b> <span class="muted" style="font-size:11px">${q.members}/${UT[q.ut].members}${UT[q.ut].unit}・体力${Math.round(q.hp/q.maxhp*100)}%・魔核 約${pv.mat}・危険 <span style="color:${pv.rc}">${pv.risk}</span></span></span><button data-hunt="${q.id}" class="${q.hunt?'on':''}" style="min-width:86px">${q.hunt?'出撃する '+ui('check','amber',12):'待機'}</button></div>`;}).join(''):'<div class="muted">部隊がいません（城館で農兵を集められます）</div>';
+  <h3 style="margin:10px 0 4px">夜狩り</h3><div class="help">部隊を森へ出して、はぐれ魔物を狩ります。参加する部隊は<b>1つの一団</b>になって出るので、まとめて出すほど危険が下がります。翌朝、魔核を持ち帰りますが、負傷や戦死の危険があります。</div>`;
+  {const pv=huntPreview(huntParty());const pct=Math.min(100,pv.r/2*100);
+   h+=`<div class="hparty"><div class="row" style="align-items:center"><span><b>今夜の狩り</b> <span class="muted" style="font-size:12px">${pv.n?`${pv.n}部隊・${pv.men}人`:'参加する部隊を選んでください'}</span></span>${pv.n?`<span>危険 <b style="color:${pv.rc}">${pv.risk}</b>　${ic('mat',12)}魔核 約${pv.mat}</span>`:''}</div>
+     <div class="hmeter" title="一団の戦力（右ほど安全）"><i style="width:${pct}%;background:${pv.n?pv.rc:'transparent'}"></i><u style="left:45%"></u><u style="left:80%"></u></div>
+     <div class="muted" style="font-size:10.5px;display:flex;justify-content:space-between"><span>危険</span><span>ふつう</span><span>安全</span></div></div>`;}
+  h+=list.length?list.map(q=>`<div class="row" style="align-items:center"><span>${icSvg(q.model||defModel(q.ut),18)} <b>${unitLabel(q)}</b> <span class="muted" style="font-size:11px">${q.members}/${UT[q.ut].members}${UT[q.ut].unit}・体力${Math.round(q.hp/q.maxhp*100)}%</span></span><button data-hunt="${q.id}" class="${q.hunt?'on':''}" style="min-width:86px">${q.hunt?'参加 '+ui('check','amber',12):'待機'}</button></div>`).join(''):'<div class="muted">部隊がいません（城館で農兵を集められます）</div>';
   if(has('overtime'))h+=`<h3 style="margin:12px 0 4px">深夜残業</h3><div class="row" style="align-items:center"><span class="muted" style="font-size:12px">今夜も生産を続ける（${has('allnight')?'昼と同じ量。幸福度 −15':'昼の半分。幸福度 −8'}）</span><button id="otTg" class="${S.overtime?'on':''}">${S.overtime?'残業させる '+ui('check','amber',12):'させない'}</button></div>`;
   h+=`<div style="margin-top:12px;text-align:right"><button id="toMorning" class="on" style="padding:8px 16px">朝へ [Enter]</button></div>`;
   const card=openOverlay('night',h,true);
@@ -3549,21 +3587,24 @@ function showNight(){phaseReset();
 function morning(){
   if(S.phase!=='night')return;phaseReset();S.buyToday={};
   const D=huntDanger();let tot=0;const res=[];let ot=null;
-  for(const q of S.squads.filter(x=>x.hunt&&!x.gar)){
-    const pw=huntPower(q),r=pw/D;const ye=heroSk(q,'yome');const mat=Math.max(0,Math.round((3+S.wave*1.5)*Math.max(0.3,Math.min(2.5,r))*(0.6+Math.random()*0.8)*(has('nighthunt')?1.5:1)*(ye?2:1)));
-    const loss=Math.min(0.9,(0.08+Math.random()*0.3)*D/(D+pw)*(has('nighthunt')?0.6:1)*(ye?0.4:1));q.hp-=q.maxhp*loss;let dead=0;
+  const party=huntParty(),P=party.reduce((a,q)=>a+huntPower(q),0),ye=party.some(q=>heroSk(q,'yome'));
+  if(party.length){tot=Math.max(0,Math.round((3+S.wave*1.5)*Math.max(0.3,Math.min(huntMatCap(party.length),P/D))*(0.6+Math.random()*0.8)*(has('nighthunt')?1.5:1)*(ye?2:1)));S.mat+=tot;}
+  for(const q of party){
+    const mat=0;
+    const loss=Math.min(0.9,(0.08+Math.random()*0.3)*D/(D+P)*(has('nighthunt')?0.6:1)*(ye?0.4:1));q.hp-=q.maxhp*loss;let dead=0;
     const mh=memberHp(q)*bonus(q).hp;while(q.members>1&&q.hp<mh*(q.members-1)){q.members--;dead++;S.kia++;}
     if(q.hp<1)q.hp=1;if(supOf(q))q.sup=Math.max(0,q.sup-12);
-    S.mat+=mat;tot+=mat;q.hunt=false;
-    log(`${unitLabel(q)}が夜狩りから戻った：魔核+${mat}${dead?`・戦死${dead}人`:loss>0.25?'・負傷':''}`,dead?'kia':'good');
+    q.hunt=false;
+    if(dead||loss>0.25)log(`夜狩り：${unitLabel(q)}${dead?` 戦死${dead}人`:' 負傷'}`,dead?'kia':'warn');
     res.push({q:unitLabel(q),m:MT(q).key,mat,dead,hp:Math.round(q.hp/q.maxhp*100),loss});
   }
+  if(party.length)log(`夜狩りの一団（${party.length}部隊）が戻った：魔核+${tot}`,'good');
   if(S.overtime&&has('overtime')){const full=has('allnight');const before={steel:S.steel,fuel:S.fuel};S.gross={steel:0,ammo:0,pop:0,used:0};for(let i=0;i<(full?100:50);i++)update(0.1,true);S.happy=Math.max(0,S.happy-(full?15:8));ot={wood:Math.round(S.steel-before.steel),food:Math.round(S.fuel-before.fuel)};log(`深夜残業：木材+${ot.wood}・幸福度−${has('allnight')?15:8}`,'warn');}
   tickAid();
   S.phase='day';setTimeout(()=>saveGame(true),0);log(`朝になった。ターン${S.turn}　第${S.wave+1}襲撃まで残り${S.turnsLeft}ターン`);
   renderAll();
   if(res.length||ot){let h=`<h2 style="margin:0 0 8px">${ui('sun','amber',24)} 夜明け — 夜の結果</h2>`;
-    if(res.length){h+=`<h3 style="margin:6px 0 4px">夜狩り</h3>`+res.map(r=>`<div class="row" style="align-items:center"><span>${icSvg(r.m,20)} <b>${r.q}</b></span><span>${resTxt({mat:r.mat},true)}　体力 ${r.hp}%${r.dead?`　<b style="color:var(--red)">戦死 ${r.dead}人</b>`:r.loss>0.25?'　<span style="color:var(--amber)">負傷</span>':'　<span style="color:var(--green)">無事</span>'}</span></div>`).join('')+`<div class="row" style="margin-top:4px"><span class="muted">合計</span><b style="color:#c08aff">魔核 +${tot}</b></div>`;}
+    if(res.length){h+=`<h3 style="margin:6px 0 4px">夜狩り</h3>`+res.map(r=>`<div class="row" style="align-items:center"><span>${icSvg(r.m,20)} <b>${r.q}</b></span><span>体力 ${r.hp}%${r.dead?`　<b style="color:var(--red)">戦死 ${r.dead}人</b>`:r.loss>0.25?'　<span style="color:var(--amber)">負傷</span>':'　<span style="color:var(--green)">無事</span>'}</span></div>`).join('')+`<div class="row" style="margin-top:4px"><span class="muted">合計</span><b style="color:#c08aff">魔核 +${tot}</b></div>`;}
     if(ot)h+=`<h3 style="margin:10px 0 4px">深夜残業</h3><div>${resTxt({steel:ot.wood,fuel:ot.food},true)}<span style="color:var(--amber)">幸福度 −${has('allnight')?15:8}</span></div>`;
     h+=`<div style="text-align:right;margin-top:10px"><button id="mnOk" class="on">閉じる [Enter]</button></div>`;
     openOverlay('report',h,true);document.getElementById('mnOk').onclick=closeOverlay;}
@@ -5517,6 +5558,7 @@ document.querySelectorAll('.speed [data-spd]').forEach(b=>b.onclick=()=>{S.speed
 {const px=(id,t)=>{const e=document.getElementById(id);if(e)e.onclick=()=>{document.getElementById('more').open=false;const b=document.getElementById(t);if(b.onclick)b.onclick();else b.click();};};px('mRep','bRepAll');px('mSup','bSupAll');px('mHist','bHist');px('mDex','bDex');
  document.getElementById('mLog').onclick=()=>{document.getElementById('more').open=false;openOverlay('log',`<h2>通信ログ<button id="ovClose" style="float:right">閉じる</button></h2><div class="logfull">${document.getElementById('log').innerHTML}</div>`,false);document.getElementById('ovClose').onclick=closeOverlay;};
  const mic=(id,n)=>{const e=document.querySelector('#'+id+' .mic');if(e)e.innerHTML=ui(n,'light',24);};PXICON.ui.icons.build=PXICON.ui.icons.build||["............","...xxxxx....","..xxxxxxxx..","..xxxxxxxx..","...xxxxx....","......xx....",".....xx.....","....xx......","...xx.......","..xx........",".xx.........","............"];PXICON.ui.icons.town=PXICON.ui.icons.town||["............",".....xx.....","....xxxx....","...xxxxxx...","..xxxxxxxx..",".xxxxxxxxxx.","..xxxxxxxx..","..xx.xx.xx..","..xx.xx.xx..","..xxxxxxxx..","..xxxxxxxx..","............"];
+PXICON.ui.icons.sage=["...####.....","..######....","..#.##.#....","..######....","...####..##.",".######..##.","#######.####","#######.####","#######.####","#######..##.","#######.....","#######....."];
 PXICON.ui.icons.crown=PXICON.ui.icons.crown||["............","............",".x...x...x..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..","............","............","............"];
 PXICON.ui.icons.target=PXICON.ui.icons.target||["............","....xxxx....","..xx....xx..","..x......x..",".x...xx...x.",".x..xxxx..x.",".x..xxxx..x.",".x...xx...x.","..x......x..","..xx....xx..","....xxxx....","............"];
 mic('bInfoTab','target');mic('bSpd','play');mic('bBuild','build');mic('bTown','town');mic('bArmyTab','army');mic('bHero','crown');mic('bRes','research');mic('bArmy','army');mic('bHire','hire');document.querySelector('#more .mic').innerHTML=ui('menu','light',24)+ui('gear','light',12);
@@ -5906,15 +5948,15 @@ function renderResBox(){
   const key=S.research.map(r=>r.id+r.left).join()+resCap()+JSON.stringify(S.tech)+S.waveActive;
   if(key===lastResKey)return;lastResKey=key;
   const el=document.getElementById('resBox');
-  let h=`<div class="row"><span class="muted">研究員</span><span>${resBusy()} / ${resCap()}人</span></div>`;
+  let h=`<div class="row" style="align-items:center"><span class="muted">研究員</span><span style="display:inline-flex;align-items:center;gap:6px">${sageHTML(resBusy(),resCap())}${resBusy()} / ${resCap()}人</span></div>`;
   for(const r of S.research){const t=techOf(r.id);
-    h+=`<div style="margin:3px 0"><span style="color:${CAT_COLOR[t.cat]}">■</span> ${t.name}${t.max>1?' Lv'+(lvl(t.id)+1):''}<span class="muted" style="float:right">残り${r.left}ターン</span>
-    <div class="tbar"><i style="width:${(r.total-r.left)/r.total*100}%"></i></div></div>`;}
+    h+=`<button class="rbi" data-rgo="${t.id}" style="--tc:${CAT_COLOR[t.cat]}">${t.name}${t.max>1?' Lv'+(lvl(t.id)+1):''}<span class="muted" style="float:right">${r.total-r.left}/${r.total}ターン</span>${resPips(r)}</button>`;}
   if(!S.research.length)h+=`<div class="muted" style="margin:3px 0">${S.waveActive?'夜・襲撃中は研究を開始できません':`<span style="color:var(--amber)">研究員が${resCap()-resBusy()}人空いています</span>`}</div>`;
   const totalLv=TECH.reduce((a,t)=>a+(t.max||1),0),doneLv=Object.values(S.tech).reduce((a,b)=>a+b,0);
   h+=`<div class="muted" style="font-size:11px">研究達成 ${doneLv} / ${totalLv}</div>`;
   h+=`<button id="bRes2" style="margin-top:5px;width:100%">研究画面を開く [R]</button>`;
   el.innerHTML=h;document.getElementById('bRes2').onclick=showResearch;
+  el.querySelectorAll('[data-rgo]').forEach(b=>b.onclick=()=>{if(S.waveActive){showResearch();return;}gotoTech(b.dataset.rgo);});
 }
 // ===== 襲撃ごとの推奨の育成度 =====
 // 基本は敵の総耐久から自動で出す。手で直すときは REC_ADJ[マップID][襲撃番号] に {pop,def,sq} を書く
@@ -5935,6 +5977,14 @@ function sprImg(k,sz){const im=ICIMG[k];if(!im)return '';let u=SPR_URL[k];if(!u)
 function eSpr(k,sz){return WICON['e_'+k]?icSvg('e_'+k,sz):sprImg('e_'+k,sz)||dotE(k);}
 function dangerOf(w){const r=recOf(w),c=curDev();const rd=(Math.min(1,c.pop/r.pop)+Math.min(1,c.def/r.def)+Math.min(1,c.sq/r.sq))/3;
   return Math.max(1,Math.min(5,Math.ceil(1+2*(w.n/finalWave())+3*(1-rd))+(w.blood?1:0)));}
+function sageHTML(busy,cap){const M=12;let h='';for(let i=0;i<Math.min(cap,M);i++)h+=ui('sage',i<busy?'cyan':'off',12);if(cap>M)h+=`<small>+${cap-M}</small>`;return `<span class="sages" title="研究員 ${busy}/${cap}（明るい＝研究中・暗い＝空き）">${h}</span>`;}
+function resPips(r){return pipsHTML(r.total-r.left,r.total,'tpips');}
+function gotoTech(id){const tj=techOf(id);if(!tj)return;S.resTab=tj.cat;S.resSel=tj.id;showResearch();const c=document.getElementById('ovCard');const nd=c&&c.querySelector(`[data-node="${tj.id}"]`);if(!nd)return;
+  // 画面ごと動かさないよう、一覧の中だけをスクロールして真ん中に出す
+  for(const box of [nd.closest('.rcards'),c.querySelector('.rcols')]){if(!box)continue;const br=box.getBoundingClientRect(),nr=nd.getBoundingClientRect();
+    if(box.scrollHeight>box.clientHeight+1)box.scrollTop+=nr.top-br.top-(box.clientHeight-nr.height)/2;
+    if(box.scrollWidth>box.clientWidth+1)box.scrollLeft+=nr.left-br.left-(box.clientWidth-nr.width)/2;}
+  c.scrollTop=0;}
 function pipsHTML(n,max,cls){let h='';for(let i=0;i<max;i++)h+=`<i class="${i<n?'on':''}"></i>`;return `<span class="${cls}">${h}</span>`;}
 function recMeters(w){const r=recOf(w),c=curDev();
   const m=(lab,v,t,tip)=>`<div class="rec${v<t?' short':''}" title="${tip}"><div class="rt"><span>${lab}</span><b>${v} <small>/ ${t}</small></b></div><div class="ebar"><i style="width:${Math.round(Math.min(1,v/Math.max(1,t))*100)}%"></i></div></div>`;
@@ -6110,11 +6160,12 @@ function showResearch(){
   if(!S.resSel||techOf(S.resSel).cat!==cat)S.resSel=L.list[0].id;
   const RN=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ'];
   const cap=resCap(),busy=resBusy();
-  let h=`<div class="rhead"><span class="rtt">研究</span><div class="rstat"><small>研究員</small><b>${busy} / ${cap}</b>${pipsHTML(busy,Math.min(cap,16),'rpips')}</div><div class="rstat"><small>襲撃まで</small><b>${S.waveActive?'交戦中':S.turnsLeft+' ターン'}</b></div>
+  const free=cap-busy,land=isLand();
+  const nowH=`<div class="rnow"><small>研究中</small>${S.research.length?S.research.map(r=>{const t=techOf(r.id);return `<button class="rnc" data-goto="${t.id}" style="--tc:${CAT_COLOR[t.cat]}"><b>${t.name}${t.max>1?' Lv'+(lvl(t.id)+1):''}</b><span>${r.total-r.left}/${r.total}T</span>${resPips(r)}</button>`;}).join(''):'<span class="muted" style="font-size:12px">なし</span>'}${free>0?`<span class="rnf">研究員が${free}人空いています</span>`:''}</div>`;
+  let h=`<div class="rhead"><span class="rtt">研究</span><div class="rstat"><small>研究員</small><b>${busy} / ${cap}</b><span style="grid-column:1/-1">${sageHTML(busy,cap)}</span></div>${land?nowH:''}<div class="rstat rwave"><small>襲撃まで</small><b>${S.waveActive?'交戦中':S.turnsLeft+' ターン'}</b></div>
     <div class="rres">${['steel','stone','iron','fuel','ammo','elec','gold','mat'].map(k=>`<span>${ic(k,12)}${Math.floor(S[k])}</span>`).join('')}<span>${ic('pop',12)}${S.pop}</span></div><button id="ovClose">閉じる<kbd>R</kbd></button></div>`;
-  // 研究中のもの（どのタブにあっても見えるように）。押すとそのタブのその研究へ移動
-  {const free=cap-busy;
-   h+=`<div class="rnow"><small>研究中</small>${S.research.length?S.research.map(r=>{const t=techOf(r.id);return `<button class="rnc" data-goto="${t.id}" style="--tc:${CAT_COLOR[t.cat]}"><b>${t.name}${t.max>1?' Lv'+(lvl(t.id)+1):''}</b><span>残り${r.left}ターン</span><div class="tbar"><i style="width:${(r.total-r.left)/r.total*100}%"></i></div></button>`;}).join(''):'<span class="muted" style="font-size:12px">なし</span>'}${free>0?`<span class="rnf">研究員が${free}人空いています</span>`:''}</div>`;}
+  // 研究中のもの（どのタブにあっても見えるように）。押すとそのタブのその研究へ移動。横持ちはヘッダーの中に入れる
+  if(!land)h+=nowH;
   h+=`<div class="rtabsrow"><div class="ttabs">${RES_TABS.map(c=>{const ts=TECH.filter(t=>t.cat===c);const dn=ts.filter(t=>techState(t)==='done').length;return `<button data-tab="${c}" class="${c===cat?'on':''}" style="--tc:${CAT_COLOR[c]}">${c}<span class="tcnt">${dn}/${ts.length}</span>${S.research.some(r=>techOf(r.id).cat===c)?'<i class="tact" title="研究中あり"></i>':''}</button>`;}).join('')}</div>
     <div class="rlegend"><span><i class="lg done"></i>完了</span><span><i class="lg active"></i>研究中</span><span><i class="lg ready"></i>研究できる</span><span><i class="lg locked"></i>前提が足りない</span><span>${ui('lock','dim',12)}城Lvで解放</span></div></div>`;
   const maxR=Math.max(...L.list.map(techRank));
@@ -6126,7 +6177,7 @@ function showResearch(){
     h+=`<div class="rankcol${open&&!mapLock?'':' locked'}"><div class="rankhead">ランク ${RN[rk]}${cond}</div><div class="rcards">`;
     for(const [t,dep] of resOrder(inR.filter(x=>!x.gate)).concat(inR.filter(x=>x.gate).map(x=>[x,0]))){
       const st=techState(t),r=S.research.find(x=>x.id===t.id),Lv=lvl(t.id),mx=t.max||1;
-      const stTxt=st==='done'?'<span class="s done">完了</span>':st==='active'?`<span class="s act">研究中 残${r.left}T</span>`:st==='excluded'?'<span class="s">選択不可</span>':st==='locked'?'<span class="s">要 前提</span>':st==='maplock'?'<span class="s">次のマップから</span>':'';
+      const stTxt=st==='done'?'<span class="s done">完了</span>':st==='active'?`<span class="s act">研究中 ${r.total-r.left}/${r.total}T</span>`:st==='excluded'?'<span class="s">選択不可</span>':st==='locked'?'<span class="s">要 前提</span>':st==='maplock'?'<span class="s">次のマップから</span>':'';
       if(t.gate&&st==='locked')t.line=`ランク${RN[t.gate-1]}の研究 合計Lv${rankSum(cat,t.gate-1)}/${gateNeed(cat,t.gate)}`;else if(t.gate)t.line='';
       const outside=(t.pre||[]).filter(x=>!L.inTab(x));
       h+=`<div class="tnode ${st} ${t.excl?'excl':''} ${t.id===S.resSel?'sel':''} ${t.key||t.gate?'key':''}" data-node="${t.id}" style="margin-left:${dep*18}px">
@@ -6134,7 +6185,7 @@ function showResearch(){
         <div class="te">${t.eff||''}</div>
         ${t.line||t.excl||outside.length?`<div class="tl">${t.line?t.line:''}${t.excl?' <span style="color:var(--amber)">分岐</span>':''}${outside.length?' 要：'+outside.map(x=>techOf(x).name).join('・'):''}</div>`:''}
         <div class="tm"><span class="cst">${st==='done'?'':costText(techCost(t))}</span><span class="tt2">${techTurns(t)}T</span></div>
-        ${r?`<div class="tbar"><i style="width:${(r.total-r.left)/r.total*100}%"></i></div>`:st==='done'?'<div class="tbar"><i style="width:100%"></i></div>':''}</div>`;
+        ${r?resPips(r):st==='done'?'<div class="tbar"><i style="width:100%"></i></div>':''}</div>`;
     }
     h+=`</div></div>`;
   }
@@ -6160,7 +6211,7 @@ function showResearch(){
   document.getElementById('ovClose').onclick=closeOverlay;
   card.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{S.resTab=b.dataset.tab;S.resSel=null;showResearch();});
   card.querySelectorAll('[data-node]').forEach(b=>b.onclick=()=>{S.resSel=b.dataset.node;showResearch();});
-  card.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>{const tj=techOf(b.dataset.goto);S.resTab=tj.cat;S.resSel=tj.id;showResearch();const nd=card.querySelector(`[data-node="${tj.id}"]`);if(nd)nd.scrollIntoView({block:'nearest',inline:'center'});});
+  card.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>gotoTech(b.dataset.goto));
   card.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{startResearch(b.dataset.start);showResearch();renderResBox();});
   card.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{const tj=techOf(b.dataset.jump);S.resTab=tj.cat;S.resSel=tj.id;showResearch();const nd=card.querySelector(`[data-node="${tj.id}"]`);if(nd)nd.scrollIntoView({block:'nearest',inline:'center'});});
   card.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{cancelResearch(b.dataset.cancel);showResearch();renderResBox();});
