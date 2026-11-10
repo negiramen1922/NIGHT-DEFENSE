@@ -1114,6 +1114,35 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 }
 /* スマホ：仮置き＋十字キー */
 #mRep.dim{opacity:.55}
+/* スマホ：たたんだ資源バーに6つ（金貨・木材・石材・鉄・食料・人員）が収まるように詰める */
+@media (max-width:900px){
+  body.resMin:not(.land) #wrap #resbar{justify-content:space-between!important;padding:0 6px!important}
+  body.resMin:not(.land) #wrap #resbar .res{margin-right:0!important;column-gap:3px}
+  body.resMin:not(.land) #wrap #resbar .res>b{font-size:15px!important}
+  body.land #wrap #resbar .res{margin-right:8px!important;gap:2px}
+  body.land #wrap #resbar .res>b{min-width:2.1em!important;font-size:14px!important}
+  body.land #wrap #resbar .res .dl{min-width:0!important;font-size:10px}
+  body.land #wave .wvc small{display:none}
+  body.land #wave{padding:0 6px!important;gap:6px!important}
+  body.resMin:not(.land) #wrap #resbar .res>b{font-size:14px!important;min-width:1.7em!important}
+  body.resMin:not(.land) #wrap #resbar .res.key{grid-template-columns:auto 2.1em!important}
+  body.resMin:not(.land) #wrap #resbar .res>.pi{width:11px!important;height:11px!important}
+}
+@media (max-width:360px){
+  body.resMin:not(.land) #wrap #resbar .res .dl{display:none!important}
+  body.resMin:not(.land) #wrap #resbar .res>b{font-size:12.5px!important;min-width:0!important}
+  body.resMin:not(.land) #wrap #resbar{padding:0 4px!important}
+  body.resMin:not(.land) #wrap #resbar .res.key{grid-template-columns:auto auto!important;grid-template-rows:auto!important}
+  body.resMin:not(.land) #wrap #resbar .res>.pi{grid-row:auto!important}
+  #resTg{padding:4px 7px!important;font-size:0!important;min-width:0}
+  #resTg::after{content:'▴';font-size:13px}
+  body.resMin #resTg::after{content:'▾'}
+}
+#armyBox .sbrow{display:flex;align-items:center;gap:6px;margin-top:3px}
+#armyBox .supbar{flex:1;height:4px;background:#1a221c;display:block}
+#armyBox .supbar i{display:block;height:100%}
+#armyBox .sbrow small{font-size:10px;white-space:nowrap;min-width:6.5em;text-align:right}
+#armyBox .sqm{flex:1;min-width:0;display:flex;flex-direction:column}
 /* ===== 中身の長さで位置がずれないように ===== */
 /* 訓練のボタン：アイコンは決まった幅、文字は左そろえ */
 [data-train]{justify-content:flex-start!important;text-align:left!important}
@@ -1405,7 +1434,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
     <div class="box" id="info"><h3>選択中</h3><div id="infoBody" class="muted">施設か部隊をクリック</div></div>
     <div id="rtabs"><button data-rt="info" class="tabInfo">選択中</button><button data-rt="build" class="on">建設</button><button data-rt="res">研究</button><button data-rt="army">軍事</button><button data-rt="econ">街</button></div>
     <div class="box" data-rt="econ" style="display:none"><h3>街の状況</h3><div id="econ"></div></div>
-    <div class="box" data-rt="build"><h3>建設</h3><div id="facCapBox"></div><div id="build"></div></div>
+    <div class="box" data-rt="build"><h3>建設</h3><div id="facCapBox"></div><button id="bRepB" class="wide" style="width:100%;margin:0 0 8px">一括修理</button><div id="build"></div></div>
     <div class="box" data-rt="army" style="display:none"><h3>軍事</h3><div id="armySubs" class="asubs"></div><div id="armyBox"></div></div>
     <div class="box" data-rt="res" style="display:none"><h3>研究</h3><div id="resBox"></div></div>
   </div>
@@ -2882,6 +2911,9 @@ function coBonus(u){const p=partner(u);return p&&Math.hypot(p.x-u.x,p.y-u.y)<3*T
 function hpB(b){return hpOf(b.type,b.lv,b.mat)*(1+0.2*(b.ench||0));}
 function rescaleHp(){for(const b of S.blds){const n=hpB(b);if(n!==b.maxhp){b.hp*=n/b.maxhp;b.maxhp=n;}if(b.wall){const m=hpOf(b.wall.bastion?'bastion':'wall',b.wall.lv);if(m!==b.wall.maxhp){b.wall.hp*=m/b.wall.maxhp;b.wall.maxhp=m;}}}}
 function countB(type){let n=0;for(const b of S.blds)if(b.type===type)n++;return n;}
+// 足りない資源を「木材が12・石材が5足りません」の形で返す（足りていれば空）
+function lackText(c,pop){const L=[];for(const k in (c||{})){const need=(c[k]||0)-(S[k]||0);if(need>0.5)L.push(`${RES_NAME[k]||k}が${Math.ceil(need)}`);}
+  if(pop&&S.pop<pop)L.push(`待機中の住民が${pop-S.pop}人`);return L.length?L.join('・')+'足りません':'';}
 function costOf(type){return B[type].cost;}
 function maxLvOf(type){const g=B[type].grp;if(g!=='prod'&&g!=='def')return 1;return Math.min(3,(S&&S.baseLv)||1);}
 function upgCost(b){
@@ -5285,6 +5317,7 @@ function handleTap(ev,shift){
     if(padMode()){setGhost(Math.floor(p.x/T),Math.floor(p.y/T));return;}
     tryBuildAt(p.x,p.y);return;
   }
+  if(S.buildPick){S.buildPick=false;renderBuild();renderMode();}
   const hitR=Math.max(20,(IS_TOUCH?34:24)/cam.z);
   if(S.sel&&S.sel.kind==='s'&&Math.hypot(S.sel.x-p.x,S.sel.y-p.y)<hitR*1.3){deselect();return;}
   {let best=null,bd=hitR;for(const s of S.squads){if(s.gar)continue;const d=Math.hypot(s.x-p.x,s.y-p.y);if(d<bd){bd=d;best=s;}}
@@ -5466,7 +5499,7 @@ document.getElementById('bArmy').onclick=()=>openArmyTab('list',true);
 function setRT(t){if(t==='info'&&!isNarrow())t='build';document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
-document.getElementById('bRepAll').onclick=repairAll;document.getElementById('bSupAll').onclick=supplyAll;
+document.getElementById('bRepAll').onclick=repairAll;document.getElementById('bRepB').onclick=repairAll;document.getElementById('bSupAll').onclick=supplyAll;
 document.getElementById('bHelp').onclick=()=>{if(!S.overlay)showHelp(false);};
 document.getElementById('bNaval').onclick=toggleNaval;
 document.getElementById('bMute').onclick=auToggle;
@@ -5713,7 +5746,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     if(o.lv>=3)h+=`<div class="muted" style="margin-top:3px">最大まで改修済み</div>`;
     else if(o.lv>=mx)h+=`<div class="muted" style="margin-top:3px">城を<span style="color:var(--amber)">Lv${o.lv+1}</span>にすると改修できます（施設のLvは城のLvまで）</div>`;
     else if(o.bt>0)h+=`<div class="muted" style="margin-top:3px">${o.upg==='ench'?'魔核強化中':o.upg==='mat'?'造り替え中':o.upg?'改修中':'建設完了後に改修できます'}（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</div>`;
-    else h+=`<button id="iUpg" class="on wide" ${canAfford(uc)&&!S.waveActive?'':'disabled'} title="${S.waveActive?'襲撃中は改修できません':'[U]'}"><span>${S.waveActive?'襲撃中は改修できません':`Lv${o.lv+1} に改修`}</span><span class="cost">${costText(uc)}<span class="t">${upgTurns(o)}T</span></span></button>`;
+    else h+=`<button id="iUpg" class="on wide" ${canAfford(uc)&&!S.waveActive?'':'disabled'} title="${S.waveActive?'襲撃中は改修できません':'[U]'}"><span>${S.waveActive?'襲撃中は改修できません':`Lv${o.lv+1} に改修`}</span><span class="cost">${costText(uc)}<span class="t">${upgTurns(o)}T</span></span></button>`;if(!S.waveActive&&!canAfford(uc))h+=`<div style="color:var(--red);font-size:11px;margin-top:2px">${lackText(uc)}</div>`;
     h+=`</div>`;
   }
   if(UNIT_HOME[o.type]){
@@ -5764,7 +5797,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(o.type==='hq'){const gq=S.squads.filter(q=>q.ut==='guard');h+=`<div class="upg"><b>近衛兵</b><div class="muted" style="font-size:11px">城で編成できる精鋭（部隊画面 [K]）。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内で火力2倍・被害半分</div>${gq.length?gq.map(q=>`<div class="row" style="align-items:center"><span>${unitLabel(q)} ${q.members}/${UT.guard.members}人・${q.gar?'駐屯中':'出撃中'}</span>${q.gar?`<button data-gdout="${q.id}" style="padding:2px 8px">外に出す</button>`:''}</div>`).join(''):'<div class="muted" style="font-size:11px">まだいません</div>'}</div>`;}
   if(o.type==='hq'){const c=baseUpCost();h+=`<div class="upg"><div class="row"><b>拠点レベル ${S.baseLv}/${BASE_MAX}</b><span class="muted">英雄 ${S.cmds.length}/${maxCmd()}</span></div>
     <div class="muted" style="font-size:11px">レベルが上がると：英雄の上限 +2・領地の半径 +6マス・城館に住める人数 +10・施設の上限 +${FAC_PER_LV}・前哨砦 +1。<b style="color:var(--text)">Lv2で施設のLv2と研究ランクⅡ、Lv3で施設のLv3と研究ランクⅢ</b>が解放。城の姿も 木→石→鉄→魔核合金 と変わり、<b style="color:#c48aff">Lv5で結界</b>（襲撃のたびに城への被害を1500まで防ぐ）。Lv3以上への強化には魔核が必要</div>
-    ${S.baseUp?`<div class="gd" style="margin-top:4px">Lv${S.baseUp.to}に強化中…　残り${S.baseUp.left}ターン（強化中も城は普段どおり働きます）</div>`:S.baseLv<BASE_MAX?`<button id="iBaseUp" style="margin-top:4px;width:100%" ${canAfford(c)&&!S.waveActive?'':'disabled'}>拠点をLv${S.baseLv+1}に（${costText(c)}・${baseUpTurns()}ターン）</button>`:'<div class="gd">最大レベル</div>'}</div>`;}
+    ${S.baseUp?`<div class="gd" style="margin-top:4px">Lv${S.baseUp.to}に強化中…　残り${S.baseUp.left}ターン（強化中も城は普段どおり働きます）</div>`:S.baseLv<BASE_MAX?`<button id="iBaseUp" style="margin-top:4px;width:100%" ${canAfford(c)&&!S.waveActive?'':'disabled'}>拠点をLv${S.baseLv+1}に（${costText(c)}・${baseUpTurns()}ターン）</button>${!canAfford(c)&&!S.waveActive?`<div style="color:var(--red);font-size:11px;margin-top:2px">${lackText(c)}</div>`:''}`:'<div class="gd">最大レベル</div>'}</div>`;}
   if(false)h+=`<div class="muted" style="margin-top:6px;font-size:11px">研究「城館防衛火器」で自衛火器を設置できます</div>`;
   if(!isS&&o.kind==='b'&&(WALL_TYPES.includes(o.type)||o.type==='gate'||o.type==='tower')&&ready(o)){const G=wallGroup(o);const dm=G.filter(damaged);const rc=dm.reduce((a,x)=>a+repairCost(x),0);
     const WR=['fence','swall','wall'],nx=WR[WR.indexOf(o.type)+1];const up=nx&&(!B[nx].req||has(B[nx].req))?G.filter(x=>x.type===o.type&&placeOK(nx,x.x,x.y)):[];const uc={};for(const k in costOf(nx||'fence'))uc[k]=(costOf(nx||'fence')[k]||0)*up.length;
@@ -5920,7 +5953,7 @@ function renderTop(){
   if(S.powder==null)S.powder=0;if(S.silver==null){S.silver=Math.floor(S.tcred||0);delete S.tcred;}let h='';
   // 13種を5グループに（UI v2）
   const GRP=[['通貨',['gold','silver']],['資材',['steel','stone','iron','fuel','elec','mat']],['軍需',['ammo','sword'].concat(has('gunpowder')||S.powder>0?['powder']:[])]];
-  const KEY=['gold','steel','stone','fuel'];
+  const KEY=['gold','steel','stone','iron','fuel'];
   const dl=d=>d==null?'':`<span class="dl ${d>0.5?'up':d<-0.5?'dn':'zero'}">${Math.abs(d)<0.5?'±0':Math.round(Math.abs(d))}</span>`;
   for(const [lb,gp] of GRP){h+=`<div class="rgp" data-label="${lb}"><div class="rgi">`;for(const k of gp){
     const v=Math.floor(S[k]);const d=n[k];const low=d<0&&S[k]<-d*2;
@@ -5944,6 +5977,7 @@ function renderTop(){
   bn.classList.toggle('last',!S.waveActive&&S.phase!=='night'&&S.turnsLeft===1);renderPauseUI();
   {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,sq.length?`一括補給 ${sq.length}部隊（${supCostText(supCost(sq))}）<kbd>N</kbd>`:'一括補給');const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
   const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${ra2.n}棟（${ic('steel',12)}${ra2.c}）<kbd>X</kbd>`:'一括修理');const dA=!ra2.n||S.steel<1||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
+  {const rb=document.getElementById('bRepB');if(rb){const l=S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${ra2.n}棟（木材${ra2.c}）`:'一括修理（壊れた施設なし）';if(rb.dataset.l!==l){rb.dataset.l=l;rb.textContent=l;}if(rb.disabled!==dA)rb.disabled=dA;}}
   {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${ra2.n}棟（木材${ra2.c}）`:'一括修理');mr.classList.toggle('dim',dA);}}
   const bnv=document.getElementById('bNaval');bnv.style.display=has('naval')?'':'none';setText(bnv,S.aimNaval?'目標を指定…（Escで取消）':`艦砲射撃 残り${S.waveActive?S.navalLeft:(has('navalre')?2:1)} [V]`);
   {const dn=!S.waveActive||S.navalLeft<=0;if(bnv.disabled!==dn)bnv.disabled=dn;bnv.classList.toggle('on',!!S.aimNaval);}
@@ -6078,7 +6112,7 @@ function showResearch(){
   if(st==='done')act=`<span style="color:var(--green);font-weight:bold">${ui('check','green',12)} 最大レベル（Lv${t.max||1}）・研究完了</span>`;
   else if(st==='active')act=`<span style="color:var(--cyan)">研究中 残り${r.left}ターン</span> <button data-cancel="${t.id}">中止（費用の半分を回収）</button>`;
   else if(st==='ready'){const need=techRes(t),rok=resBusy()+need<=resCap()&&S.pop>=need;const ok=canAfford(c)&&rok&&!S.waveActive;
-    act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?(S.pop<need?'待機中の住民が足りません':'研究員が足りません（研究室を増やす・改築する）'):'資源が足りません'}</span>`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
+    act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?(S.pop<need?'待機中の住民が足りません':'研究員が足りません（研究室を増やす・改築する）'):(lackText(c)||'資源が足りません')}</span>`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
   else if(st==='excluded')act='<span class="muted">もう一方の分岐を選んだため研究できません</span>';
   else if(st==='maplock')act='<span class="muted">このマップでは第三段階の研究はできません（2マップ目以降で解禁）</span>';
   else if(t.gate&&!(rankOpen(cat,t.gate-1)&&rankSum(cat,t.gate-1)>=gateNeed(cat,t.gate)))act=`<span class="muted">条件：${!rankOpen(cat,t.gate-1)?`<span style="color:var(--red)">${gateOf(cat,t.gate-1).name}</span>・`:''}<span style="color:${rankSum(cat,t.gate-1)>=gateNeed(cat,t.gate)?'var(--green)':'var(--red)'}">ランク${RN[t.gate-1]}の研究を合計Lv${gateNeed(cat,t.gate)}以上（今 ${rankSum(cat,t.gate-1)}）</span></span>`;
@@ -6110,7 +6144,7 @@ function showArmy(target){
   h+=`</div>`;
   h+=`<h3 style="margin:8px 0 4px">訓練する</h3><div style="display:flex;flex-wrap:wrap;gap:6px">`;
   for(const bt in UNIT_HOME)for(const mk of modelsAt(bt)){const m=MTC[mk],o=sl[bt],ok=o.used<o.cap&&canAfford(m.cost,m.popEach*m.members)&&!S.waveActive;
-    h+=`<button data-train="${mk}" ${ok?'':'disabled'} style="text-align:left;min-width:190px"><span style="display:flex;gap:6px;align-items:center">${icSvg(mk,26)}<span><b style="color:${m.color}">${m.name}</b> <span class="muted" style="font-size:10px">${B[bt].name}</span><br><span style="font-size:11px">${costText(m.cost,m.popEach*m.members)}・${Math.ceil(unitTime(mk)/TURN_SEC)}T</span></span></span></button>`;}
+    h+=`<button data-train="${mk}" ${ok?'':'disabled'} style="text-align:left;min-width:190px"><span style="display:flex;gap:6px;align-items:center">${icSvg(mk,26)}<span><b style="color:${m.color}">${m.name}</b> <span class="muted" style="font-size:10px">${B[bt].name}</span><br><span style="font-size:11px">${costText(m.cost,m.popEach*m.members)}・${Math.ceil(unitTime(mk)/TURN_SEC)}T</span>${!S.waveActive&&!canAfford(m.cost,m.popEach*m.members)?`<br><span style="font-size:10.5px;color:var(--red)">${lackText(m.cost,m.popEach*m.members)}</span>`:o.used>=o.cap?`<br><span style="font-size:10.5px;color:var(--amber)">${B[bt].name}の枠がいっぱい（${o.used}/${o.cap}）</span>`:''}</span></span></button>`;}
   h+=`</div>`;
   const qs=[];for(const b of S.blds)if(b.qm&&b.qm.length)b.qm.forEach((mk,i)=>qs.push({b,i,mk,p:i===0?Math.min(1,b.qt/unitTime(mk,b)):0}));
   qs.sort((a,b)=>(b.p-a.p)||(a.i-b.i));
@@ -6533,12 +6567,12 @@ function renderArmyPanel(force){if(!S)return;const sub=S.armySub||'list';
   else if(sub==='adv')showHire(el,'adv');}
 function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el)return;if((S.armySub||'list')!=='list')return;const box=el.closest('.box');if(box&&box.style.display==='none'&&!force)return;
   const sq=S.squads.filter(needsSupply);
-  const key=S.squads.map(s=>s.id+':'+Math.round(s.hp/s.maxhp*20)+':'+s.members+(s.gar?'g':'')+(s.mode||'')+(s.supPend?'s':'')).join()+'|'+sq.length+'|'+S.waveActive+'|'+(S.sel&&S.sel.kind==='s'?S.sel.id:'');if(key===armyKey&&!force)return;armyKey=key;
-  let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length?'':'disabled'}>一括補給${sq.length?`（${sq.length}）`:''}</button></div>`;
+  const key=S.squads.map(s=>s.id+':'+Math.round(s.hp/s.maxhp*20)+':'+(supOf(s)?Math.round(s.sup/supOf(s).max*20):'')+':'+s.members+(s.gar?'g':'')+(s.mode||'')+(s.supPend?'s':'')).join()+'|'+sq.length+'|'+S.waveActive+'|'+(S.sel&&S.sel.kind==='s'?S.sel.id:'');if(key===armyKey&&!force)return;armyKey=key;
+  let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length&&!S.waveActive?'':'disabled'}>${sq.length?`一括補給（${sq.length}部隊）`:'一括補給（必要なし）'}</button></div>`;
   if(!S.squads.length)h+='<div class="muted">部隊がいません。兵舎などで訓練しましょう</div>';
   else h+=`<div class="sqhd"><span>部隊 ${S.squads.length}・英雄 ${S.cmds.length}</span><span>クリックで指揮／Q で順に選択</span></div><div class="sqlist">`+S.squads.map(s=>{const r=Math.max(0,s.hp/s.maxhp),hc=cmdOf(s),ik=hc&&WICON['h_'+hc.spec]&&s.ut!=='drake'?'h_'+hc.spec:sqKey(s);
       const stt=s.gar?['配置中','gd']:s.supPend||s.eqPend?['補給へ','wn']:s.mode==='guard'?['迎撃','cy']:s.mode==='hold'?['固守','wn']:s.mode==='return'?['帰還','dm']:['待機','dm'];
-      return `<button data-sq="${s.id}" class="sqrow${S.sel===s?' cur':''}">${icSvg(ik,32)}<span class="sqm"><span class="sqn"><b>${unitLabel(s)}</b><span class="${stt[1]}">${stt[0]}</span><span class="sqc">兵 ${s.members}/${UT[s.ut].members}</span></span><span class="hpbar${r<0.3?' low':r<0.6?' mid':''}"><i style="width:${Math.round(r*100)}%"></i></span></span></button>`;}).join('')+'</div>';
+      return `<button data-sq="${s.id}" class="sqrow${S.sel===s?' cur':''}">${icSvg(ik,32)}<span class="sqm"><span class="sqn"><b>${unitLabel(s)}</b><span class="${stt[1]}">${stt[0]}</span><span class="sqc">兵 ${s.members}/${UT[s.ut].members}</span></span><span class="hpbar${r<0.3?' low':r<0.6?' mid':''}"><i style="width:${Math.round(r*100)}%"></i></span>${(()=>{const sp=supOf(s);if(!sp)return '';const q=Math.max(0,Math.min(1,s.sup/sp.max));const col={sword:'#c8d0dc',ammo:'#f2b33d',elec:'#62c6d9',powder:'#b0a090',fuel:'#e89040'}[sp.key]||'#c8d0dc';return `<span class="sbrow"><span class="supbar${q<0.25?' low':''}"><i style="width:${Math.round(q*100)}%;background:${col}"></i></span><small style="color:${q<0.25?'var(--red)':col}">${sp.name} ${Math.floor(s.sup)}/${sp.max}</small></span>`;})()}</span></button>`;}).join('')+'</div>';
   el.innerHTML=h;
   el.querySelectorAll('[data-sq]').forEach(b=>b.onclick=()=>{const q0=S.squads.find(s=>s.id==b.dataset.sq);if(S.sel===q0){deselect();return;}S.sel=q0;S.multi=[];renderInfo(true);const q=S.sel;if(q&&!q.gar){cam.x=q.x-VW/2/cam.z;cam.y=q.y-VH/2/cam.z;clampCam();}});
   document.getElementById('abSel').onclick=()=>{S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;renderInfo(true);renderMode();};
@@ -6780,13 +6814,13 @@ function padMode(){return isNarrow();}
 function footAt(px,py){let NS=newSz(S.buildMode),gx=Math.floor(px/T-(NS-1)/2),gy=Math.floor(py/T-(NS-1)/2);
   const ub=MOUNT_T.includes(S.buildMode)&&bastionAt(Math.floor(px/T),Math.floor(py/T));if(ub){gx=ub.x;gy=ub.y;NS=bsz(ub);}return {gx,gy,NS};}
 function tryBuildAt(px,py){const {gx,gy,NS}=footAt(px,py);
-  if(!canPlace(S.buildMode,gx,gy)){se('error');const cb=capBlock(S.buildMode);if(cb)toast(cb,'warn');return false;}
+  if(!canPlace(S.buildMode,gx,gy)){se('error');const cb=capBlock(S.buildMode);const lk=lackText(costOf(S.buildMode),B[S.buildMode].pop);if(cb)toast(cb,'warn');else if(lk)toast(lk,'warn');return false;}
   placeB(S.buildMode,gx,gy);S.fx.push({x:(gx+NS/2)*T,y:(gy+NS/2)*T,r:T*0.8*NS,t:0,dur:0.35,c:'#6fe08a'});renderBuild();renderInfo(true);renderMode();return true;}
 function ghostReason(){if(!S.buildMode||!bGhost)return '';const t=S.buildMode,d=B[t];const {gx,gy}=footAt((bGhost.x+.5)*T,(bGhost.y+.5)*T);
   if(canPlace(t,gx,gy))return '';
   const cb=capBlock(t);if(cb)return cb;
   if(S.waveActive||S.phase==='night')return '夜は建設できません';
-  if(!canAfford(costOf(t),d.pop))return '資源が足りません';
+  if(!canAfford(costOf(t),d.pop))return lackText(costOf(t),d.pop)||'資源が足りません';
   return 'ここには建てられません';}
 function setGhost(x,y){const first=!bGhost;bGhost={x:Math.max(0,Math.min(COLS-1,x)),y:Math.max(0,Math.min(ROWS-1,y))};se('click');
   // 引いた地図だと小さくて調整しにくいので、最初の仮置きで少し寄る
@@ -6842,7 +6876,7 @@ function renderMode(){
   const tap=IS_TOUCH?'タップ':'クリック';
   let t;
   if(S.buildMode){const d=B[S.buildMode],c=costOf(S.buildMode),ok=canAfford(c,d.pop),sz=newSz(S.buildMode);
-    t=`${icSvg(S.buildMode,24)}<b class="mn">${d.name}</b><span class="szt">${sz}×${sz}</span><span class="ms">・${ok?(padMode()?(bGhost?'十字キーで調整して「決定」':(WALL_TYPES.includes(S.buildMode)?'場所をタップ・なぞると一列に配置':'建てたい場所をタップ')):(WALL_TYPES.includes(S.buildMode)?`${tap}で1枚・ドラッグで一列に配置`:`マップを${tap}して配置（続けて置けます）`)):'<span style="color:var(--red)">資源が足りません</span>'}</span><span class="mc">${costText(c,d.pop)}</span>`;}
+    t=`${icSvg(S.buildMode,24)}<b class="mn">${d.name}</b><span class="szt">${sz}×${sz}</span><span class="ms">・${ok?(padMode()?(bGhost?'十字キーで調整して「決定」':(WALL_TYPES.includes(S.buildMode)?'場所をタップ・なぞると一列に配置':'建てたい場所をタップ')):(WALL_TYPES.includes(S.buildMode)?`${tap}で1枚・ドラッグで一列に配置`:`マップを${tap}して配置（続けて置けます）`)):`<span style="color:var(--red)">${lackText(c,d.pop)||'資源が足りません'}</span>`}</span><span class="mc">${costText(c,d.pop)}</span>`;}
   else if(S.buildPick)t=`<b class="mn">建設モード</b><span class="ms">・建てる施設を「建設」の一覧から選んでください</span>`;
   else if(S.aimNaval)t='<b class="mn" style="color:#ffe38a">艦砲射撃</b><span class="ms">・目標地点をクリック（Escで取消）</span>';
   else if(S.multi&&S.multi.length)t=`<b class="mn">${S.multi.length}部隊</b><span class="ms">を選択中・地図を${tap}でまとめて移動・Shift+クリックで追加/除外</span>${X}`;
@@ -6872,7 +6906,7 @@ function toggleFull(on){
 }
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&isFull())toggleFull(false);});
 function togglePanel(){const r=document.getElementById('right');r.classList.toggle('open');setText(document.getElementById('bPanel'),r.classList.contains('open')?'パネル ▶':'◀ パネル');}
-function openSheet(){if(isFull()&&!isNarrow()){const r=document.getElementById('right');if(!r.classList.contains('open'))togglePanel();return;}if(isNarrow()){document.getElementById('right').classList.add('open');setText(document.getElementById('sheetLbl'),'▼ 閉じる');if((S.sel||S.selTile||S.heroView)&&!S.buildMode&&!S.buildPick&&typeof setRT==='function')setRT('info');}}
+function openSheet(){if(isFull()&&!isNarrow()){const r=document.getElementById('right');if(!r.classList.contains('open'))togglePanel();return;}if(isNarrow()){document.getElementById('right').classList.add('open');setText(document.getElementById('sheetLbl'),'▼ 閉じる');if((S.sel||S.selTile||S.heroView)&&!S.buildMode&&typeof setRT==='function')setRT('info');}}
 document.getElementById('bFull').onclick=()=>toggleFull();
 new MutationObserver(()=>{const o=document.getElementById('right').classList.contains('open');document.body.classList.toggle('sheetOpen',o);}).observe(document.getElementById('right'),{attributes:true,attributeFilter:['class']});
 document.getElementById('mBack').onclick=()=>{document.getElementById('right').classList.remove('open');setText(document.getElementById('sheetLbl'),'▲ 詳細・建設');};
