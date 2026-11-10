@@ -688,6 +688,17 @@ button.ghost:hover:not(:disabled){box-shadow:none;color:var(--amber)}
 #intel .ec small{font-size:10px;color:#a08a86}
 #intel .ec b{font-family:var(--px-font);font-weight:400;font-size:12px}
 #intel .ec.gone{opacity:.35}
+#intel .imini{display:none}#intelMin{display:none}
+@media (min-width:901px){
+  body:not(.land) #intelMin{display:inline-flex;position:absolute;right:6px;top:4px;padding:0 8px;height:20px;align-items:center;font-size:11px;z-index:2}
+  body:not(.land) #intel{position:relative;padding-right:40px!important}
+  body.intelMin:not(.land) #intel{min-height:30px!important;flex-wrap:nowrap}
+  body.intelMin:not(.land) #intel>*:not(.lbl):not(.imini):not(#intelMin){display:none!important}
+  body.intelMin:not(.land) #intel .lbl{min-height:30px!important;flex-direction:row;align-items:center;gap:8px}
+  body.intelMin:not(.land) #intel .imini{display:inline-flex;align-items:baseline;gap:4px;font-size:12px}
+  body.intelMin:not(.land) #intel .imini b{font-family:var(--px-font);font-weight:400;font-size:15px;color:var(--red)}
+  body.intelMin:not(.land) #intelMin{top:50%;transform:translateY(-50%)}
+}
 /* 襲撃中（PC）：敵の種類は「絵＋数」の小さな札を横に並べる（名前は絵にマウスを乗せると出る）。残敵のバーは幅を決めておく */
 @media (min-width:901px){
   body.night #intel{flex-wrap:nowrap}
@@ -4096,7 +4107,7 @@ function squadAI(s,dt,firing){
   if(s.mode==='return'){
     const h=nearestHangar(s);
     if(h){const hx=bcx(h),hy=bcy(h);
-      if(Math.hypot(hx-s.x,hy-s.y)<TU*(MT(s).naval?3.5:1.5)){if(s.hp>=s.maxhp-1&&s.members>=UT[s.ut].members&&(supNeed(s)<1||supAvail(supT(s))<1)){s.mode='guard';s.ax=s.x;s.ay=s.y;log(`${unitLabel(s)} 手当てと補給を終え、迎撃態勢へ`,'good');}return;}
+      if(Math.hypot(hx-s.x,hy-s.y)<TU*(MT(s).naval?3.5:1.5)){if(s.hp>=s.maxhp-1&&s.members>=UT[s.ut].members&&(supNeed(s)<1||supAvail(supT(s))<1)){const rb=s.retBack;s.retBack=null;if(rb){s.mode=rb.mode||'guard';s.tx=rb.x;s.ty=rb.y;s.ax=rb.x;s.ay=rb.y;log(`${unitLabel(s)} 手当てと補給を終え、元の場所へ戻る（${MODE_NAME[s.mode]}）`,'good');}else{s.mode='guard';s.ax=s.x;s.ay=s.y;log(`${unitLabel(s)} 手当てと補給を終え、迎撃態勢へ`,'good');}}return;}
       stepTo(s,hx,hy,dt,false);return;}
     s.mode='guard';
   }
@@ -4119,7 +4130,7 @@ function squadAI(s,dt,firing){
 
   }
 }
-function orderMove(s,x,y,noLink){s.tx=x;s.ty=y;s.ax=x;s.ay=y;if(s.mode==='return')s.mode='guard';if(s.ut==='guard')s.stayOut=true;
+function orderMove(s,x,y,noLink){s.tx=x;s.ty=y;s.ax=x;s.ay=y;if(s.mode==='return'){s.mode=(s.retBack&&s.retBack.mode)||'guard';}s.retBack=null;if(s.ut==='guard')s.stayOut=true;
   const p=partner(s);if(p&&!noLink)orderMove(p,x+TU*0.9,y+TU*0.4,true);}
 const NIGHT_STOP=new Set(['miner','quarry','ironmine','farm','fishery','well','market','ammo','power','elecf','powder','barracks','apart','furnace','lab','tavern']);
 function update(dt,sim){
@@ -4582,11 +4593,11 @@ function supplySquad(s,quiet,miss){const sp=supOf(s);let got=0;
 // 補給・補充・手当ては、部隊が一度所属施設へ戻って受ける（戦闘中も可）。終われば元の場所へ戻る
 function orderSupply(s,quiet){if(!needsSupply(s))return false;
   if(s.gar||!nearestHangar(s)||nearHome(s)){const ok=supplySquad(s,quiet,{})>0;if(ok&&!quiet){se('upgrade');log(`${unitLabel(s)} に補給した`,'good');}return ok;}
-  s.supPend=true;if(s.eqBack==null)s.eqBack=[s.tx!=null?s.tx:s.ax,s.tx!=null?s.ty:s.ay];if(!quiet)log(`${unitLabel(s)} 補給を受けに所属施設へ戻る`);return true;}
+  s.supPend=true;if(s.eqBack==null){s.eqBack=[s.tx!=null?s.tx:s.ax,s.tx!=null?s.ty:s.ay];s.eqBackMode=s.mode==='return'?(s.retBack&&s.retBack.mode)||'guard':s.mode;}if(!quiet)log(`${unitLabel(s)} 補給を受けに所属施設へ戻る`);return true;}
 function nearHome(s){const h=nearestHangar(s);if(!h)return false;const hx=bcx(h),hy=bcy(h);return Math.hypot(hx-s.x,hy-s.y)<T*bsz(h)/2+1.2*TU;}
 function arriveHome(s){if(s.eqPend){s.eq=Object.assign({},EQ_DEF[s.ut],s.eq||{},s.eqPend);const ns=Object.values(s.eqPend).map(k=>EQ[k].n).join('・');s.eqPend=null;log(`${unitLabel(s)} 装備を ${ns} に替えた`,'good');}
   if(s.supPend){s.supPend=false;if(supplySquad(s,false,{})>0){se('upgrade');log(`${unitLabel(s)} 補給・補充・手当てを受けた`,'good');}}
-  if(s.eqBack){const [bx,by]=s.eqBack;s.eqBack=null;s.mode='guard';s.tx=bx;s.ty=by;s.ax=bx;s.ay=by;}}
+  if(s.eqBack){const [bx,by]=s.eqBack;s.eqBack=null;s.mode=s.eqBackMode||'guard';s.eqBackMode=null;s.tx=bx;s.ty=by;s.ax=bx;s.ay=by;}}
 function supplyAll(){let n=0;const list=S.squads.filter(needsSupply);for(const x of list)if(orderSupply(x,true))n++;
   if(n){se('upgrade');log(`一括補給：${n}部隊（離れている部隊は所属施設へ戻って補給を受ける）`,'good');}else{se('error');if(list.length)log('補給する資材が足りない','warn');}renderInfo(true);if(S.overlay==='army')showArmy();}
 function supplyOne(id){const x=S.squads.find(q=>q.id==id);if(x)orderSupply(x,false);renderInfo(true);}
@@ -4677,7 +4688,7 @@ function orderEquip(s,slot,id){if(!EQ[id]||!eqOk(id))return;if(eqKey(s,slot)===i
   if(s.eqBack==null)s.eqBack=[s.tx!=null?s.tx:s.ax,s.tx!=null?s.ty:s.ay];
   log(`${unitLabel(s)} 装備を「${EQ[id].n}」に持ち替えに戻る`);}
 function applyEquip(s){if(s.eqPend||s.supPend){arriveHome(s);return;}s.eq=Object.assign({},EQ_DEF[s.ut],s.eq||{},s.eqPend||{});const ns=Object.values(s.eqPend||{}).map(k=>EQ[k].n).join('・');s.eqPend=null;if(ns)log(`${unitLabel(s)} 装備を ${ns} に替えた`,'good');
-  if(s.eqBack){const [bx,by]=s.eqBack;s.eqBack=null;s.mode='guard';s.tx=bx;s.ty=by;s.ax=bx;s.ay=by;}}
+  if(s.eqBack){const [bx,by]=s.eqBack;s.eqBack=null;s.mode=s.eqBackMode||'guard';s.eqBackMode=null;s.tx=bx;s.ty=by;s.ax=bx;s.ay=by;}}
 function castleC(b){b=b||hqOf();return b?[bcx(b),bcy(b)]:[0,0];}
 function nearCastle(s){const [x,y]=castleC();return Math.hypot(s.x-x,s.y-y)<7*TU;}
 // 熟練度：魔物を倒すと経験。新兵→熟練（火力+10%）→精鋭（研究「精鋭」：火力+20%・耐久+10%）
@@ -5789,7 +5800,7 @@ document.addEventListener('keydown',ev=>{
   if(S.sel&&S.sel.kind==='s'){const m={g:'guard',f:'hold',b:'return'}[ev.key.toLowerCase()];if(m){setMode(S.sel,m);}}
   const dm=/^Digit(\d)$/.exec(ev.code);if(dm){const n=+dm[1];const gl=groupList(BUILD_GROUPS[ev.shiftKey?1:0]);const k=gl[n===0?9:n-1];if(k){ev.preventDefault();S.lastBuild=k;enterBuild(k);}}
 });
-function setMode(s,m,noLink){s.mode=m;if(m==='hold'){s.tx=null;s.ax=s.x;s.ay=s.y;}if(m==='guard'&&s.tx==null){s.ax=s.x;s.ay=s.y;}if(!noLink){const p=partner(s);if(p)setMode(p,m,true);}log(`${unitLabel(s)}：${MODE_NAME[m]}`);renderInfo(true);}
+function setMode(s,m,noLink){if(m==='return'&&s.mode!=='return')s.retBack={x:s.tx!=null?s.tx:s.ax,y:s.tx!=null?s.ty:s.ay,mode:s.mode};else if(m!=='return')s.retBack=null;s.mode=m;if(m==='hold'){s.tx=null;s.ax=s.x;s.ay=s.y;}if(m==='guard'&&s.tx==null){s.ax=s.x;s.ay=s.y;}if(!noLink){const p=partner(s);if(p)setMode(p,m,true);}log(`${unitLabel(s)}：${MODE_NAME[m]}`);renderInfo(true);}
 function togglePause(){if(S.over)return;S.paused=!S.paused;renderPauseUI();}
 function renderPauseUI(){if(!S)return;const p=!!S.paused&&!S.over;const b=document.getElementById('bPause');b.classList.toggle('primary',!!S.paused);setHTML(b,S.paused?`${ui('play','dark',24)}<span>再開</span><kbd>Space</kbd>`:`${ui('pause','light',12)}<span>一時停止</span><kbd>Space</kbd>`);
   const ps=document.getElementById('bPauseSeg');ps.classList.toggle('on',!!S.paused);setHTML(ps,ui(S.paused?'play':'pause',S.paused?'amber':'dim',12));
@@ -6329,6 +6340,10 @@ function pipsHTML(n,max,cls){let h='';for(let i=0;i<max;i++)h+=`<i class="${i<n?
 function recMeters(w){const r=recOf(w),c=curDev();
   const m=(lab,v,t,tip)=>`<div class="rec${v<t?' short':''}" title="${tip}"><div class="rt"><span>${lab}</span><b>${v} <small>/ ${t}</small></b></div><div class="ebar"><i style="width:${Math.round(Math.min(1,v/Math.max(1,t))*100)}%"></i></div></div>`;
   return `<span class="rtag">推奨</span>${m('人口',c.pop,r.pop,'住民と兵の合計')}${m('防衛施設',c.def,r.def,'バリスタ・投石機などの数（Lv2は1.6基、Lv3は2.3基として数える）')}${m('部隊',c.sq,r.sq,'編成した部隊の数')}`;}
+// 敵情の帯をたたむ（PC）。たたんだときは「第◯襲撃・規模・あと◯日」だけの1行
+function intelMin(){try{return localStorage.getItem('nd_intel_min')==='1';}catch(e){return false;}}
+function setIntelMin(v){try{localStorage.setItem('nd_intel_min',v?'1':'0');}catch(e){}document.body.classList.toggle('intelMin',!!v);}
+setTimeout(()=>document.body.classList.toggle('intelMin',intelMin()),0);
 function renderIntel(){
   const el=document.getElementById('intel');
   let h;
@@ -6337,7 +6352,7 @@ function renderIntel(){
     const cnt={};for(const e of S.enemies)cnt[e.type]=(cnt[e.type]||0)+1;for(let i=S.qi;i<S.cur.q.length;i++){const t=S.cur.q[i].type;cnt[t]=(cnt[t]||0)+1;}
     const rem=S.enemies.length+S.cur.q.length-S.qi;S.cur.maxRem=Math.max(S.cur.maxRem||S.cur.q.length,rem);
     const all=S.cur.seenT=S.cur.seenT||{};for(const k in cnt)all[k]=1;for(const e of S.cur.q)all[e.type]=1;
-    h=`<div class="lbl"><span>交戦</span><b>第${S.cur.n}襲撃</b></div>${tags(S.cur)}<div class="icell remain"><small>残敵</small><div class="rr"><b>${rem}</b><span> / ${S.cur.maxRem}</span></div><div class="ebar"><i style="width:${Math.round(rem/S.cur.maxRem*100)}%"></i></div></div><div class="isep"></div><div class="etypes">`;
+    h=`<div class="lbl"><span>交戦</span><b>第${S.cur.n}襲撃</b></div><span class="imini">残敵 <b>${rem}</b> / ${S.cur.maxRem}${S.cur.blood?'　<span style="color:#ff7a6a">ブラッドムーン</span>':''}</span>${tags(S.cur)}<div class="icell remain"><small>残敵</small><div class="rr"><b>${rem}</b><span> / ${S.cur.maxRem}</span></div><div class="ebar"><i style="width:${Math.round(rem/S.cur.maxRem*100)}%"></i></div></div><div class="isep"></div><div class="etypes">`;
     for(const k of Object.keys(E))if(all[k])h+=`<span class="ec${cnt[k]?'':' gone'}" title="${E[k].name}：${E[k].desc}">${eSpr(k,30)}<span><small>${E[k].name}</small><b>×${cnt[k]||0}</b></span></span>`;
     h+=`</div><div class="icell isrc"><small>襲撃元</small><span>${S.cur.sides.map(sideSrc).join('・')}</span></div>`;
   }else if(S.next){
@@ -6346,7 +6361,7 @@ function renderIntel(){
     if(it.cnt)types=Object.keys(E).filter(k=>it.cnt[k]).map(k=>`<span class="et" title="${E[k].desc}">${eSpr(k,24)}×${it.cnt[k]}</span>`).join('');
     else if(it.types)types=Object.keys(E).filter(k=>it.types.includes(k)).map(k=>`<span class="et" title="${E[k].name}：${E[k].desc}">${eSpr(k,24)}</span>`).join('')+'<span class="muted">（数は不明）</span>';
     else types=`<span>不明</span><span class="muted">（偵察Lv${it.L}）</span>`;
-    h=`<div class="lbl"><span>敵情予測</span><b>第${w.n}襲撃</b></div>${tags(w)}<div class="icell"><small>規模</small><b class="big">${it.total}</b></div><div class="icell"><small>襲撃元</small><span>${it.sides.map(sd=>sideSrc(sd)+campTag(sd)).join('・')}${it.hidden?' <span class="muted">ほか不明</span>':''}</span></div><div class="icell itypes"><small>敵の種類</small><span class="ets">${types}</span></div><div class="icell" title="敵の強さと、推奨に対する今の備えから出した目安"><small>危険度</small>${pipsHTML(dg,5,'danger-pips')}</div><div class="isep"></div><div class="recs">${recMeters(w)}</div>`;
+    h=`<div class="lbl"><span>敵情予測</span><b>第${w.n}襲撃</b></div><span class="imini">規模 <b>${it.total}</b>　あと ${S.turnsLeft} 日${w.blood?'　<span style="color:#ff7a6a">ブラッドムーン</span>':''}</span>${tags(w)}<div class="icell"><small>規模</small><b class="big">${it.total}</b></div><div class="icell"><small>襲撃元</small><span>${it.sides.map(sd=>sideSrc(sd)+campTag(sd)).join('・')}${it.hidden?' <span class="muted">ほか不明</span>':''}</span></div><div class="icell itypes"><small>敵の種類</small><span class="ets">${types}</span></div><div class="icell" title="敵の強さと、推奨に対する今の備えから出した目安"><small>危険度</small>${pipsHTML(dg,5,'danger-pips')}</div><div class="isep"></div><div class="recs">${recMeters(w)}</div>`;
     const det=[];
     if(w.blood)det.push('<span style="color:#ff7a6a">赤い月が昇る……魔物が強く、レッドキャップが現れる</span>');
     if(it.tactic)det.push(`<span style="color:var(--amber)">戦術：${it.tactic}</span>`);
@@ -6361,7 +6376,9 @@ function renderIntel(){
     if(S.intelOpen)h+=`<div class="idet">${det.join('')}</div>`;
     el.classList.toggle('hot',dg>=4);
   }else h='';
-  if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h;setTimeout(resizeView,0);const tg=document.getElementById('intelTg');if(tg)tg.onclick=()=>{S.intelOpen=!S.intelOpen;renderIntel();resizeView();};}
+  h+=`<button id="intelMin" class="ghost" title="${intelMin()?'敵情を開く':'敵情をたたむ'}">${intelMin()?'▾':'▴'}</button>`;   // PC：敵情の帯をたたむ・開く
+  if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h;setTimeout(resizeView,0);const tg=document.getElementById('intelTg');if(tg)tg.onclick=()=>{S.intelOpen=!S.intelOpen;renderIntel();resizeView();};
+    const mn=document.getElementById('intelMin');if(mn)mn.onclick=()=>{setIntelMin(!intelMin());se('click');renderIntel();setTimeout(resizeView,0);};}
 }
 function renderSheetHandle(){const el=document.getElementById('sheetSel');if(!el||!isNarrow())return;const o=S.sel;let h='';
   if(o){const r=Math.max(0,o.hp/o.maxhp);h=`${o.kind==='s'?icSvg(o.model||defModel(o.ut),30):icSvg(o.type,30)}<span class="shm"><span class="shn"><b>${o.kind==='s'?unitLabel(o):B[o.type].name}</b>${o.kind==='b'&&B[o.type].grp?`<span class="ilv">Lv${o.lv||1}</span>`:''}<span class="shv">${o.kind==='s'?Math.round(r*100)+'%':Math.ceil(o.hp)+'/'+Math.ceil(o.maxhp)}</span></span><span class="hpbar${r<0.3?' low':r<0.6?' mid':''}"><i style="width:${Math.round(r*100)}%"></i></span></span>`;}
