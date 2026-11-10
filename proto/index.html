@@ -111,10 +111,12 @@ button.on{border-color:var(--amber);background:#2a2412;color:var(--amber)}
 #build button{text-align:left;padding:4px 6px;line-height:1.3}
 #build button small{display:block;color:var(--dim);font-size:10px}
 #info{min-height:120px}
-#infoSplit{display:none;align-items:center;gap:8px;flex-shrink:0;height:22px;margin:-3px 0;cursor:row-resize;user-select:none;touch-action:none}
-#infoSplit .grip{flex:1;height:6px;background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 9px);opacity:.9}
-#infoSplit:hover .grip,#infoSplit.drag .grip{background:repeating-linear-gradient(90deg,var(--amber) 0 6px,transparent 6px 9px)}
-#infoSplit button{padding:1px 8px;font-size:11px;cursor:pointer;flex-shrink:0}
+#infoSplit{display:none;position:relative;align-items:center;justify-content:center;flex-shrink:0;height:16px;margin:-4px 0;cursor:row-resize;user-select:none;touch-action:none}
+#infoSplit::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line)}   /* 薄い線 */
+#infoSplit .grip{position:relative;width:36px;height:10px;background:#2f3f33;box-shadow:inset 0 0 0 1px #4a5e4e}   /* 真ん中の四角（つまみ） */
+#infoSplit:hover .grip,#infoSplit.drag .grip{background:var(--amber);box-shadow:none}
+#infoSplit:hover::before,#infoSplit.drag::before{background:#6d5a2a}
+#infoClose{display:none;position:absolute;z-index:4;width:26px;height:26px;padding:0;align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer}
 .row{display:flex;justify-content:space-between;margin:2px 0}
 .muted{color:var(--dim)}
 select{background:#0e1510;color:var(--text);border:1px solid var(--line);font:inherit;padding:3px;width:100%}
@@ -282,6 +284,8 @@ body.fullmap #right.open{transform:none}
   body:not(.fullmap) #rtabs{flex-shrink:0;margin-bottom:0}
   /* 詳細と下のパネルのあいだの仕切り：ドラッグで高さを変える・詳細を閉じる */
   body.hasSel:not(.fullmap) #infoSplit{display:flex}
+  #right{position:relative}
+  body.hasSel:not(.fullmap) #infoClose{display:flex;top:6px;right:10px}   /* 詳細の右上の × */
   body.hasSel.infoSized:not(.fullmap) #info{flex:0 0 auto;height:var(--infoH);max-height:none}
   body:not(.fullmap) #right .box[data-rt]{flex:1 1 0;min-height:80px;overflow-y:auto}
   body:not(.fullmap) #right .box[data-rt="res"],body:not(.fullmap) #right .box[data-rt="hero"]{flex:1 1 0}
@@ -1544,7 +1548,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
   <div id="right">
     <div id="sheetHandle"><span id="sheetSel"></span><span id="sheetLbl">▲ 詳細・建設</span></div>
     <div class="box" id="info"><h3>選択中</h3><div id="infoBody" class="muted">施設か部隊をクリック</div></div>
-    <div id="infoSplit" title="上下にドラッグして、詳細と下のパネルの高さを変える（ダブルクリックで元に戻す）"><span class="grip"></span><button id="infoClose">× 詳細を閉じる</button></div>
+    <div id="infoSplit" title="上下にドラッグして、詳細と下のパネルの高さを変える（ダブルクリックで元に戻す）"><span class="grip"></span></div><button id="infoClose" title="詳細を閉じる">×</button>
     <div id="rtabs"><button data-rt="info" class="tabInfo">選択中</button><button data-rt="build" class="on">建設</button><button data-rt="res">研究</button><button data-rt="army">軍事</button><button data-rt="econ">街</button></div>
     <div class="box" data-rt="econ" style="display:none"><h3>街の状況</h3><div id="econ"></div></div>
     <div class="box" data-rt="build"><h3>建設</h3><div id="facCapBox"></div><button id="bRepB" class="wide" style="width:100%;margin:0 0 8px">一括修理</button><div id="build"></div></div>
