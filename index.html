@@ -1114,6 +1114,10 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 }
 /* スマホ：仮置き＋十字キー */
 #mRep.dim{opacity:.55}
+.supc{display:inline-flex;gap:8px;margin-left:8px;align-items:center;font-size:11px}
+@media (min-width:1301px){#controls #bSupAll{width:260px!important;max-width:none!important}}
+.supc .cst{display:inline-flex;align-items:center;gap:2px}
+#abSup{display:inline-flex;align-items:center;flex-wrap:wrap}
 /* スマホ：たたんだ資源バーに6つ（金貨・木材・石材・鉄・食料・人員）が収まるように詰める */
 @media (max-width:900px){
   body.resMin:not(.land) #wrap #resbar{justify-content:space-between!important;padding:0 6px!important}
@@ -4258,6 +4262,7 @@ function supplyAll(){let n=0;const list=S.squads.filter(needsSupply);for(const x
   if(n){se('upgrade');log(`一括補給：${n}部隊（離れている部隊は所属施設へ戻って補給を受ける）`,'good');}else{se('error');if(list.length)log('補給する資材が足りない','warn');}renderInfo(true);if(S.overlay==='army')showArmy();}
 function supplyOne(id){const x=S.squads.find(q=>q.id==id);if(x)orderSupply(x,false);renderInfo(true);}
 function supText(s){const sp=supOf(s);if(!sp)return '';const r=s.sup/sp.max;return `${Math.round(r*100)}%${r<0.25?(sp.melee?'（消耗：火力低下）':'（残りわずか）'):''}`;}
+function supCostHTML(list){const c=supCost(list),pop=Math.ceil(c.pop||0);delete c.pop;for(const k in c)c[k]=Math.ceil(c[k]);return costText(c,pop);}
 function supCostText(c){return Object.keys(c).map(k=>`${k==='pop'?'人員':RES_NAME[k]}${Math.round(c[k]*10)/10}`).join('・')||'なし';}
 // 火力の重なり方：研究どうしは足し算 → 研究・英雄・その場の効果はそれぞれ掛け算
 function squadResBonus(s){let r=(has('analysis')?0.1:0)+vetDmg(s);
@@ -5989,7 +5994,8 @@ function renderTop(){
   if(bn.disabled!==S.waveActive)bn.disabled=S.waveActive;
   setHTML(bn,S.waveActive?`${ui('moon','red',24)}<span>襲撃中</span>`:S.phase==='night'?`${ui('sun','dark',24)}<span>朝へ</span><kbd>Enter</kbd>`:`${ui('moon','dark',24)}<span>${S.turnsLeft===1?'夜へ・襲撃':'夜へ'}</span><kbd>Enter</kbd>`);
   bn.classList.toggle('last',!S.waveActive&&S.phase!=='night'&&S.turnsLeft===1);renderPauseUI();
-  {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,sq.length?`一括補給 ${sq.length}部隊（${supCostText(supCost(sq))}）<kbd>N</kbd>`:'一括補給');const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
+  {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,sq.length?`一括補給 <span class="supc">${supCostHTML(sq)}</span><kbd>N</kbd>`:'一括補給');
+  {const ms=document.getElementById('mSup');if(ms)setHTML(ms,sq.length?`一括補給（${sq.length}部隊）<span class="supc">${supCostHTML(sq)}</span>`:'一括補給（必要なし）');}const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
   const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${ra2.n}棟（${ic('steel',12)}${ra2.c}）<kbd>X</kbd>`:'一括修理');const dA=!ra2.n||S.steel<1||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
   {const rb=document.getElementById('bRepB');if(rb){const l=S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${ra2.n}棟（木材${ra2.c}）`:'一括修理（壊れた施設なし）';if(rb.dataset.l!==l){rb.dataset.l=l;rb.textContent=l;}if(rb.disabled!==dA)rb.disabled=dA;}}
   {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${ra2.n}棟（木材${ra2.c}）`:'一括修理');mr.classList.toggle('dim',dA);}}
@@ -6581,8 +6587,8 @@ function renderArmyPanel(force){if(!S)return;const sub=S.armySub||'list';
   else if(sub==='adv')showHire(el,'adv');}
 function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el)return;if((S.armySub||'list')!=='list')return;const box=el.closest('.box');if(box&&box.style.display==='none'&&!force)return;
   const sq=S.squads.filter(needsSupply);
-  const key=S.squads.map(s=>s.id+':'+Math.round(s.hp/s.maxhp*20)+':'+(supOf(s)?Math.round(s.sup/supOf(s).max*20):'')+':'+s.members+(s.gar?'g':'')+(s.mode||'')+(s.supPend?'s':'')).join()+'|'+sq.length+'|'+S.waveActive+'|'+(S.sel&&S.sel.kind==='s'?S.sel.id:'');if(key===armyKey&&!force)return;armyKey=key;
-  let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length&&!S.waveActive?'':'disabled'}>${sq.length?`一括補給（${sq.length}部隊）`:'一括補給（必要なし）'}</button></div>`;
+  const key=S.squads.map(s=>s.id+':'+Math.round(s.hp/s.maxhp*20)+':'+(supOf(s)?Math.round(s.sup/supOf(s).max*20):'')+':'+s.members+(s.gar?'g':'')+(s.mode||'')+(s.supPend?'s':'')).join()+'|'+sq.length+'|'+S.waveActive+'|'+(S.sel&&S.sel.kind==='s'?S.sel.id:'')+'|'+['sword','ammo','elec','powder','iron','fuel','pop'].map(k=>Math.floor(S[k]||0)).join(',');if(key===armyKey&&!force)return;armyKey=key;
+  let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length&&!S.waveActive?'':'disabled'}>${sq.length?`一括補給（${sq.length}部隊）<span class="supc">${supCostHTML(sq)}</span>`:'一括補給（必要なし）'}</button></div>`;
   if(!S.squads.length)h+='<div class="muted">部隊がいません。兵舎などで訓練しましょう</div>';
   else h+=`<div class="sqhd"><span>部隊 ${S.squads.length}・英雄 ${S.cmds.length}</span><span>クリックで指揮／Q で順に選択</span></div><div class="sqlist">`+S.squads.map(s=>{const r=Math.max(0,s.hp/s.maxhp),hc=cmdOf(s),ik=hc&&WICON['h_'+hc.spec]&&s.ut!=='drake'?'h_'+hc.spec:sqKey(s);
       const stt=s.gar?['配置中','gd']:s.supPend||s.eqPend?['補給へ','wn']:s.mode==='guard'?['迎撃','cy']:s.mode==='hold'?['固守','wn']:s.mode==='return'?['帰還','dm']:['待機','dm'];
