@@ -1430,6 +1430,15 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 </style>
 </head>
 <body>
+<!-- 読み込み画面：ゲームの準備ができるまで（タイトルが出るまで）と、マップを作る間・セーブを読む間に出す -->
+<style>#boot{position:fixed;inset:0;z-index:999;background:#0b0f0c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#cfe3cf;font-family:sans-serif}
+#boot.off{display:none}#boot .btt{font-size:22px;letter-spacing:.2em;color:#f2b33d}
+#boot .bbar{width:min(240px,60vw);height:6px;background:#1a221c;overflow:hidden;box-shadow:0 0 0 1px #2f3f33}
+#boot .bbar i{display:block;height:100%;width:35%;background:#f2b33d;animation:bootMv 1.1s ease-in-out infinite}
+@keyframes bootMv{0%{transform:translateX(-100%)}100%{transform:translateX(290%)}}
+#boot small{color:#8aa48d;font-size:12px}</style>
+<script>addEventListener('error',function(){var b=document.getElementById('boot');if(b)b.classList.add('off');});</script>
+<div id="boot"><div class="btt">ナイトディフェンス</div><div class="bbar"><i></i></div><small id="bootMsg">読み込み中…</small></div>
 <div id="rotateMsg"><div class="rph"></div><b>スマホを横向きにしてください</b><small id="rotHint">このゲームは横持ちで遊ぶ画面になっています。</small><button id="rotFree" class="ghost">縦のまま遊ぶ</button></div>
 <div id="wrap">
   <div id="topbar">
@@ -2527,7 +2536,11 @@ const MTN={
  3:[[".....oo.......","....owWo......","...owwwWo.....","...owwWWRo....","..owwrRRRRo...","..orrrrRRRRo..",".orrrRrrRRRRo.",".ohhrrrRRRHHo.","ohhhhhrRRHHHdo","ohhghhhhhHHHdo","ohhhhhhhhhHHdo","ohhhhhhhhhhHdo","oooooooooooooo",".............."],
     ["......oo......",".....owWo.....","....owwWWo.oo.","....owwWRoowWo","...owrrRRRowWo","..orrrrRRRRrRo","..orrRrrRRRRRo",".ohrrrrrRRRRHo",".ohhhrrRRRHHdo","ohhhhhhRRHHHdo","ohhghhhhhHHHdo","ohhhhhhhhhHHdo","oooooooooooooo",".............."]],
 };
-function pxStamp(c,ox,oy,art,pal){for(let y=0;y<art.length;y++)for(let x=0;x<art[y].length;x++){const ch=art[y][x];if(ch==='.')continue;c.fillStyle=pal[ch];c.fillRect(ox+x,oy+y,1,1);}}
+const STAMP_C=new Map();
+function pxStamp(c,ox,oy,art,pal){if(c===NOCTX)return;const key=art.join('|')+JSON.stringify(pal);let cv=STAMP_C.get(key);
+  if(!cv){cv=document.createElement('canvas');cv.width=Math.max(...art.map(r=>r.length));cv.height=art.length;pxStampRaw(cv.getContext('2d'),0,0,art,pal);STAMP_C.set(key,cv);}
+  c.drawImage(cv,ox,oy);}
+function pxStampRaw(c,ox,oy,art,pal){for(let y=0;y<art.length;y++)for(let x=0;x<art[y].length;x++){const ch=art[y][x];if(ch==='.')continue;c.fillStyle=pal[ch];c.fillRect(ox+x,oy+y,1,1);}}
 // 山：隣り合う山がつながって山並みに見えるよう、マスからはみ出して描く（奥の行から順に）
 function pxMountain(c,X,Y,lv,x,y){
   const O='#1c1824',by=Y*TP+TP-1,h=[0,6,9,12][lv]+Math.floor(pxH(x,y,77)*3),w=10+Math.floor(pxH(x,y,78)*4),cx=X*TP+7+Math.round((pxH(x,y,79)-0.5)*4);
@@ -2543,9 +2556,16 @@ function pxOverlay(c,X,Y,oil,ore,rich){const ox=X*TP,oy=Y*TP,O='#1c1824';
   if(ore){const n=[0,1,2,3][rich||1];const P=[[1,7],[6,2],[7,8]];for(let i=0;i<n;i++){pxStamp(c,ox+P[i][0],oy+P[i][1],BOULDER,{o:O,s:'#6a5a4a',S:'#4a3e32'});c.fillStyle='#e0843a';c.fillRect(ox+P[i][0]+3,oy+P[i][1]+2,1,1);c.fillRect(ox+P[i][0]+5,oy+P[i][1]+3,1,1);}}
 }
 let TREE_Q=null;
+// 地面の色むら（1ドットずつ）は、まとめて画像の配列に書いてから1回で貼る（1ドットずつ描くと始めるときに数秒かかるため）
+let FILL_MODE=null,FILL_BUF=null;const HEXC={};
+function hN(a,b){let h=Math.imul(a,73856093)^Math.imul(b,19349663);h=Math.imul(h^(h>>>13),1274126177);h^=h>>>16;return (h>>>0)/4294967296;}   // 速いノイズ（地面の色むら用）
+function hexRGB(h){let v=HEXC[h];if(!v){const n=parseInt(h.slice(1),16);v=HEXC[h]=[n>>16&255,n>>8&255,n&255];}return v;}
+const NOCTX=new Proxy({},{get:()=>()=>{},set:()=>true});
 function pxTile(c,X,Y,v,lv,x,y,oil,ore,rich){
   const ox=X*TP,oy=Y*TP,h=(i)=>pxH(x,y,i);
-  const fillN=(cols,w)=>{for(let j=0;j<TP;j++)for(let i=0;i<TP;i++){const r=pxH(x*TP+i,y*TP+j,1);c.fillStyle=cols[r<w[0]?0:r<w[1]?1:2];c.fillRect(ox+i,oy+j,1,1);}};
+  const fillN=(cols,w)=>{if(FILL_MODE==='skip')return;
+    if(FILL_MODE==='buf'){const B=FILL_BUF.data,BW=FILL_BUF.width,cc=cols.map(hexRGB);for(let j=0;j<TP;j++)for(let i=0;i<TP;i++){const r=hN(x*TP+i,y*TP+j),q=cc[r<w[0]?0:r<w[1]?1:2],o=((oy+j)*BW+ox+i)*4;B[o]=q[0];B[o+1]=q[1];B[o+2]=q[2];B[o+3]=255;}return;}
+    for(let j=0;j<TP;j++)for(let i=0;i<TP;i++){const r=pxH(x*TP+i,y*TP+j,1);c.fillStyle=cols[r<w[0]?0:r<w[1]?1:2];c.fillRect(ox+i,oy+j,1,1);}};
   const O='#1c1824';
   if(v===0||v===8||(v===1&&lv===0)){
     const dirt=v===8||pxH(x,y,9)>0.94;
@@ -2591,12 +2611,14 @@ function renderTerrain(){
   // 地形の絵は旧タイル（U×Uマス）ごとに描く（各タイルの左上のマスを代表にする）
   const C0=COLS/U,R0=ROWS/U;
   const lo=document.createElement('canvas');lo.width=C0*TP;lo.height=R0*TP;const lc=lo.getContext('2d');
-  TREE_Q=[];
-  try{for(let Y=0;Y<R0;Y++)for(let X=0;X<C0;X++){const x=X*U,y=Y*U;
-    const v=S.ter[y][x];
-    pxTile(lc,X,Y,v,v===1?elevAt(x,y):v===2?forestAt(x,y):v===4?marshAt(x,y):0,X,Y,S.oil[y][x],S.ore[y][x],richAt(x,y));
-  }
-  TREE_Q.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);for(const t of TREE_Q)t[2]();}finally{TREE_Q=null;}
+  // 1回目：地面の色むらだけを配列に書いて貼る。2回目：その上に飾り（草・岩・木など）を描く
+  const tileArgs=(X,Y)=>{const x=X*U,y=Y*U,v=S.ter[y][x];return [X,Y,v,v===1?elevAt(x,y):v===2?forestAt(x,y):v===4?marshAt(x,y):0,X,Y,S.oil[y][x],S.ore[y][x],richAt(x,y)];};
+  try{FILL_BUF=lc.createImageData(lo.width,lo.height);FILL_MODE='buf';
+    for(let Y=0;Y<R0;Y++)for(let X=0;X<C0;X++)pxTile(NOCTX,...tileArgs(X,Y));
+    lc.putImageData(FILL_BUF,0,0);}finally{FILL_BUF=null;FILL_MODE=null;}
+  TREE_Q=[];FILL_MODE='skip';
+  try{for(let Y=0;Y<R0;Y++)for(let X=0;X<C0;X++)pxTile(lc,...tileArgs(X,Y));
+  TREE_Q.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);for(const t of TREE_Q)t[2]();}finally{TREE_Q=null;FILL_MODE=null;}
   for(let Y=0;Y<R0;Y++)for(let X=0;X<C0;X++){if(S.ter[Y*U][X*U]===3)pxMountain(lc,X,Y,pxH(X,Y,76)<0.55?3:2,X,Y);}
   for(let Y=0;Y<R0;Y++)for(let X=0;X<C0;X++){const x=X*U,y=Y*U;if(S.oil[y][x]||S.ore[y][x])pxOverlay(lc,X,Y,S.oil[y][x],S.ore[y][x],richAt(x,y));}
   c.imageSmoothingEnabled=false;c.drawImage(lo,0,0,W,H);
@@ -2606,7 +2628,9 @@ function renderTerrain(){
   for(let y=0;y<=ROWS;y++){c.strokeStyle=y%U?'rgba(10,14,10,.13)':'rgba(10,14,10,.35)';c.beginPath();c.moveTo(0,y*T+.5);c.lineTo(W,y*T+.5);c.stroke();}
   miniCv=document.createElement('canvas');miniCv.width=MM.w;miniCv.height=MM.h;const m=miniCv.getContext('2d');
   const sx=MM.w/COLS,sy=MM.h/ROWS;const col={0:'#0b120d',1:'#24382a',2:'#11221a',3:'#4a4238',4:'#13282c',6:'#0a2236',7:'#6a1030',8:'#5a5030',9:'#1a4a6a',10:'#3a6a7a'};
-  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){m.fillStyle=S.oil[y][x]?'#7a4fd0':S.ore[y][x]?'#4a3c1a':col[S.ter[y][x]];m.fillRect(x*sx,y*sy,Math.ceil(sx),Math.ceil(sy));}
+  {const tc=document.createElement('canvas');tc.width=COLS;tc.height=ROWS;const tg=tc.getContext('2d'),id=tg.createImageData(COLS,ROWS),D=id.data;
+   for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const q=hexRGB(S.oil[y][x]?'#7a4fd0':S.ore[y][x]?'#4a3c1a':(col[S.ter[y][x]]||'#0b120d')),o=(y*COLS+x)*4;D[o]=q[0];D[o+1]=q[1];D[o+2]=q[2];D[o+3]=255;}
+   tg.putImageData(id,0,0);m.imageSmoothingEnabled=false;m.drawImage(tc,0,0,MM.w,MM.h);}
 }
 // ===== 霧（未探索）と支配圏 =====
 let fogCv=null,miniFog=null;
@@ -6523,7 +6547,10 @@ function pixelLogo(){const lines=['NIGHT','DEFENSE'],P=7,GAP=1,LG=3;const px=[];
   const stars=[[1,0.5],[W0+2,9],[-1,13],[W0-3,0]].map(([a,b])=>`<rect x="${a*P}" y="${b*P}" width="${P*0.5}" height="${P*0.5}" fill="#ffe8a8" opacity=".8"/>`).join('');
   return `<svg viewBox="${-P*2} ${-P} ${(W+5)*P} ${(H+1)*P}" shape-rendering="crispEdges" class="plogo" style="width:min(460px,92%);height:auto;display:block;margin:4px auto 2px" xmlns="http://www.w3.org/2000/svg"><g fill="#3a0e08" opacity=".7">${sh}</g><g fill="#1c1210">${o}</g>${fg}${moon}${stars}</svg>`;}
 // ===== タイトル画面 =====
-function showTitle(){const sv=saveInfo();
+// 重い処理の前に読み込み画面を出す（画面が描かれてから処理する）
+function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn();return;}document.getElementById('bootMsg').textContent=msg||'読み込み中…';b.classList.remove('off');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();}finally{b.classList.add('off');}}));}
+function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.add('off');}const sv=saveInfo();
   const dt=sv?new Date(sv.date):null;const when=dt?`${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`:'';
   openOverlay('title',`<div style="text-align:center;padding:10px 6px 4px">
     ${pixelLogo()}
@@ -6538,7 +6565,7 @@ function showTitle(){const sv=saveInfo();
       <button id="tOld" style="padding:6px;font-size:12px" class="ghost">旧版（ver 0.9）で遊ぶ</button>
     </div>
     <div class="muted" style="font-size:11px;margin-top:14px">ver ${GAME_VER}　・　PC・スマホ（横持ち）で遊べます　・　進行はブラウザに自動保存されます</div></div>`);
-  const c=document.getElementById('tContinue');if(c)c.onclick=()=>{closeOverlay();if(!loadGame())toast('セーブデータを読み込めませんでした','bad');};
+  const c=document.getElementById('tContinue');if(c)c.onclick=()=>{closeOverlay();withLoading('セーブを読み込んでいます…',()=>{if(!loadGame())toast('セーブデータを読み込めませんでした','bad');});};
   document.getElementById('tNew').onclick=()=>{if(sv&&!confirmNew())return;showIntro();};
   document.getElementById('tHelp').onclick=()=>showHelp(true);
   document.getElementById('tOld').onclick=()=>{location.href='../v0.9/index.html';};
@@ -6555,7 +6582,7 @@ function showIntro(){
   <div style="display:flex;flex-direction:column;gap:8px;margin:4px 0 6px">`+MAPL.map(([id,nm,sub,col,diff,desc])=>`<button data-map="${id}" style="display:flex;gap:12px;align-items:center;text-align:left;padding:8px 10px">
     <img src="${mapIcon(id)}" width="144" height="84" style="image-rendering:pixelated;border:1px solid var(--line);flex-shrink:0" alt="">
     <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">${diff}</small><br><small style="color:var(--dim);line-height:1.6">${desc}</small></span></button>`).join('')+`</div>`,true);
-  const go=(mid)=>{closeOverlay();CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');renderAll();resizeView();};
+  const go=(mid)=>{closeOverlay();withLoading('マップを作っています…',()=>{CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');renderAll();resizeView();});};
   document.querySelectorAll('[data-map]').forEach(b=>b.onclick=()=>go(b.dataset.map));
   document.getElementById('inBack').onclick=showTitle;
   const upd=()=>document.querySelectorAll('[data-tsk]').forEach(b=>b.classList.toggle('on',(b.dataset.tsk==='1')===tasksOn()));upd();
