@@ -1513,6 +1513,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
       <button id="bLegend">地形の凡例 [L]</button>
       <button id="bFull">全画面 [Z]</button>
       <button id="bPanel" style="display:none">◀ パネル</button>
+      <button id="bDbgNight" style="display:none">テスト：夜の出来事を呼ぶ</button>
       <button id="bSave">セーブ（自動でも保存）</button>
       <button id="bTitle">タイトルへ</button>
       <button id="bHelp">遊び方</button>
@@ -3752,11 +3753,13 @@ function showNight(){phaseReset();
 // 夜中の事件（朝の報告に出る）。起きる確率は幸福度しだい。夜警が多いほど被害が小さい
 function incidentChance(){const h=S.happy;return h>=75?0.08:h>=55?0.15:h>=35?0.28:0.45;}
 function nightIncident(N){
+  if(N.forceInc)return nightIncidentOf(N.forceInc,nightGuards());
   if(N.plan==='watch'||N.plan==='fest')return null;
   if(S.mapId==='t'&&S.turn<=5)return null;   // 入門マップは最初の5日は起きない
   if(Math.random()>=incidentChance())return null;
   const g=nightGuards(),L=['fire','rat','scout'];if(S.happy<45)L.push('flee','flee');
-  const k=L[Math.floor(Math.random()*L.length)];
+  return nightIncidentOf(L[Math.floor(Math.random()*L.length)],g);}
+function nightIncidentOf(k,g){
   if(k==='fire'){const bs=S.blds.filter(b=>PROD_TYPES.includes(b.type)&&!(b.bt>0));if(!bs.length)return null;const b=bs[Math.floor(Math.random()*bs.length)];const r=g>=2?0.15:0.5;b.hp=Math.max(1,b.hp-b.maxhp*r);
     return {ic:'ev_fire',col:'#ff8a3a',n:'夜中の火事',t:g>=2?`${B[b.type].name}で火が出たが、夜警がすぐに消した（小火で済んだ）`:`${B[b.type].name}が燃えた！ 耐久 −${Math.round(r*100)}%（夜警が少なかった）`,bad:g<2};}
   if(k==='rat'){const loss=Math.min(60,Math.round(S.fuel*(g>=1?0.06:0.15)));S.fuel-=loss;
@@ -3809,6 +3812,21 @@ function morning(){
   h+=`<div style="text-align:right;margin-top:10px"><button id="mnOk" class="on">閉じる [Enter]</button></div>`;
   openOverlay('report',h,true);document.getElementById('mnOk').onclick=closeOverlay;
 }
+// 試作版だけ：夜の出来事を呼び出して試す（設定メニュー）
+function dbgNight(){
+  if(S.phase!=='night'||S.waveActive){toast('静かな夜（「夜へ」を押したあと）に使えます','warn');return;}
+  const V=[['trav','旅人の一家'],['fest','祭りの企画'],['shop','行商人'],['star','流れ星'],['moon','赤い月の予告']],I=[['fire','夜中の火事'],['rat','倉庫のネズミ'],['scout','魔物の斥候'],['flee','住民の脱走']];
+  openOverlay('help',`<h2>テスト：夜の出来事を呼ぶ</h2><div class="help">試作版だけのボタンです。訪問はすぐ夜の画面に出ます。事件は「朝へ」を押したあとの朝の報告に出ます。</div>
+    <h3>訪ねてくる出来事</h3><div class="nvops">${V.map(([k,n])=>`<button data-dv="${k}">${ui(VISIT[k].ic,VISIT[k].col,14)} ${n}</button>`).join('')}</div>
+    <h3>夜中の事件（朝に出る）</h3><div class="nvops">${I.map(([k,n])=>`<button data-di="${k}">${n}</button>`).join('')}</div>
+    <h3>今夜の過ごし方</h3><div class="nvops"><button data-df="1">今夜を祭りにする（花火）</button></div>
+    <div style="text-align:right;margin-top:10px"><button id="dbgBack">夜の画面に戻る</button></div>`,true);
+  const card=document.getElementById('ovCard');
+  card.querySelectorAll('[data-dv]').forEach(b=>b.onclick=()=>{const N=S.night||(nightStart(),S.night);N.visit=b.dataset.dv;N.done=null;N.bought=[];if(N.visit==='shop')N.shop=SHOP.map(x=>x.id).sort(()=>Math.random()-0.5).slice(0,3);se('bell');showNight();});
+  card.querySelectorAll('[data-di]').forEach(b=>b.onclick=()=>{const N=S.night||(nightStart(),S.night);N.forceInc=b.dataset.di;toast(`「朝へ」を押すと「${b.textContent}」が起きます`,'good');showNight();});
+  card.querySelector('[data-df]').onclick=()=>{const N=S.night||(nightStart(),S.night);N.plan='fest';N.fwShown=false;N.visit=null;showNight();};
+  document.getElementById('dbgBack').onclick=()=>showNight();}
+setTimeout(()=>{if(GAME_VER.includes('試作版')){const b=document.getElementById('bDbgNight');if(b){b.style.display='';b.onclick=()=>{document.getElementById('more').open=false;dbgNight();};}}},0);   // GAME_VER は後ろで決まるので、読み込み後に見る
 // 祭りの花火（画面いっぱい。タップで終わる）
 function fireworks(ms){const cv=document.createElement('canvas');cv.id='fwCv';document.body.appendChild(cv);const g=cv.getContext('2d');
   const fit=()=>{cv.width=innerWidth;cv.height=innerHeight;};fit();
