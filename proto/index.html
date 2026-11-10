@@ -688,6 +688,16 @@ button.ghost:hover:not(:disabled){box-shadow:none;color:var(--amber)}
 #intel .ec small{font-size:10px;color:#a08a86}
 #intel .ec b{font-family:var(--px-font);font-weight:400;font-size:12px}
 #intel .ec.gone{opacity:.35}
+/* 襲撃中（PC）：敵の種類は「絵＋数」の小さな札を横に並べる（名前は絵にマウスを乗せると出る）。残敵のバーは幅を決めておく */
+@media (min-width:901px){
+  body.night #intel{flex-wrap:nowrap}
+  body.night #intel .icell.remain{flex:0 0 200px}
+  body.night #intel .etypes{flex:1 1 0;min-width:0;flex-wrap:wrap;gap:4px 12px;padding:4px 0}
+  body.night #intel .ec{gap:2px}
+  body.night #intel .ec svg,body.night #intel .ec img{width:22px!important;height:22px!important}
+  body.night #intel .ec small{display:none}
+  body.night #intel .icell.isrc{flex:0 1 auto;max-width:200px}
+}
 #intel .isrc{margin-left:auto;align-items:flex-end}
 @keyframes hotBlink{0%,100%{box-shadow:var(--px-red)}50%{box-shadow:0 -2px 0 #5a221d,0 2px 0 #5a221d,-2px 0 0 #5a221d,2px 0 0 #5a221d}}
 #intel.hot{animation:hotBlink 1.6s steps(2) infinite}
@@ -6328,7 +6338,7 @@ function renderIntel(){
     const rem=S.enemies.length+S.cur.q.length-S.qi;S.cur.maxRem=Math.max(S.cur.maxRem||S.cur.q.length,rem);
     const all=S.cur.seenT=S.cur.seenT||{};for(const k in cnt)all[k]=1;for(const e of S.cur.q)all[e.type]=1;
     h=`<div class="lbl"><span>交戦</span><b>第${S.cur.n}襲撃</b></div>${tags(S.cur)}<div class="icell remain"><small>残敵</small><div class="rr"><b>${rem}</b><span> / ${S.cur.maxRem}</span></div><div class="ebar"><i style="width:${Math.round(rem/S.cur.maxRem*100)}%"></i></div></div><div class="isep"></div><div class="etypes">`;
-    for(const k of Object.keys(E))if(all[k])h+=`<span class="ec${cnt[k]?'':' gone'}" title="${E[k].desc}">${eSpr(k,30)}<span><small>${E[k].name}</small><b>×${cnt[k]||0}</b></span></span>`;
+    for(const k of Object.keys(E))if(all[k])h+=`<span class="ec${cnt[k]?'':' gone'}" title="${E[k].name}：${E[k].desc}">${eSpr(k,30)}<span><small>${E[k].name}</small><b>×${cnt[k]||0}</b></span></span>`;
     h+=`</div><div class="icell isrc"><small>襲撃元</small><span>${S.cur.sides.map(sideSrc).join('・')}</span></div>`;
   }else if(S.next){
     const w=S.next,it=intelOf(w),dg=dangerOf(w);
