@@ -1694,7 +1694,7 @@ const FAC_BASE=50,FAC_PER_LV=20,FAC_PER_OUTPOST=15;   // 施設の上限＝50＋
 function facCap(){return FAC_BASE+FAC_PER_LV*((S.baseLv||1)-1)+FAC_PER_OUTPOST*outpostReadyN();}
 function outpostCap(){return (S.baseLv||1)+1;}
 function capBlock(t){if(t==='outpost'&&outpostN()>=outpostCap())return `前哨砦は城の強化で増やせます（いま ${outpostN()}/${outpostCap()}）`;
-  if(B[t]&&B[t].isMine&&S.mines&&trapCount()>=trapCap())return `罠が上限です（${trapCount()}/${trapCap()}）。城の強化で増えます`;
+  if(B[t]&&B[t].isMine&&S.mines&&trapCount()>=trapCap())return `罠が上限です（${trapCount()}/${trapCap()}）。城の強化で増えます（城Lv1〜5：${TRAP_CAP.join('・')}）`;
   if(facCounted(t)&&facCount()>=facCap())return `施設が上限です（${facCount()}/${facCap()}）。前哨砦か城の強化で上限が増えます`;return '';}
 function baseUpCost(){const l=S.baseLv;const c={gold:250*l,stone:120*l,steel:150*l};const m={2:60,3:200,4:500}[l];if(m)c.mat=m;if(l>=2)c.iron=40*l;return c;}
 
@@ -3172,9 +3172,9 @@ function repairAll(){if(S.waveActive){se('error');toast('戦闘中は修理で�
   renderInfo(true);
 }
 function mineAt(x,y){return S.mines.find(m=>{const n=m.sz||U;return x>=m.x&&x<m.x+n&&y>=m.y&&y<m.y+n;});}
-// 罠の数の上限（施設の上限とは別。ゆるめ）：150＋50×(城Lv−1)。1×1 なので、前の2×2で数えると約4分の1の広さ
-const TRAP_BASE=150,TRAP_PER_LV=50;
-function trapCap(){return TRAP_BASE+TRAP_PER_LV*((S.baseLv||1)-1);}
+// 罠の数の上限（施設の上限とは別）：城Lv1〜5で 50・70・100・120・150
+const TRAP_CAP=[50,70,100,120,150];
+function trapCap(){return TRAP_CAP[Math.max(0,Math.min(TRAP_CAP.length-1,(S.baseLv||1)-1))];}
 function trapCount(){return (S.mines||[]).length;}
 // トゲ床の耐久：踏まれている時間（敵1体×1秒で1減る）。0で壊れ、一括修理（木材6）で直す
 const SPIKE_DUR=30,SPIKE_FIX=6,SPIKE_DPS=9;
@@ -6273,7 +6273,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(PROD_BT.includes(o.type)&&!['barracks','apart','lab'].includes(o.type)){h+=`<div class="upg"><b>生産</b> <span style="color:${o.off?'var(--red)':'var(--green)'}">${o.off?'停止中':'稼働中'}</span><div class="muted" style="font-size:11px">止めている間は産出も消費もしません（材料を使う施設の節約に）</div><button id="prodOff" style="margin-top:4px">${o.off?'生産を再開する':'生産を止める'}</button></div>`;}
   if(o.type==='hq'){const gq=S.squads.filter(q=>q.ut==='guard');h+=`<div class="upg"><b>近衛兵</b><div class="muted" style="font-size:11px">城で編成できる精鋭（部隊画面 [K]）。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内で火力2倍・被害半分</div>${gq.length?gq.map(q=>`<div class="row" style="align-items:center"><span>${unitLabel(q)} ${q.members}/${UT.guard.members}人・${q.gar?'駐屯中':'出撃中'}</span>${q.gar?`<button data-gdout="${q.id}" style="padding:2px 8px">外に出す</button>`:''}</div>`).join(''):'<div class="muted" style="font-size:11px">まだいません</div>'}</div>`;}
   if(o.type==='hq'){const c=baseUpCost();h+=`<div class="upg"><div class="row"><b>拠点レベル ${S.baseLv}/${BASE_MAX}</b><span class="muted">英雄 ${S.cmds.length}/${maxCmd()}</span></div>
-    <div class="muted" style="font-size:11px">レベルが上がると：英雄の上限 +2・領地の半径 +6マス・城館に住める人数 +10・施設の上限 +${FAC_PER_LV}・前哨砦 +1。<b style="color:var(--text)">Lv2で施設のLv2と研究ランクⅡ、Lv3で施設のLv3と研究ランクⅢ</b>が解放。城の姿も 木→石→鉄→魔核合金 と変わり、<b style="color:#c48aff">Lv5で結界</b>（襲撃のたびに城への被害を1500まで防ぐ）。Lv3以上への強化には魔核が必要</div>
+    <div class="muted" style="font-size:11px">レベルが上がると：英雄の上限 +2・領地の半径 +6マス・城館に住める人数 +10・施設の上限 +${FAC_PER_LV}・前哨砦 +1・罠の上限 ${trapCap()}→${TRAP_CAP[Math.min(TRAP_CAP.length-1,S.baseLv||1)]}。<b style="color:var(--text)">Lv2で施設のLv2と研究ランクⅡ、Lv3で施設のLv3と研究ランクⅢ</b>が解放。城の姿も 木→石→鉄→魔核合金 と変わり、<b style="color:#c48aff">Lv5で結界</b>（襲撃のたびに城への被害を1500まで防ぐ）。Lv3以上への強化には魔核が必要</div>
     ${S.baseUp?`<div class="gd" style="margin-top:4px">Lv${S.baseUp.to}に強化中…　残り${S.baseUp.left}ターン（強化中も城は普段どおり働きます）</div>`:S.baseLv<BASE_MAX?`<button id="iBaseUp" style="margin-top:4px;width:100%" ${canAfford(c)&&!S.waveActive?'':'disabled'}>拠点をLv${S.baseLv+1}に（${costText(c)}・${baseUpTurns()}ターン）</button>`:'<div class="gd">最大レベル</div>'}</div>`;}
   if(false)h+=`<div class="muted" style="margin-top:6px;font-size:11px">研究「城館防衛火器」で自衛火器を設置できます</div>`;
   if(!isS&&o.kind==='b'&&(WALL_TYPES.includes(o.type)||o.type==='gate'||o.type==='tower')&&ready(o)){const G=wallGroup(o);const dm=G.filter(damaged);const rc=dm.reduce((a,x)=>a+repairCost(x),0);
