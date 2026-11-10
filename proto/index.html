@@ -2973,8 +2973,9 @@ function repairAllCost(){let n=0,c=0;for(const b of S.blds)if(damaged(b)){n++;c+
 function repairAll(){if(S.waveActive){se('error');toast('戦闘中は修理できない（昼に修理しよう）','warn');return;}
   const list=S.blds.filter(damaged).sort((a,b)=>(b.type==='hq')-(a.type==='hq')||(gunOf(b)?1:0)-(gunOf(a)?1:0)||a.hp/a.maxhp-b.hp/b.maxhp);
   let n=0,c=0;for(const b of list){const k=repairCost(b);if(repair(b,true)){n++;c+=k;}}
-  if(n){se('upgrade');log(`一括修理：${n}棟（木材${c}）`,'good');toast(`一括修理：${n}棟（木材${c}）`,'good');}
-  else{se('error');toast(list.length?'木材が足りず、修理できません':'修理が必要な施設はありません','warn');}
+  const bc=S.blds.filter(b=>b.bt>0&&!b.upg&&b.hp<b.maxhp-0.5).length;const note=bc?`（建設中の${bc}棟は、完成すると耐久が満タンになります）`:'';
+  if(n){se('upgrade');log(`一括修理：${n}棟（木材${c}）`,'good');toast(`一括修理：${n}棟（木材${c}）${note}`,'good');}
+  else{se('error');toast(list.length?'木材が足りず、修理できません':'修理が必要な施設はありません'+note,'warn');}
   renderInfo(true);
 }
 function mineAt(x,y){return S.mines.find(m=>x>=m.x&&x<m.x+U&&y>=m.y&&y<m.y+U);}
@@ -3762,7 +3763,7 @@ function squadAI(s,dt,firing){
   if(s.mode==='return'){
     const h=nearestHangar(s);
     if(h){const hx=bcx(h),hy=bcy(h);
-      if(Math.hypot(hx-s.x,hy-s.y)<TU*(MT(s).naval?3.5:1.5)){if(s.hp>=s.maxhp-1&&s.members>=UT[s.ut].members&&(supNeed(s)<1||supAvail(SUP[s.ut])<1)){s.mode='guard';s.ax=s.x;s.ay=s.y;log(`${unitLabel(s)} 手当てと補給を終え、迎撃態勢へ`,'good');}return;}
+      if(Math.hypot(hx-s.x,hy-s.y)<TU*(MT(s).naval?3.5:1.5)){if(s.hp>=s.maxhp-1&&s.members>=UT[s.ut].members&&(supNeed(s)<1||supAvail(supT(s))<1)){s.mode='guard';s.ax=s.x;s.ay=s.y;log(`${unitLabel(s)} 手当てと補給を終え、迎撃態勢へ`,'good');}return;}
       stepTo(s,hx,hy,dt,false);return;}
     s.mode='guard';
   }
@@ -3858,7 +3859,7 @@ function update(dt,sim){
         const mh=memberHp(s)*bonus(s).hp,cap=mh*s.members;
         if(s.hp<cap)s.hp=Math.min(cap,s.hp+rep*dt);
         // 欠けた兵の補充（人員と資材が必要）
-        else if(supNeed(s)>0.01){const sp=SUP[s.ut],a=Math.min(supNeed(s),6*dt,supAvail(sp));if(a>0){supPay(sp,a,UT[s.ut].name+'（補給）');s.sup+=a;}}
+        else if(supNeed(s)>0.01){const sp=supT(s),a=Math.min(supNeed(s),6*dt,supAvail(sp));if(a>0){supPay(sp,a,UT[s.ut].name+'（補給）');s.sup+=a;}}
         if(s.hp>=cap&&s.members<UT[s.ut].members&&UT[s.ut].refill){const rc=UT[s.ut].refill;if(canAfford(rc,UT[s.ut].popEach)){for(const k in rc)useRes(UT[s.ut].name+'（補充）',k,rc[k]);S.pop-=UT[s.ut].popEach;s.members++;s.hp=Math.min(s.maxhp,s.hp+mh*0.3);log(`${unitLabel(s)} 兵を1人補充（${s.members}/${UT[s.ut].members}）`);}}
       }
     }
@@ -4228,7 +4229,10 @@ const SUP={
   guard:{key:'sword',max:60,per:0.05,name:'武具',melee:true,desc:'攻撃するたびに武具が傷む。尽きると火力半減'},
   drake:{key:'fuel',max:40,per:0.6,name:'竜の餌',melee:true,desc:'攻撃するたびに竜が消耗する。尽きると火力半減'},
 };
-function supOf(s){const sp=SUP[s.ut];if(!sp)return null;if(s.sup==null)s.sup=sp.max;return sp;}
+// 冒険者も補給が必要：剣士→武具、狩人→矢筒、魔導士→魔力（エーテル）
+const ADV_SUP={advSword:'inf',advBow:'arch',advMage:'mage'};
+function supT(s){return s.ut==='adv'?SUP[ADV_SUP[s.model]]:SUP[s.ut];}
+function supOf(s){const sp=supT(s);if(!sp)return null;if(s.sup==null)s.sup=sp.max;return sp;}
 function supNeed(s){const sp=supOf(s);return sp?Math.max(0,sp.max-s.sup):0;}
 function needsSupply(s){return supNeed(s)>0.01||refillNeed(s)>0||healNeed(s)>=1;}
 function supCost(list){const c={};for(const s of list){const sp=supOf(s);if(sp&&sp.costs&&supNeed(s)>0.01){const n=supNeed(s);for(const k in sp.costs)c[k]=(c[k]||0)+n*sp.costs[k];}const rn=refillNeed(s);if(rn){const rc=UT[s.ut].refill||{};for(const k in rc)c[k]=(c[k]||0)+rc[k]*rn;c.pop=(c.pop||0)+UT[s.ut].popEach*rn;}const hn=healNeed(s);if(hn>=1)c.fuel=(c.fuel||0)+hn/HEAL_PER_FOOD;if(!sp||sp.costs)continue;const n=supNeed(s);if(n>0.01)c[sp.key]=(c[sp.key]||0)+n*sp.per;}for(const k in c)c[k]=Math.ceil(c[k]*10)/10;return c;}
@@ -4902,7 +4906,7 @@ function drawBldV2(b,an){const r=bldSpr(b);if(!r||!r[0])return false;const [sp,a
   // 英雄の旗
   if(c){const col=SPECS[c.spec].color;ctx.fillStyle='#1c1824';ctx.fillRect(x+1,y-4,2,11);ctx.fillStyle='#e8e0c8';ctx.fillRect(x+1.5,y-4,1,10);const wv=Math.sin(an*3+b.id)>0?1:0;ctx.fillStyle=col;ctx.fillRect(x+3,y-3,6,4);ctx.fillRect(x+3+wv,y+1,5,1);}
   // 耐久・土台・要員・原料
-  if(b.hp<b.maxhp&&!building){ctx.fillStyle='#300';ctx.fillRect(x+2,y-1,S2-4,2);ctx.fillStyle=b.hp/b.maxhp>.4?'#6fe08a':'#ff5a4e';ctx.fillRect(x+2,y-1,(S2-4)*b.hp/b.maxhp,2);}
+  if(b.hp<b.maxhp-0.5&&!building){ctx.fillStyle='#300';ctx.fillRect(x+2,y-1,S2-4,2);ctx.fillStyle=b.hp/b.maxhp>.4?'#6fe08a':'#ff5a4e';ctx.fillRect(x+2,y-1,(S2-4)*b.hp/b.maxhp,2);}
   if(b.wall&&b.wall.hp<b.wall.maxhp){ctx.fillStyle='#222';ctx.fillRect(x+2,y+S2-2,S2-4,2);ctx.fillStyle='#b8c8b8';ctx.fillRect(x+2,y+S2-2,(S2-4)*b.wall.hp/b.wall.maxhp,2);}
   if((b.starved||b.noFuel||b.noAmmo)&&!building){ctx.fillStyle='#ff5a4e';ctx.font='bold 11px sans-serif';ctx.fillText('!',x+S2-4,y+8);}
   if(d.pop&&b.crew<crewNeed(b)&&!building){ctx.fillStyle=b.crew?'#f2b33d':'#ff5a4e';ctx.font='bold 8px sans-serif';ctx.fillText(b.crew+'/'+crewNeed(b),x+S2-8,y+S2-4);}
@@ -4916,7 +4920,7 @@ function drawBldV2(b,an){const r=bldSpr(b);if(!r||!r[0])return false;const [sp,a
 function drawBuilding(b,an){if(!b._bst&&!b._big&&drawBldV2(b,an))return;
   if(b.type==='bastion'){const x0=b.x*T,y0=b.y*T,S2=T*bsz(b);ctx.imageSmoothingEnabled=false;if(ICIMG.bastion)ctx.drawImage(ICIMG.bastion,x0,y0,S2,S2);ctx.imageSmoothingEnabled=true;
     if(b.bt>0&&!b.upg){ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(x0,y0,S2,S2);ctx.fillStyle='#f2b33d';ctx.font='bold 11px sans-serif';ctx.fillText(Math.ceil(b.bt/TURN_SEC-0.01)+'T',x0+S2-16,y0+S2-6);}
-    if(b.hp<b.maxhp){ctx.fillStyle='#222';ctx.fillRect(x0+3,y0+S2-4,S2-6,3);ctx.fillStyle='#b8c8b8';ctx.fillRect(x0+3,y0+S2-4,(S2-6)*b.hp/b.maxhp,3);}
+    if(b.hp<b.maxhp-0.5){ctx.fillStyle='#222';ctx.fillRect(x0+3,y0+S2-4,S2-6,3);ctx.fillStyle='#b8c8b8';ctx.fillRect(x0+3,y0+S2-4,(S2-6)*b.hp/b.maxhp,3);}
     if(S.sel===b){ctx.strokeStyle='#f2b33d';ctx.lineWidth=2;ctx.strokeRect(x0+1,y0+1,S2-2,S2-2);ctx.lineWidth=1;}return;}
   if(b.onB&&!b._bst){const x0=b.x*T,y0=b.y*T,S2=T*bsz(b);ctx.imageSmoothingEnabled=false;if(b.wall&&ICIMG.bastion)ctx.drawImage(ICIMG.bastion,x0,y0,S2,S2);else{ctx.fillStyle='#4a4640';ctx.fillRect(x0+2,y0+2,S2-4,S2-4);}ctx.imageSmoothingEnabled=true;
     const f=(newSz(b.type)>U?1:0.7)*S2/TU,ox=x0+(S2-f*TU)/2,oy=y0+(S2-f*TU)/2-(newSz(b.type)>U?0:2);b._bst=1;b._big=1;ctx.save();ctx.translate(ox,oy);ctx.scale(f,f);ctx.translate(-x0,-y0);try{drawBuilding(b,an);}finally{ctx.restore();b._bst=0;b._big=0;}
@@ -5025,7 +5029,7 @@ function drawBuilding(b,an){if(!b._bst&&!b._big&&drawBldV2(b,an))return;
   }
   if(c){const hIm=PXI['h_'+c.spec];const col=SPECS[c.spec].color;ctx.fillStyle='#1c1824';ctx.fillRect(x+1,y,2,12);ctx.fillStyle='#e8e0c8';ctx.fillRect(x+1.5,y,1,11);const w=Math.sin(an*3+b.id)>0?1:0;ctx.fillStyle=col;ctx.fillRect(x+3,y+1,6,4);ctx.fillRect(x+3+w,y+5,5,1);
     if(hIm){ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(hIm,x+TU-15,y+TU-17+(Math.sin(an*2+b.id)>0.6?-1:0),16,16);ctx.restore();}}
-  if(b.hp<b.maxhp){ctx.fillStyle='#300';ctx.fillRect(x+3,y,TU-6,3);ctx.fillStyle=b.hp/b.maxhp>.4?'#6fe08a':'#ff5a4e';ctx.fillRect(x+3,y,(TU-6)*b.hp/b.maxhp,3);}
+  if(b.hp<b.maxhp-0.5&&!(b.bt>0&&!b.upg)){ctx.fillStyle='#300';ctx.fillRect(x+3,y,TU-6,3);ctx.fillStyle=b.hp/b.maxhp>.4?'#6fe08a':'#ff5a4e';ctx.fillRect(x+3,y,(TU-6)*b.hp/b.maxhp,3);}
   if(b.wall&&!b.onB&&b.wall.hp<b.wall.maxhp){ctx.fillStyle='#222';ctx.fillRect(x+3,y+TU-3,TU-6,2);ctx.fillStyle='#b8c8b8';ctx.fillRect(x+3,y+TU-3,(TU-6)*b.wall.hp/b.wall.maxhp,2);}
   if((b.starved||b.noFuel)&&!(b.bt>0)){ctx.fillStyle='#ff5a4e';ctx.font='bold 11px sans-serif';ctx.fillText('!',x+TU-6,y+TU-8);}
   if(d.pop&&b.crew<crewNeed(b)&&!(b.bt>0&&!b.upg)){ctx.fillStyle=b.crew?'#f2b33d':'#ff5a4e';ctx.font='bold 8px sans-serif';ctx.fillText(b.crew+'/'+crewNeed(b),x+TU-8,y+TU-8);}
@@ -5796,8 +5800,8 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     const gu=B[o.type].garUt,gn=UT[gu].name;
     if(gs)h+=`<div class="upg"><b>配置中：${unitLabel(gs)}</b>（${gs.members}/${UT[gs.ut].members}人）<div class="muted" style="font-size:11px">人数が多いほど火力が上がる。部隊の英雄はここからスキルを使う</div><button id="iUngar" style="margin-top:4px">${gn}を降ろす</button></div>`;
     else{const cands=S.squads.filter(x=>x.ut===gu&&!x.gar);h+=`<div class="upg"><b style="color:var(--amber)">${gn}がいません（攻撃しません）</b><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${cands.map(x=>`<button data-gar="${x.id}">${unitLabel(x)}を配置（${x.members}人）</button>`).join('')||`<span class="muted" style="font-size:11px">配置できる${gn}がいません</span>`}</div></div>`;}}
-  if(isS&&!SUP[o.ut]&&refillNeed(o))h+=`<div style="margin-top:4px"><button onclick="supplyOne(${o.id})">欠員を補充する（${supCostText(supCost([o]))}）</button></div>`;
-  if(isS&&SUP[o.ut]){const sp=supOf(o);h+=`<div class="row"><span class="muted">補給（${sp.name}）</span><span id="iSup">${supText(o)}</span></div><div class="muted" style="font-size:11px">${sp.desc}。所属施設のそばで休むと自動で補給される</div><div style="margin-top:4px">${o.supPend?'<span style="color:var(--amber);font-size:12px">補給を受けに所属施設へ戻っています</span>':`<button onclick="supplyOne(${o.id})" ${needsSupply(o)?'':'disabled'}>補給・補充・手当て（${supCostText(supCost([o]))}）</button>`}</div><div class="muted" style="font-size:10.5px">押すと所属施設へ一度戻って補給・欠員の補充・傷の手当てを受け、元の場所へ戻る（戦闘中も可）</div>`;}
+  if(isS&&!supT(o)&&refillNeed(o))h+=`<div style="margin-top:4px"><button onclick="supplyOne(${o.id})">欠員を補充する（${supCostText(supCost([o]))}）</button></div>`;
+  if(isS&&supT(o)){const sp=supOf(o);h+=`<div class="row"><span class="muted">補給（${sp.name}）</span><span id="iSup">${supText(o)}</span></div><div class="muted" style="font-size:11px">${sp.desc}。所属施設のそばで休むと自動で補給される</div><div style="margin-top:4px">${o.supPend?'<span style="color:var(--amber);font-size:12px">補給を受けに所属施設へ戻っています</span>':`<button onclick="supplyOne(${o.id})" ${needsSupply(o)?'':'disabled'}>補給・補充・手当て（${supCostText(supCost([o]))}）</button>`}</div><div class="muted" style="font-size:10.5px">押すと所属施設へ一度戻って補給・欠員の補充・傷の手当てを受け、元の場所へ戻る（戦闘中も可）</div>`;}
   if(isS&&(o.ut==='arch'||o.ut==='mage')&&!o.gar){const tw=S.blds.filter(b=>B[b.type].garUt===o.ut&&!b.gar&&!(b.bt>0));if(tw.length){const nb=tw.sort((a,b2)=>Math.hypot(a.x*T-o.x,a.y*T-o.y)-Math.hypot(b2.x*T-o.x,b2.y*T-o.y))[0];h+=`<div style="margin-top:6px"><button data-gartower="${nb.id}">いちばん近い${B[nb.type].name}に配置する</button></div>`;}}
   if(!isS&&B[o.type].shells){const cur=o.shell||'he';
     h+=`<div class="upg"><b>砲弾</b><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${Object.entries(SHELL).map(([k,v])=>{const ok=!v.req||has(v.req);return `<button data-shell="${k}" class="${cur===k?'on':''}" ${ok?'':'disabled'} title="${ok?'':'研究で解禁'}">${icSvg(k,14)} ${v.n}</button>`;}).join('')}</div>
@@ -6122,7 +6126,7 @@ function showResearch(){
   if(st==='done')act=`<span style="color:var(--green);font-weight:bold">${ui('check','green',12)} 最大レベル（Lv${t.max||1}）・研究完了</span>`;
   else if(st==='active')act=`<span style="color:var(--cyan)">研究中 残り${r.left}ターン</span> <button data-cancel="${t.id}">中止（費用の半分を回収）</button>`;
   else if(st==='ready'){const need=techRes(t),rok=resBusy()+need<=resCap()&&S.pop>=need;const ok=canAfford(c)&&rok&&!S.waveActive;
-    act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?(S.pop<need?'待機中の住民が足りません':'研究員が足りません（研究室を増やす・改築する）'):(lackText(c)||'資源が足りません')}</span>`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
+    act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?(S.pop<need?'待機中の住民が足りません':'研究員が足りません（研究室を増やす・改築する）'):`<span style="color:var(--red)">${lackText(c)||'資源が足りません'}</span>`}</span>`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
   else if(st==='excluded')act='<span class="muted">もう一方の分岐を選んだため研究できません</span>';
   else if(st==='maplock')act='<span class="muted">このマップでは第三段階の研究はできません（2マップ目以降で解禁）</span>';
   else if(t.gate&&!(rankOpen(cat,t.gate-1)&&rankSum(cat,t.gate-1)>=gateNeed(cat,t.gate)))act=`<span class="muted">条件：${!rankOpen(cat,t.gate-1)?`<span style="color:var(--red)">${gateOf(cat,t.gate-1).name}</span>・`:''}<span style="color:${rankSum(cat,t.gate-1)>=gateNeed(cat,t.gate)?'var(--green)':'var(--red)'}">ランク${RN[t.gate-1]}の研究を合計Lv${gateNeed(cat,t.gate)}以上（今 ${rankSum(cat,t.gate-1)}）</span></span>`;
@@ -6161,7 +6165,7 @@ function showArmy(target){
   h+=`<h3 style="margin:10px 0 4px">訓練の順番待ち（${qs.length}）</h3>`;
   h+=qs.length?qs.map((q,j)=>`<div class="row" style="align-items:center"><span>${j===0?'<b style="color:var(--green)">次 </b>':''}${icSvg(q.mk,18)} ${MTC[q.mk].name}　<span class="muted" style="font-size:11px">${B[q.b.type].name}${q.i===0?`・${Math.round(q.p*100)}%`:'・待機中'}</span></span><button data-cancel="${q.b.id}:${q.i}" style="padding:2px 8px">取り消す</button></div>`).join(''):'<div class="muted">なし</div>';
   if(!target){  h+=`<h3 style="margin:10px 0 4px">全部隊（${S.squads.length}）</h3><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px"><button data-all="sel">全部隊を選択</button><button data-all="sup">一括補給（${supCostText(supCost(S.squads))}）</button>${['guard','hold','return'].map(m=>`<button data-all="${m}">全部隊：${MODE_NAME[m]}</button>`).join('')}</div>`;
-  h+=S.squads.length?S.squads.map(u=>`<div class="row" style="align-items:center"><span>${icSvg(u.model||defModel(u.ut),18)} <b>${unitLabel(u)}</b> <span class="muted" style="font-size:11px">${u.members}/${UT[u.ut].members}${UT[u.ut].unit}・体力${Math.round(u.hp/u.maxhp*100)}%${SUP[u.ut]?`・<span style="color:${u.sup/SUP[u.ut].max<0.25?'var(--red)':'inherit'}">${SUP[u.ut].name}${Math.round(supOf(u)&&u.sup/SUP[u.ut].max*100)}%</span>`:''}・${u.gar?'物見櫓':MODE_NAME[u.mode]}</span></span><span><button data-pick="${u.id}" style="padding:2px 8px">選ぶ</button></span></div>`).join(''):'<div class="muted">部隊がいません</div>';
+  h+=S.squads.length?S.squads.map(u=>`<div class="row" style="align-items:center"><span>${icSvg(u.model||defModel(u.ut),18)} <b>${unitLabel(u)}</b> <span class="muted" style="font-size:11px">${u.members}/${UT[u.ut].members}${UT[u.ut].unit}・体力${Math.round(u.hp/u.maxhp*100)}%${supT(u)?`・<span style="color:${u.sup/supT(u).max<0.25?'var(--red)':'inherit'}">${supT(u).name}${Math.round(supOf(u)&&u.sup/supT(u).max*100)}%</span>`:''}・${u.gar?'物見櫓':MODE_NAME[u.mode]}</span></span><span><button data-pick="${u.id}" style="padding:2px 8px">選ぶ</button></span></div>`).join(''):'<div class="muted">部隊がいません</div>';
   }
   let card;if(target){target.innerHTML=h;card=target;}else{card=openOverlay('army',h,true);document.getElementById('ovClose').onclick=closeOverlay;}
   card.querySelectorAll('[data-train]').forEach(b=>b.onclick=()=>{if(trainModel(b.dataset.train))se('click');showArmy(target);});
@@ -6184,7 +6188,7 @@ function showHire(target,mode){
     <button data-hire="${c.id}" style="margin-top:6px;width:100%" ${canAfford(cost,3)&&!full?'':'disabled'}>雇用（${costText(cost,3)}）</button></div>`;}
   if(!S.cands.length)h+='<div class="muted">候補者がいません。次の撃退後に補充されます</div>';
   h+=`</div>`;}
-  if(showA){h+=`<h3 style="margin:${showH?12:0}px 0 4px">冒険者ギルド</h3><div class="help">金貨で雇える即戦力。人員を使わないが、倒れた仲間は補充できず、毎ターン給金がかかる</div><div class="cands">`;
+  if(showA){h+=`<h3 style="margin:${showH?12:0}px 0 4px">冒険者ギルド</h3><div class="help">金貨で雇える即戦力。人員を使わないが、倒れた仲間は補充できず、毎ターン給金がかかる。剣士は武具、狩人は矢、魔導士はエーテルの補給が必要</div><div class="cands">`;
   for(const k of ['advSword','advBow','advMage']){const m=MTC[k];h+=`<div class="cand"><div style="display:flex;gap:6px;align-items:center">${icSvg(k==='advBow'?'archer':k==='advMage'?'wizard':'pawn',28)}<b style="color:${m.color}">${m.name}</b></div><div class="muted" style="margin:4px 0">${m.desc}</div><button data-adv="${k}" style="width:100%" ${canAfford(m.cost)&&!S.waveActive?'':'disabled'}>雇う（${costText(m.cost)}）</button></div>`;}
   h+=`</div>`;}
   if(showH){h+=`<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button id="hReroll" ${S.gold>=30&&!S.waveActive?'':'disabled'}>候補者を探し直す（${ic('gold',12)}30）</button><span class="help">夜・襲撃中は探し直せません</span></div>`;
@@ -6839,7 +6843,7 @@ function setGhost(x,y){const first=!bGhost;bGhost={x:Math.max(0,Math.min(COLS-1,
 const GHOST_Z=1.8;
 function moveGhost(dx,dy){if(!bGhost)return;bGhost.x=Math.max(0,Math.min(COLS-1,bGhost.x+dx));bGhost.y=Math.max(0,Math.min(ROWS-1,bGhost.y+dy));ghostIntoView();renderPad();}
 // 仮置きが十字キーや上の表示に隠れないよう、地図を少し動かす
-function ghostIntoView(){if(!bGhost)return;document.body.classList.add('bpad');
+function ghostIntoView(){if(!bGhost)return;if(!document.body.classList.contains('bpad'))padShownAt=performance.now();document.body.classList.add('bpad');
   const r=cv.getBoundingClientRect(),k=pxScale(),pad=document.getElementById('bpad').getBoundingClientRect(),mb=document.getElementById('modeBar').getBoundingClientRect();
   const {gx,gy,NS}=footAt((bGhost.x+.5)*T,(bGhost.y+.5)*T);
   const top=((mb.bottom||r.top)-r.top)*k+8,bot=(Math.min(pad.top||r.bottom,r.bottom)-r.top)*k-8;
@@ -6850,14 +6854,16 @@ function ghostIntoView(){if(!bGhost)return;document.body.classList.add('bpad');
 function ghostConfirm(){if(!bGhost||!S.buildMode)return;
   const why=ghostReason();if(why){se('error');toast(why,'warn');renderPad();return;}
   if(tryBuildAt((bGhost.x+.5)*T,(bGhost.y+.5)*T)){bGhost=null;renderMode();}}
-let padKey='';
-function renderPad(){const on=!!(padMode()&&S&&S.buildMode&&bGhost);document.body.classList.toggle('bpad',on);if(!on){padKey='';return;}
+let padKey='',padShownAt=0;
+function renderPad(){const on=!!(padMode()&&S&&S.buildMode&&bGhost);if(on&&!document.body.classList.contains('bpad'))padShownAt=performance.now();document.body.classList.toggle('bpad',on);if(!on){padKey='';return;}
   const why=ghostReason(),key=S.buildMode+'|'+why;if(key===padKey)return;padKey=key;
   document.getElementById('bpIc').innerHTML=icSvg(S.buildMode,20);setText(document.getElementById('bpName'),B[S.buildMode].name);
   const st=document.getElementById('bpState');st.className='bpS '+(why?'ng':'ok');setText(st,why||'ここに建てられます');
   document.getElementById('bpOk').classList.toggle('ng',!!why);}
-document.getElementById('bpOk').onclick=ghostConfirm;
-document.getElementById('bpCancel').onclick=()=>{bGhost=null;renderMode();};
+// 十字キーの欄が出た直後の押しは無視（地図をタップした指がそのまま「決定」に当たって、勝手に建つのを防ぐ）
+const padFresh=()=>performance.now()-padShownAt<450;
+document.getElementById('bpOk').onclick=()=>{if(padFresh())return;ghostConfirm();};
+document.getElementById('bpCancel').onclick=()=>{if(padFresh())return;bGhost=null;renderMode();};
 // 十字キー：押しっぱなしで連続して動く
 document.querySelectorAll('#bpad .bpX button').forEach(b=>{const [dx,dy]=b.dataset.d.split(',').map(Number);let t1=null,t2=null;
   const stop=()=>{clearTimeout(t1);clearInterval(t2);t1=t2=null;};
