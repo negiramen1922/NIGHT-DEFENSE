@@ -3680,6 +3680,8 @@ function huntParty(){return S.squads.filter(q=>q.hunt&&!q.gar);}
 function huntRatio(qs){return qs.reduce((a,q)=>a+huntPower(q),0)/huntDanger();}
 function huntMatCap(n){return 1.5+n;}   // 魔核の上限（1部隊なら今までどおり2.5倍）
 function huntPreview(qs){const r=huntRatio(qs),n=qs.length;return {n,men:qs.reduce((a,q)=>a+q.members,0),r,mat:n?Math.round((3+S.wave*1.5)*Math.max(0.3,Math.min(huntMatCap(n),r))):0,risk:r>1.6?'低い':r>0.9?'ふつう':'高い',rc:r>1.6?'var(--green)':r>0.9?'var(--amber)':'var(--red)'};}
+// 夜狩りの経験：1部隊あたり。襲撃が進むほど多い。危険な狩り（一団の戦力が足りない）ほど少し多め
+function huntXp(qs){if(!qs.length)return 0;const r=huntRatio(qs);return Math.round((6+S.wave*2)*(r<0.9?1.5:r<1.6?1.2:1));}
 function nightGuards(){return S.squads.filter(q=>!q.hunt).length;}
 // 幸福度の「気分」：何日か続く上乗せ（祭り・宴など）。happyParts に出る
 function addMood(n,v,d){S.moods=(S.moods||[]).filter(m=>m.n!==n);S.moods.push({n,v,d});S.happy=Math.max(0,Math.min(100,S.happy+v));}
@@ -3750,6 +3752,8 @@ function visitHTML(N){const v=VISIT[N.visit];if(!v)return '';
   return h+`</div>`;}
 function showNight(){phaseReset();
   if(S.phase!=='night')return;
+  // ボタンを押して描き直すとき、いちばん上に戻らないように（スクロール位置を覚えておく）
+  const keepY=S.overlay==='night'?(document.getElementById('ovCard')||{}).scrollTop||0:0;
   if(!S.night)nightStart();const N=S.night;
   const list=S.squads.filter(q=>!q.gar);
   let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} ${N.plan==='fest'?'祭りの夜':'静かな夜'}</h2></div>
@@ -3764,7 +3768,7 @@ function showNight(){phaseReset();
   // 夜狩り
   h+=`<h3 style="margin:12px 0 4px">夜狩り</h3><div class="help">参加する部隊は<b>1つの一団</b>で森へ出ます（まとめるほど安全）。残った部隊は街の<b>夜警</b>になり、夜中の事件の被害を小さくします。</div>`;
   {const pv=huntPreview(huntParty());const pct=Math.min(100,pv.r/2*100),g=nightGuards();
-   h+=`<div class="hparty"><div class="row" style="align-items:center"><span><b>今夜の狩り</b> <span class="muted" style="font-size:12px">${pv.n?`${pv.n}部隊・${pv.men}人`:'参加する部隊を選んでください'}</span></span>${pv.n?`<span>危険 <b style="color:${pv.rc}">${pv.risk}</b>　${ic('mat',12)}魔核 約${pv.mat}</span>`:''}</div>
+   h+=`<div class="hparty"><div class="row" style="align-items:center"><span><b>今夜の狩り</b> <span class="muted" style="font-size:12px">${pv.n?`${pv.n}部隊・${pv.men}人`:'参加する部隊を選んでください'}</span></span>${pv.n?`<span>危険 <b style="color:${pv.rc}">${pv.risk}</b>　${ic('mat',12)}魔核 約${pv.mat}　経験 +${huntXp(huntParty())}/部隊</span>`:''}</div>
      <div class="hmeter" title="一団の戦力（右ほど安全）"><i style="width:${pct}%;background:${pv.n?pv.rc:'transparent'}"></i><u style="left:45%"></u><u style="left:80%"></u></div>
      <div class="muted" style="font-size:10.5px;display:flex;justify-content:space-between"><span>危険</span><span>ふつう</span><span>安全</span></div>
      <div class="row" style="margin-top:4px"><span class="muted">街の夜警</span><span>${ui('eye',g?'green':'red',12)} ${g}部隊${g?'':'（だれも残っていない）'}</span></div></div>`;}
@@ -3772,7 +3776,7 @@ function showNight(){phaseReset();
   // 研究の入れ忘れ
   {const free=resCap()-resBusy();if(free>0)h+=`<div class="row nres" style="align-items:center;margin-top:10px"><span style="color:var(--amber)">${ui('research','amber',14)} 研究員が${free}人空いています</span><button id="nRes">研究を開く</button></div>`;}
   h+=`<div class="nfoot"><button id="ovClose">地図を見る</button><button id="toMorning" class="on">朝へ [Enter]</button></div>`;
-  const card=openOverlay('night',h,true);
+  const card=openOverlay('night',h,true);if(keepY)card.scrollTop=keepY;
   document.getElementById('ovClose').onclick=closeOverlay;
   document.getElementById('toMorning').onclick=()=>{closeOverlay();morning();};
   {const b=document.getElementById('nRes');if(b)b.onclick=()=>{S.resFromNight=true;showResearch();};}   // 研究を閉じたら夜の画面に戻る（closeOverlay）
@@ -3811,13 +3815,15 @@ function morning(){
   const D=huntDanger();let tot=0;const res=[];let ot=null;const pl=[];
   const party=huntParty(),P=party.reduce((a,q)=>a+huntPower(q),0),ye=party.some(q=>heroSk(q,'yome'));
   if(party.length){tot=Math.max(0,Math.round((3+S.wave*1.5)*Math.max(0.3,Math.min(huntMatCap(party.length),P/D))*(0.6+Math.random()*0.8)*(has('nighthunt')?1.5:1)*(ye?2:1)));S.mat+=tot;}
+  const hxp=huntXp(party);
   for(const q of party){
     const mat=0;
+    {const l0=vetLv(q);q.vet=(q.vet||0)+hxp;const l1=vetLv(q);if(l1>l0){q.maxhp=unitMaxHp(q);log(`${unitLabel(q)} が「${VET[l1].n}」になった（夜狩り）`,'good');}q._hl=l1>l0?VET[l1].n:null;}
     const loss=Math.min(0.9,(0.08+Math.random()*0.3)*D/(D+P)*(has('nighthunt')?0.6:1)*(ye?0.4:1));q.hp-=q.maxhp*loss;let dead=0;
     const mh=memberHp(q)*bonus(q).hp;while(q.members>1&&q.hp<mh*(q.members-1)){q.members--;dead++;S.kia++;}
     if(q.hp<1)q.hp=1;if(supOf(q))q.sup=Math.max(0,q.sup-12);
     if(dead||loss>0.25)log(`夜狩り：${unitLabel(q)}${dead?` 戦死${dead}人`:' 負傷'}`,dead?'kia':'warn');
-    res.push({q:unitLabel(q),m:MT(q).key,mat,dead,hp:Math.round(q.hp/q.maxhp*100),loss});
+    res.push({q:unitLabel(q),m:MT(q).key,mat,dead,hp:Math.round(q.hp/q.maxhp*100),loss,xp:hxp,up:q._hl,vi:vetIc(q,12)});delete q._hl;
   }
   if(party.length)log(`夜狩りの一団（${party.length}部隊）が戻った：魔核+${tot}`,'good');
   // 事件は、狩りの部隊が戻る前（夜警の数で決まる）
@@ -3839,7 +3845,7 @@ function morning(){
   if(inc)h+=`<div class="nvisit" style="--vc:${inc.col}"><div class="nvh">${ui(inc.ic,inc.col,24)}<b>${inc.n}</b></div><div class="nvt">${inc.t}</div></div>`;
   if(pl.length)h+=`<h3 style="margin:6px 0 4px">今夜の過ごし方</h3>`+pl.map(t=>`<div>${t}</div>`).join('');
   if(ot)h+=`<h3 style="margin:10px 0 4px">夜なべ</h3><div>${resTxt({steel:ot.wood,fuel:ot.food},true)}<span style="color:var(--amber)">幸福度 −${has('allnight')?15:8}</span></div>`;
-  if(res.length){h+=`<h3 style="margin:10px 0 4px">夜狩り</h3>`+res.map(r=>`<div class="row" style="align-items:center"><span>${icSvg(r.m,20)} <b>${r.q}</b></span><span>体力 ${r.hp}%${r.dead?`　<b style="color:var(--red)">戦死 ${r.dead}人</b>`:r.loss>0.25?'　<span style="color:var(--amber)">負傷</span>':'　<span style="color:var(--green)">無事</span>'}</span></div>`).join('')+`<div class="row" style="margin-top:4px"><span class="muted">合計</span><b style="color:#c08aff">魔核 +${tot}</b></div>`;}
+  if(res.length){h+=`<h3 style="margin:10px 0 4px">夜狩り</h3>`+res.map(r=>`<div class="row" style="align-items:center"><span>${icSvg(r.m,20)} <b>${r.q}</b></span><span>${r.vi}経験 +${r.xp}${r.up?` <b style="color:var(--amber)">「${r.up}」に！</b>`:''}　体力 ${r.hp}%${r.dead?`　<b style="color:var(--red)">戦死 ${r.dead}人</b>`:r.loss>0.25?'　<span style="color:var(--amber)">負傷</span>':'　<span style="color:var(--green)">無事</span>'}</span></div>`).join('')+`<div class="row" style="margin-top:4px"><span class="muted">合計</span><b style="color:#c08aff">魔核 +${tot}</b></div>`;}
   h+=`<div class="row" style="align-items:center;margin-top:8px"><span class="muted">街の機嫌</span><span style="display:inline-flex;align-items:center;gap:6px">${happyIc(24)}<b>${Math.round(S.happy)}</b> ${happyName()}</span></div>`;
   h+=`<div style="text-align:right;margin-top:10px"><button id="mnOk" class="on">閉じる [Enter]</button></div>`;
   openOverlay('report',h,true);document.getElementById('mnOk').onclick=closeOverlay;
