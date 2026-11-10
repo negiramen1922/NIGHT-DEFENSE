@@ -910,6 +910,10 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 .nplan{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:6px 8px;text-align:left;min-height:52px}
 .nplan.on{box-shadow:inset 0 0 0 2px var(--amber);background:#2a2210}.nph{display:flex;align-items:center;gap:5px}.nph b{font-weight:400}
 .npd{font-size:11px;color:var(--dim);line-height:1.4}.nplan[disabled] .npd{color:var(--off)}
+.nres2{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 6px;padding:5px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line);font-size:12px}
+.nres2 span{display:inline-flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}.nres2 b{font-weight:400}
+.vetic{display:inline-flex;align-items:center;margin-right:3px;vertical-align:middle}.vetl{display:inline-flex;align-items:center;gap:2px}.vetl b{font-weight:400;margin-left:3px}
+#info .hpbar.vet i{background:#c08aff}.vetb{display:inline-flex;align-items:center}
 .nfoot{position:sticky;bottom:-20px;z-index:2;display:flex;justify-content:flex-end;gap:8px;margin:12px -4px -20px;padding:8px 4px 20px;background:var(--panel,#121a14);box-shadow:0 -1px 0 var(--line),0 -8px 12px rgba(0,0,0,.35)}
 .nfoot button{padding:8px 16px}
 @media (max-width:900px){.nfoot{bottom:-14px;margin-bottom:-14px;padding-bottom:14px}}   /* カードの下の余白ぶん下げて、すき間から中身が見えないように */
@@ -3749,6 +3753,7 @@ function showNight(){phaseReset();
   if(!S.night)nightStart();const N=S.night;
   const list=S.squads.filter(q=>!q.gar);
   let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} ${N.plan==='fest'?'祭りの夜':'静かな夜'}</h2></div>
+  <div class="nres2">${['gold','fuel','steel','stone','iron','ammo','sword','elec','mat'].map(k=>`<span title="${RES_NAME[k]}">${ic(k,14)}<b>${Math.floor(S[k]||0)}</b></span>`).join('')}<span title="待機中の住民">${ic('pop',14)}<b>${S.pop}</b></span></div>
   <div class="row" style="align-items:center;margin:2px 0 6px"><span class="muted">街の機嫌</span><span style="display:inline-flex;align-items:center;gap:6px">${happyIc(24)}<b>${Math.round(S.happy)}</b> ${happyName()}</span></div>`;
   if(N.plan==='fest'&&!N.fwShown){N.fwShown=true;setTimeout(()=>fireworks(4500),250);}
   if(N.visit)h+=visitHTML(N);
@@ -4663,6 +4668,12 @@ function nearCastle(s){const [x,y]=castleC();return Math.hypot(s.x-x,s.y-y)<7*TU
 const VET=[{n:'新兵',xp:0},{n:'熟練',xp:30},{n:'精鋭',xp:90}];
 function vetLv(s){const v=s.vet||0;const cap=has('elite')?2:1;let l=0;for(let i=1;i<=cap;i++)if(v>=VET[i].xp)l=i;return l;}
 function vetDmg(s){return [0,0.1,0.2][vetLv(s)];}
+const VET_COL=['dim','cyan','amber'];
+function vetIc(s,sz){const l=vetLv(s);return `<span class="vetic" title="熟練度：${VET[l].n}">${ui('vet'+l,VET_COL[l],sz||12)}</span>`;}
+// 経験値バー：今の段階の区切りから次の段階まで。上限なら満タン
+function vetBar(s){const v=Math.floor(s.vet||0),l=vetLv(s),cap=has('elite')?2:1,nx=VET[l+1];
+  if(l>=cap||!nx)return {txt:l>=2?`${v}（最大）`:`${v}（上限：研究「精鋭」で解放）`,pct:100};
+  const a=VET[l].xp;return {txt:`${v} / ${nx.xp}`,pct:Math.max(0,Math.min(100,Math.round((v-a)/(nx.xp-a)*100)))};}
 function damageSquad(s,dmg){if(s.invT>0)return;if(s.shieldT>0)dmg*=0.5;if(s.yugT>0)dmg*=0.7;
   const t=MT(s);
   dmg*=(t.frail||1)*(1-bonus(s).red)*(1-(t.armor||0))*(1-(t.red||0))*(has('shieldwall')&&s.model==='heavy'?0.75:1)*(s.ut==='guard'&&nearCastle(s)?0.5:1)*(1-eqS(s,'red'))*(has('dragonscale')&&s.ut==='drake'?0.7:1)*(coBonus(s)?0.9:1)*coverAt(s.x,s.y)*(s.ut==='mech'&&has('blade')?0.85:1);
@@ -5846,6 +5857,9 @@ PXICON.ui.icons.ev_moon=["....xxxx....", "..xxxxxxxx..", ".xxx.xxxxxx.", ".xxxxx
 PXICON.ui.icons.eye=["............","............","...xxxxxx...",".xx......xx.","x...xxxx...x","x..xx..xx..x","x..xx..xx..x","x...xxxx...x",".xx......xx.","...xxxxxx...","............","............"];
 PXICON.ui.icons.disk=["xxxxxxxxxx..","x..xxxxx..x.","x..xx.xx..xx","x..xx.xx...x","x..xxxxx...x","x..........x","x.xxxxxxxx.x","x.x......x.x","x.x......x.x","x.x......x.x","x.x......x.x","xxxxxxxxxxxx"];
 PXICON.ui.icons.bed=["............","............","x...........","x.xx.xxxxxx.","x.xx.xxxxxxx","xxxxxxxxxxxx","xxxxxxxxxxxx","x..........x","x..........x","............","............","............"];
+PXICON.ui.icons.vet0=["............","............","............",".....xx.....","....xxxx....","...xx..xx...","..xx....xx..",".xx......xx.","............","............","............","............"];
+PXICON.ui.icons.vet1=["............",".....xx.....","....xxxx....","...xx..xx...","..xx....xx..",".....xx.....","....xxxx....","...xx..xx...","..xx....xx..","............","............","............"];
+PXICON.ui.icons.vet2=[".....xx.....",".....xx.....","....xxxx....","xxxxxxxxxxxx",".xxxxxxxxxx.","..xxxxxxxx..","...xxxxxx...","..xxxxxxxx..","..xxx..xxx..",".xxx....xxx.",".xx......xx.","............"];
 PXICON.ui.icons.sage=["...####.....","..######....","..#.##.#....","..######....","...####..##.",".######..##.","#######.####","#######.####","#######.####","#######..##.","#######.....","#######....."];
 PXICON.ui.icons.crown=PXICON.ui.icons.crown||["............","............",".x...x...x..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..",".xx.xxx.xx..",".xxxxxxxxx..",".xxxxxxxxx..","............","............","............"];
 PXICON.ui.icons.target=PXICON.ui.icons.target||["............","....xxxx....","..xx....xx..","..x......x..",".x...xx...x.",".x..xxxx..x.",".x..xxxx..x.",".x...xx...x.","..x......x..","..xx....xx..","....xxxx....","............"];
@@ -6010,8 +6024,9 @@ function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
     h+=`<div class="ihead"><span class="iname">${unitLabel(o)}</span>${o.coNo?`<span class="muted">第${o.coNo}中隊</span>`:''}<span class="ist">${MODE_NAME[o.mode]||''}</span><span class="ir">兵 ${o.members}/${t.members}</span></div>`;
     h+=`<div class="hpline"><span>体力</span><span id="iHp">${Math.round(r*100)}%</span></div><div class="hpbar${hc}"><i id="iHpBar" style="width:${Math.round(r*100)}%"></i></div>`;
     const sp=supOf(o);if(sp)h+=`<div class="hpline"><span>${sp.name}</span><span id="iSup">${supText(o)}</span></div><div class="hpbar sup"><i id="iSupBar" style="width:${Math.round(o.sup/sp.max*100)}%"></i></div>`;
+    {const vb=vetBar(o);h+=`<div class="hpline"><span class="vetl">${vetIc(o,12)}熟練度 <b>${VET[vetLv(o)].n}</b></span><span id="iVet">${vb.txt}</span></div><div class="hpbar vet"><i id="iVetBar" style="width:${vb.pct}%"></i></div>`;}
     h+=`<div class="cmdbtns">${['guard','hold','return'].map((m,i)=>`<button data-mode="${m}" class="${o.mode===m?'cur':''}${m==='return'?' ret':''}" title="${MODE_NAME[m]} [${'GFB'[i]}]">${MODE_NAME[m]}<kbd>${'GFB'[i]}</kbd></button>`).join('')}</div>`;
-    h+=`<div class="stats"><div><small>火力</small><b>${Math.round(unitDmg(o)/t.rate)}<span>/秒</span></b></div><div><small>射程</small><b>${(unitRange(o)*U).toFixed(1)}<span>マス${unitSplash(o)?'・範囲':''}</span></b></div><div><small>熟練度</small><b>${VET[vetLv(o)].n}</b></div></div>`;
+    h+=`<div class="stats"><div><small>火力</small><b>${Math.round(unitDmg(o)/t.rate)}<span>/秒</span></b></div><div><small>射程</small><b>${(unitRange(o)*U).toFixed(1)}<span>マス${unitSplash(o)?'・範囲':''}</span></b></div><div><small>熟練度</small><b class="vetb">${vetIc(o,12)}${VET[vetLv(o)].n}</b></div></div>`;
     return h;}
   const d=B[o.type];
   h+=`<div class="ihead"><span class="iname">${d.name}</span>${d.grp?`<span class="ilv">Lv${o.lv||1}</span>`:''}<span class="itype">${tag}</span></div>`;
@@ -6075,6 +6090,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     setText(document.getElementById('iHp'),o.kind==='s'?`${Math.round(o.hp/o.maxhp*100)}%`:`${Math.ceil(o.hp)} / ${Math.ceil(o.maxhp)}`);{const hb=document.getElementById('iHpBar');if(hb){const r=Math.max(0,o.hp/o.maxhp);hb.style.width=Math.round(r*100)+'%';hb.parentNode.className='hpbar'+(r<0.3?' low':r<0.6?' mid':'');}}
     {const sb=document.getElementById('iSupBar');const sp=o.kind==='s'&&supOf(o);if(sb&&sp)sb.style.width=Math.round(o.sup/sp.max*100)+'%';}
     const su=document.getElementById('iSup');if(su&&o.kind==='s')setText(su,supText(o));
+    if(o.kind==='s'){const ve=document.getElementById('iVet');if(ve){const vb=vetBar(o);setText(ve,vb.txt);const vbar=document.getElementById('iVetBar');if(vbar)vbar.style.width=vb.pct+'%';}}
     const br=document.getElementById('iRep');if(br){const dm=damaged(o);const c=dm?repairCost(o):0;setText(br,o.rep?'修理中…':dm?`修理（木材${c}${S.waveActive?'・数秒':''}）`:'損傷なし');const dis=!dm||S.steel<c;if(br.disabled!==dis)br.disabled=dis;}
     if(o.wall)setText(document.getElementById('iWall'),`${Math.ceil(o.wall.hp)} / ${Math.ceil(o.wall.maxhp)}`);
     if(o.kind==='b'&&B[o.type].pop)setHTML(document.getElementById('iCrew'),crewTile(o));
@@ -6101,7 +6117,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     h+=`<div class="row"><span class="muted">兵種</span><span style="color:${t.color}">${t.name}（${t.role}）</span></div><div class="desc">${t.desc}</div>`;
     h+=brkHTML('火力（1発）',dmgBaseS(o)*Math.max(0,o.members)/t.members,dmgPctS(o));
     h+=`<div class="row"><span class="muted">火力・射程</span><span>${Math.round(unitDmg(o)/t.rate)}/秒・${(unitRange(o)*U).toFixed(1)}マス${unitSplash(o)?'（範囲）':''}</span></div>`;
-    {const vl=vetLv(o),nx=VET[vl+1],cap=has('elite')?2:1;h+=`<div class="row"><span class="muted">熟練度</span><span>${VET[vl].n}${vl<cap&&nx?`　<span class="muted" style="font-size:11px">次まで ${Math.max(0,Math.ceil(nx.xp-(o.vet||0)))}</span>`:vl===1&&!has('elite')?'　<span class="muted" style="font-size:11px">（研究「精鋭」で上限解放）</span>':''}</span></div>`;
+    if(0){const vl=vetLv(o),nx=VET[vl+1],cap=has('elite')?2:1;h+=`<div class="row"><span class="muted">熟練度</span><span>${VET[vl].n}${vl<cap&&nx?`　<span class="muted" style="font-size:11px">次まで ${Math.max(0,Math.ceil(nx.xp-(o.vet||0)))}</span>`:vl===1&&!has('elite')?'　<span class="muted" style="font-size:11px">（研究「精鋭」で上限解放）</span>':''}</span></div>`;
      const rb=Math.round(squadResBonus(o)*100),hb=Math.round((bonus(o).dmg-1)*100);h+=`<div class="muted" style="font-size:11px;text-align:right">火力の内訳：研究・熟練 +${rb}%／英雄 +${hb}%${coBonus(o)?'／中隊 +15%':''}${o.buffT>0?'／鼓舞 +30%':''}${o.members<t.members?`／欠員 ×${(o.members/t.members).toFixed(1)}`:''}</div>`;}
     if(true){
       const p=partner(o);
@@ -6970,7 +6986,7 @@ function renderArmyPanel(force){if(!S)return;const sub=S.armySub||'list';
   else if(sub==='adv')showHire(el,'adv');}
 function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el)return;if((S.armySub||'list')!=='list')return;const box=el.closest('.box');if(box&&box.style.display==='none'&&!force)return;
   const sq=S.squads.filter(needsSupply);
-  const key=S.squads.map(s=>s.id+':'+Math.round(s.hp/s.maxhp*20)+':'+(supOf(s)?Math.round(s.sup/supOf(s).max*20):'')+':'+s.members+(s.gar?'g':'')+(s.mode||'')+(s.supPend?'s':'')).join()+'|'+sq.length+'|'+S.waveActive+'|'+(S.sel&&S.sel.kind==='s'?S.sel.id:'')+'|'+['sword','ammo','elec','powder','iron','fuel','pop'].map(k=>Math.floor(S[k]||0)).join(',')+'|'+S.blds.filter(b=>b.type==='ammo').map(b=>(b.mode||'a')+(b.bt>0?'b':'')).join('');if(key===armyKey&&!force)return;armyKey=key;
+  const key=S.squads.map(s=>s.id+':'+vetLv(s)+':'+Math.round(s.hp/s.maxhp*20)+':'+(supOf(s)?Math.round(s.sup/supOf(s).max*20):'')+':'+s.members+(s.gar?'g':'')+(s.mode||'')+(s.supPend?'s':'')).join()+'|'+sq.length+'|'+S.waveActive+'|'+(S.sel&&S.sel.kind==='s'?S.sel.id:'')+'|'+['sword','ammo','elec','powder','iron','fuel','pop'].map(k=>Math.floor(S[k]||0)).join(',')+'|'+S.blds.filter(b=>b.type==='ammo').map(b=>(b.mode||'a')+(b.bt>0?'b':'')).join('');if(key===armyKey&&!force)return;armyKey=key;
   let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length&&!S.waveActive?'':'disabled'}>${sq.length?`一括補給（${sq.length}部隊）<span class="supc">${supCostHTML(sq)}</span>`:'一括補給（必要なし）'}</button></div>`;
   // 武器工房：何を作っているか・切り替え（建物を探さなくても変えられるように）
   {const ws=S.blds.filter(b=>b.type==='ammo');
@@ -6979,7 +6995,7 @@ function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el
   if(!S.squads.length)h+='<div class="muted">部隊がいません。兵舎などで訓練しましょう</div>';
   else h+=`<div class="sqhd"><span>部隊 ${S.squads.length}・英雄 ${S.cmds.length}</span><span>クリックで指揮／Q で順に選択</span></div><div class="sqlist">`+S.squads.map(s=>{const r=Math.max(0,s.hp/s.maxhp),hc=cmdOf(s),ik=hc&&WICON['h_'+hc.spec]&&s.ut!=='drake'?'h_'+hc.spec:sqKey(s);
       const stt=s.gar?['配置中','gd']:s.supPend||s.eqPend?['補給へ','wn']:s.mode==='guard'?['迎撃','cy']:s.mode==='hold'?['固守','wn']:s.mode==='return'?['帰還','dm']:['待機','dm'];
-      return `<button data-sq="${s.id}" class="sqrow${S.sel===s?' cur':''}">${icSvg(ik,32)}<span class="sqm"><span class="sqn"><b>${unitLabel(s)}</b><span class="${stt[1]}">${stt[0]}</span><span class="sqc">兵 ${s.members}/${UT[s.ut].members}</span></span><span class="hpbar${r<0.3?' low':r<0.6?' mid':''}"><i style="width:${Math.round(r*100)}%"></i></span>${(()=>{const sp=supOf(s);if(!sp)return '';const q=Math.max(0,Math.min(1,s.sup/sp.max));const col={sword:'#c8d0dc',ammo:'#f2b33d',elec:'#62c6d9',powder:'#b0a090',fuel:'#e89040'}[sp.key]||'#c8d0dc';return `<span class="sbrow"><span class="supbar${q<0.25?' low':''}"><i style="width:${Math.round(q*100)}%;background:${col}"></i></span><small style="color:${q<0.25?'var(--red)':col}">${sp.name} ${Math.round(q*100)}%</small></span>`;})()}</span></button>`;}).join('')+'</div>';
+      return `<button data-sq="${s.id}" class="sqrow${S.sel===s?' cur':''}">${icSvg(ik,32)}<span class="sqm"><span class="sqn">${vetIc(s,12)}<b>${unitLabel(s)}</b><span class="${stt[1]}">${stt[0]}</span><span class="sqc">兵 ${s.members}/${UT[s.ut].members}</span></span><span class="hpbar${r<0.3?' low':r<0.6?' mid':''}"><i style="width:${Math.round(r*100)}%"></i></span>${(()=>{const sp=supOf(s);if(!sp)return '';const q=Math.max(0,Math.min(1,s.sup/sp.max));const col={sword:'#c8d0dc',ammo:'#f2b33d',elec:'#62c6d9',powder:'#b0a090',fuel:'#e89040'}[sp.key]||'#c8d0dc';return `<span class="sbrow"><span class="supbar${q<0.25?' low':''}"><i style="width:${Math.round(q*100)}%;background:${col}"></i></span><small style="color:${q<0.25?'var(--red)':col}">${sp.name} ${Math.round(q*100)}%</small></span>`;})()}</span></button>`;}).join('')+'</div>';
   el.innerHTML=h;el.querySelectorAll('[data-wsw]').forEach(b=>b.onclick=()=>{const w=S.blds.find(x=>x.id==b.dataset.wsw);if(!w)return;w.mode=w.mode==='sword'?null:'sword';se('click');renderArmyBox(true);if(S.sel===w)renderInfo(true);});
   el.querySelectorAll('[data-sq]').forEach(b=>b.onclick=()=>{const q0=S.squads.find(s=>s.id==b.dataset.sq);if(S.sel===q0){deselect();return;}S.sel=q0;S.multi=[];renderInfo(true);const q=S.sel;if(q&&!q.gar){cam.x=q.x-VW/2/cam.z;cam.y=q.y-VH/2/cam.z;clampCam();}});
   document.getElementById('abSel').onclick=()=>{S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;renderInfo(true);renderMode();};
