@@ -4,8 +4,8 @@
 // ゲーム本体の SPR（ドット絵）・E（魔物の数値）・ui/ic（アイコン）・se（効果音）を借りて使う。
 (function(){
 'use strict';
-const W=1120,H=560,DEPLOY_X=220;               // 戦場の大きさ。左の DEPLOY_X までが配置できる帯
-const CX=760,CY=280,RING=165;                    // 敵の陣の中心と、柵の輪の半径
+const W=1240,H=720;                              // 戦場の大きさ
+const CX=620,CY=360;let RING=165,NODEP=280;      // 敵の陣は戦場のまん中。RING：外側の柵の輪の半径（陣ごと）、NODEP：この半径より内側には部隊を置けない（全方向から攻められる）
 // こちらの部隊（攻め）。m：人数、hp：1人の体力、dmg：1人の1回の攻撃、rate：攻撃の間隔（秒）、rng：射程、spd：速さ、bld：建物へのダメージ倍率
 const SU={
   sword: {n:'兵士',  spr:'pawn',   m:5,hp:40, dmg:8, rate:0.8,rng:16, spd:42,bld:1,  role:'melee', d:'近くの魔物に向かい、いなければ中心へ進む'},
@@ -13,14 +13,15 @@ const SU={
   archer:{n:'弓兵',  spr:'archer', m:5,hp:24, dmg:6, rate:1.1,rng:130,spd:38,bld:0.5,role:'ranged',d:'近接の味方の後ろから撃つ。柵の向こうにも届く'},
   cav:   {n:'騎兵',  spr:'rider',  m:3,hp:70, dmg:11,rate:0.9,rng:16, spd:72,bld:0.8,role:'cav',   d:'足が速い。弓の魔物と見張り台を先に狙う'},
   eng:   {n:'工兵',  spr:'farmer', m:4,hp:34, dmg:6, rate:0.9,rng:16, spd:38,bld:5,  role:'eng',   d:'柵・建物を壊すのが得意（建物へ×5）。近くの罠を外す'},
-  ram:   {n:'破城槌',draw:'ram',   m:1,hp:900,dmg:70,rate:1.6,rng:20, spd:20,bld:1,  role:'ram',isBld:true,carry:2,d:'中心へまっすぐ進む（柵は壊して進む）。壊れるか中心に着くと兵士2部隊が出る。建物あつかい（建物に強い魔物に弱い）'},
-  cat:   {n:'移動式投石機',draw:'cat',m:1,hp:320,dmg:55,rate:3.2,rng:270,minR:60,spd:11,bld:2.5,role:'cat',isBld:true,splash:34,d:'とても遅い。遠くから見張り台・建物を壊す（まわりにも当たる）'},
+  ram:   {n:'破城槌',draw:'ram',   m:1,hp:900,dmg:70,rate:1.6,rng:20, spd:44,bld:1,  role:'ram',isBld:true,carry:2,d:'中心へまっすぐ進む（柵は壊して進む）。壊れるか中心に着くと兵士2部隊が出る。建物あつかい（建物に強い魔物に弱い）'},
+  cat:   {n:'移動式投石機',draw:'cat',m:1,hp:320,dmg:55,rate:3.2,rng:270,minR:60,spd:16,bld:2.5,role:'cat',isBld:true,splash:34,d:'とても遅い。遠くから見張り台・建物を壊す（まわりにも当たる）'},
 };
 const ORDER=['sword','shield','archer','cav','eng','ram','cat'];
 // 敵の陣（小・大）。魔物の数と、見張り台・小屋の数
 const CAMPS={
-  s:{n:'小さな駐留地',foes:{swarm:24,gobarcher:6,grappler:3,troll:1},towers:4,huts:4,traps:6},
-  l:{n:'大きな駐留地',foes:{swarm:40,charger:6,gobarcher:10,grappler:6,troll:3,spitter:3},towers:6,huts:6,traps:12},
+  // ring：外側の柵の半径、inner：内側の柵（0でなし）、cen：中心の耐久、towers：見張り台（外側・内側）
+  s:{n:'小さな駐留地',ring:135,inner:0,cen:1400,foes:{swarm:16,gobarcher:4,grappler:2},towers:[3,0],huts:3,traps:8},
+  l:{n:'大きな駐留地',ring:220,inner:115,cen:3200,foes:{swarm:50,charger:10,gobarcher:14,grappler:8,troll:4,spitter:4},towers:[6,4],huts:6,traps:20},
 };
 let G=null,cv=null,cx=null,raf=0,last=0,nid=1;
 const $=id=>document.getElementById(id);
@@ -39,7 +40,7 @@ function openSiege(){
 function renderSetup(){const root=$('siege');
   root.innerHTML=`<div class="sgSetup"><h2>攻城戦（試作）<small>駐留地を別の戦場で攻める</small></h2>
     <div class="sgRow"><b>攻める陣</b>${Object.entries(CAMPS).map(([k,c])=>`<button data-camp="${k}" class="${G.camp===k?'on':''}">${c.n}<small>${Object.entries(c.foes).map(([e,n])=>`${(typeof E!=='undefined'&&E[e]?E[e].name:e)}${n}`).join('・')}・見張り台${c.towers}</small></button>`).join('')}</div>
-    <div class="sgHelp">連れていく部隊を自由に選べます（試作なので費用なし）。左の帯に置いてから「戦闘開始」。陣の中心を壊せば勝ちです。</div>
+    <div class="sgHelp">連れていく部隊を自由に選べます（試作なので費用なし）。陣のまわり（どの方向からでも）に置いてから「戦闘開始」。陣の中心を壊せば勝ちです。</div>
     <div class="sgUnits">${ORDER.map(k=>{const d=SU[k];return `<div class="sgU"><span class="sgI">${unitIcon(k,32)}</span><span class="sgN"><b>${d.n}</b><small>${d.d}</small><small class="muted">${d.m>1?`${d.m}人・`:''}体力${d.hp*d.m}・攻撃${d.dmg*d.m}${d.rng>40?`・射程${d.rng}`:''}</small></span><span class="sgC"><button data-dec="${k}">−</button><b>${G.pool[k]}</b><button data-inc="${k}">＋</button></span></div>`;}).join('')}</div>
     <div class="sgFoot"><button id="sgBack">やめる（タイトルへ）</button><button id="sgGo" class="primary" ${ORDER.some(k=>G.pool[k]>0)?'':'disabled'}>出撃（配置へ）</button></div></div>`;
   root.querySelectorAll('[data-camp]').forEach(b=>b.onclick=()=>{G.camp=b.dataset.camp;sfx('click');renderSetup();});
@@ -55,12 +56,15 @@ function unitIcon(k,sz){const d=SU[k];if(d.draw){const c=document.createElement(
 // ---------- 戦場をつくる ----------
 function buildField(){const c=CAMPS[G.camp];G.units=[];G.foes=[];G.blds=[];G.shots=[];G.fx=[];G.traps=[];G.sel=new Set();G.t=0;G.card=ORDER.find(k=>G.pool[k]>0)||null;
   const B=(kind,x,y,r,hp,ex)=>G.blds.push(Object.assign({id:nid++,kind,x,y,r,hp,maxhp:hp,cd:Math.random()},ex||{}));
-  B('center',CX,CY,28,1800);
-  // 柵の輪（杭を並べる）。左の手前に1か所・右に1か所すき間
-  const N=Math.round(2*Math.PI*RING/14);for(let i=0;i<N;i++){const a=i/N*Math.PI*2;const deg=a*180/Math.PI;if(Math.abs(deg-180)<9||Math.abs(deg-0)<7||deg>353)continue;B('post',CX+Math.cos(a)*RING,CY+Math.sin(a)*RING,8,170);}
-  for(let i=0;i<c.towers;i++){const a=(i+0.5)/c.towers*Math.PI*2;B('tower',CX+Math.cos(a)*118,CY+Math.sin(a)*118,15,420,{rng:150,dmg:8,rate:1.1});}
-  for(let i=0;i<c.huts;i++){const a=i/c.huts*Math.PI*2+0.4;B('hut',CX+Math.cos(a)*68,CY+Math.sin(a)*68,16,260);}
-  for(let i=0;i<c.traps;i++){const a=Math.PI+(i/(c.traps-1||1)-0.5)*1.6;G.traps.push({x:CX+Math.cos(a)*(RING+28+(i%2)*16),y:CY+Math.sin(a)*(RING+28+(i%2)*16),hp:1});}
+  RING=c.ring;NODEP=RING+75;   // 陣の柵から少し離れた所から置ける
+  B('center',CX,CY,28,c.cen);
+  // 柵の輪（杭を並べる）。すき間を何か所か（外側は上下左右、内側はななめ2か所）
+  const ringPosts=(R,gaps,hp)=>{const N=Math.round(2*Math.PI*R/14);for(let i=0;i<N;i++){const a=i/N*Math.PI*2,deg=a*180/Math.PI;if(gaps.some(g=>Math.abs(((deg-g+540)%360)-180)<8))continue;B('post',CX+Math.cos(a)*R,CY+Math.sin(a)*R,8,hp);}};
+  ringPosts(RING,[0,90,180,270],170);if(c.inner)ringPosts(c.inner,[45,225],220);
+  for(let i=0;i<c.towers[0];i++){const a=(i+0.5)/c.towers[0]*Math.PI*2;B('tower',CX+Math.cos(a)*(RING-42),CY+Math.sin(a)*(RING-42),15,420,{rng:150,dmg:8,rate:1.1});}
+  for(let i=0;i<c.towers[1];i++){const a=i/c.towers[1]*Math.PI*2;B('tower',CX+Math.cos(a)*72,CY+Math.sin(a)*72,15,520,{rng:160,dmg:10,rate:1.0});}
+  for(let i=0;i<c.huts;i++){const a=i/c.huts*Math.PI*2+0.4,r=c.inner?(c.inner+RING)/2:RING*0.5;B('hut',CX+Math.cos(a)*r,CY+Math.sin(a)*r,16,260);}
+  for(let i=0;i<c.traps;i++){const a=i/c.traps*Math.PI*2+0.2,r=RING+26+(i%2)*16;G.traps.push({x:CX+Math.cos(a)*r,y:CY+Math.sin(a)*r,hp:1});}
   for(const [k,n] of Object.entries(c.foes))for(let i=0;i<n;i++){const d=E[k];const a=Math.random()*Math.PI*2,r=40+Math.random()*(RING-60);const x=CX+Math.cos(a)*r,y=CY+Math.sin(a)*r;
     G.foes.push({id:nid++,k,x,y,px:x,py:y,hp:d.hp,maxhp:d.hp,cd:Math.random(),face:-1,tg:null});}
   G.bldTotal=G.blds.filter(b=>b.kind!=='post').reduce((a,b)=>a+b.maxhp,0);
@@ -85,8 +89,11 @@ function fit(){if(!cv)return;const r=cv.getBoundingClientRect(),dpr=Math.min(2,d
 function renderCards(){const el=$('sgCards');if(!el)return;
   el.innerHTML=ORDER.filter(k=>G.pool[k]>0||G.units.some(u=>u.t===k)).map(k=>`<button data-card="${k}" class="${G.card===k?'on':''}" ${G.pool[k]?'':'disabled'}>${unitIcon(k,22)}<span>${SU[k].n}</span><b>${G.pool[k]}</b></button>`).join('')+
     (G.phase==='deploy'?`<button id="sgAll" class="ghost">残りを全部置く</button><button id="sgFight" class="primary" ${G.units.length?'':'disabled'}>戦闘開始</button>`:'');
-  el.querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>{G.card=G.card===b.dataset.card?null:b.dataset.card;sfx('click');renderCards();msg(G.card?`${SU[G.card].n}：左の帯をタップして置く`:'');});
-  const a=$('sgAll');if(a)a.onclick=()=>{let i=0;for(const k of ORDER)while(G.pool[k]>0){const n=G.units.length;spawnSquad(k,60+((n*37)%150),70+((n*83)%(H-140)));G.pool[k]--;i++;}sfx('build');renderCards();};
+  el.querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>{G.card=G.card===b.dataset.card?null:b.dataset.card;sfx('click');renderCards();msg(G.card?`${SU[G.card].n}：陣のまわりの明るい所をタップして置く`:'');});
+  const a=$('sgAll');if(a)a.onclick=()=>{// 残りの部隊を、陣のまわりの4方向に分けて置く（同じ種類はなるべく同じ方向へ）
+    const rest=[];for(const k of ORDER)for(let j=0;j<G.pool[k];j++)rest.push(k);const n=rest.length;
+    rest.forEach((k,i)=>{const side=i%4,a0=[Math.PI,-Math.PI/2,0,Math.PI/2][side]+((Math.floor(i/4)%5)-2)*0.12;let r=NODEP+30+Math.floor(i/20)*26;let x=CX+Math.cos(a0)*r*1.25,y=CY+Math.sin(a0)*r;x=Math.max(20,Math.min(W-20,x));y=Math.max(20,Math.min(H-20,y));
+      if(!canDeploy({x,y})){x=CX+Math.cos(a0)*(NODEP+40)*1.4;y=Math.max(20,Math.min(H-20,CY+Math.sin(a0)*(NODEP+40)));}spawnSquad(k,x,y);G.pool[k]--;});sfx('build');renderCards();};
   const f=$('sgFight');if(f)f.onclick=()=>{G.phase='battle';sfx('alarm');msg('戦闘開始！ 部隊は自分で動きます。部隊を選んで地図をタップすると移動、敵を押すとそこを攻撃');renderCards();};}
 function renderCmd(){const el=$('sgCmd');if(!el)return;const n=G.sel.size;
   el.innerHTML=n?`<span>${n}部隊を選択中</span><button data-cmd="auto">自動で戦う</button><button data-cmd="hold">固守</button><button data-cmd="none">選択を解除</button>`:`<button data-cmd="all">全部隊を選ぶ</button><span class="muted">ドラッグで範囲選択</span>`;
@@ -107,10 +114,11 @@ function bindInput(){let down=null;
       for(const u of G.units)if(alive(u)&&u.x>=x0&&u.x<=x1&&u.y>=y0&&u.y<=y1)G.sel.add(u.id);G.box=null;sfx('click');renderCmd();}
     else tap(p,down.shift);down=null;};
 }
+function canDeploy(p){return p.x>12&&p.y>12&&p.x<W-12&&p.y<H-12&&Math.hypot(p.x-CX,p.y-CY)>NODEP;}
 function tap(p,shift){
   // 置く
-  if(G.card&&G.phase!=='end'){if(p.x<DEPLOY_X&&p.x>10&&p.y>10&&p.y<H-10){if(G.pool[G.card]>0){spawnSquad(G.card,p.x,p.y);G.pool[G.card]--;sfx('build');if(!G.pool[G.card])G.card=ORDER.find(k=>G.pool[k]>0)||null;renderCards();}return;}
-    else{msg('部隊は左の帯（明るい所）にだけ置けます');return;}}
+  if(G.card&&G.phase!=='end'){if(canDeploy(p)){if(G.pool[G.card]>0){spawnSquad(G.card,p.x,p.y);G.pool[G.card]--;sfx('build');if(!G.pool[G.card])G.card=ORDER.find(k=>G.pool[k]>0)||null;renderCards();}return;}
+    else{msg('部隊は陣のまわりの明るい所にだけ置けます（陣に近すぎる所には置けない）');return;}}
   // 自分の部隊を押す → 選ぶ
   const u=G.units.filter(alive).sort((a,b)=>dist(a,p)-dist(b,p))[0];
   if(u&&dist(u,p)<22){if(!shift&&!G.sel.has(u.id))G.sel.clear();if(shift&&G.sel.has(u.id))G.sel.delete(u.id);else G.sel.add(u.id);sfx('click');renderCmd();return;}
@@ -162,7 +170,7 @@ function update(dt){G.t+=dt;
       if(!u.focus)u.tg=tg;}
     if(u.hold){if(tg&&dist(u,tg)<=d.rng+(tg.r||6)+6&&u.cd<=0){u.cd=d.rate;attack(u,tg,atk);}continue;}
     if(d.role==='ranged'&&!tg){// 近接の味方の後ろにつく（いなければ中心へ少し進む）
-      const fr=nearest(u,G.units,1e9,o=>o!==u&&!SU[o.t].isBld&&SU[o.t].role!=='ranged');const gx=fr?fr.x-30:Math.min(cen?cen.x-RING-60:W/2,u.x+40),gy=fr?fr.y:u.y;stepTo(u,gx,gy,d.spd,dt);continue;}
+      const fr=nearest(u,G.units,1e9,o=>o!==u&&!SU[o.t].isBld&&SU[o.t].role!=='ranged');let gx,gy;if(fr){const dx=fr.x-CX,dy=fr.y-CY,dl=Math.hypot(dx,dy)||1;gx=fr.x+dx/dl*30;gy=fr.y+dy/dl*30;}else{const dx=u.x-CX,dy=u.y-CY,dl=Math.hypot(dx,dy)||1,r=Math.max(RING+70,dl-40);gx=CX+dx/dl*r;gy=CY+dy/dl*r;}stepTo(u,gx,gy,d.spd,dt);continue;}
     if(!tg)continue;
     const reach=d.rng+(tg.r||E[tg.k]&&E[tg.k].r||6)+2,dd=dist(u,tg);
     if(d.minR&&dd<d.minR){stepTo(u,u.x-(tg.x-u.x),u.y-(tg.y-u.y),d.spd,dt);continue;}
@@ -227,10 +235,11 @@ function draw(tt){const g=cx;if(!g)return;g.setTransform(1,0,0,1,0,0);g.fillStyl
   // 地面
   g.fillStyle='#2f4a26';g.fillRect(0,0,W,H);
   if(!G.ground){const c=document.createElement('canvas');c.width=W;c.height=H;const q=c.getContext('2d');for(let i=0;i<5000;i++){q.fillStyle=['#36552c','#2a4222','#3b5a30','#283e20'][i%4];q.fillRect((i*137)%W,(i*311+(i*i)%97)%H,2,2);}
-    q.fillStyle='rgba(70,52,30,.55)';q.beginPath();q.arc(CX,CY,RING+6,0,7);q.fill();G.ground=c;}
+    q.fillStyle='rgba(70,52,30,.55)';q.beginPath();q.arc(CX,CY,RING+6,0,7);q.fill();if(CAMPS[G.camp].inner){q.fillStyle='rgba(50,36,20,.5)';q.beginPath();q.arc(CX,CY,CAMPS[G.camp].inner+4,0,7);q.fill();}G.ground=c;}
   g.drawImage(G.ground,0,0);
   // 配置の帯
-  g.fillStyle=G.phase==='deploy'||G.card?'rgba(98,198,217,.14)':'rgba(98,198,217,.05)';g.fillRect(0,0,DEPLOY_X,H);g.strokeStyle='rgba(98,198,217,.5)';g.setLineDash([6,4]);g.beginPath();g.moveTo(DEPLOY_X,0);g.lineTo(DEPLOY_X,H);g.stroke();g.setLineDash([]);
+  {const on=G.phase==='deploy'||G.card;g.save();g.beginPath();g.rect(0,0,W,H);g.arc(CX,CY,NODEP,0,Math.PI*2,true);g.fillStyle=on?'rgba(98,198,217,.14)':'rgba(98,198,217,.04)';g.fill('evenodd');g.restore();
+    g.strokeStyle=on?'rgba(98,198,217,.6)':'rgba(98,198,217,.25)';g.setLineDash([6,4]);g.beginPath();g.arc(CX,CY,NODEP,0,7);g.stroke();g.setLineDash([]);}
   // 罠
   for(const t of G.traps){if(t.hp<=0)continue;g.fillStyle='#3a3228';g.fillRect(t.x-6,t.y-6,12,12);g.fillStyle='#c8c8c0';for(let i=0;i<2;i++)for(let j=0;j<2;j++){g.beginPath();g.moveTo(t.x-4+i*6,t.y-1+j*5);g.lineTo(t.x-3+i*6,t.y-5+j*5);g.lineTo(t.x-2+i*6,t.y-1+j*5);g.fill();}}
   // 建物
