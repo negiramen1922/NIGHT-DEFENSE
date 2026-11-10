@@ -1239,7 +1239,11 @@ body.land #controls>#bSpd.fast{color:var(--amber);box-shadow:inset 0 0 0 2px var
 body.land.sheetOpen #controls>*{display:none!important}
 body.land.sheetOpen #wrap #controls>#mBack,body.land.sheetOpen #wrap #controls>#bBuild,body.land.sheetOpen #wrap #controls>#bTown,body.land.sheetOpen #wrap #controls>#bArmyTab,body.land.sheetOpen #wrap #controls>#bRes{display:flex!important}
 
-body.land.sheetOpen #wrap #controls>#mBack{grid-row:span 2;align-self:stretch;height:auto!important;min-height:0;max-height:none}
+body.land #wrap #controls{grid-template-rows:repeat(6,minmax(0,1fr))!important;grid-auto-rows:0!important}
+body.land.night #wrap #controls{grid-template-rows:repeat(7,minmax(0,1fr))!important}
+body.land.sheetOpen #wrap #controls>#mBack{grid-row:span 1;align-self:stretch;height:auto!important;min-height:0;max-height:none}
+body.land.night.sheetOpen #wrap #controls>#mBack{grid-row:span 2}
+body.land.sheetOpen #wrap #controls>#bInfoTab{order:5}
 body.land.sheetOpen #mBack{order:-1;height:auto!important;font-size:0!important;flex-direction:column!important;background:#2a2412;box-shadow:0 0 0 2px var(--amber)}
 body.land.sheetOpen #mBack::after{content:'▶\A閉じる';font-size:15px;line-height:1.5;text-align:center;white-space:pre;color:var(--amber)}
 body.land #rtabs{display:none!important}
@@ -2548,6 +2552,10 @@ function initFog(){
   const c=fogCv.getContext('2d');c.fillStyle='rgba(4,6,5,.68)';c.fillRect(0,0,COLS,ROWS);
   const m=miniFog.getContext('2d');m.fillStyle='rgba(0,0,0,.62)';m.fillRect(0,0,MM.w,MM.h);
 }
+// セーブから再開したときなど：保存してある「見た範囲」（S.seen）から霧を描き直す
+function rebuildFog(){initFog();if(!fogCv||!S.seen)return;const c=fogCv.getContext('2d'),m=miniFog.getContext('2d'),sx=MM.w/COLS,sy=MM.h/ROWS;
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(S.seen[y*COLS+x]){c.clearRect(x,y,1,1);m.clearRect(x*sx,y*sy,Math.ceil(sx),Math.ceil(sy));}
+  revealAll();}
 function isSeen(x,y){return x>=0&&y>=0&&x<COLS&&y<ROWS&&(!S.seen||S.seen[y*COLS+x]===1);}
 function reveal(cx,cy,r){
   if(!fogCv)return;r*=U;const c=fogCv.getContext('2d'),m=miniFog.getContext('2d'),sx=MM.w/COLS,sy=MM.h/ROWS;let ch=false;
@@ -3510,7 +3518,7 @@ function huntPreview(q){const D=huntDanger(),pw=huntPower(q),r=pw/D;return {mat:
 function showNight(){phaseReset();
   if(S.phase!=='night')return;
   const list=S.squads.filter(q=>!q.gar);
-  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} 静かな夜</h2><button id="ovClose">地図を見る</button></div>
+  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} 静かな夜</h2><span style="display:flex;gap:6px"><button id="toMorningTop" class="on" style="padding:6px 14px">朝へ [Enter]</button><button id="ovClose">地図を見る</button></span></div>
   <div class="help">今夜は襲撃がありません。夜は建設・生産・訓練ができない代わりに、夜にしかできないことがあります。</div>
   <h3 style="margin:10px 0 4px">夜狩り</h3><div class="help">部隊を森へ出して、はぐれ魔物を狩ります。翌朝、魔核を持ち帰りますが、負傷や戦死の危険があります。</div>`;
   h+=list.length?list.map(q=>{const pv=huntPreview(q);return `<div class="row" style="align-items:center"><span>${icSvg(q.model||defModel(q.ut),18)} <b>${unitLabel(q)}</b> <span class="muted" style="font-size:11px">${q.members}/${UT[q.ut].members}${UT[q.ut].unit}・体力${Math.round(q.hp/q.maxhp*100)}%・魔核 約${pv.mat}・危険 <span style="color:${pv.rc}">${pv.risk}</span></span></span><button data-hunt="${q.id}" class="${q.hunt?'on':''}" style="min-width:86px">${q.hunt?'出撃する '+ui('check','amber',12):'待機'}</button></div>`;}).join(''):'<div class="muted">部隊がいません（城館で農兵を集められます）</div>';
@@ -3519,6 +3527,7 @@ function showNight(){phaseReset();
   const card=openOverlay('night',h,true);
   document.getElementById('ovClose').onclick=closeOverlay;
   document.getElementById('toMorning').onclick=()=>{closeOverlay();morning();};
+  document.getElementById('toMorningTop').onclick=()=>{closeOverlay();morning();};
   const ot=document.getElementById('otTg');if(ot)ot.onclick=()=>{S.overtime=!S.overtime;showNight();};
   card.querySelectorAll('[data-hunt]').forEach(b=>b.onclick=()=>{const q=S.squads.find(x=>x.id==b.dataset.hunt);if(q){q.hunt=!q.hunt;se('click');}showNight();});
 }
@@ -6229,7 +6238,7 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   for(const c of (S.cmds||[]).concat(S.cands||[]))if(c&&c.lv>HERO_MAX){c.lv=HERO_MAX;c.xp=0;for(const k of ['atk','def','tec'])c[k]=Math.min(c[k],20);}
   S.seen=d.S.seenArr?Uint8Array.from(d.S.seenArr):new Uint8Array(COLS*ROWS).fill(1);delete S.seenArr;
   Object.assign(S,{shots:[],eshots:[],beams:[],fx:[],navShells:[],porters:[],enemies:[],multi:[],sel:null,selCmd:null,overlay:null,buildMode:null,buildPick:false,selTile:null,paused:false});
-  computeElev();renderTerrain();document.getElementById('log').innerHTML='';buildSig='';
+  computeElev();renderTerrain();rebuildFog();document.getElementById('log').innerHTML='';buildSig='';
   const hq=hqOf();if(hq){cam.z=1;cam.x=bcx(hq)-VW/2;cam.y=bcy(hq)-VH/2;clampCam();}
   log(`${MAPS[CUR_MAP]?MAPS[CUR_MAP].name:''}：セーブから再開（${S.turn}日目・第${S.wave+1}襲撃の前）`,'good');
   renderAll();resizeView();auMusicFor&&auMusicFor();return true;}
