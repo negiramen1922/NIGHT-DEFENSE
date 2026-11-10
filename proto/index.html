@@ -111,6 +111,10 @@ button.on{border-color:var(--amber);background:#2a2412;color:var(--amber)}
 #build button{text-align:left;padding:4px 6px;line-height:1.3}
 #build button small{display:block;color:var(--dim);font-size:10px}
 #info{min-height:120px}
+#infoSplit{display:none;align-items:center;gap:8px;flex-shrink:0;height:22px;margin:-3px 0;cursor:row-resize;user-select:none;touch-action:none}
+#infoSplit .grip{flex:1;height:6px;background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 9px);opacity:.9}
+#infoSplit:hover .grip,#infoSplit.drag .grip{background:repeating-linear-gradient(90deg,var(--amber) 0 6px,transparent 6px 9px)}
+#infoSplit button{padding:1px 8px;font-size:11px;cursor:pointer;flex-shrink:0}
 .row{display:flex;justify-content:space-between;margin:2px 0}
 .muted{color:var(--dim)}
 select{background:#0e1510;color:var(--text);border:1px solid var(--line);font:inherit;padding:3px;width:100%}
@@ -276,6 +280,9 @@ body.fullmap #right.open{transform:none}
   body:not(.fullmap) #right{overflow:hidden;gap:6px}
   body:not(.fullmap) #info{flex:0 1 auto;max-height:58vh;overflow-y:auto}
   body:not(.fullmap) #rtabs{flex-shrink:0;margin-bottom:0}
+  /* 詳細と下のパネルのあいだの仕切り：ドラッグで高さを変える・詳細を閉じる */
+  body.hasSel:not(.fullmap) #infoSplit{display:flex}
+  body.hasSel.infoSized:not(.fullmap) #info{flex:0 0 auto;height:var(--infoH);max-height:none}
   body:not(.fullmap) #right .box[data-rt]{flex:1 1 0;min-height:80px;overflow-y:auto}
   body:not(.fullmap) #right .box[data-rt="res"],body:not(.fullmap) #right .box[data-rt="hero"]{flex:1 1 0}
   #info .art{max-height:92px;width:auto;max-width:100%;margin:0 auto 6px}
@@ -1521,6 +1528,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
   <div id="right">
     <div id="sheetHandle"><span id="sheetSel"></span><span id="sheetLbl">▲ 詳細・建設</span></div>
     <div class="box" id="info"><h3>選択中</h3><div id="infoBody" class="muted">施設か部隊をクリック</div></div>
+    <div id="infoSplit" title="上下にドラッグして、詳細と下のパネルの高さを変える（ダブルクリックで元に戻す）"><span class="grip"></span><button id="infoClose">× 詳細を閉じる</button></div>
     <div id="rtabs"><button data-rt="info" class="tabInfo">選択中</button><button data-rt="build" class="on">建設</button><button data-rt="res">研究</button><button data-rt="army">軍事</button><button data-rt="econ">街</button></div>
     <div class="box" data-rt="econ" style="display:none"><h3>街の状況</h3><div id="econ"></div></div>
     <div class="box" data-rt="build"><h3>建設</h3><div id="facCapBox"></div><button id="bRepB" class="wide" style="width:100%;margin:0 0 8px">一括修理</button><div id="build"></div></div>
@@ -5583,6 +5591,16 @@ function popCapOf(){let c=0;for(const b of S.blds)c+=houseOf(b);return c;}
 function popTotal(){let t=S.pop;for(const b of S.blds){t+=b.crew||0;if(b.qm)for(const m of b.qm){const u=MTC[m];t+=u.popEach*u.members;}}
   for(const s of S.squads)t+=s.members*MT(s).popEach;for(const r of S.research)t+=(r.paid&&r.paid.pop)||0;return t;}
 function deselect(){S.multi=[];S.sel=null;S.selTile=null;renderInfo(true);renderMode();}
+// 詳細の高さ（PC）：仕切りをドラッグ。localStorage に覚える
+{const sp=document.getElementById('infoSplit'),rt=document.getElementById('right'),inf=document.getElementById('info');
+ const setH=h=>{if(h==null){document.body.classList.remove('infoSized');rt.style.removeProperty('--infoH');return;}const max=Math.max(120,rt.clientHeight-200);h=Math.max(90,Math.min(max,Math.round(h)));rt.style.setProperty('--infoH',h+'px');document.body.classList.add('infoSized');};
+ try{const v=+localStorage.getItem('nd_info_h');if(v)setH(v);}catch(e){}
+ document.getElementById('infoClose').onclick=e=>{e.stopPropagation();se('click');deselect();};
+ sp.addEventListener('dblclick',e=>{if(e.target.closest('button'))return;setH(null);try{localStorage.removeItem('nd_info_h');}catch(e){}});
+ sp.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;e.preventDefault();const y0=e.clientY,h0=inf.getBoundingClientRect().height;sp.classList.add('drag');sp.setPointerCapture(e.pointerId);
+   const mv=ev=>setH(h0+ev.clientY-y0);
+   const up=()=>{sp.classList.remove('drag');sp.removeEventListener('pointermove',mv);sp.removeEventListener('pointerup',up);sp.removeEventListener('pointercancel',up);try{localStorage.setItem('nd_info_h',parseInt(getComputedStyle(rt).getPropertyValue('--infoH'))||'');}catch(e){}};
+   sp.addEventListener('pointermove',mv);sp.addEventListener('pointerup',up);sp.addEventListener('pointercancel',up);});}
 function handleTap(ev,shift){
   const prevSel=S.sel,prevTile=S.selTile&&(S.selTile.x+','+S.selTile.y);
   setTimeout(()=>{const nowTile=S.selTile&&(S.selTile.x+','+S.selTile.y);if((S.sel&&S.sel!==prevSel)||(!S.sel&&S.selTile&&nowTile!==prevTile&&!(prevSel&&prevSel.kind==='s'))){openSheet();const i=document.getElementById('info');if(i)i.scrollIntoView({block:'nearest',behavior:'smooth'});}},0);
