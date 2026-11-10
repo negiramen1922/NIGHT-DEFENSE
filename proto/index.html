@@ -904,6 +904,7 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 .nvops{display:flex;flex-wrap:wrap;gap:6px}.nvops button{padding:6px 12px}
 .nshop .row{padding:3px 0;border-top:1px solid var(--line)}.nshop button{padding:3px 10px;font-size:12px}
 .cst2{display:inline-flex;gap:6px;margin-left:6px;font-size:11px}
+.use{display:inline-flex;align-items:center;gap:2px;color:var(--amber);white-space:nowrap}.use.lack{color:var(--red)}
 .nplans{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
 .nplan{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:6px 8px;text-align:left;min-height:52px}
 .nplan.on{box-shadow:inset 0 0 0 2px var(--amber);background:#2a2210}.nph{display:flex;align-items:center;gap:5px}.nph b{font-weight:400}
@@ -3700,6 +3701,8 @@ const VISIT={
     ops:[{l:'祈りを捧げる',cost:()=>churchN()?{}:{gold:20},f:()=>{addMood('祈りで心が落ち着いた',2,1);return '祈りで住民の心が落ち着いた';}},
          {l:'そのままにする',f:()=>{addMood('赤い月におびえる',-5,2);return '住民はおびえている。幸福度 −5';}}]},
 };
+// 夜の画面の「使う量」：−5 のように書き、琥珀色。足りないときだけ赤（赤は「足りない」の意味なので、ふだんの消費には使わない）
+function useText(c){return Object.keys(c).filter(k=>c[k]).map(k=>{const lack=(S[k]||0)<c[k];return `<span class="use${lack?' lack':''}" title="${RES_NAME[k]||k} ${c[k]}を使う${lack?'（足りない）':''}">${ic(k,12)}−${c[k]}</span>`;}).join('');}
 function visitCost(o){return typeof o.cost==='function'?o.cost():(o.cost||{});}
 // 行商人の品（毎回この中から3つ）
 const SHOP=[
@@ -3731,10 +3734,10 @@ function nightStart(){
 function visitHTML(N){const v=VISIT[N.visit];if(!v)return '';
   let h=`<div class="nvisit" style="--vc:${v.col}"><div class="nvh">${ui(v.ic,v.col,24)}<b>${v.name}</b></div><div class="nvt">${v.t}</div>`;
   if(v.shop){h+=`<div class="nshop">${N.shop.map(id=>{const it=SHOP.find(x=>x.id===id),got=N.bought.includes(id),w=it.ok?it.ok():'';const c={gold:it.g};
-      return `<div class="row" style="align-items:center"><span>${ui(it.ic,'amber',14)} <b>${it.n}</b> <span class="muted" style="font-size:11px">${it.d}</span></span>${got?'<span style="color:var(--green)">買った</span>':`<button data-shop="${id}" ${w||!canAfford(c)?'disabled':''} title="${w}">${costText(c)} 買う</button>`}</div>`;}).join('')}</div>`;
+      return `<div class="row" style="align-items:center"><span>${ui(it.ic,'amber',14)} <b>${it.n}</b> <span class="muted" style="font-size:11px">${it.d}</span></span>${got?'<span style="color:var(--green)">買った</span>':`<button data-shop="${id}" ${w||!canAfford(c)?'disabled':''} title="${w}">${useText(c)} 買う</button>`}</div>`;}).join('')}</div>`;
     if(N.done)h+=`<div class="nvr">${N.done}</div>`;}
   else if(N.done)h+=`<div class="nvr">${N.done}</div>`;
-  else h+=`<div class="nvops">${v.ops.map((o,i)=>{const c=visitCost(o);const ok=canAfford(c);return `<button data-vop="${i}" ${ok?'':'disabled'}>${o.l}${Object.keys(c).length?' <span class="cst2">'+costText(c)+'</span>':''}</button>`;}).join('')}</div>`;
+  else h+=`<div class="nvops">${v.ops.map((o,i)=>{const c=visitCost(o);const ok=canAfford(c);return `<button data-vop="${i}" ${ok?'':'disabled'}>${o.l}${Object.keys(c).length?' <span class="cst2">'+useText(c)+'</span>':''}</button>`;}).join('')}</div>`;
   return h+`</div>`;}
 function showNight(){phaseReset();
   if(S.phase!=='night')return;
@@ -3747,7 +3750,7 @@ function showNight(){phaseReset();
   // 今夜の過ごし方
   h+=`<h3 style="margin:10px 0 4px">今夜の過ごし方</h3>`;
   if(N.plan==='fest')h+=`<div class="nfest">${ui('ev_fest','#f2b33d',24)}<div><b>今夜は祭り！</b><div class="muted" style="font-size:12px">幸福度 +15（3日続く）${S.fireworks?'・花火で さらに +5':''}</div></div><button id="nFw">花火を見る</button></div>`;
-  else h+=`<div class="nplans">${NPLAN.map(p=>{const w=planBlock(p),on=N.plan===p.id;return `<button class="nplan${on?' on':''}" data-plan="${p.id}" ${w&&!on?'disabled':''}><span class="nph">${ui(p.ic,on?'amber':'light',14)}<b>${p.name}</b>${p.cost?`<span class="cst2">${costText(p.cost)}</span>`:''}</span><span class="npd">${w||p.d()}</span></button>`;}).join('')}</div>`;
+  else h+=`<div class="nplans">${NPLAN.map(p=>{const w=planBlock(p),on=N.plan===p.id;return `<button class="nplan${on?' on':''}" data-plan="${p.id}" ${w&&!on?'disabled':''}><span class="nph">${ui(p.ic,on?'amber':'light',14)}<b>${p.name}</b>${p.cost?`<span class="cst2">${useText(p.cost)}</span>`:''}</span><span class="npd">${w||p.d()}</span></button>`;}).join('')}</div>`;
   // 夜狩り
   h+=`<h3 style="margin:12px 0 4px">夜狩り</h3><div class="help">参加する部隊は<b>1つの一団</b>で森へ出ます（まとめるほど安全）。残った部隊は街の<b>夜警</b>になり、夜中の事件の被害を小さくします。</div>`;
   {const pv=huntPreview(huntParty());const pct=Math.min(100,pv.r/2*100),g=nightGuards();
