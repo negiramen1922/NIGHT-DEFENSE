@@ -956,6 +956,14 @@ body.land #saveMark{right:calc(var(--rail) + 8px);bottom:auto;top:44px}   /* ス
   body:not(.land) #controls>#bPause .pi{width:12px!important;height:12px!important}
 }
 #fwCv{position:fixed;inset:0;z-index:80;cursor:pointer;background:rgba(4,6,14,.45)}
+.mkt{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.mkm,.mkr{display:flex;flex-wrap:wrap;gap:4px}.mkm button{flex:1;padding:4px}.mkr button{padding:3px 8px;font-size:12px;display:inline-flex;align-items:center;gap:3px}
+.mkm button.on,.mkr button.on{box-shadow:inset 0 0 0 2px var(--amber);color:var(--amber);background:#2a2210}
+.mkrate{font-size:11px}
+.mks{display:flex;align-items:center;gap:3px}.mks input{flex:1;min-width:0;accent-color:#f2b33d;height:22px}.mks button{width:28px;padding:2px 0;font-size:14px;flex-shrink:0}
+.mksum{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}
+.mksum span{display:inline-flex;align-items:center;gap:3px}.mksum b{font-family:var(--px-font);font-weight:400;font-size:16px}
+.mkout b{color:var(--amber)}.mkin b{color:var(--green)}.mkarr{color:var(--dim)}.mksum small{flex-basis:100%;font-size:10.5px}
 .wsum{margin:0 0 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}.wchips{display:flex;flex-wrap:wrap;gap:4px;margin:5px 0 3px}.wchips button{padding:3px 8px;font-size:12px;display:inline-flex;align-items:center;gap:4px}.wchips small{color:var(--dim)}
 .hparty{margin:6px 0 8px;padding:6px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line)}
 .hmeter{position:relative;height:8px;background:#22303a;margin:6px 0 2px}.hmeter i{display:block;height:100%}.hmeter u{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--dim)}
@@ -3146,13 +3154,19 @@ function placeWallLine(a,b){const t=S.buildMode;if(!t)return;let n=0,miss=0;
 function wallGroup(b0){const K=o=>WALL_TYPES.includes(o.type)||o.type==='gate'||o.type==='tower';if(!K(b0))return[b0];
   const seen=new Set([b0]),q=[b0];while(q.length){const b=q.pop();const n=bsz(b);for(let y=b.y-1;y<=b.y+n;y++)for(let x=b.x-1;x<=b.x+n;x++){const o=S.grid[y]&&S.grid[y][x];if(o&&!seen.has(o)&&K(o)){seen.add(o);q.push(o);}}}
   return [...seen];}
-function repairAllCost(){let n=0,c=0;for(const b of S.blds)if(damaged(b)){n++;c+=repairCost(b);}return{n,c};}
+// 埋まった落とし穴（1つ木材8で掘り直す）。一括修理にも入れる
+const PIT_DIG=8;
+function pitsToDig(){return (S.mines||[]).filter(m=>m.kind==='pit'&&!m.armed);}
+function digPits(){let n=0;for(const m of pitsToDig()){if(S.steel<PIT_DIG)break;S.steel-=PIT_DIG;m.armed=true;m.used=false;m.uses=null;n++;}return n;}
+function repWhat(r){const b=r.n-(r.pits||0);return (b?`${b}棟`:'')+(r.pits?`${b?'・':''}穴${r.pits}`:'');}   // 「3棟・穴2」
+function repairAllCost(){let n=0,c=0;for(const b of S.blds)if(damaged(b)){n++;c+=repairCost(b);}const p=pitsToDig().length;return{n:n+p,c:c+p*PIT_DIG,pits:p};}
 function repairAll(){if(S.waveActive){se('error');toast('戦闘中は修理できない（昼に修理しよう）','warn');return;}
   const list=S.blds.filter(damaged).sort((a,b)=>(b.type==='hq')-(a.type==='hq')||(gunOf(b)?1:0)-(gunOf(a)?1:0)||a.hp/a.maxhp-b.hp/b.maxhp);
   let n=0,c=0;for(const b of list){const k=repairCost(b);if(repair(b,true)){n++;c+=k;}}
+  const pn0=pitsToDig().length,pn=digPits();c+=pn*PIT_DIG;const pt=pn?`・落とし穴${pn}個`:'';
   const bc=S.blds.filter(b=>b.bt>0&&!b.upg&&b.hp<b.maxhp-0.5).length;const note=bc?`（建設中の${bc}棟は、完成すると耐久が満タンになります）`:'';
-  if(n){se('upgrade');log(`一括修理：${n}棟（木材${c}）`,'good');toast(`一括修理：${n}棟（木材${c}）${note}`,'good');}
-  else{se('error');toast(list.length?'木材が足りず、修理できません':'修理が必要な施設はありません'+note,'warn');}
+  if(n||pn){se('upgrade');log(`一括修理：${n}棟${pt}（木材${c}）`,'good');toast(`一括修理：${n}棟${pt}（木材${c}）${note}`,'good');}
+  else{se('error');toast(list.length||pn0?'木材が足りず、修理できません':'修理が必要な施設はありません'+note,'warn');}
   renderInfo(true);
 }
 function mineAt(x,y){return S.mines.find(m=>x>=m.x&&x<m.x+U&&y>=m.y&&y<m.y+U);}
@@ -3899,7 +3913,7 @@ function fireworks(ms){const cv=document.createElement('canvas');cv.id='fwCv';do
     for(let i=P.length-1;i>=0;i--){const q=P[i];q.vy+=90*dt;q.vx*=0.985;q.x+=q.vx*dt;q.y+=q.vy*dt;q.l-=dt*0.7;if(q.l<=0){P.splice(i,1);continue;}g.fillStyle=q.c;g.globalAlpha=q.l*0.35;g.fillRect(Math.round((q.x-q.vx*0.05)/3)*3,Math.round((q.y-q.vy*0.05)/3)*3,3,3);g.globalAlpha=q.l;g.fillRect(Math.round(q.x/3)*3,Math.round(q.y/3)*3,3,3);}
     g.globalAlpha=1;if(el>ms&&!P.length&&!R.length){end();return;}requestAnimationFrame(loop);})(t0);}
 function doEndTurn(){
-  {let n=0;for(const m of S.mines)if(m.kind==='pit'){if(!m.armed&&S.steel>=8){S.steel-=8;m.armed=true;m.used=false;n++;}if(m.armed)m.uses=null;}if(n)log(`落とし穴 ${n}個を掘り直した（木材−${n*8}）`);}
+  {const n=digPits();for(const m of S.mines)if(m.kind==='pit'&&m.armed)m.uses=null;if(n)log(`落とし穴 ${n}個を掘り直した（木材−${n*PIT_DIG}）`);}
   if(!S.waveActive&&S.recentLoss)S.recentLoss=Math.max(0,S.recentLoss-1);
   if(S.waveActive||S.over)return;
   if(S.turnsLeft===1&&!S.skipConfirm){
@@ -3948,7 +3962,7 @@ function turnReport(t0,ev){
   if(!S.research.length)warn.push(`研究員が${resCap()}人空いています`);
   if(S.powerRatio<1)warn.push('電力不足で生産が落ちています');
   if(popTotal()>=S.popCap)warn.push('住居が満員です。住居を増やすか改修してください');
-  const rc=repairAllCost();if(rc.n)warn.push(`損傷した施設 ${rc.n}棟（一括修理 木材${rc.c}）`);
+  const rc=repairAllCost();if(rc.n)warn.push(`損傷した施設・埋まった落とし穴 ${repWhat(rc)}（一括修理 木材${rc.c}）`);
   if(S.shortCrew)warn.push(`人員不足で ${S.shortCrew}名 の欠員があります`);
   if(S.ammo<60)warn.push('矢が少なくなっています');
   const idle=S.cmds.filter(c=>!c.assign).length;if(idle)warn.push(`待機中の英雄 ${idle}名`);
@@ -4337,6 +4351,7 @@ function update(dt,sim){
       S.steel+=rew;
       S.next=genWave(S.wave+1);genCands();
       log(`昼・準備に移行（補給 木材+${rew}）。第${S.wave+1}襲撃まで ${NEXT_PREP}ターン。雇用候補が更新されました`,'warn');
+      const pitN=digPits();for(const m of S.mines)if(m.kind==='pit'&&m.armed)m.uses=null;if(pitN)log(`落とし穴 ${pitN}個を掘り直した（木材−${pitN*PIT_DIG}）`);   // 襲撃が終わったらすぐ掘り直す（前はターン終わりまで埋まったままだった）
       const lostC=S.fallen.slice(ws.fallen||0);
       const newSide=S.next.sides.find(sd=>!S.cur.sides.includes(sd));
       S.recentLoss=(S.bldLost-(ws.bld||0))+Math.round((S.kia-(ws.kia||0))/3);
@@ -4346,7 +4361,7 @@ function update(dt,sim){
       showReport(`第${S.wave}襲撃（${S.turn}日目） 戦闘報告`,statGrid([['撃破',S.waveKills,'var(--green)'],['戦死',S.kia-(ws.kia||0),S.kia-(ws.kia||0)?'var(--red)':''],['施設損失',S.bldLost-(ws.bld||0),S.bldLost-(ws.bld||0)?'var(--amber)':''],['魔核','+'+(S.mat-(ws.mat||0)),'var(--mat)']])+`<div class="rsup">補給 ${resTxt({steel:rew})}</div>`
         +lostC.map(c=>`<div class="bd">✝ ${cmdName(c)}（${c.spec}）${c.cause}</div>`).join('')
         +(newSide&&lvl('scout')>=1?`<div class="wn">⚠ 偵察より：次の夜から新たに${sideName(newSide)}からの襲撃が予測されます</div>`:newSide?`<div class="wn">⚠ 敵の動きに変化あり。襲撃方面が増える可能性があります</div>`:'')
-        +wledHTML()+relief+`<div>昼・準備に移行。第${S.wave+1}襲撃まで <b>${NEXT_PREP}</b> ターン。雇用候補が更新されました</div>`);
+        +wledHTML()+relief+(pitN?`<div>落とし穴 ${pitN}個を掘り直した（木材−${pitN*PIT_DIG}）</div>`:pitsToDig().length?`<div class="wn">落とし穴 ${pitsToDig().length}個が埋まったまま（木材が足りない）</div>`:'')+`<div>昼・準備に移行。第${S.wave+1}襲撃まで <b>${NEXT_PREP}</b> ターン。雇用候補が更新されました</div>`);
       renderAll();setTimeout(()=>saveGame(true),0);
     }
   }
@@ -6017,13 +6032,38 @@ function heroFx(o,cid){// その英雄を配属した時の効果（一時的に
   return L.filter(x=>x[1]);}
 function fxHTML(L,base){return L.map(([k,v])=>{const b0=base&&base.find(x=>x[0]===k);const d=b0?v-b0[1]:null;return `<span class="hfx">${k}<b class="${v<0&&k!=='被害'?'bd':'gd'}">${v>0?'+':''}${v}%</b>${d!=null&&d!==0?`<i class="${d>0===(k!=='被害')?'up':'dn'}">${d>0?'▲':'▼'}${Math.abs(d)}</i>`:''}</span>`;}).join('');}
 function hcdText(c){const k=heroSkills(c).find(q=>q.cd);if(!k)return '';const left=(c.cdk&&c.cdk[k.id])||0;if(c.fired&&nowS()-c.fired<1.2)return '発動！';return left>0.05?`あと${Math.ceil(left)}秒`:'準備完了';}
+// 交易の品と値段（1つあたり）。売る：資材→銀貨（買う値の1/4）、魔核→金貨。買う：銀貨→資材
+function mktItems(md){const L=TRADE.map(([k,bp])=>({k,rate:md==='sell'?bp*0.25:bp,pay:'silver'}));if(md==='sell')L.push({k:'mat',rate:matPrice(),pay:'gold'});return L;}
+function mktMax(md,it){if(md==='sell')return Math.max(0,Math.floor(S[it.k]||0));return Math.max(0,Math.min(buyLeft(it.k),Math.floor((S.silver||0)/it.rate)));}
+function mktVal(md,it,n){return md==='sell'?Math.floor(n*it.rate):Math.ceil(n*it.rate);}
+function fmtRate(r){return Number.isInteger(r)?String(r):r.toFixed(r<1?3:2).replace(/0+$/,'').replace(/\.$/,'');}
+function mktSum(md,it,n){const v=mktVal(md,it,n);
+  if(md==='sell')return `<span class="mkout">${ic(it.k,16)}${RES_NAME[it.k]} <b>−${n}</b></span><span class="mkarr">→</span><span class="mkin">${ic(it.pay,16)}${RES_NAME[it.pay]} <b>+${v}</b></span><small class="muted">${RES_NAME[it.k]} ${Math.floor(S[it.k]||0)}→${Math.floor(S[it.k]||0)-n}　${RES_NAME[it.pay]} ${Math.floor(S[it.pay]||0)}→${Math.floor(S[it.pay]||0)+v}</small>`;
+  return `<span class="mkout">${ic('silver',16)}銀貨 <b>−${v}</b></span><span class="mkarr">→</span><span class="mkin">${ic(it.k,16)}${RES_NAME[it.k]} <b>+${n}</b></span><small class="muted">銀貨 ${Math.floor(S.silver||0)}→${Math.floor(S.silver||0)-v}　${RES_NAME[it.k]} ${Math.floor(S[it.k]||0)}→${Math.floor(S[it.k]||0)+n}</small>`;}
+function bindMarket(el){const md=S.mktMode||'sell',it=mktItems(md).find(x=>x.k===S.mktRes);if(!it)return;const rg=el.querySelector('#mkN');if(!rg)return;
+  const upd=()=>{const n=+rg.value;S.mktN=n;const sm=el.querySelector('#mkSum');if(sm)sm.innerHTML=mktSum(md,it,n);const go=el.querySelector('#mkGo');if(go)go.disabled=n<=0;};
+  rg.oninput=upd;
+  el.querySelectorAll('[data-mka]').forEach(b=>b.onclick=()=>{rg.value=Math.max(0,Math.min(+rg.max,+rg.value+(+b.dataset.mka)));se('click');upd();});
+  el.querySelectorAll('[data-mkm]').forEach(b=>b.onclick=()=>{S.mktMode=b.dataset.mkm;S.mktN=0;se('click');renderInfo(true);});
+  el.querySelectorAll('[data-mkr]').forEach(b=>b.onclick=()=>{S.mktRes=b.dataset.mkr;S.mktN=0;se('click');renderInfo(true);});
+  el.querySelector('#mkGo').onclick=()=>{const n=Math.min(+rg.value,mktMax(md,it));if(n<=0)return;const v=mktVal(md,it,n);
+    if(md==='sell'){S[it.k]-=n;S[it.pay]=(S[it.pay]||0)+v;log(`交易：${RES_NAME[it.k]}${n}を売った（${RES_NAME[it.pay]}+${v}）`,'good');}
+    else{if((S.silver||0)<v)return;S.silver-=v;S.buyToday=S.buyToday||{};S.buyToday[it.k]=(S.buyToday[it.k]||0)+n;S[it.k]+=n;log(`交易：${RES_NAME[it.k]}${n}を買った（銀貨−${v}）`,'good');}
+    S.tradeN=(S.tradeN||0)+1;S.mktN=0;se('upgrade');renderInfo(true);renderTop&&renderTop();};}
 function marketHTML(o){let h='';
   {const n=econ().net,hi=S.mktHiT&&nowS()-S.mktHiT<120?(S.mktHi||[]):[];
     h+=`<div class="upg"><b>買い物の目安</b><span class="muted" style="font-size:11px">　在庫・1日の増減</span>`+TRADE.map(([k])=>{const d=n[k]||0,v=Math.floor(S[k]||0),days=d<-0.5?Math.floor(v/-d):null;
       const st=hi.includes(k)?'<b style="color:var(--red)">足りない</b>':days!=null&&days<=3?`<span style="color:var(--amber)">あと${days}日で尽きる</span>`:d<-0.5?`<span class="muted">${days}日分</span>`:d>0.5?'<span style="color:var(--green)">増えている</span>':'<span class="muted">変わらない</span>';
       return `<div class="row mkrow${hi.includes(k)?' hi':''}" style="align-items:center"><span>${ic(k,12)} ${RES_NAME[k]} <b>${v}</b> <span class="muted" style="font-size:11px">${Math.abs(d)<0.5?'±0':(d>0?'+':'−')+Math.round(Math.abs(d))}/日</span></span><span style="font-size:11px">${st}</span></div>`;}).join('')+`</div>`;}
-  {const tc=Math.floor(S.silver||0);h+=`<div class="upg"><b>交易</b> <span class="muted" style="font-size:11px">20ずつ売り買い・1日に各${buyLimit()}まで買える</span><div style="font-size:11.5px;margin:2px 0 4px">${ic('silver',12)} 銀貨 <b style="color:#dde4ec">${tc}</b> <span class="muted" style="font-size:10.5px">（資材を売ると銀貨が入り、資材は銀貨で買う。金貨では買えない）</span></div>`+TRADE.map(([k,bp])=>{const g=Math.round(bp*20),left=buyLeft(k);return `<div class="row" style="align-items:center"><span>${ic(k,12)} ${RES_NAME[k]} <span class="muted" style="font-size:11px">買 ${ic('silver',10)}${g}／売 ${ic('silver',10)}${Math.round(bp*20*0.25)}・今日あと${left}</span></span><span><button data-buy="${k}" style="padding:1px 8px" ${tc>=g&&left>=20?'':'disabled'}>買う</button> <button data-sellr="${k}" style="padding:1px 8px" ${S[k]>=20?'':'disabled'}>売る</button></span></div>`;}).join('')+`</div>`;}
-  {const pr=matPrice();h+=`<div class="upg"><b>魔核の買い取り</b>　<span class="muted">1つ ${ic('gold',12)}${pr}</span><div style="display:flex;gap:4px;margin-top:4px"><button data-sell="10" ${S.mat>=10?'':'disabled'}>10個売る（+${10*pr}）</button><button data-sell="all" ${S.mat>=1?'':'disabled'}>全部売る（${Math.floor(S.mat)}個 → +${Math.floor(S.mat)*pr}）</button></div><div class="muted" style="font-size:11px;margin-top:3px">市場が2棟以上あると高く売れる。研究に使う分は残しておこう</div></div>`;}
+  // 交易：売る／買うを選び、品物を選び、つまみ（と矢印）で量を決める。使う量・手に入る量を大きく出す
+  {const md=S.mktMode||'sell',L=mktItems(md);if(!L.some(x=>x.k===S.mktRes))S.mktRes=L[0].k;const it=L.find(x=>x.k===S.mktRes),mx=mktMax(md,it);const n=Math.max(0,Math.min(mx,S.mktN||0));S.mktN=n;
+   h+=`<div class="upg"><b>交易</b><span class="muted" style="font-size:11px">資材は銀貨で売り買い・魔核は金貨で売る・1日に各${buyLimit()}まで買える</span>
+     <div class="mkt"><div class="mkm"><button data-mkm="sell" class="${md==='sell'?'on':''}">売る</button><button data-mkm="buy" class="${md==='buy'?'on':''}">買う</button></div>
+     <div class="mkr">${L.map(x=>`<button data-mkr="${x.k}" class="${x.k===it.k?'on':''}">${ic(x.k,14)}${RES_NAME[x.k]}</button>`).join('')}</div>
+     <div class="mkrate muted">${md==='sell'?`${RES_NAME[it.k]} 1つ → ${ic(it.pay,10)}${RES_NAME[it.pay]} ${fmtRate(it.rate)}`:`${RES_NAME[it.k]} 1つ ← ${ic('silver',10)}銀貨 ${fmtRate(it.rate)}`}${md==='buy'?`　今日あと ${buyLeft(it.k)}`:''}</div>
+     <div class="mks"><button data-mka="-10" title="−10">«</button><button data-mka="-1" title="−1">‹</button><input type="range" id="mkN" min="0" max="${mx}" step="1" value="${n}" ${mx?'':'disabled'}><button data-mka="1" title="+1">›</button><button data-mka="10" title="+10">»</button></div>
+     <div class="mksum" id="mkSum">${mktSum(md,it,n)}</div>
+     <button id="mkGo" class="primary wide" ${n>0?'':'disabled'}>${md==='sell'?'売る':'買う'}</button></div></div>`;}
   return h;}
 function heroBlock(o){const c=cmdOf(o),isS=o.kind==='s',want=specOfTarget(o);const cur=c?heroFx(o,c.id):null;
   let h=`<div class="hsec"><div class="hhd"><span>配属英雄</span><small>向いている：${want}</small></div>`;
@@ -6232,6 +6272,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(sel)sel.onchange=()=>{const v=sel.value;if(v)assign(S.cmds.find(x=>x.id===v),o);else if(c){assign(c,null);o.cmd=null;}renderInfo(true);renderCmds(true);};
   el.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>setMode(o,b.dataset.mode));
   {const bu=document.getElementById('iBaseUp');if(bu)bu.onclick=()=>{const c=baseUpCost();if(!canAfford(c)||S.waveActive||S.baseUp||S.baseLv>=BASE_MAX)return;for(const k in c)S[k]-=c[k];const n=baseUpTurns();S.baseUp={to:S.baseLv+1,left:n};se('upgrade');log(`城の強化を開始（Lv${S.baseUp.to}・${n}ターン）`);renderInfo(true);};}
+  if(o.type==='market')bindMarket(el);
   el.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const k=b.dataset.buy,bp=TRADE.find(x=>x[0]===k)[1],g=Math.round(bp*20);if((S.silver||0)<g||buyLeft(k)<20)return;S.silver-=g;S.buyToday=S.buyToday||{};S.buyToday[k]=(S.buyToday[k]||0)+20;S[k]+=20;se('click');S.tradeN=(S.tradeN||0)+1;log(`交易：${RES_NAME[k]}20を銀貨${g}で買った`);renderInfo(true);});
   el.querySelectorAll('[data-sellr]').forEach(b=>b.onclick=()=>{const k=b.dataset.sellr,bp=TRADE.find(x=>x[0]===k)[1],g=Math.round(bp*20*0.25);if(S[k]<20)return;S[k]-=20;S.silver=(S.silver||0)+g;se('click');S.tradeN=(S.tradeN||0)+1;log(`交易：${RES_NAME[k]}20を銀貨${g}で売った`);renderInfo(true);});
   el.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{const n=b.dataset.sell==='all'?Math.floor(S.mat):Math.min(10,Math.floor(S.mat));if(n<=0)return;const g=n*matPrice();S.mat-=n;S.gold+=g;se('click');S.tradeN=(S.tradeN||0)+1;log(`魔核${n}個を売った（金貨+${g}）`,'good');renderInfo(true);});
@@ -6413,9 +6454,9 @@ function renderTop(){
   bn.classList.toggle('last',!S.waveActive&&S.phase!=='night'&&S.turnsLeft===1);renderPauseUI();
   {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,sq.length?`一括補給 <span class="supc">${supCostHTML(sq)}</span><kbd>N</kbd>`:'一括補給');
   {const ms=document.getElementById('mSup');if(ms)setHTML(ms,sq.length?`一括補給（${sq.length}部隊）<span class="supc">${supCostHTML(sq)}</span>`:'一括補給（必要なし）');}const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
-  const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${ra2.n}棟（${ic('steel',12)}${ra2.c}）<kbd>X</kbd>`:'一括修理');const dA=!ra2.n||S.steel<1||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
-  {const rb=document.getElementById('bRepB');if(rb){const l=S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${ra2.n}棟（木材${ra2.c}）`:'一括修理（壊れた施設なし）';if(rb.dataset.l!==l){rb.dataset.l=l;rb.textContent=l;}if(rb.disabled!==dA)rb.disabled=dA;}}
-  {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${ra2.n}棟（木材${ra2.c}）`:'一括修理');mr.classList.toggle('dim',dA);}}
+  const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${repWhat(ra2)}（${ic('steel',12)}${ra2.c}）<kbd>X</kbd>`:'一括修理');const dA=!ra2.n||S.steel<1||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
+  {const rb=document.getElementById('bRepB');if(rb){const l=S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${repWhat(ra2)}（木材${ra2.c}）`:'一括修理（壊れた施設なし）';if(rb.dataset.l!==l){rb.dataset.l=l;rb.textContent=l;}if(rb.disabled!==dA)rb.disabled=dA;}}
+  {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${repWhat(ra2)}（木材${ra2.c}）`:'一括修理');mr.classList.toggle('dim',dA);}}
   const bnv=document.getElementById('bNaval');bnv.style.display=has('naval')?'':'none';setText(bnv,S.aimNaval?'目標を指定…（Escで取消）':`艦砲射撃 残り${S.waveActive?S.navalLeft:(has('navalre')?2:1)} [V]`);
   {const dn=!S.waveActive||S.navalLeft<=0;if(bnv.disabled!==dn)bnv.disabled=dn;bnv.classList.toggle('on',!!S.aimNaval);}
 
@@ -6764,7 +6805,7 @@ const GUIDE={
   {t:'農場を2つ建てる',b:'farm',n:2,d:'<b>平地</b>に建てると食料がとれます。食料が尽きると住民が増えなくなります。',rw:{steel:30}},
   {t:'武器工房を建てる',b:'ammo',n:1,d:'矢や剣をつくります。工房をクリックすると作る物を切り替えられます。',rw:{gold:30}},
   {t:'交易市場を建てる',b:'market',n:1,d:'外の商人と取引できます。余った資源を売ったり、足りない資源を買ったり。',rw:{iron:20}},
-  {t:'交易市場で取引する',c:()=>S.tradeN||0,n:1,ping:'market',hi:'[data-buy],[data-sellr],[data-sell]',d:'交易市場をクリックし、選択中パネルの「交易」で資源を売り買いします。',rw:{gold:40}},
+  {t:'交易市場で取引する',c:()=>S.tradeN||0,n:1,ping:'market',hi:'#mkGo,.mkr',d:'交易市場をクリックし、選択中パネルの「交易」で資源を売り買いします。',rw:{gold:40}},
   {t:'人口を100人にする',c:()=>popTotal(),n:100,ping:'barracks',d:'住居を増やし、食料を切らさないこと。住居は改修すると住める数が増えます。',rw:{gold:100}},
  ]},
  def:{name:'防衛',steps:[
