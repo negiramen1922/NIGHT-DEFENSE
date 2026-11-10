@@ -6051,10 +6051,18 @@ function renderTop(){
 }
 
 // ===== オーバーレイ =====
+// 同じ画面の描き直し（ボタンを押したあとなど）は、スクロール位置を保つ。別の画面を開いたときだけ上から
 function openOverlay(kind,html,wide){
+  const card0=document.getElementById('ovCard'),same=S.overlay===kind&&document.getElementById('overlay').style.display==='flex';
+  const keep=same?{top:card0.scrollTop,inner:[...card0.querySelectorAll('*')].filter(e=>e.scrollTop>0||e.scrollLeft>0).map(e=>[innerKey(e,card0),e.scrollTop,e.scrollLeft])}:null;
   S.overlay=kind;document.getElementById('overlay').classList.toggle('home',kind==='title'||kind==='intro'||(kind==='help'&&/タイトルへ/.test(html)));const card=document.getElementById('ovCard');card.className='card'+(wide?' wide':'')+' ov-'+kind;card.innerHTML=html;
-  document.getElementById('overlay').style.display='flex';document.body.classList.add('ov');card.scrollTop=0;return card;
+  document.getElementById('overlay').style.display='flex';document.body.classList.add('ov');card.scrollTop=keep?keep.top:0;
+  if(keep)for(const [k,t,l] of keep.inner){const e=findInner(k,card);if(e){e.scrollTop=t;e.scrollLeft=l;}}   // 中の一覧（図鑑・研究の列など）も
+  return card;
 }
+// 中のスクロールする箱を、描き直したあとでも見つけられるように「クラス名と、同じクラスの何番目か」で覚える
+function innerKey(e,root){const c=e.className&&typeof e.className==='string'?e.className.split(' ')[0]:e.tagName;const all=[...root.querySelectorAll(e.className&&typeof e.className==='string'?'.'+c:c)];return [c,all.indexOf(e)];}
+function findInner(k,root){const [c,i]=k;try{return root.querySelectorAll(/^[A-Z]+$/.test(c)?c:'.'+c)[i]||null;}catch(e){return null;}}
 function closeOverlay(){const was=S&&S.overlay;if(S)S.overlay=null;if(was==='report'&&S.phase==='night'&&S.nightPending){S.nightPending=false;setTimeout(showNight,0);}document.getElementById('overlay').style.display='none';document.body.classList.remove('ov');}
 // ===== モンスター図鑑 =====
 const DEX_ORDER=['swarm','charger','gobarcher','spitter','grappler','troll','harpy','heavy','wyvern','wolf','tiger','mammoth','redcap','king'];
