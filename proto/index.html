@@ -287,6 +287,7 @@ body.fullmap #right.open{transform:none}
   body.hasSel:not(.fullmap) #infoSplit{display:flex}
   #right{position:relative}
   body.hasSel:not(.fullmap) #infoClose{display:flex;top:6px;right:10px}   /* 詳細の右上の × */
+  body.hasSel:not(.fullmap) #tClose{display:none}   /* マスの詳細にある × は、右上の × と重なるので出さない */
   body.hasSel.infoSized:not(.fullmap) #info{flex:0 0 auto;height:var(--infoH);max-height:none}
   body:not(.fullmap) #right .box[data-rt]{flex:1 1 0;min-height:80px;overflow-y:auto}
   body:not(.fullmap) #right .box[data-rt="res"],body:not(.fullmap) #right .box[data-rt="hero"]{flex:1 1 0}
