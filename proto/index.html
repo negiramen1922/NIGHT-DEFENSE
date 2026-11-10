@@ -7496,5 +7496,6 @@ auUi();newState();renderAll();resizeView();setTimeout(resizeView,300);showTitle(
 (function(){var done=0;function go(){if(done)return;done=1;try{performance.mark('ndMainStart');}catch(e){}var s=document.createElement('script');s.textContent=document.getElementById('ndMain').textContent;document.body.appendChild(s);}
  requestAnimationFrame(function(){setTimeout(go,0);});setTimeout(go,400);})();
 </script>
+<script src="siege.js"></script>   <!-- 試作版だけ：攻城戦（proto/siege.js） -->
 </body>
 </html>

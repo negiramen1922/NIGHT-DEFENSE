@@ -9,7 +9,8 @@ for a,b in [("const SAVE_KEY='abyss_save_v3',","const SAVE_KEY='abyss_save_v3_pr
             (f"GAME_VER='{ver}'",f"GAME_VER='{ver} 試作版'"),
             ("location.href='v0.9/index.html';","location.href='../v0.9/index.html';"),
             ('<meta name="apple-mobile-web-app-title" content="ナイトディフェンス">','<meta name="apple-mobile-web-app-title" content="ND試作版">'),
-            ('<title>ナイトディフェンス — シミュレーション型ディフェンスゲーム</title>','<title>ナイトディフェンス（試作版）</title>\n<meta name="robots" content="noindex">')]:
+            ('<title>ナイトディフェンス — シミュレーション型ディフェンスゲーム</title>','<title>ナイトディフェンス（試作版）</title>\n<meta name="robots" content="noindex">'),
+            ('</body>','<script src="siege.js"></script>   <!-- 試作版だけ：攻城戦（proto/siege.js） -->\n</body>')]:
     assert s.count(a)==1,a; s=s.replace(a,b)
 open(dst+'/index.html','w',encoding='utf-8').write(s)
 m=json.load(open(src+'/manifest.webmanifest',encoding='utf-8'));m['name']='ナイトディフェンス 試作版';m['short_name']='ND試作版'
