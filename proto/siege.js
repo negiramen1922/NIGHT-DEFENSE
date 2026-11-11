@@ -712,6 +712,7 @@ const css=document.createElement('style');css.textContent=`
 #sgMusic{position:fixed;inset:0;z-index:960;background:rgba(5,8,6,.82);display:none;align-items:center;justify-content:center;color:#e8e0c8;font-family:inherit}
 #sgMusic .sgMBox{width:min(520px,94vw);max-height:92vh;overflow:auto;background:#121a14;box-shadow:0 0 0 2px #f2b33d;padding:14px 18px}#sgMusic h2{margin:0 0 4px;color:#f2b33d;font-size:18px}
 #sgMusic .sgML{display:flex;flex-direction:column;gap:6px;margin:10px 0}#sgMusic .sgML button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:8px 10px}#sgMusic .sgML button.on{box-shadow:inset 0 0 0 2px #f2b33d}#sgMusic .sgML small{font-size:11px;color:#9ab0a0}
+#sgMusic .sgVol{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:8px 0;font-size:12px}#sgMusic .sgVol label{display:flex;align-items:center;gap:6px}#sgMusic .sgVol input{width:120px}#sgMusic .sgVol b{min-width:24px;color:#f2b33d}
 #sgMusic .sgMS{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0;font-size:11px;align-items:center}#sgMusic .sgMS b{width:100%;color:#9ab0a0}#sgMusic .sgMS button{display:flex;flex-direction:column;padding:4px 8px;font-size:11px}#sgMusic .sgMS button small{font-size:9px;color:#8aa48d}#sgMusic .sgMS button.on{box-shadow:inset 0 0 0 2px #f2b33d}
 #sgMusic .sgMT{display:flex;flex-wrap:wrap;gap:4px 8px;font-size:11px;color:#7f9a82;margin:6px 0}#sgMusic .sgMT b{width:100%;color:#9ab0a0}#sgMusic .sgMT span{padding:1px 6px;box-shadow:inset 0 0 0 1px #2f3f33}
 #sgMusic .sgFoot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
@@ -794,16 +795,23 @@ function playTrack(i){musicHook();try{if(typeof auInit==='function')auInit();}ca
 function openMusic(){musicHook();let root=document.getElementById('sgMusic');if(!root){root=document.createElement('div');root.id='sgMusic';document.body.appendChild(root);}root.style.display='flex';renderMusic();}
 function closeMusic(){MUS=null;if(typeof AU!=='undefined'&&AU.ctx){AU.track=null;try{auMusicFor();}catch(e){}}const r=document.getElementById('sgMusic');if(r){r.style.display='none';r.innerHTML='';}}
 function renderMusic(){const r=document.getElementById('sgMusic');if(!r)return;const on=typeof AU!=='undefined'&&AU.on;
-  r.innerHTML=`<div class="sgMBox"><h2>♪ 音楽室</h2><small class="muted">押すとその曲が流れます。音量は設定の「BGM」で変えられます${on?'':'（今は消音中です）'}</small>
+  const bv=typeof AU!=='undefined'?AU.bgmVol:0.5,sv=typeof AU!=='undefined'?AU.seVol:0.6;
+  r.innerHTML=`<div class="sgMBox"><h2>♪ 音楽室</h2><small class="muted">押すとその曲が流れます${on?'':'（今は消音中です）'}</small>
+    <div class="sgVol"><label>BGM <input type="range" id="sgVB" min="0" max="1" step="0.05" value="${bv}"><b id="sgVBn">${Math.round(bv*100)}</b></label><label>効果音 <input type="range" id="sgVS" min="0" max="1" step="0.05" value="${sv}"><b id="sgVSn">${Math.round(sv*100)}</b></label><button id="sgMute">${on?'消音にする':'音を出す'}</button></div>
     <div class="sgML">${TRACKS.map((t,i)=>`<button data-tr="${i}" class="${MUS&&MUS.i===i?'on':''}"><b>${MUS&&MUS.i===i?'▶ ':''}${t.n}</b><small>${t.d}${t.stage?'（ステージで変わる）':''}</small></button>`).join('')}</div>
     <div class="sgMS"><b>ステージ</b>${STAGES.map(([k,n,d])=>`<button data-st="${k}" class="${MUS_MAP===k?'on':''}" title="${d}">${n}<small>${d}</small></button>`).join('')}<small class="muted">昼・夜・祭り・襲撃・ボスの曲は、ステージごとに音の高さや楽器が変わります</small></div>
     <div class="sgFoot"><button id="sgMStop">止める</button><button id="sgMClose" class="primary">閉じる</button></div></div>`;
   r.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>playTrack(+b.dataset.tr));
+  {const vb=document.getElementById('sgVB'),vs=document.getElementById('sgVS');   // 音量（ゲームの設定と同じ値。保存もされる）
+    vb.oninput=()=>{try{auSetBgm(+vb.value);}catch(e){}document.getElementById('sgVBn').textContent=Math.round(vb.value*100);};
+    vs.oninput=()=>{try{auSetSe(+vs.value);}catch(e){}document.getElementById('sgVSn').textContent=Math.round(vs.value*100);};
+    vs.onchange=()=>{try{se('click');}catch(e){}};
+    document.getElementById('sgMute').onclick=()=>{try{auInit();auToggle();}catch(e){}renderMusic();};}
   r.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{MUS_MAP=b.dataset.st;if(typeof AU!=='undefined')AU.map=MUS_MAP;renderMusic();});
   document.getElementById('sgMStop').onclick=()=>{MUS=null;if(typeof AU!=='undefined'&&AU.ctx){AU.track=null;}renderMusic();};   // 止める（閉じると元の曲に戻る）
   document.getElementById('sgMClose').onclick=closeMusic;}
 function hook(){if(typeof showTitle!=='function'||typeof E==='undefined'||typeof SPR==='undefined'){setTimeout(hook,200);return;}
-  const orig=showTitle;window.showTitle=showTitle=function(){const r=orig.apply(this,arguments);try{const nb=document.getElementById('tNew');if(nb&&!document.getElementById('tSiege')){const b=document.createElement('button');b.id='tSiege';b.textContent='攻城戦（試作）';b.style.padding='8px';b.onclick=openSiege;nb.insertAdjacentElement('afterend',b);}if(nb&&!document.getElementById('tMusic')){const m=document.createElement('button');m.id='tMusic';m.textContent='♪ 音楽室';m.style.padding='8px';m.onclick=openMusic;(document.getElementById('tSiege')||nb).insertAdjacentElement('afterend',m);}}catch(e){}return r;};
+  const orig=showTitle;window.showTitle=showTitle=function(){const r=orig.apply(this,arguments);try{const nb=document.getElementById('tNew');if(nb&&!document.getElementById('tSiege')){const b=document.createElement('button');b.id='tSiege';b.textContent='攻城戦（試作）';b.style.padding='8px';b.onclick=openSiege;nb.insertAdjacentElement('afterend',b);}if(nb&&!document.getElementById('tMusic')){const m=document.createElement('button');m.id='tMusic';m.textContent='♪ 音楽室・音量';m.style.padding='8px';m.onclick=openMusic;(document.getElementById('tSiege')||nb).insertAdjacentElement('afterend',m);}}catch(e){}return r;};
   if(typeof S!=='undefined'&&S&&S.overlay==='title')showTitle();
   musicHook();
   window.openSiege=openSiege;window.__siege=()=>G;window.__siegeUpd=dt=>update(dt);window.__tb=tBlock;window.__fp=findPath;window.__reach=reachable;}
