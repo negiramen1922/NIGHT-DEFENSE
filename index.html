@@ -1509,10 +1509,10 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 @keyframes bootMv{0%{transform:translateX(-100%)}100%{transform:translateX(290%)}}
 #boot small{color:#8aa48d;font-size:12px}
 /* 読み込み中に左下を歩く、英雄たちと逃げるゴブリン（ゲームの歩くドット絵） */
-#boot .bwalk{position:absolute;left:12px;bottom:14px;width:min(360px,70vw);height:60px;overflow:hidden;border-bottom:2px solid #1a221c}
-#boot .bgrp{position:absolute;left:0;bottom:2px;width:242px;height:56px;animation:bootMarch 7s linear infinite;will-change:transform}
-#boot .bw{position:absolute;bottom:0;overflow:hidden}
-#boot .bw b{position:absolute;left:0;top:0;height:100%;width:400%;background-image:inherit;background-size:100% 100%;image-rendering:pixelated;background-repeat:no-repeat;animation:bootStep .6s steps(4) infinite;will-change:transform}
+#boot .bwalk{position:absolute;left:12px;bottom:14px;width:min(360px,70vw);height:72px;overflow:hidden;border-bottom:2px solid #1a221c}
+#boot .bgrp{position:absolute;left:0;bottom:2px;width:242px;height:68px;animation:bootMarch 7s linear infinite;will-change:transform}
+#boot .bw{position:absolute;bottom:0;overflow:hidden;padding-top:12px}   /* 頭の上にすき間（端末によって上の1列が欠けないように） */
+#boot .bw b{position:absolute;left:0;bottom:0;height:calc(100% - 12px);width:400%;background-image:inherit;background-size:100% 100%;image-rendering:pixelated;background-repeat:no-repeat;animation:bootStep .6s steps(4) infinite;will-change:transform}
 @keyframes bootStep{from{transform:translateX(0)}to{transform:translateX(-100%)}}
 @keyframes bootMarch{from{transform:translateX(-242px)}to{transform:translateX(min(360px,70vw))}}
 #boot .bw.h_arch{width:48px;height:48px;left:0px;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAQCAYAAACm53kpAAACSUlEQVR4nNWWz2vTYBzGnzcGHPuFLTJCCdKWEETBg+tp9eSpRfEgtcqO4m7qaaKnHHL25v8wbPUkg3nqSTyMetLiKFkbNIauyhrbrUjBvR6qNc37plYTFnwu4X3zfT7P+837El7AR5/W1qiZy1G/95Nk5nL0ZTZLZUn5J/9x5hM/wE6vhzu7e7BaBrfGq2mbnYZ3nPmjQZAGZEmh6euz09gxN4jj7abFcKLKJ0EB3oXUt3Rfr5rXcCLVw/fmwpg/ynxmF/4WUNYLtKg9J26/mtfg5rjHal7zPdZR5AtlvcAcPTWvccf1LZ3ZPadlAgA6dnXE8TYxqamo84WgALeslkG8i3eLt/tR54scgO8xnHR8AeDq+ipt2CbUvIYLt+MAgKfXZnHrRX9Uc251haYTSWw+3mA4UeSLQQFuNWwT3UobVx5exMfPJrPA5WIKb8pNNC6H10DQfMEPwNNyMYVupY2GPQ7v2FV6cq+O6oO7AICvfYfrb1q73Pko80UvQK1ofwAIzHwskSEdu0qz6/cBAN1DB8ntIePRtoPkzzprcfj85vTH/FHmi2E0EFRR5hPt5nmql2qkY1dpLJEhsqTQS/fS6B46TLG18wX7r4WxH1FQvywpNL5yBPnsaaZ+ce4UXj1pwGoZI/6vvLD8ol6qkbJeoLFEhvmp9Nq/v/TCEv+mFtQ/bX0skSHuS09YfhEA3tXejxV/KFnDZ3sAq2UQWVLomaUjzGMG+xgwwUH988YMHOOAqXdwMDEnDL/3a97gJvD1jDP33/l/AKs8i6141h/JAAAAAElFTkSuQmCC);background-size:0 0;background-repeat:no-repeat}
