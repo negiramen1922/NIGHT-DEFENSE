@@ -1671,7 +1671,7 @@ const HQ_GOLD=12;   // 城館の収入（毎ターン）
 const WAVE_LEAD=3;   // 敵を全滅させてから次の波が来るまでの秒数
 const FINAL_WAVE_BASE=10, FIRST_PREP=10, NEXT_PREP=4, TURN_SEC=10;
 function maxCmd(){return 2+2*((S&&S.baseLv)||1);}
-const BASE_MAX=5;
+const BASE_MAX=7;
 // 施設の大きさ（マス）。古いセーブの施設は sz を持たないので、城2×2・その他1×1のまま扱う
 // 大きさ（マス）：基本は2×2、大きい施設は3×3、城は4×4
 const BIG_SZ=3;
@@ -1697,7 +1697,7 @@ function outpostCap(){return (S.baseLv||1)+1;}
 function capBlock(t){if(t==='outpost'&&outpostN()>=outpostCap())return `前哨砦は城の強化で増やせます（いま ${outpostN()}/${outpostCap()}）`;
   if(B[t]&&B[t].isMine&&S.mines&&trapCount()>=trapCap())return `罠が上限です（${trapCount()}/${trapCap()}）。城の強化で増えます（城Lv1〜5：${TRAP_CAP.join('・')}）`;
   if(facCounted(t)&&facCount()>=facCap())return `施設が上限です（${facCount()}/${facCap()}）。前哨砦か城の強化で上限が増えます`;return '';}
-function baseUpCost(){const l=S.baseLv;const c={gold:250*l,stone:120*l,steel:150*l};const m={2:60,3:200,4:500}[l];if(m)c.mat=m;if(l>=2)c.iron=40*l;return c;}
+function baseUpCost(){const l=S.baseLv;const c={gold:l===1?150:250*l,stone:120*l,steel:150*l};const m={2:60,3:200,4:500,5:800,6:1200}[l];   /* 試作：城は最大Lv7（Lv2＝第4・Lv3＝第8・Lv4＝第12・Lv5＝第17・Lv6＝第22・Lv7＝第27襲撃のころの想定）。Lv1→2の金貨は250→150 */if(m)c.mat=m;if(l>=2)c.iron=40*l;return c;}
 
 const SPECS={
   '守備':{color:'#f2b33d',stat:'def',desc:'防衛施設（バリスタ・投石機・大砲・物見櫓・壁・門・城館）を強化'},
@@ -1875,7 +1875,7 @@ function buyModels(ut){return Object.keys(MODEL).filter(k=>MODEL[k].ut===ut&&MOD
 const BUILD_T={power:2,lab:2,hangar:2,rail:2,reactor:3,elecf:2,tankf:2,outpost:2};
 function buildTurns(type){return Math.max(1,(BUILD_T[type]||1)-(has('prefab')?1:0));}
 // 強化にかかるターン数（数字はここで調整）
-const BASE_UP_T={1:2,2:3,3:4,4:5};   // 城：Lv2へ2T・Lv3へ3T・Lv4へ4T・Lv5へ5T（強化中も城は普段どおり働く）
+const BASE_UP_T={1:2,2:3,3:4,4:5,5:6,6:6};   // 城：Lv2へ2T・Lv3へ3T・Lv4へ4T・Lv5へ5T（強化中も城は普段どおり働く）
 const ENCH_T=[1,2,3];                 // 魔核強化：★1へ1T・★2へ2T・★3へ3T（強化中の施設は停止）
 const MAT_T=[0,1,2];                  // 造り替え：石へ1T・鉄へ2T（造り替え中の施設は停止）
 function baseUpTurns(){return BASE_UP_T[S.baseLv]||5;}
@@ -3174,7 +3174,7 @@ function repairAll(){if(S.waveActive){se('error');toast('戦闘中は修理で�
 }
 function mineAt(x,y){return S.mines.find(m=>{const n=m.sz||U;return x>=m.x&&x<m.x+n&&y>=m.y&&y<m.y+n;});}
 // 罠の数の上限（施設の上限とは別）：城Lv1〜5で 50・70・100・120・150
-const TRAP_CAP=[50,70,100,120,150];
+const TRAP_CAP=[50,70,100,120,150,170,200];
 function trapCap(){return TRAP_CAP[Math.max(0,Math.min(TRAP_CAP.length-1,(S.baseLv||1)-1))];}
 function trapCount(){return (S.mines||[]).length;}
 // トゲ床の耐久：踏まれている時間（敵1体×1秒で1減る）。0で壊れ、一括修理（木材6）で直す
