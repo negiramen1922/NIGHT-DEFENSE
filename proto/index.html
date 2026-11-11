@@ -2045,7 +2045,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  // 部隊
  set('swordplay',{tier:1,max:3,pre:[],cost:{sword:10,fuel:30},icon:'pawn',eff:'近接部隊（農兵・兵士・重装歩兵・騎兵）の火力 +30%（Lvごと・最大3）'});
  set('archery',{tier:1,max:3,pre:[],cost:{steel:30,ammo:30},icon:'archer',eff:'弓兵隊（物見櫓に配置した弓兵も）の火力 +30%（Lvごと・最大3）'});
- set('formation',{tier:1,pre:[],cost:{fuel:40,sword:10},icon:'heavy',eff:'小隊（部隊）3つまでを「中隊」にまとめられる。一緒に動き、近くにいる間は火力 +15%・被害 −10%'});
+ set('formation',{tier:1,pre:[],cost:{fuel:40,sword:10},icon:'heavy',eff:'小隊（部隊）3つまでを「中隊」にまとめられる。一緒に動き、近くにいる間は火力 +15%・耐久 +10%'});
  set('armcare',{cat:'部隊',tier:1,name:'武具の手入れ',cost:{steel:30,iron:15},t:1,pre:[],icon:'pawn',eff:'近接部隊・竜騎兵の武具の傷み −40%'});
  set('bigquiver',{cat:'部隊',tier:1,name:'大矢筒',cost:{steel:30,ammo:30},t:1,pre:[],icon:'archer',eff:'弓兵隊の矢筒 60本→100本'});
  set('scout',{tier:1,pre:[]});set('doctrine',{tier:1,pre:[]});set('nighthunt',{tier:1,pre:[]});
@@ -2057,8 +2057,9 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('highmagic',{cat:'部隊',tier:2,name:'高等魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard',eff:'魔術師の魔法の範囲 +30%、魔力の消費 −30%'});
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館か所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
- set('battalion',{cat:'部隊',tier:3,name:'大隊',cost:{gold:80,fuel:60,sword:20},t:3,pre:['formation'],icon:'heavy',eff:'中隊3つまでを「大隊」にまとめられる。ほかの中隊が8マス以内にいると火力+10%・被害−5%（中隊の効果と重なる）'});
- set('division',{cat:'部隊',tier:3,name:'師団',cost:{gold:160,fuel:120,iron:60},t:4,pre:['battalion'],icon:'heavy',eff:'大隊3つまでを「師団」にまとめられる。ほかの大隊が12マス以内にいると火力+10%・被害−5%（今はランクⅢ。ランクを伸ばしたらⅥのつもり）'});
+ set('alloyarms',{cat:'部隊',tier:3,name:'合金の武具',cost:{iron:70,gold:50},t:3,pre:['heavyarms'],icon:'heavy',eff:'全部隊の武器が「合金」に上がる（鋼の剣→合金の剣など）：さらに火力+25%・耐久+10%'});
+ set('battalion',{cat:'部隊',tier:3,name:'大隊',cost:{gold:80,fuel:60,sword:20},t:3,pre:['formation'],icon:'heavy',eff:'中隊3つまでを「大隊」にまとめられる。ほかの中隊が8マス以内にいると火力+10%・耐久+5%（中隊の効果と重なる）'});
+ set('division',{cat:'部隊',tier:3,name:'師団',cost:{gold:160,fuel:120,iron:60},t:4,pre:['battalion'],icon:'heavy',eff:'大隊3つまでを「師団」にまとめられる。ほかの大隊が12マス以内にいると火力+10%・耐久+5%（今はランクⅢ。ランクを伸ばしたらⅥのつもり）'});
  set('unit_r3',{cat:'部隊',gate:3,tier:3,name:'部隊強化Ⅲ',cost:{gold:120,fuel:80,iron:40},t:3,pre:[],icon:'dragon',eff:'部隊タブのランクⅢの研究を解放（竜騎兵など）'});
  set('dragon',{tier:3,pre:[]});
  set('dragonscale',{cat:'部隊',tier:3,name:'竜鱗',cost:{gold:80,mat:40,fuel:40},t:3,pre:['dragon'],icon:'dragon',eff:'竜騎兵が受ける被害 −30%'});
@@ -2091,6 +2092,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('polearm',{cat:'部隊',tier:1,name:'長柄の武器',cost:{steel:40,iron:10},t:1,pre:[],icon:'pawn_spear_shield',eff:'兵士・重装歩兵の武器が「槍」に、弓兵の弓が「長弓」に上がる（自動）'});
  set('firecraft',{cat:'部隊',tier:1,name:'火の扱い',cost:{steel:40,fuel:20},t:1,pre:[],icon:'pawn_sword_torch',eff:'弓兵の矢が「火矢」に上がる（篝火の近くで燃やす）'});
  set('heavyarms',{cat:'部隊',tier:2,name:'重武器',cost:{iron:50,steel:40},t:2,pre:[],icon:'pawn_axe_shield',eff:'兵士・重装歩兵の武器が「戦斧」に、弓兵が「クロスボウ」に、騎兵が「鋼の騎槍」に上がる（自動）'});
+ set('heavyarms',{cat:'部隊',tier:2,name:'鋼の武具',cost:{iron:40,steel:30},t:2,pre:[],icon:'heavy',eff:'全部隊の武器が「鋼」に上がる（鉄の剣→鋼の剣など）：火力+25%・耐久+10%'});
  set('horsearch',{cat:'部隊',tier:2,name:'騎射',cost:{steel:40,fuel:40},t:2,pre:['cavalry'],icon:'rider_hbow',eff:'騎兵の武器が「騎射の騎槍」に上がる（重武器も要る）：空の敵も射落とせる'});
  set('elemental',{cat:'部隊',tier:2,name:'属性魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard_tstaff',eff:'魔術師の杖が「属性の杖」に上がる（範囲＋雷の連鎖＋足止め）'});
  set('shells',{cat:'部隊',tier:3,name:'特殊砲弾',cost:{iron:60,gold:40},t:3,pre:['artillery'],icon:'cannoneer',eff:'砲兵の弾が「特殊砲弾」に上がる（火力+40%・燃やす）'});
@@ -2770,6 +2772,9 @@ function nearestOre(cx,cy){let best=null,bd=1e9;for(let y=0;y<ROWS;y++)for(let x
 // ===== 研究ヘルパー =====
 function lvl(id){return S.tech[id]||0;}
 function has(id){return lvl(id)>0;}
+const MERGED={mine2:'mine',quarry2:'quarrying',farm2:'farming',fish2:'fishing',autoammo2:'autoammo'};   // 試作：「Ⅱ」の研究は元の研究のⅡ段目にまとめた（効果の計算は元から両方を足しているのでそのまま）
+const HIDDEN_T=new Set(['polearm','firecraft','horsearch','elemental','shells','dragongear',...Object.keys(MERGED)]);   // 装備の種類の研究は武器の材料の段にまとめた
+for(const t of TECH)if(t&&HIDDEN_T.has(t.id)){t.cat0=t.cat;t.cat='（まとめた）';}
 for(const t of TECH){if(t&&t.max>1&&/Lvごと|／Lv/.test(t.eff||'')){t.lvRank=true;t.eff=t.eff.replace(/[・、]?最大\d+/,'・最大は城のランクまで');}}   // 試作：重ねる研究は城のランクまで
 function techOf(id){return TECH.find(x=>x.id===id);}
 // 試作（2026-11-11）：「Lvごと」に重ねる研究は、段の上限＝今の城のランク（城Lv）。決め打ちの「最大2・3」はやめる。段が上がるほど材料も増える（下の techCost）
@@ -4662,7 +4667,7 @@ function squadResBonus(s){let r=(has('analysis')?0.1:0)+vetDmg(s);
   return r;}
 function dmgPctS(s){const L=[];const add=(n,v)=>{if(v)L.push([n,v]);};const v=vetDmg(s);add('英雄',bonus0(s).dmg-1);add('研究',squadResBonus(s)-v);add('熟練度',v);
   if(coBonus(s))add('中隊',0.15);if(bnBonus(s))add('大隊',0.1);if(dvBonus(s))add('師団',0.1);if(s.buffT>0)add('鼓舞',0.3);if(s.ut==='guard'&&nearCastle(s))add('城のそば',1.0);return L;}
-function dmgBaseS(s){const t=MT(s);return t.dmg*eqP(s,'dmg');}
+function dmgBaseS(s){const t=MT(s);return t.dmg*eqP(s,'dmg')*(1+0.25*wMat(s));}   // 材料の段ごとに火力+25%
 function unitDmg(s){
   const t=MT(s);return dmgBaseS(s)*(1+pctSum(dmgPctS(s)))*Math.max(0,s.members)/t.members;
 }
@@ -4723,9 +4728,13 @@ const EQ_SLOTS={inf:['main','sub'],arch:['main','ammo'],cav:['main'],mage:['main
 const EQ_DEF={inf:{main:'sword',sub:'shield'},arch:{main:'sbow',ammo:'arrow'},cav:{main:'lance'},mage:{main:'fstaff'},art:{ammo:'he'},drake:{gear:'dnone'}};
 const SLOT_NAME={main:'武器',sub:'副装備',ammo:'矢・弾',gear:'装具'};
 const BIG_E=new Set(['charger','grappler','troll','heavy','king','wyvern']),SMALL_E=new Set(['swarm','redcap','gobarcher','spitter']);
-// 試作（2026-11-11）：装備は選ばず、研究すると自動で一段上がる（武器のアップグレード）。並びの中で研究済みのいちばん上を使う
-const EQ_UP={inf:{main:['sword','spear','axe'],sub:['shield']},arch:{main:['sbow','lbow','xbow'],ammo:['arrow','farrow','parrow']},cav:{main:['lance','hlance','rlance']},mage:{main:['fstaff','estaff']},art:{ammo:['he','he2']},drake:{gear:['dnone','dgear']}};
-function eqKey(s,slot){const L=EQ_UP[s.ut]&&EQ_UP[s.ut][slot];if(L){let k=L[0];for(const id of L)if(eqOk(id))k=id;return k;}return (EQ_DEF[s.ut]||{})[slot];}
+// 試作（2026-11-11）：武器の種類は変えず、**材料が一段ずつ良くなる**（鉄の剣 → 鋼の剣 → 合金の剣 → 魔金属の剣 → 聖銀の剣…）。装備の種類（槍・戦斧など）は選ばない
+const EQ_UP=null;
+const W_MAT=['鉄','鋼','合金','魔金属','聖銀','竜晶'],W_REQ=[null,'heavyarms','alloyarms'],W_RANK=['Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ','Ⅶ'];
+const W_NAME={inf:'剣',mil:'剣',guard:'剣',arch:'矢じり',cav:'騎槍',mage:'杖',art:'砲弾',drake:'竜具',adv:'武器'};
+function wMat(s){let m=0;for(let i=1;i<W_REQ.length;i++)if(W_REQ[i]&&has(W_REQ[i]))m=i;return m;}   // 今の材料の段（0＝鉄）
+function wName(s,m){return W_MAT[m]+'の'+(W_NAME[s.ut]||'武器');}
+function eqKey(s,slot){return (EQ_DEF[s.ut]||{})[slot];}
 function eqList(s){return (EQ_SLOTS[s.ut]||[]).map(sl=>EQ[eqKey(s,sl)]).filter(Boolean);}
 function eqP(s,k){let v=1;for(const e of eqList(s))if(e[k]!=null)v*=e[k];return v;}
 function eqS(s,k){let v=0;for(const e of eqList(s))if(e[k])v+=e[k];return v;}
@@ -4760,7 +4769,7 @@ function vetBar(s){const v=Math.floor(s.vet||0),l=vetLv(s),cap=has('elite')?2:1,
   const a=VET[l].xp;return {txt:`${v} / ${nx.xp}`,pct:Math.max(0,Math.min(100,Math.round((v-a)/(nx.xp-a)*100)))};}
 function damageSquad(s,dmg){if(s.invT>0)return;if(s.shieldT>0)dmg*=0.5;if(s.yugT>0)dmg*=0.7;
   const t=MT(s);
-  dmg*=(t.frail||1)*(1-bonus(s).red)*(1-(t.armor||0))*(1-(t.red||0))*(has('shieldwall')&&s.model==='heavy'?0.75:1)*(s.ut==='guard'&&nearCastle(s)?0.5:1)*(1-eqS(s,'red'))*(has('dragonscale')&&s.ut==='drake'?0.7:1)*(coBonus(s)?0.9:1)*(bnBonus(s)?0.95:1)*(dvBonus(s)?0.95:1)*coverAt(s.x,s.y)*(s.ut==='mech'&&has('blade')?0.85:1);
+  dmg*=(t.frail||1)*(1-bonus(s).red)*(1-(t.armor||0))*(1-(t.red||0))*(has('shieldwall')&&s.model==='heavy'?0.75:1)*(s.ut==='guard'&&nearCastle(s)?0.5:1)*(1-eqS(s,'red'))*(has('dragonscale')&&s.ut==='drake'?0.7:1)*(1/(1+(coBonus(s)?0.1:0)+(bnBonus(s)?0.05:0)+(dvBonus(s)?0.05:0)+0.1*wMat(s)))*coverAt(s.x,s.y)*(s.ut==='mech'&&has('blade')?0.85:1);
   s.hp-=dmg;
   // 1機ぶんの耐久を割り込むごとに兵（と衛士）を失う
   const m=Math.max(0,Math.ceil(s.hp/(memberHp(s)*bonus(s).hp)-1e-6));
@@ -6276,7 +6285,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
       if(!has('formation'))h+=`<div class="upg"><b>中隊編成</b><div class="muted" style="font-size:11px">研究「隊列」（部隊タブ）で、小隊（部隊）3つまでを中隊にまとめられるようになります</div></div>`;
       else{
         const L=o.co?grpOf('co',o.co):[o];
-        h+=`<div class="upg"><div class="row"><b>${o.co?`第${o.coNo}中隊`:'中隊編成'}</b>${o.co?`<span class="muted">${L.map(x=>'第'+x.no).join('・')}部隊（${L.length}/3）</span>`:''}</div><div class="muted" style="font-size:11px">小隊（部隊）3つまでで中隊。3マス以内にいると火力+15%・被害−10%。移動と行動は一緒に動きます。${coBonus(o)?'<span style="color:var(--green)">（効果発揮中）</span>':''}</div>`;
+        h+=`<div class="upg"><div class="row"><b>${o.co?`第${o.coNo}中隊`:'中隊編成'}</b>${o.co?`<span class="muted">${L.map(x=>'第'+x.no).join('・')}部隊（${L.length}/3）</span>`:''}</div><div class="muted" style="font-size:11px">小隊（部隊）3つまでで中隊。3マス以内にいると火力+15%・耐久+10%。移動と行動は一緒に動きます。${coBonus(o)?'<span style="color:var(--green)">（効果発揮中）</span>':''}</div>`;
         const cands=S.squads.filter(x=>x!==o&&!x.gar&&(coFix(x),!x.co||(!o.co&&grpOf('co',x.co).length<3))&&!(o.co&&x.co));
         if(L.length<3&&cands.length)h+=`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${cands.slice(0,12).map(x=>`<button data-co="${x.id}">${unitLabel(x)}${x.co?`（第${x.coNo}中隊）に入る`:'と組む'}</button>`).join('')}</div>`;
         if(o.co)h+=`<div style="display:flex;gap:4px;margin-top:4px"><button id="coLeave">この部隊だけ抜ける</button><button id="coSplit">中隊を解隊</button></div>`;
@@ -6284,21 +6293,18 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
         if(o.co){   // 大隊・師団
           if(!has('battalion'))h+=`<div class="upg"><b>大隊</b><div class="muted" style="font-size:11px">研究「大隊」で、中隊3つまでを大隊にまとめられます</div></div>`;
           else{const myC=o.bn?new Set(grpOf('bn',o.bn).map(x=>x.co)):new Set([o.co]);const cs=[...new Set(S.squads.filter(x=>x.co&&!myC.has(x.co)&&(!x.bn||(!o.bn&&new Set(grpOf('bn',x.bn).map(y=>y.co)).size<3))&&!(o.bn&&x.bn)).map(x=>x.co))].map(c=>grpOf('co',c)[0]);
-            h+=`<div class="upg"><div class="row"><b>${o.bn?`第${o.bnNo}大隊`:'大隊編成'}</b>${o.bn?`<span class="muted">中隊 ${myC.size}/3</span>`:''}</div><div class="muted" style="font-size:11px">中隊3つまでで大隊。ほかの中隊が8マス以内にいると火力+10%・被害−5%（中隊と重なる）${bnBonus(o)?'<span style="color:var(--green)">（効果発揮中）</span>':''}</div>`;
+            h+=`<div class="upg"><div class="row"><b>${o.bn?`第${o.bnNo}大隊`:'大隊編成'}</b>${o.bn?`<span class="muted">中隊 ${myC.size}/3</span>`:''}</div><div class="muted" style="font-size:11px">中隊3つまでで大隊。ほかの中隊が8マス以内にいると火力+10%・耐久+5%（中隊と重なる）${bnBonus(o)?'<span style="color:var(--green)">（効果発揮中）</span>':''}</div>`;
             if(myC.size<3&&cs.length)h+=`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${cs.slice(0,8).map(x=>`<button data-bn="${x.id}">第${x.coNo}中隊${x.bn?`（第${x.bnNo}大隊）に入る`:'とまとめる'}</button>`).join('')}</div>`;
             if(o.bn)h+=`<button id="bnLeave" style="margin-top:4px">この中隊を大隊から外す</button>`;h+=`</div>`;
             if(o.bn){if(!has('division'))h+=`<div class="upg"><b>師団</b><div class="muted" style="font-size:11px">研究「師団」で、大隊3つまでを師団にまとめられます</div></div>`;
               else{const myB=o.dv?new Set(grpOf('dv',o.dv).map(x=>x.bn)):new Set([o.bn]);const bs=[...new Set(S.squads.filter(x=>x.bn&&!myB.has(x.bn)&&(!x.dv||(!o.dv&&new Set(grpOf('dv',x.dv).map(y=>y.bn)).size<3))&&!(o.dv&&x.dv)).map(x=>x.bn))].map(b=>grpOf('bn',b)[0]);
-                h+=`<div class="upg"><div class="row"><b>${o.dv?`第${o.dvNo}師団`:'師団編成'}</b>${o.dv?`<span class="muted">大隊 ${myB.size}/3</span>`:''}</div><div class="muted" style="font-size:11px">大隊3つまでで師団。ほかの大隊が12マス以内にいると火力+10%・被害−5%${dvBonus(o)?'<span style="color:var(--green)">（効果発揮中）</span>':''}</div>`;
+                h+=`<div class="upg"><div class="row"><b>${o.dv?`第${o.dvNo}師団`:'師団編成'}</b>${o.dv?`<span class="muted">大隊 ${myB.size}/3</span>`:''}</div><div class="muted" style="font-size:11px">大隊3つまでで師団。ほかの大隊が12マス以内にいると火力+10%・耐久+5%${dvBonus(o)?'<span style="color:var(--green)">（効果発揮中）</span>':''}</div>`;
                 if(myB.size<3&&bs.length)h+=`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${bs.slice(0,8).map(x=>`<button data-dv="${x.id}">第${x.bnNo}大隊${x.dv?`（第${x.dvNo}師団）に入る`:'とまとめる'}</button>`).join('')}</div>`;
                 if(o.dv)h+=`<button id="dvLeave" style="margin-top:4px">この大隊を師団から外す</button>`;h+=`</div>`;}}}
         }
       }
     }
-    if(EQ_UP[o.ut]){h+=`<div class="upg"><b>武器</b><div class="muted" style="font-size:11px">研究すると自動で一段上がります（選ぶ必要はありません）</div>`;
-      for(const sl in EQ_UP[o.ut]){const L=EQ_UP[o.ut][sl],cur=eqKey(o,sl);if(L.length<2&&!['sub'].includes(sl))continue;
-        h+=`<div style="margin-top:4px;font-size:11px"><span class="muted">${SLOT_NAME[sl]}　</span>${L.map(id=>{const e=EQ[id],ok=eqOk(id),rq=e.req?[].concat(e.req).map(r=>techOf(r)?techOf(r).name:r).join('＋'):'';return `<span title="${e.d}" style="${id===cur?'color:var(--amber);font-weight:bold':ok?'':'color:var(--muted)'}">${e.n}${!ok&&rq?`（研究「${rq}」）`:''}</span>`;}).join(' → ')}</div><div class="muted" style="font-size:10.5px">${EQ[cur].d}</div>`;}
-      h+=`</div>`;}
+    if(W_NAME[o.ut]&&o.ut!=='adv'){const m=wMat(o);h+=`<div class="upg"><b>武器</b><div class="muted" style="font-size:11px">研究すると材料が一段ずつ良くなります（段ごとに火力+25%・耐久+10%）</div><div style="margin-top:4px;font-size:11px">${W_MAT.map((x,i)=>{const rq=W_REQ[i],t=rq&&techOf(rq);const st=i===m?'color:var(--amber);font-weight:bold':i<m?'':'color:var(--muted)';return `<span style="${st}">${wName(o,i)}${i>m?(t?`（研究「${t.name}」）`:`（ランク${W_RANK[i]}・これから）`):''}</span>`;}).join(' → ')}</div></div>`;}
     if(o.ut==='adv')h+=`<div class="upg"><b>冒険者との契約</b><div class="muted" style="font-size:11px">毎ターン給金 ${MT(o).wage}。契約を終えると帰っていき、給金もかからなくなる（返金なし）</div><button id="advBye" style="margin-top:4px" ${S.waveActive?'disabled':''}>契約を終えて帰ってもらう${S.waveActive?'（戦闘中は不可）':''}</button></div>`;
     if(o.ut==='guard')h+=`<div class="upg"><b>近衛</b><div class="muted" style="font-size:11px">城から14マス以内：火力2倍・受ける被害半分（${nearCastle(o)?'<span style="color:var(--green)">効果発揮中</span>':'範囲外'}）</div><button id="gdHome" style="margin-top:4px">${o.stayOut?'城に戻って駐屯する':'城に駐屯中（自動で打って出る）'}</button></div>`;
     h+=`<details style="font-size:11px"><summary class="muted" style="cursor:pointer">行動の説明</summary><div class="muted">地図をクリックで移動（移動先が待機地点になります）。<br>迎撃：待機地点の周囲12マスに来た敵を自動で迎え撃つ（柵や壁の向こうの敵には回り込んで向かう）　固守：その場を動かない（近接部隊は柵・壁越しに敵を突ける）　帰還・補給：所属施設へ戻り、手当て・欠員の補充・矢や武具の補給</div></details>`;
@@ -6686,7 +6692,7 @@ function showResearch(){
     const cond=rk<=1?`<span class="cond ok">${ui('check','green',12)}解放済</span>`:open&&!mapLock?`<span class="cond ok">${ui('check','green',12)}城Lv${rk} で解放</span>`:mapLock?`<span class="cond">${ui('lock','dim',12)}次のマップから</span>`:`<span class="cond">${ui('lock','dim',12)}城Lv${rk} で解放</span>`;
     h+=`<div class="rankcol${open&&!mapLock?'':' locked'}"><div class="rankhead">ランク ${RN[rk]}${cond}</div><div class="rcards">`;
     for(const [t,dep] of resOrder(inR.filter(x=>!x.gate)).concat(inR.filter(x=>x.gate).map(x=>[x,0]))){
-      const st=techState(t),r=S.research.find(x=>x.id===t.id),Lv=lvl(t.id),mx=t.max||1;
+      const st=techState(t),r=S.research.find(x=>x.id===t.id),Lv=lvl(t.id),mx=tMax(t);
       const stTxt=st==='done'?'<span class="s done">完了</span>':st==='active'?`<span class="s act">研究中 ${r.total-r.left}/${r.total}T</span>`:st==='excluded'?'<span class="s">選択不可</span>':st==='locked'?'<span class="s">要 前提</span>':st==='maplock'?'<span class="s">次のマップから</span>':'';
       if(t.gate&&st==='locked')t.line=`ランク${RN[t.gate-1]}の研究 合計Lv${rankSum(cat,t.gate-1)}/${gateNeed(cat,t.gate)}`;else if(t.gate)t.line='';
       const outside=(t.pre||[]).filter(x=>!L.inTab(x));
