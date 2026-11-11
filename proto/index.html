@@ -2768,13 +2768,16 @@ function nearestOre(cx,cy){let best=null,bd=1e9;for(let y=0;y<ROWS;y++)for(let x
 // ===== 研究ヘルパー =====
 function lvl(id){return S.tech[id]||0;}
 function has(id){return lvl(id)>0;}
+for(const t of TECH){if(t&&t.max>1&&/Lvごと|／Lv/.test(t.eff||'')){t.lvRank=true;t.eff=t.eff.replace(/[・、]?最大\d+/,'・最大は城のランクまで');}}   // 試作：重ねる研究は城のランクまで
 function techOf(id){return TECH.find(x=>x.id===id);}
+// 試作（2026-11-11）：「Lvごと」に重ねる研究は、段の上限＝今の城のランク（城Lv）。決め打ちの「最大2・3」はやめる。段が上がるほど材料も増える（下の techCost）
+function tMax(t){return t.lvRank?Math.max(1,S.baseLv||1):(t.max||1);}
 function techCost(t){const L=lvl(t.id);const c={};const base=Object.assign({},t.cost);if(t.tier>=2)base.gold=(base.gold||0)+40*(t.tier-1);for(const k in base)c[k]=Math.round(base[k]*(1+0.7*L));return c;}
 function techTurns(t){return t.t+lvl(t.id);}
 const MAP_MAXTIER={f:2,m:3,t:2,s:3};
 function mapMaxTier(){return MAP_MAXTIER[CUR_MAP]||4;}
 function techState(t){
-  if(lvl(t.id)>=(t.max||1))return'done';
+  if(lvl(t.id)>=tMax(t))return'done';
   if(S.research.find(r=>r.id===t.id))return'active';
   if((t.tier||1)>mapMaxTier())return'maplock';
   if(t.gate){if(!rankOpen(t.cat,t.gate-1)||rankSum(t.cat,t.gate-1)<gateNeed(t.cat,t.gate))return'locked';}
@@ -3694,7 +3697,7 @@ function startResearch(id){
   if(S.pop<need){se('error');toast(`研究員になれる待機中の住民が足りません（必要${need}人）`,'bad');return;}
   for(const k in c)S[k]-=c[k];S.pop-=need;
   const turns=techTurns(t);
-  S.research.push({id,left:turns,total:turns,paid:c,res:need});se('resStart');log(`研究開始：${t.name}${t.max>1?' Lv'+(lvl(id)+1):''}（${turns}ターン）`);
+  S.research.push({id,left:turns,total:turns,paid:c,res:need});se('resStart');log(`研究開始：${t.name}${tMax(t)>1||t.lvRank?' Lv'+(lvl(id)+1):''}（${turns}ターン）`);
 }
 function cancelResearch(id){
   const r=S.research.find(x=>x.id===id);if(!r)return;
@@ -3706,7 +3709,7 @@ function advanceResearch(){
   for(const b of S.blds){if(b.type==='lab'){if(b.lv>=3)chance+=0.12;const c=cmdOf(b);if(c){chance+=c.tec*0.03*match(c,b)*(c.trait==='技術畑'?1.3:1);gainXp(c,3);}}}
   for(const r of S.research){r.left--;if(r.left>0&&Math.random()<chance){r.left--;log(`研究所より報告：${techOf(r.id).name} の進捗が前倒し`,'good');}}
   const done=S.research.filter(r=>r.left<=0);
-  if(done.length)se('research');for(const r of done){if(r.paid.pop){S.pop+=r.paid.pop;}S.pop+=r.res||0;S.tech[r.id]=lvl(r.id)+1;const t=techOf(r.id);log(`研究完了：${t.name}${t.max>1?' Lv'+lvl(r.id):''}`,'good');}
+  if(done.length)se('research');for(const r of done){if(r.paid.pop){S.pop+=r.paid.pop;}S.pop+=r.res||0;S.tech[r.id]=lvl(r.id)+1;const t=techOf(r.id);log(`研究完了：${t.name}${tMax(t)>1||t.lvRank?' Lv'+lvl(r.id):''}`,'good');}
   S.research=S.research.filter(r=>r.left>0);
   if(done.length)rescaleHp();
 }
@@ -6382,9 +6385,9 @@ function renderResBox(){
   const el=document.getElementById('resBox');
   let h=`<div class="row" style="align-items:center"><span class="muted">研究員</span><span style="display:inline-flex;align-items:center;gap:6px">${sageHTML(resBusy(),resCap())}${resBusy()} / ${resCap()}人</span></div>`;
   for(const r of S.research){const t=techOf(r.id);
-    h+=`<button class="rbi" data-rgo="${t.id}" style="--tc:${CAT_COLOR[t.cat]}">${t.name}${t.max>1?' Lv'+(lvl(t.id)+1):''}<span class="muted" style="float:right">${r.total-r.left}/${r.total}ターン</span>${resPips(r)}</button>`;}
+    h+=`<button class="rbi" data-rgo="${t.id}" style="--tc:${CAT_COLOR[t.cat]}">${t.name}${tMax(t)>1||t.lvRank?' Lv'+(lvl(t.id)+1):''}<span class="muted" style="float:right">${r.total-r.left}/${r.total}ターン</span>${resPips(r)}</button>`;}
   if(!S.research.length)h+=`<div class="muted" style="margin:3px 0">${S.waveActive?'夜・襲撃中は研究を開始できません':`<span style="color:var(--amber)">研究員が${resCap()-resBusy()}人空いています</span>`}</div>`;
-  const totalLv=TECH.reduce((a,t)=>a+(t.max||1),0),doneLv=Object.values(S.tech).reduce((a,b)=>a+b,0);
+  const totalLv=TECH.reduce((a,t)=>a+tMax(t),0),doneLv=Object.values(S.tech).reduce((a,b)=>a+b,0);
   h+=`<div class="muted" style="font-size:11px">研究達成 ${doneLv} / ${totalLv}</div>`;
   h+=`<button id="bRes2" style="margin-top:5px;width:100%">研究画面を開く [R]</button>`;
   el.innerHTML=h;document.getElementById('bRes2').onclick=showResearch;
@@ -6607,7 +6610,7 @@ function showResearch(){
   const RN=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ'];
   const cap=resCap(),busy=resBusy();
   const free=cap-busy,land=isLand();
-  const nowH=`<div class="rnow"><small>研究中</small>${S.research.length?S.research.map(r=>{const t=techOf(r.id);return `<button class="rnc" data-goto="${t.id}" style="--tc:${CAT_COLOR[t.cat]}"><b>${t.name}${t.max>1?' Lv'+(lvl(t.id)+1):''}</b><span>${r.total-r.left}/${r.total}T</span>${resPips(r)}</button>`;}).join(''):'<span class="muted" style="font-size:12px">なし</span>'}${free>0?`<span class="rnf">研究員が${free}人空いています</span>`:''}</div>`;
+  const nowH=`<div class="rnow"><small>研究中</small>${S.research.length?S.research.map(r=>{const t=techOf(r.id);return `<button class="rnc" data-goto="${t.id}" style="--tc:${CAT_COLOR[t.cat]}"><b>${t.name}${tMax(t)>1||t.lvRank?' Lv'+(lvl(t.id)+1):''}</b><span>${r.total-r.left}/${r.total}T</span>${resPips(r)}</button>`;}).join(''):'<span class="muted" style="font-size:12px">なし</span>'}${free>0?`<span class="rnf">研究員が${free}人空いています</span>`:''}</div>`;
   let h=`<div class="rhead"><span class="rtt">研究</span><div class="rstat"><small>研究員</small><b>${busy} / ${cap}</b><span style="grid-column:1/-1">${sageHTML(busy,cap)}</span></div>${land?nowH:''}<div class="rstat rwave"><small>襲撃まで</small><b>${S.waveActive?'交戦中':S.turnsLeft+' ターン'}</b></div>
     <div class="rres">${['steel','stone','iron','fuel','ammo','elec','gold','mat'].map(k=>`<span>${ic(k,12)}${Math.floor(S[k])}</span>`).join('')}<span>${ic('pop',12)}${S.pop}</span></div><button id="ovClose">閉じる<kbd>R</kbd></button></div>`;
   // 研究中のもの（どのタブにあっても見えるように）。押すとそのタブのその研究へ移動。横持ちはヘッダーの中に入れる
@@ -6639,7 +6642,7 @@ function showResearch(){
   // 詳細
   const t=techOf(S.resSel),st=techState(t),r=S.research.find(x=>x.id===t.id),c=techCost(t),turns=r?r.total:techTurns(t);
   let act='';
-  if(st==='done')act=`<span style="color:var(--green);font-weight:bold">${ui('check','green',12)} 最大レベル（Lv${t.max||1}）・研究完了</span>`;
+  if(st==='done')act=`<span style="color:var(--green);font-weight:bold">${ui('check','green',12)} 最大レベル（Lv${tMax(t)}）・研究完了</span>`;
   else if(st==='active')act=`<span style="color:var(--cyan)">研究中 残り${r.left}ターン</span> <button data-cancel="${t.id}">中止（費用の半分を回収）</button>`;
   else if(st==='ready'){const need=techRes(t),rok=resBusy()+need<=resCap()&&S.pop>=need;const ok=canAfford(c)&&rok&&!S.waveActive;
     act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?(S.pop<need?'待機中の住民が足りません':'研究員が足りません（研究室を増やす・改築する）'):'資源が足りません'}</span>${rok?mktBtn(c):''}`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
@@ -6649,7 +6652,7 @@ function showResearch(){
   else if(!t.gate&&!rankOpen(cat,t.tier||1))act=`<span class="muted">ランク${RN[t.tier||1]}は未解放：<span style="color:var(--red)">城をLv${t.tier||1}</span>にすると研究できます</span>`;
   else act=`<span class="muted">前提：${(t.pre||[]).map(p=>`<span style="color:${has(p)?'var(--green)':'var(--red)'}">${techOf(p).name}${techOf(p).cat!==cat?`（${techOf(p).cat}）<button data-jump="${p}" style="padding:1px 8px">そこへ移動</button>`:''}</span>`).join('・')}${t.preSum?`${(t.pre||[]).length?'・':''}<span style="color:${preSumLv(t)>=t.preSum.n?'var(--green)':'var(--red)'}">${t.preSum.label}の合計Lv ${preSumLv(t)}/${t.preSum.n}</span>`:''}</span>`;
   const exo=t.excl?TECH.filter(o=>o.excl===t.excl&&o.id!==t.id).map(o=>o.name).join('・'):'';
-  h+=`<div class="tdet"><div class="tdl"><div><b class="tdn" style="color:${CAT_COLOR[cat]}">${t.name}</b><span class="tdlv">${lvl(t.id)>=(t.max||1)?`<b style="color:var(--green)">Lv ${lvl(t.id)}（最大）</b>`:`Lv ${lvl(t.id)} → ${lvl(t.id)+1} ／ 最大 ${t.max||1}`}</span>${t.key?'<span style="color:var(--amber);margin-left:8px">重要</span>':''}</div>
+  h+=`<div class="tdet"><div class="tdl"><div><b class="tdn" style="color:${CAT_COLOR[cat]}">${t.name}</b><span class="tdlv">${lvl(t.id)>=tMax(t)?`<b style="color:var(--green)">Lv ${lvl(t.id)}（最大）</b>`:`Lv ${lvl(t.id)} → ${lvl(t.id)+1} ／ 最大 ${tMax(t)}${t.lvRank?'（城のランク）':''}`}</span>${t.key?'<span style="color:var(--amber);margin-left:8px">重要</span>':''}</div>
     <div class="tde">${t.eff}</div>${exo?`<div style="color:var(--amber);font-size:11px">分岐：「${exo}」とどちらか一方しか研究できません</div>`:''}</div>
     <div class="tdr">${act}</div></div>`;
   const card=openOverlay('res',h,true);
