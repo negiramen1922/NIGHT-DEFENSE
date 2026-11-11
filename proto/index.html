@@ -2057,7 +2057,10 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('highmagic',{cat:'部隊',tier:2,name:'高等魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard',eff:'魔術師の魔法の範囲 +30%、魔力の消費 −30%'});
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館か所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
- set('alloyarms',{cat:'部隊',tier:3,name:'合金の武具',cost:{iron:70,gold:50},t:3,pre:['heavyarms'],icon:'heavy',eff:'全部隊の武器が「合金」に上がる（鋼の剣→合金の剣など）：さらに火力+25%・耐久+10%'});
+ set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「鉄の鎧」になる：体力 +20／人（補給で鎧を使う）'});
+ set('steelarmor',{cat:'部隊',tier:2,name:'鋼の鎧',cost:{iron:45,steel:30},t:2,pre:['ironarmor'],icon:'heavy',eff:'鎧が「鋼の鎧」になる：体力 +45／人'});
+ set('alloyarmor',{cat:'部隊',tier:3,name:'合金の鎧',cost:{iron:80,gold:50},t:3,pre:['steelarmor'],icon:'heavy',eff:'鎧が「合金の鎧」になる：体力 +75／人'});
+ set('alloyarms',{cat:'部隊',tier:3,name:'合金の武具',cost:{iron:70,gold:50},t:3,pre:['heavyarms'],icon:'heavy',eff:'全部隊の武器が「合金」になる（鋼の剣→合金の剣など）：攻撃×1.9（補給で鉄と金貨も使う）'});
  set('battalion',{cat:'部隊',tier:3,name:'大隊',cost:{gold:80,fuel:60,sword:20},t:3,pre:['formation'],icon:'heavy',eff:'中隊3つまでを「大隊」にまとめられる。ほかの中隊が8マス以内にいると火力+10%・耐久+5%（中隊の効果と重なる）'});
  set('division',{cat:'部隊',tier:3,name:'師団',cost:{gold:160,fuel:120,iron:60},t:4,pre:['battalion'],icon:'heavy',eff:'大隊3つまでを「師団」にまとめられる。ほかの大隊が12マス以内にいると火力+10%・耐久+5%（今はランクⅢ。ランクを伸ばしたらⅥのつもり）'});
  set('unit_r3',{cat:'部隊',gate:3,tier:3,name:'部隊強化Ⅲ',cost:{gold:120,fuel:80,iron:40},t:3,pre:[],icon:'dragon',eff:'部隊タブのランクⅢの研究を解放（竜騎兵など）'});
@@ -2092,7 +2095,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('polearm',{cat:'部隊',tier:1,name:'長柄の武器',cost:{steel:40,iron:10},t:1,pre:[],icon:'pawn_spear_shield',eff:'兵士・重装歩兵の武器が「槍」に、弓兵の弓が「長弓」に上がる（自動）'});
  set('firecraft',{cat:'部隊',tier:1,name:'火の扱い',cost:{steel:40,fuel:20},t:1,pre:[],icon:'pawn_sword_torch',eff:'弓兵の矢が「火矢」に上がる（篝火の近くで燃やす）'});
  set('heavyarms',{cat:'部隊',tier:2,name:'重武器',cost:{iron:50,steel:40},t:2,pre:[],icon:'pawn_axe_shield',eff:'兵士・重装歩兵の武器が「戦斧」に、弓兵が「クロスボウ」に、騎兵が「鋼の騎槍」に上がる（自動）'});
- set('heavyarms',{cat:'部隊',tier:2,name:'鋼の武具',cost:{iron:40,steel:30},t:2,pre:[],icon:'heavy',eff:'全部隊の武器が「鋼」に上がる（鉄の剣→鋼の剣など）：火力+25%・耐久+10%'});
+ set('heavyarms',{cat:'部隊',tier:2,name:'鋼の武具',cost:{iron:40,steel:30},t:2,pre:[],icon:'heavy',eff:'全部隊の武器が「鋼」になる（鉄の剣→鋼の剣など）：攻撃×1.4（補給で鉄も使う）'});
  set('horsearch',{cat:'部隊',tier:2,name:'騎射',cost:{steel:40,fuel:40},t:2,pre:['cavalry'],icon:'rider_hbow',eff:'騎兵の武器が「騎射の騎槍」に上がる（重武器も要る）：空の敵も射落とせる'});
  set('elemental',{cat:'部隊',tier:2,name:'属性魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard_tstaff',eff:'魔術師の杖が「属性の杖」に上がる（範囲＋雷の連鎖＋足止め）'});
  set('shells',{cat:'部隊',tier:3,name:'特殊砲弾',cost:{iron:60,gold:40},t:3,pre:['artillery'],icon:'cannoneer',eff:'砲兵の弾が「特殊砲弾」に上がる（火力+40%・燃やす）'});
@@ -3099,7 +3102,7 @@ function gunOf(b){if(b.bt>0)return null;if(B[b.type].garrison&&!garOf(b))return 
 function rangeOf(b){return rangeOf0(b);}
 function rangeOf0(b){const g=gunOf(b)||B[b.type];let r=(g.range||0)+wallRange(b)+elevRange(b);if(b.type==='field'&&b.shell==='can')r=r*0.65;if(has('fcs')){if(b.type==='mg'||b.type==='tower'||b.type==='field')r+=1;if(b.type==='tower'&&has('tower'))r+=1;if(HOW_FAM.includes(b.type)||b.type==='mlrs')r+=2;}if(HOW_FAM.includes(b.type)&&has('longhow'))r+=3;if(b.type==='mg'&&has('heavymg'))r+=0.5;if(B[b.type].grp==='def')r+=UP.range[(b.lv||1)-1];return r;}
 // 1機（1両）あたりの耐久
-function memberHp(u){const t=MT(u);return t.hpEach*(has('bonearmor')&&['inf','cav','mil','guard'].includes(t.ut)?1.25:1);}
+function memberHp(u){const t=MT(u);return (t.hpEach+(typeof aTier==='function'?A_HP[aTier(u)]:0))*(has('bonearmor')&&['inf','cav','mil','guard'].includes(t.ut)?1.25:1);}   // 鎧の段で1人あたりの体力が増える
 function unitMaxHp(u){const t=MT(u);return t.hpEach*UT[u.ut].members*(1+(bonus(u).hp-1)+(has('bonearmor')&&['inf','cav','mil','guard'].includes(t.ut)?0.25:0)+(u.kind==='s'&&vetLv(u)>=2?0.1:0));}
 function unitTime(m,b){const t=MT(m);return t.time*(has('assembly')?0.6:1)*(t.ut==='mech'&&has('mobile')?0.8:1)/UP.prod[(b?b.lv:1)-1];}
 function squadTime(b){return unitTime((b.qm&&b.qm[0])||defModel(UNIT_HOME[b.type])||'mech',b);}
@@ -3229,7 +3232,7 @@ function placeB(type,x,y,free,szo){
 }
 function canAfford(cost,pop){for(const k in cost)if(S[k]<cost[k])return false;return S.pop>=(pop||0);}
 // ===== 資源アイコン =====
-const RES_NAME={powder:'火薬',gold:'金貨',silver:'銀貨',sword:'剣',steel:'木材',stone:'石材',iron:'鉄',ammo:'矢',fuel:'食料',elec:'エーテル',mat:'魔核',pop:'住民',power:'電力',kia:'戦死'};
+const RES_NAME={armor:'鎧',powder:'火薬',gold:'金貨',silver:'銀貨',sword:'剣',steel:'木材',stone:'石材',iron:'鉄',ammo:'矢',fuel:'食料',elec:'エーテル',mat:'魔核',pop:'住民',power:'電力',kia:'戦死'};
 const ICON={
   gold:'<circle cx="8" cy="8" r="6.2" fill="#d8a830"/><circle cx="8" cy="8" r="4.6" fill="none" stroke="#f8d870" stroke-width="1"/><path d="M8 5 V11 M6.5 6.5 H9.5 M6.5 9.5 H9.5" stroke="#8a6a10" stroke-width="1"/>',
   sword:'<path d="M12.5 1.5 L14.5 3.5 L6 12 L4 10Z" fill="#d8dce4"/><path d="M3 9 L7 13" stroke="#8a6a3a" stroke-width="1.6"/><path d="M2.5 13.5 L4.5 11.5" stroke="#6a4a2a" stroke-width="1.8"/>',
@@ -3263,7 +3266,7 @@ function ui(name,col,sz){sz=piSz(sz||12);return `<img class="pi" src="${piURL(na
 function ic(k,sz){sz=sz||14;const p=PI_RES[k];if(p&&PXICON.items[p]){const z=piSz(sz);return `<img class="ic pi" src="${piURL(p)}" width="${z}" height="${z}" alt="${RES_NAME[k]||k}" title="${RES_NAME[k]||k}" style="width:${z}px;height:${z}px">`;}
   return `<svg class="ic" width="${sz}" height="${sz}" viewBox="0 0 16 16" aria-label="${RES_NAME[k]||k}">${ICON[k]||''}</svg>`;}
 // 費用の表示。手持ちが足りない資源は赤字にする
-function costText(c,pop){const p=[];const lack=(k,v)=>S&&(S[k]||0)<v;for(const k of ['gold','steel','stone','iron','fuel','ammo','sword','powder','elec','mat'])if(c[k])p.push(`<span class="cst${lack(k,c[k])?' lack':''}" title="${RES_NAME[k]}${lack(k,c[k])?`（足りない：あと${Math.ceil(c[k]-(S[k]||0))}）`:''}">${ic(k,12)}${c[k]}</span>`);if(c.pop)p.push(`<span class="cst${lack('pop',c.pop)?' lack':''}" title="人員（研究中だけ拘束・完了で復帰）">${ic('pop',12)}${c.pop}</span>`);if(pop)p.push(`<span class="cst${lack('pop',pop)?' lack':''}" title="人員">${ic('pop',12)}${pop}</span>`);return p.join(' ');}
+function costText(c,pop){const p=[];const lack=(k,v)=>S&&(S[k]||0)<v;for(const k of ['gold','steel','stone','iron','fuel','ammo','sword','armor','powder','elec','mat'])if(c[k])p.push(`<span class="cst${lack(k,c[k])?' lack':''}" title="${RES_NAME[k]}${lack(k,c[k])?`（足りない：あと${Math.ceil(c[k]-(S[k]||0))}）`:''}">${ic(k,12)}${c[k]}</span>`);if(c.pop)p.push(`<span class="cst${lack('pop',c.pop)?' lack':''}" title="人員（研究中だけ拘束・完了で復帰）">${ic('pop',12)}${c.pop}</span>`);if(pop)p.push(`<span class="cst${lack('pop',pop)?' lack':''}" title="人員">${ic('pop',12)}${pop}</span>`);return p.join(' ');}
 function setHTML(el,v){if(el&&el.dataset.h!==v){el.dataset.h=v;el.innerHTML=v;}}
 
 // ===== 英雄 =====
@@ -4241,7 +4244,7 @@ function update(dt,sim){
     else if(b.type==='tavern'){S.fuel=Math.max(0,S.fuel-0.2*dt);}
     else if(b.type==='ironmine'){const v=0.6*um*RICH[richAt(b.x,b.y)]*(techMul('ironmine')+bn.prod-1)*dt;S.iron+=v;depleteTick(b,v);tickProdXp(b,dt);}
     else if(b.type==='farm'){S.fuel+=0.8*um*(techMul('farm')+bn.prod-1)*dt;tickProdXp(b,dt);}
-    else if(b.type==='ammo'){const m=um*(techMul('ammo')+bn.prod-1)*dt;const sw=b.mode==='sword';const kf=heroSk(b,'kenyaku')?0.6:1;const ns=(sw?0.2:0.4)*m*kf,ni=(sw?0.4:0.2)*m*kf;if(S.steel>=ns&&S.iron>=ni){S.steel-=ns;S.iron-=ni;if(sw)S.sword+=0.5*m;else S.ammo+=3.0*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
+    else if(b.type==='ammo'){const m=um*(techMul('ammo')+bn.prod-1)*dt;const sw=b.mode==='sword',ar=b.mode==='armor';const kf=heroSk(b,'kenyaku')?0.6:1;const ns=(sw||ar?0.2:0.4)*m*kf,ni=(ar?0.6:sw?0.4:0.2)*m*kf;if(S.steel>=ns&&S.iron>=ni){S.steel-=ns;S.iron-=ni;if(ar)S.armor=(S.armor||0)+0.4*m;else if(sw)S.sword+=0.5*m;else S.ammo+=3.0*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
     else if(b.type==='powder'){const m=um*bn.prod*dt;const nw=0.6*m,nm=0.1*m;if(S.steel>=nw&&S.mat>=nm){S.steel-=nw;S.mat-=nm;S.powder=(S.powder||0)+0.6*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
     else if(b.type==='furnace'){b.fa=(b.fa||0)+0.2*um*bn.prod*dt;b.starved=S.mat<1;while(b.fa>=1&&S.mat>=1){b.fa-=1;S.mat-=1;S.elec+=2;}if(S.mat<1)b.fa=Math.min(b.fa,1);tickProdXp(b,dt);}
     else if(b.type==='well'){const v=0.3*um*RICH[richAt(b.x,b.y)]*bn.prod*dt;S.elec+=v;depleteTick(b,v);tickProdXp(b,dt);}
@@ -4630,7 +4633,8 @@ const SUP={
 };
 // 冒険者も補給が必要：剣士→武具、狩人→矢筒、魔導士→魔力（エーテル）
 const ADV_SUP={advSword:'inf',advBow:'arch',advMage:'mage'};
-function supT(s){return s.ut==='adv'?SUP[ADV_SUP[s.model]]:SUP[s.ut];}
+function supT(s){const b=s.ut==='adv'?SUP[ADV_SUP[s.model]]:SUP[s.ut];if(!b||s.ut==='adv')return b;const wt=wTier(s),at=aTier(s);if(!wt&&!at)return b;
+  const c=Object.assign({},b.costs||{[b.key]:b.per});for(const x of [W_SUP[wt]||{},A_SUP[at]||{}])for(const k in x)c[k]=(c[k]||0)+x[k]*(b.per||1);return Object.create(b,{costs:{value:c}});}   // 武器・鎧の段が上なほど補給で使う資材が増える
 function supOf(s){const sp=supT(s);if(!sp)return null;if(s.sup==null)s.sup=sp.max;return sp;}
 function supNeed(s){const sp=supOf(s);return sp?Math.max(0,sp.max-s.sup):0;}
 function needsSupply(s){return supNeed(s)>0.01||refillNeed(s)>0||healNeed(s)>=1;}
@@ -4667,7 +4671,7 @@ function squadResBonus(s){let r=(has('analysis')?0.1:0)+vetDmg(s);
   return r;}
 function dmgPctS(s){const L=[];const add=(n,v)=>{if(v)L.push([n,v]);};const v=vetDmg(s);add('英雄',bonus0(s).dmg-1);add('研究',squadResBonus(s)-v);add('熟練度',v);
   if(coBonus(s))add('中隊',0.15);if(bnBonus(s))add('大隊',0.1);if(dvBonus(s))add('師団',0.1);if(s.buffT>0)add('鼓舞',0.3);if(s.ut==='guard'&&nearCastle(s))add('城のそば',1.0);return L;}
-function dmgBaseS(s){const t=MT(s);return t.dmg*eqP(s,'dmg')*(1+0.25*wMat(s));}   // 材料の段ごとに火力+25%
+function dmgBaseS(s){const t=MT(s);return t.dmg*eqP(s,'dmg')*W_DMG[wTier(s)];}   // 武器の段で攻撃が上がる
 function unitDmg(s){
   const t=MT(s);return dmgBaseS(s)*(1+pctSum(dmgPctS(s)))*Math.max(0,s.members)/t.members;
 }
@@ -4728,12 +4732,23 @@ const EQ_SLOTS={inf:['main','sub'],arch:['main','ammo'],cav:['main'],mage:['main
 const EQ_DEF={inf:{main:'sword',sub:'shield'},arch:{main:'sbow',ammo:'arrow'},cav:{main:'lance'},mage:{main:'fstaff'},art:{ammo:'he'},drake:{gear:'dnone'}};
 const SLOT_NAME={main:'武器',sub:'副装備',ammo:'矢・弾',gear:'装具'};
 const BIG_E=new Set(['charger','grappler','troll','heavy','king','wyvern']),SMALL_E=new Set(['swarm','redcap','gobarcher','spitter']);
-// 試作（2026-11-11）：武器の種類は変えず、**材料が一段ずつ良くなる**（鉄の剣 → 鋼の剣 → 合金の剣 → 魔金属の剣 → 聖銀の剣…）。装備の種類（槍・戦斧など）は選ばない
+// 試作（2026-11-11）：武器と鎧は、種類は変えず材料が一段ずつ良くなる（鉄の剣→鋼の剣→合金の剣…／革の鎧→鉄の鎧→鋼の鎧…）。
+// 部隊ごとに使う段を選べる（s.wT／s.aT。null＝研究した最新を自動で使う）。上の段ほど補給で使う資材が増える＝古い段にして資材を節約できる
 const EQ_UP=null;
 const W_MAT=['鉄','鋼','合金','魔金属','聖銀','竜晶'],W_REQ=[null,'heavyarms','alloyarms'],W_RANK=['Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ','Ⅶ'];
+const W_DMG=[1,1.4,1.9,2.6,3.5,4.6];                       // 武器の段ごとの攻撃（鉄を1として）
+const W_SUP=[{},{iron:0.3},{iron:0.5,gold:0.2}];            // 武器の段ごとに、補給1あたり余分に使う資材
 const W_NAME={inf:'剣',mil:'剣',guard:'剣',arch:'矢じり',cav:'騎槍',mage:'杖',art:'砲弾',drake:'竜具',adv:'武器'};
-function wMat(s){let m=0;for(let i=1;i<W_REQ.length;i++)if(W_REQ[i]&&has(W_REQ[i]))m=i;return m;}   // 今の材料の段（0＝鉄）
+const A_MAT=['革','鉄','鋼','合金','魔金属','聖銀'],A_REQ=[null,'ironarmor','steelarmor','alloyarmor'],A_RANK=['Ⅰ','Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ'];
+const A_HP=[0,20,45,75,110,160];                             // 鎧の段ごとに、1人あたり増える体力
+const A_SUP=[{},{armor:0.5},{armor:0.8,iron:0.3},{armor:1.2,iron:0.6}];   // 鎧の段ごとの補給の資材
+const ARMORED=['inf','cav','guard','mil'];                   // 鎧を着る兵科：兵士・重装歩兵・騎兵（騎士）・近衛
+function wMat(s){let m=0;for(let i=1;i<W_REQ.length;i++)if(W_REQ[i]&&has(W_REQ[i]))m=i;return m;}   // 研究した武器の段
+function aMat(){let m=0;for(let i=1;i<A_REQ.length;i++)if(A_REQ[i]&&has(A_REQ[i]))m=i;return m;}
+function wTier(s){const a=wMat(s);return s&&s.wT!=null?Math.min(s.wT,a):a;}
+function aTier(s){if(!s||typeof s!=='object'||!ARMORED.includes(s.ut))return 0;const a=aMat();return s.aT!=null?Math.min(s.aT,a):a;}
 function wName(s,m){return W_MAT[m]+'の'+(W_NAME[s.ut]||'武器');}
+function aName(m){return A_MAT[m]+'の鎧';}
 function eqKey(s,slot){return (EQ_DEF[s.ut]||{})[slot];}
 function eqList(s){return (EQ_SLOTS[s.ut]||[]).map(sl=>EQ[eqKey(s,sl)]).filter(Boolean);}
 function eqP(s,k){let v=1;for(const e of eqList(s))if(e[k]!=null)v*=e[k];return v;}
@@ -4769,7 +4784,7 @@ function vetBar(s){const v=Math.floor(s.vet||0),l=vetLv(s),cap=has('elite')?2:1,
   const a=VET[l].xp;return {txt:`${v} / ${nx.xp}`,pct:Math.max(0,Math.min(100,Math.round((v-a)/(nx.xp-a)*100)))};}
 function damageSquad(s,dmg){if(s.invT>0)return;if(s.shieldT>0)dmg*=0.5;if(s.yugT>0)dmg*=0.7;
   const t=MT(s);
-  dmg*=(t.frail||1)*(1-bonus(s).red)*(1-(t.armor||0))*(1-(t.red||0))*(has('shieldwall')&&s.model==='heavy'?0.75:1)*(s.ut==='guard'&&nearCastle(s)?0.5:1)*(1-eqS(s,'red'))*(has('dragonscale')&&s.ut==='drake'?0.7:1)*(1/(1+(coBonus(s)?0.1:0)+(bnBonus(s)?0.05:0)+(dvBonus(s)?0.05:0)+0.1*wMat(s)))*coverAt(s.x,s.y)*(s.ut==='mech'&&has('blade')?0.85:1);
+  dmg*=(t.frail||1)*(1-bonus(s).red)*(1-(t.armor||0))*(1-(t.red||0))*(has('shieldwall')&&s.model==='heavy'?0.75:1)*(s.ut==='guard'&&nearCastle(s)?0.5:1)*(1-eqS(s,'red'))*(has('dragonscale')&&s.ut==='drake'?0.7:1)*(1/(1+(coBonus(s)?0.1:0)+(bnBonus(s)?0.05:0)+(dvBonus(s)?0.05:0)))*coverAt(s.x,s.y)*(s.ut==='mech'&&has('blade')?0.85:1);
   s.hp-=dmg;
   // 1機ぶんの耐久を割り込むごとに兵（と衛士）を失う
   const m=Math.max(0,Math.ceil(s.hp/(memberHp(s)*bonus(s).hp)-1e-6));
@@ -5839,7 +5854,7 @@ function prodOf(b){const k=TURN_SEC,bn=bonus(b),um=UP.prod[b.lv-1]*eff(b)*happyM
   switch(b.type){case 'miner':return {steel:1.0*um*(b.ym||1)*(techMul('miner')+bn.prod-1)*k};case 'quarry':return {stone:0.6*um*(b.ym||1)*(techMul('quarry')+bn.prod-1)*k};
   case 'ironmine':return {iron:0.6*um*RICH[richAt(b.x,b.y)]*(techMul('ironmine')+bn.prod-1)*k};case 'farm':return {fuel:0.8*um*(techMul('farm')+bn.prod-1)*k};
   case 'fishery':return {fuel:1.0*um*(techMul('fishery')+bn.prod-1)*k};case 'well':return {elec:0.3*um*RICH[richAt(b.x,b.y)]*bn.prod*k};case 'market':return {gold:0.6*um*bn.prod*k};
-  case 'ammo':{const m=um*(techMul('ammo')+bn.prod-1)*k;const kf=heroSk(b,'kenyaku')?0.6:1;return b.mode==='sword'?{sword:0.5*m,steel:-0.2*m*kf,iron:-0.4*m*kf}:{ammo:3.0*m,steel:-0.4*m*kf,iron:-0.2*m*kf};}
+  case 'ammo':{const m=um*(techMul('ammo')+bn.prod-1)*k;const kf=heroSk(b,'kenyaku')?0.6:1;return b.mode==='armor'?{armor:0.4*m,steel:-0.2*m*kf,iron:-0.6*m*kf}:b.mode==='sword'?{sword:0.5*m,steel:-0.2*m*kf,iron:-0.4*m*kf}:{ammo:3.0*m,steel:-0.4*m*kf,iron:-0.2*m*kf};}
   case 'barracks':return {pop:S.happy>=35?bn.prod*3:0};case 'apart':return {pop:S.happy>=35?bn.prod*5:0};case 'tavern':return {fuel:-0.2*k};
   case 'furnace':{const m=0.2*um*bn.prod*k;return {elec:2*m,mat:-m};}case 'powder':{const m=um*bn.prod*k;return {powder:0.6*m,steel:-0.6*m,mat:-0.1*m};}}return null;}
 function depleteTick(b,amt){if(b.res==null||b.res===Infinity)return;b.res-=amt;if(b.res<=0){b.res=0;b.dep=true;log(`${B[b.type].name}の資源が尽きた（新しい場所を探そう）`,'warn');
@@ -6245,7 +6260,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     el.innerHTML=h;el.querySelectorAll('[data-sq]').forEach(b=>b.onclick=()=>{S.sel=S.squads.find(s=>s.id==b.dataset.sq);renderInfo(true);});}return;}
   const c=cmdOf(o);const isS=o.kind==='s';
   const uc=!isS?upgCost(o):null;
-  const key=(S.heroPick===o.id?'hp':'')+o.id+'|'+(S.baseLv||1)+'|'+(o.ench||0)+'/'+(has('enchant')?Math.floor(S.mat/5):'')+'|'+(o.type==='market'?Math.floor(S.mat)+'/'+Math.floor(S.silver||0)+'/'+JSON.stringify(S.buyToday||{})+'/'+Math.floor(S.gold/10):'')+'|'+((o.qm||[]).join(','))+'|'+(o.res!=null?Math.floor(o.res/20):'')+'|'+(o.dep?1:0)+'|'+(o.type==='hq'?S.baseLv+'|'+canAfford(baseUpCost()):'')+'|'+(o.gar||'')+'|'+S.squads.filter(q=>q.ut==='guard'&&q.gar).length+'|'+(o.stayOut?1:0)+'|'+(o.off?1:0)+'|'+(o.eq?JSON.stringify(o.eq):'')+(o.eqPend?'p':'')+(o.supPend?'s':'')+(o.eqPend?JSON.stringify(o.eqPend):'')+'|'+S.squads.filter(x=>x.ut==='arch'&&!x.gar).length+'|'+(o.mode||'')+'|'+(o.shell||'')+'|'+(o.lv||0)+'|'+(c?c.id:'')+'|'+S.cmds.filter(x=>!x.assign).length+'|'+(o.queue||0)+'|'+Object.keys(MTC).map(k=>canAfford(MTC[k].cost)?1:0).join('')+modelsFor('mech').length+modelsFor('tank').length+'|'+Math.floor(S.mat)+'|'+(o.members||0)+'|'+(o.co||'')+(o.bn||'')+(o.dv||'')+'|'+S.squads.length+'|'+(o.kind==='b'?unitsOf(o).length:'')+'|'+S.cmds.length+'|'+(uc?canAfford(uc):'')+'|'+(isS?'':maxLvOf(o.type))+'|'+has('hqgun')+'|'+(o.wall?1:0)+'|'+(o.type==='wall'?affordSig():'')+'|'+(o.mode||'')+'|'+(o.bt>0?(o.upg?'u':'b'):'')+(isS?'':Math.ceil(o.bt/TURN_SEC-0.01));
+  const key=(S.heroPick===o.id?'hp':'')+o.id+'|'+(S.baseLv||1)+'|'+(o.ench||0)+'/'+(has('enchant')?Math.floor(S.mat/5):'')+'|'+(o.type==='market'?Math.floor(S.mat)+'/'+Math.floor(S.silver||0)+'/'+JSON.stringify(S.buyToday||{})+'/'+Math.floor(S.gold/10):'')+'|'+((o.qm||[]).join(','))+'|'+(o.res!=null?Math.floor(o.res/20):'')+'|'+(o.dep?1:0)+'|'+(o.type==='hq'?S.baseLv+'|'+canAfford(baseUpCost()):'')+'|'+(o.gar||'')+'|'+S.squads.filter(q=>q.ut==='guard'&&q.gar).length+'|'+(o.stayOut?1:0)+'|'+(o.off?1:0)+'|'+(o.eq?JSON.stringify(o.eq):'')+(o.eqPend?'p':'')+(o.supPend?'s':'')+(o.eqPend?JSON.stringify(o.eqPend):'')+'|'+S.squads.filter(x=>x.ut==='arch'&&!x.gar).length+'|'+(o.mode||'')+'|'+(o.shell||'')+'|'+(o.lv||0)+'|'+(c?c.id:'')+'|'+S.cmds.filter(x=>!x.assign).length+'|'+(o.queue||0)+'|'+Object.keys(MTC).map(k=>canAfford(MTC[k].cost)?1:0).join('')+modelsFor('mech').length+modelsFor('tank').length+'|'+Math.floor(S.mat)+'|'+(o.members||0)+'|'+(o.co||'')+(o.bn||'')+(o.dv||'')+(o.wT??'')+(o.aT??'')+'|'+S.squads.length+'|'+(o.kind==='b'?unitsOf(o).length:'')+'|'+S.cmds.length+'|'+(uc?canAfford(uc):'')+'|'+(isS?'':maxLvOf(o.type))+'|'+has('hqgun')+'|'+(o.wall?1:0)+'|'+(o.type==='wall'?affordSig():'')+'|'+(o.mode||'')+'|'+(o.bt>0?(o.upg?'u':'b'):'')+(isS?'':Math.ceil(o.bt/TURN_SEC-0.01));
   if(!force&&key===lastInfoKey){
     {const hc=document.getElementById('hcd'),cc=cmdOf(o);if(hc&&cc){const t=hcdText(cc);setText(hc,t);hc.className='hcd'+(t==='発動！'?' fire':t==='準備完了'?' ready':'');}}
     setText(document.getElementById('iHp'),o.kind==='s'?`${Math.round(o.hp/o.maxhp*100)}%`:`${Math.ceil(o.hp)} / ${Math.ceil(o.maxhp)}`);{const hb=document.getElementById('iHpBar');if(hb){const r=Math.max(0,o.hp/o.maxhp);hb.style.width=Math.round(r*100)+'%';hb.parentNode.className='hpbar'+(r<0.3?' low':r<0.6?' mid':'');}}
@@ -6304,7 +6319,15 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
         }
       }
     }
-    if(W_NAME[o.ut]&&o.ut!=='adv'){const m=wMat(o);h+=`<div class="upg"><b>武器</b><div class="muted" style="font-size:11px">研究すると材料が一段ずつ良くなります（段ごとに火力+25%・耐久+10%）</div><div style="margin-top:4px;font-size:11px">${W_MAT.map((x,i)=>{const rq=W_REQ[i],t=rq&&techOf(rq);const st=i===m?'color:var(--amber);font-weight:bold':i<m?'':'color:var(--muted)';return `<span style="${st}">${wName(o,i)}${i>m?(t?`（研究「${t.name}」）`:`（ランク${W_RANK[i]}・これから）`):''}</span>`;}).join(' → ')}</div></div>`;}
+    if(W_NAME[o.ut]&&o.ut!=='adv'){const t=MT(o),wa=wMat(o),wt=wTier(o),sp=SUP[o.ut];
+      const supTxt=x=>Object.keys(x).length?'＋'+Object.entries(x).map(([k,v])=>RES_NAME[k]+'×'+v).join('・'):'';
+      h+=`<div class="upg"><b>武器</b><div class="muted" style="font-size:11px">研究すると上の段が使えるようになります。古い段にすると、補給で使う資材を節約できます${o.wT==null?'（今は最新を自動で使う）':''}</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">`;
+      for(let i=0;i<W_MAT.length;i++){const ok=i<=wa,rq=W_REQ[i]&&techOf(W_REQ[i]);if(i>wa+1&&!rq)break;h+=`<button data-wt="${i}" ${ok?'':'disabled'} title="${ok?'補給1あたり：'+(sp?RES_NAME[sp.key]:'')+supTxt(W_SUP[i]||{}):(rq?'研究「'+rq.name+'」':'ランク'+W_RANK[i]+'・これから')}" style="padding:2px 8px;${i===wt?'border-color:var(--amber);color:var(--amber)':''}">${wName(o,i)}<br><span style="font-size:10px">攻撃 ${(t.dmg*W_DMG[i]).toFixed(1)}${ok&&i?'・補給'+supTxt(W_SUP[i]):''}</span></button>`;}
+      h+=`<button data-wt="auto" style="padding:2px 8px;${o.wT==null?'border-color:var(--cyan);color:var(--cyan)':''}">最新を自動で</button></div>`;
+      if(ARMORED.includes(o.ut)){const aa=aMat(),at=aTier(o);h+=`<div style="margin-top:6px"><b style="font-size:12px">鎧</b>${o.aT==null?'<span class="muted" style="font-size:11px">（最新を自動で）</span>':''}</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:2px">`;
+        for(let i=0;i<A_MAT.length;i++){const ok=i<=aa,rq=A_REQ[i]&&techOf(A_REQ[i]);if(i>aa+1&&!rq)break;h+=`<button data-at="${i}" ${ok?'':'disabled'} title="${ok?'補給1あたり'+supTxt(A_SUP[i]||{}):(rq?'研究「'+rq.name+'」':'ランク'+A_RANK[i]+'・これから')}" style="padding:2px 8px;${i===at?'border-color:var(--amber);color:var(--amber)':''}">${aName(i)}<br><span style="font-size:10px">体力 ${Math.round(t.hpEach+A_HP[i])}/人${ok&&i?'・補給'+supTxt(A_SUP[i]):''}</span></button>`;}
+        h+=`<button data-at="auto" style="padding:2px 8px;${o.aT==null?'border-color:var(--cyan);color:var(--cyan)':''}">最新を自動で</button></div>`;}
+      h+=`<div style="display:flex;gap:4px;margin-top:6px"><button id="eqAllSame" style="font-size:11px">同じ兵科の全部隊をこの部隊と同じに</button><button id="eqAllAuto" style="font-size:11px">全部隊を最新（自動）に</button></div></div>`;}
     if(o.ut==='adv')h+=`<div class="upg"><b>冒険者との契約</b><div class="muted" style="font-size:11px">毎ターン給金 ${MT(o).wage}。契約を終えると帰っていき、給金もかからなくなる（返金なし）</div><button id="advBye" style="margin-top:4px" ${S.waveActive?'disabled':''}>契約を終えて帰ってもらう${S.waveActive?'（戦闘中は不可）':''}</button></div>`;
     if(o.ut==='guard')h+=`<div class="upg"><b>近衛</b><div class="muted" style="font-size:11px">城から14マス以内：火力2倍・受ける被害半分（${nearCastle(o)?'<span style="color:var(--green)">効果発揮中</span>':'範囲外'}）</div><button id="gdHome" style="margin-top:4px">${o.stayOut?'城に戻って駐屯する':'城に駐屯中（自動で打って出る）'}</button></div>`;
     h+=`<details style="font-size:11px"><summary class="muted" style="cursor:pointer">行動の説明</summary><div class="muted">地図をクリックで移動（移動先が待機地点になります）。<br>迎撃：待機地点の周囲12マスに来た敵を自動で迎え撃つ（柵や壁の向こうの敵には回り込んで向かう）　固守：その場を動かない（近接部隊は柵・壁越しに敵を突ける）　帰還・補給：所属施設へ戻り、手当て・欠員の補充・矢や武具の補給</div></details>`;
@@ -6343,7 +6366,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
       if(o.wuse)h+=`<div class="row"><span class="muted">${S.waveActive?'今夜の消費':'前回の夜の消費'}</span><span class="bd">${Object.entries(o.wuse).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;
       else if(o.wlast)h+=`<div class="row"><span class="muted">前回の夜の消費</span><span class="bd">${Object.entries(o.wlast).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;}}
     if(o.res!=null&&o.res!==Infinity)h+=`<div class="row"><span class="muted">残りの埋蔵量</span><span class="${o.dep?'bd':o.res<150?'wn':''}">${o.dep?'枯渇（もう採れない）':Math.floor(o.res)}</span></div>`;}
-  if(!isS&&o.type==='ammo'){const sw=o.mode==='sword';h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-wmode="arrow" class="${sw?'':'on'}">${ic('ammo',14)} 矢</button><button data-wmode="sword" class="${sw?'on':''}">${ic('sword',14)} 剣</button></div><div class="muted" style="font-size:11px;margin-top:3px">${sw?'剣：兵士・重装歩兵・騎兵の編成と補充に使う':'矢：バリスタ・物見櫓・弓兵が使う'}</div></div>`;}
+  if(!isS&&o.type==='ammo'){const sw=o.mode==='sword',ar=o.mode==='armor';h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-wmode="arrow" class="${sw||ar?'':'on'}">${ic('ammo',14)} 矢</button><button data-wmode="sword" class="${sw?'on':''}">${ic('sword',14)} 剣</button><button data-wmode="armor" class="${ar?'on':''}">${ic('armor',14)} 鎧</button></div><div class="muted" style="font-size:11px;margin-top:3px">${ar?'鎧：兵士・重装歩兵・騎兵の鎧の補給に使う（木材 −2・鉄 −6 → 鎧 +4／T 相当）':sw?'剣：兵士・重装歩兵・騎兵の編成と補充に使う':'矢：バリスタ・物見櫓・弓兵が使う'}</div></div>`;}
   if(!isS&&canEnch(o)&&!(o.bt>0&&!o.upg)){const e=o.ench||0;const what=B[o.type].range?'火力':PROD_BT.includes(o.type)?'生産量':'';
     h+=`<div class="upg"><b>魔核の強化</b><span><span class="star">${'★'.repeat(e)}${'☆'.repeat(3-e)}</span> ${e}/3</span>`;
     if(!has('enchant'))h+=`<div class="muted" style="font-size:11px">研究「魔核の強化」（魔核タブ）で使えるようになる</div>`;
@@ -6385,7 +6408,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   el.querySelectorAll('[data-sell]').forEach(b=>b.onclick=()=>{const n=b.dataset.sell==='all'?Math.floor(S.mat):Math.min(10,Math.floor(S.mat));if(n<=0)return;const g=n*matPrice();S.mat-=n;S.gold+=g;se('click');S.tradeN=(S.tradeN||0)+1;log(`魔核${n}個を売った（金貨+${g}）`,'good');renderInfo(true);});
   el.querySelectorAll('[data-qcancel]').forEach(b=>b.onclick=()=>{cancelTrain(o,+b.dataset.qcancel);renderInfo(true);});
   {const ia=document.getElementById('iArmy');if(ia)ia.onclick=()=>openArmyTab('train');}
-  el.querySelectorAll('[data-wmode]').forEach(b=>b.onclick=()=>{o.mode=b.dataset.wmode==='sword'?'sword':null;renderInfo(true);});
+  el.querySelectorAll('[data-wmode]').forEach(b=>b.onclick=()=>{o.mode=b.dataset.wmode==='sword'?'sword':b.dataset.wmode==='armor'?'armor':null;renderInfo(true);});
   el.querySelectorAll('[data-gar]').forEach(b=>b.onclick=()=>{garrison(S.squads.find(x=>x.id==b.dataset.gar),o);renderInfo(true);});
   el.querySelectorAll('[data-gartower]').forEach(b=>b.onclick=()=>{garrison(o,S.blds.find(x=>x.id==b.dataset.gartower));renderInfo(true);});
   {const u=document.getElementById('iUngar');if(u)u.onclick=()=>{ungarrison(o);renderInfo(true);};}
@@ -6395,6 +6418,10 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   el.querySelectorAll('[data-eq]').forEach(b=>b.onclick=()=>{const [sl,id]=b.dataset.eq.split(':');orderEquip(o,sl,id);renderInfo(true);});
   {const gh=el.querySelector('#gdHome');if(gh)gh.onclick=()=>{o.stayOut=false;const [qx,qy]=castleC();orderMove(o,qx,qy+1.4*TU);o.stayOut=false;renderInfo(true);};}
   el.querySelectorAll('[data-gdout]').forEach(b=>b.onclick=()=>{const q=S.squads.find(x=>x.id==b.dataset.gdout);if(!q)return;q.gar=null;q.stayOut=true;const [qx,qy]=castleC();q.x=qx;q.y=qy+1.4*TU;q.ax=q.x;q.ay=q.y;S.sel=q;renderInfo(true);});
+  el.querySelectorAll('[data-wt]').forEach(b=>b.onclick=()=>{o.wT=b.dataset.wt==='auto'?null:+b.dataset.wt;renderInfo(true);});
+  el.querySelectorAll('[data-at]').forEach(b=>b.onclick=()=>{o.aT=b.dataset.at==='auto'?null:+b.dataset.at;renderInfo(true);});
+  {const q=document.getElementById('eqAllSame');if(q)q.onclick=()=>{for(const x of S.squads)if(x.ut===o.ut){x.wT=o.wT;x.aT=o.aT;}log(`${UT[o.ut].name}の全部隊の装備を、${unitLabel(o)}と同じにした`);renderInfo(true);};
+   const w=document.getElementById('eqAllAuto');if(w)w.onclick=()=>{for(const x of S.squads){x.wT=null;x.aT=null;}log('全部隊の装備を最新（自動）にした');renderInfo(true);};}
   el.querySelectorAll('[data-co]').forEach(b=>b.onclick=()=>{formCompany(o,S.squads.find(x=>x.id==b.dataset.co));renderInfo(true);});
   el.querySelectorAll('[data-bn]').forEach(b=>b.onclick=()=>{formBattalion(o,S.squads.find(x=>x.id==b.dataset.bn));renderInfo(true);});
   el.querySelectorAll('[data-dv]').forEach(b=>b.onclick=()=>{formDivision(o,S.squads.find(x=>x.id==b.dataset.dv));renderInfo(true);});
@@ -6535,11 +6562,12 @@ function renderSheetHandle(){const el=document.getElementById('sheetSel');if(!el
   if(o){const r=Math.max(0,o.hp/o.maxhp);h=`${o.kind==='s'?icSvg(o.model||defModel(o.ut),30):icSvg(o.type,30)}<span class="shm"><span class="shn"><b>${o.kind==='s'?unitLabel(o):B[o.type].name}</b>${o.kind==='b'&&B[o.type].grp?`<span class="ilv">Lv${o.lv||1}</span>`:''}<span class="shv">${o.kind==='s'?Math.round(r*100)+'%':Math.ceil(o.hp)+'/'+Math.ceil(o.maxhp)}</span></span><span class="hpbar${r<0.3?' low':r<0.6?' mid':''}"><i style="width:${Math.round(r*100)}%"></i></span></span>`;}
   else if(S.buildMode)h=`${icSvg(S.buildMode,30)}<span class="shm"><span class="shn"><b>${B[S.buildMode].name}</b><span class="shv">建設中</span></span></span>`;
   setHTML(el,h);document.getElementById('sheetHandle').classList.toggle('has',!!h);}
-function renderTop(){
+function renderTop(){if(S&&S.armor==null)S.armor=20;   // 試作：鎧（新しい軍需）
+
   const e=econ(),n=e.net;
   if(S.powder==null)S.powder=0;if(S.silver==null){S.silver=Math.floor(S.tcred||0);delete S.tcred;}let h='';
   // 13種を5グループに（UI v2）
-  const GRP=[['通貨',['gold','silver']],['資材',['steel','stone','iron','fuel','elec','mat']],['軍需',['ammo','sword'].concat(has('gunpowder')||S.powder>0?['powder']:[])]];
+  const GRP=[['通貨',['gold','silver']],['資材',['steel','stone','iron','fuel','elec','mat']],['軍需',['ammo','sword','armor'].concat(has('gunpowder')||S.powder>0?['powder']:[])]];
   const KEY=['gold','steel','stone','iron','fuel'];
   const dl=d=>d==null?'':`<span class="dl ${d>0.5?'up':d<-0.5?'dn':'zero'}">${Math.abs(d)<0.5?'±0':Math.round(Math.abs(d))}</span>`;
   for(const [lb,gp] of GRP){h+=`<div class="rgp" data-label="${lb}"><div class="rgi">`;for(const k of gp){
