@@ -14,7 +14,7 @@ const AWAKE_SHARE=0.3;                           // 陣で起きている（戦�
 // こちらの部隊（攻め）。m：人数、hp：1人の体力、dmg：1人の1回の攻撃、rate：攻撃の間隔（秒）、rng：射程、spd：速さ、bld：建物へのダメージ倍率
 const SU={
   sword: {n:'兵士',  spr:'pawn',   m:5,hp:40, dmg:8, rate:0.8,rng:16, spd:42,bld:1,  role:'melee', d:'いちばん近い魔物・建物を狙う'},
-  shield:{n:'盾兵',  spr:'guard',  m:4,hp:170,dmg:4, rate:1.0,rng:16, spd:32,bld:0.7,role:'shield',d:'壁役。体力がとても高く、近くの魔物を引きつける。まわりの味方を盾でかばう（矢・物見櫓・岩のダメージ−35%）'},
+  heavy: {n:'重装歩兵',spr:'heavy',m:4,hp:150,dmg:7, rate:1.0,rng:16, spd:30,bld:0.8,role:'shield',d:'重い鎧の歩兵。体力が高く、近くの魔物を引きつける。まわり48の味方をかばう（矢・物見櫓・岩のダメージ−35%）＝本編の研究「盾陣」'},
   archer:{n:'弓兵',  spr:'archer', m:5,hp:24, dmg:6, rate:1.1,rng:130,spd:38,bld:0.5,role:'ranged',d:'いちばん近い相手を撃つ。柵の向こうにも届く。空の魔物を撃てる'},
   mage:  {n:'魔術師',spr:'wizard', m:3,hp:30, dmg:20,rate:1.6,rng:140,spd:30,bld:0.6,role:'ranged',magic:true,splash:30,d:'いちばん近い相手に魔法の弾（まわりにも当たる）。空の魔物も撃てる。打たれ弱い'},
   cav:   {n:'騎兵',  spr:'rider',  m:3,hp:70, dmg:11,rate:0.9,rng:16, spd:72,bld:0.8,role:'cav',   d:'足が速い。いちばん近い相手を狙う'},
@@ -26,12 +26,12 @@ const SU={
 };
 const UNIT_SPD=1.25;   // こちらの部隊の足の速さ（上の数字に掛ける）。魔物（ゴブリン40）より少し速く
 for(const k in SU)SU[k].spd=Math.round(SU[k].spd*UNIT_SPD);
-// ランク（2026-11-11 決めた案）：魔物は「第◯襲撃から出てくる」。こちらの部隊も同じランクで解放する想定（試作では選べるが目安を出す）
-const RANK_RAID=[0,1,2,3,4,7,10];   // ランク → 第何襲撃から
-const FOE_RANK={swarm:1,charger:2,harpy:3,troll:3,wolf:3,grappler:4,spitter:4,redcap:4,heavy:5,gobarcher:5,tiger:5,king:6,wyvern:6,mammoth:6};
-const UNIT_RANK={sword:1,archer:1,cav:2,shield:2,eng:2,mage:3,gun:3,ram:4,cat:4,drake:4};
+// ランク＝本編の研究のランクⅠ〜Ⅲ（城Lv2でⅡ・Lv3でⅢ）。育成の目安として表示するだけ。魔物が出てくるのは襲撃の回数で決まる（genWave）
+const RN=['','Ⅰ','Ⅱ','Ⅲ'];
+const FOE_RANK={swarm:1,charger:1,harpy:1,troll:2,grappler:2,spitter:2,redcap:2,gobarcher:2,wolf:2,heavy:3,wyvern:3,king:3,tiger:3,mammoth:3};
+const UNIT_RANK={sword:1,archer:1,eng:1,heavy:2,cav:2,mage:2,gun:2,cat:2,ram:3,drake:3};
 const DEF_FROM={wolf:1,tower:1,drum:2,rock:7};   // 陣の守りの魔物が出てくる襲撃
-const ORDER=['sword','shield','archer','mage','cav','drake','gun','eng','ram','cat'];
+const ORDER=['sword','heavy','archer','mage','cav','drake','gun','eng','ram','cat'];
 // 陣の形。b：柵（外側から）。circle は半径 r、rect は半幅 a・半高 b。gates：門の位置（circle は角度、rect は 'l','r','t','b'）
 const CAMP_SC=1.2;   // 陣の大きさ（下の数字に掛ける）
 const LAYOUTS={
@@ -46,7 +46,7 @@ const $=id=>document.getElementById(id);
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const alive=o=>o&&o.hp>0;
 const isTent=b=>b.kind==='tent'||b.kind==='chief'||b.kind==='hut'||b.kind==='nest';   // 魔物が眠っている建物（テント・小屋・竜の巣・大将のテント）
-const FLY=['harpy','wyvern'];   // 空を飛ぶ魔物は竜の巣で眠る。地上の近接の部隊（兵士・盾兵・騎兵・工兵・破城槌）は手が出せない
+const FLY=['harpy','wyvern'];   // 空を飛ぶ魔物は竜の巣で眠る。地上の近接の部隊（兵士・重装歩兵・騎兵・工兵・破城槌）は手が出せない
 const flyF=f=>!!(E[f.k]&&E[f.k].fly);
 const hitsAir=d=>d.role==='ranged'||d.role==='drake';   // 空の魔物を攻撃できる部隊：弓兵・魔術師・竜騎兵
 function nearF(u,max,filt){const d=SU[u.t];return nearest(u,G.foes,max,f=>(hitsAir(d)||!flyF(f))&&(!filt||filt(f)));}
@@ -66,7 +66,7 @@ function awakeOf(c){const a={};for(const k in c){const v=Math.round(c[k]*AWAKE_S
 const total=o=>Object.values(o).reduce((s,v)=>s+v,0);
 
 // ---------- 英雄：ゲーム本体の英雄（S.cmds）を部隊に入れる。能力で部隊が強くなり、スキルが発動する ----------
-const HFIT={'歩兵':['sword','shield'],'弓兵':['archer'],'騎兵':['cav'],'竜騎':['drake'],'魔導':['mage'],'守備':['gun','cat','ram'],'内政':['eng']};   // 適任の部隊（ほかの部隊に入れると効果は3割）
+const HFIT={'歩兵':['sword','heavy'],'弓兵':['archer'],'騎兵':['cav'],'竜騎':['drake'],'魔導':['mage'],'守備':['gun','cat','ram'],'内政':['eng']};   // 適任の部隊（ほかの部隊に入れると効果は3割）
 const HSPR={'歩兵':'h_inf','弓兵':'h_arch','工兵':'h_eng','騎兵':'h_cav','魔導':'h_mage','内政':'h_admin','守備':'h_guard','竜騎':'h_drake'};
 const TU=28;   // 1マス
 let DEMO_H=null;   // 試作用の英雄（ページを開いている間は同じ）
@@ -87,8 +87,8 @@ function attachHero(u){const c=heroList().find(h=>G.hsel&&G.hsel[h.id]===u.t&&!(
 // ---------- 画面（編成） ----------
 function openSiege(){
   if(typeof S!=='undefined'&&S&&S.overlay&&typeof closeOverlay==='function')closeOverlay();
-  G={phase:'setup',pool:{sword:4,shield:2,archer:3,mage:1,cav:1,drake:1,gun:1,eng:1,ram:1,cat:1},raid:3,layout:'auto',speed:1,paused:false};
-  try{const v=JSON.parse(localStorage.getItem('nd_siege')||'null');if(v){if(v.pool)for(const k of ORDER)if(v.pool[k]!=null)G.pool[k]=v.pool[k];if(v.raid)G.raid=v.raid;if(v.layout)G.layout=v.layout;if(v.hsel)G.hsel=v.hsel;}}catch(e){}   // 前の編成を覚えておく
+  G={phase:'setup',pool:{sword:4,heavy:2,archer:3,mage:1,cav:1,drake:1,gun:1,eng:1,ram:1,cat:1},raid:3,layout:'auto',speed:1,paused:false};
+  try{const v=JSON.parse(localStorage.getItem('nd_siege')||'null');if(v){if(v.pool){if(v.pool.shield!=null&&v.pool.heavy==null)v.pool.heavy=v.pool.shield;for(const k of ORDER)if(v.pool[k]!=null)G.pool[k]=v.pool[k];}   /* 前の「盾兵」は重装歩兵として引き継ぐ */if(v.raid)G.raid=v.raid;if(v.layout)G.layout=v.layout;if(v.hsel)G.hsel=v.hsel;}}catch(e){}   // 前の編成を覚えておく
   let root=$('siege');if(!root){root=document.createElement('div');root.id='siege';document.body.appendChild(root);}
   root.style.display='flex';document.body.classList.add('siegeOn');renderSetup();
 }
@@ -99,7 +99,7 @@ function renderSetup(){const root=$('siege');saveSetup();const st=stationed(G.ra
       <small class="muted">駐留している魔物 ${total(st)}体（${Object.entries(st).map(([k,v])=>ename(k)+v).join('・')}）<br>陣の守り：${['物見櫓','見張りオオカミ'].concat(G.raid>=DEF_FROM.drum?['戦太鼓のゴブリン']:[]).concat(G.raid>=DEF_FROM.rock?['岩投げオーガ']:[]).join('・')}<br>夜襲なので、起きて出てくるのは3割の <b style="color:#ff8a6a">${total(aw)}体</b>。残りはテントで眠っている</small></div>
     <div class="sgRow"><b>陣の形</b>${['auto'].concat(Object.keys(LAYOUTS)).map(k=>`<button data-lay="${k}" class="${G.layout===k?'on':''}">${k==='auto'?'おまかせ':LAYOUTS[k].n}</button>`).join('')}</div>
     <div class="sgHelp">部隊を自由に選べます（試作なので費用なし）。陣のまわりのどこからでも攻められます。部隊はいちばん近い相手を狙います（得意な相手は優先）。夜明け（${NIGHT_SEC/60}分）まで戦えます。<br>敵へのダメージ＝倒した魔物（起きていた3割）＋焼いたテント（眠っている7割）。</div>
-    <div class="sgUnits">${ORDER.map(k=>{const d=SU[k];return `<div class="sgU"><span class="sgI">${unitIcon(k,32)}</span><span class="sgN"><b>${d.n} <span class="sgRk${RANK_RAID[UNIT_RANK[k]]>G.raid?' late':''}" title="本編では第${RANK_RAID[UNIT_RANK[k]]}襲撃のころに解放する想定${RANK_RAID[UNIT_RANK[k]]>G.raid?'（この襲撃ではまだ。試作なので使える）':''}">ランク${UNIT_RANK[k]}・第${RANK_RAID[UNIT_RANK[k]]}襲撃〜</span></b><small>${d.d}</small><small class="muted">${d.m>1?`${d.m}人・`:''}体力${d.hp*d.m}・攻撃${d.dmg*d.m}${d.rng>40?`・射程${d.rng}`:''}</small></span><span class="sgC"><button data-dec="${k}">−</button><b>${G.pool[k]}</b><button data-inc="${k}">＋</button></span></div>`;}).join('')}</div>
+    <div class="sgUnits">${ORDER.map(k=>{const d=SU[k];return `<div class="sgU"><span class="sgI">${unitIcon(k,32)}</span><span class="sgN"><b>${d.n} <span class="sgRk" title="本編の研究ランク（城Lv${UNIT_RANK[k]}で解放）。育成の目安">研究ランク${RN[UNIT_RANK[k]]}</span></b><small>${d.d}</small><small class="muted">${d.m>1?`${d.m}人・`:''}体力${d.hp*d.m}・攻撃${d.dmg*d.m}${d.rng>40?`・射程${d.rng}`:''}</small></span><span class="sgC"><button data-dec="${k}">−</button><b>${G.pool[k]}</b><button data-inc="${k}">＋</button></span></div>`;}).join('')}</div>
     ${(()=>{const HL=heroList();if(!HL.length)return '';G.hsel=G.hsel||{};const opts=k=>`<option value="">連れて行かない</option>`+ORDER.filter(t=>G.pool[t]>0||G.hsel[k]===t).map(t=>`<option value="${t}" ${G.hsel[k]===t?'selected':''}>${SU[t].n}${''}</option>`).join('');
       return `<div class="sgHero"><b>英雄</b><small class="muted">${HL[0].demo?'（セーブに英雄がいないので、試作用の英雄です）':'（本編の英雄。ここでの戦いは本編には影響しません）'}　部隊に入れると、その部隊が強くなりスキルが発動します。適任の部隊に入れると効果が大きい</small>
         ${HL.map(c=>{const k=hSkill(c);const fit=(HFIT[c.spec]||[]).map(t=>SU[t].n).join('・')||'なし（スキルだけ）';return `<div class="sgHR"><span>${heroIcon(c,28)}</span><span class="sgHN"><b style="color:${hColor(c)}">${c.name}</b><small>${c.spec} Lv${c.lv||1}　適任：${fit}</small>${k?`<small title="${k.desc}">スキル「${k.name}」${k.desc}</small>`:''}</span><select data-hero="${c.id}">${opts(c.id)}</select></div>`;}).join('')}</div>`;})()}
@@ -227,7 +227,7 @@ function cam(){if(!cv)return;const kb=Math.min(cv.width/W,cv.height/H);G.zoom=Ma
 function zoomAt(sx,sy,f){const wx=(sx-G.ox)/G.k,wy=(sy-G.oy)/G.k;G.zoom=Math.max(1,Math.min(4,(G.zoom||1)*f));const k=Math.min(cv.width/W,cv.height/H)*G.zoom;G.camX=wx-(sx-cv.width/2)/k;G.camY=wy-(sy-cv.height/2)/k;cam();}
 function cvPt(ev){const r=cv.getBoundingClientRect(),dpr=cv.width/r.width;return [(ev.clientX-r.left)*dpr,(ev.clientY-r.top)*dpr];}
 function renderCards(){const el=$('sgCards');if(!el)return;
-  el.innerHTML=ORDER.filter(k=>G.pool[k]>0||G.units.some(u=>u.t===k)).map(k=>`<button data-card="${k}" class="${G.card===k?'on':''}" ${G.pool[k]?'':'disabled'}>${unitIcon(k,22)}<span>${SU[k].n}</span><b>${G.pool[k]}</b></button>`).join('')+
+  el.innerHTML=ORDER.filter(k=>G.pool[k]>0||G.units.some(u=>u.t===k)).map((k,i)=>`<button data-card="${k}" class="${G.card===k?'on':''}" ${G.pool[k]?'':'disabled'} title="数字キー ${(i+1)%10}"><i class="sgKey">${i<10?(i+1)%10:''}</i>${unitIcon(k,22)}<span>${SU[k].n}</span><b>${G.pool[k]}</b></button>`).join('')+
     (G.phase==='deploy'?`<button id="sgAll" class="ghost">残りを全部置く</button><button id="sgFight" class="primary" ${G.units.length?'':'disabled'}>夜襲開始</button>`:'');
   el.querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>{G.card=G.card===b.dataset.card?null:b.dataset.card;sfx('click');renderCards();msg(G.card?`${SU[G.card].n}：陣のまわりの明るい所をタップして置く`:'');});
   const a=$('sgAll');if(a)a.onclick=()=>{const rest=[];for(const k of ORDER)for(let j=0;j<G.pool[k];j++)rest.push(k);
@@ -237,9 +237,10 @@ function renderCards(){const el=$('sgCards');if(!el)return;
       spawnSquad(k,x,y);G.pool[k]--;});G.card=null;sfx('build');renderCards();};
   const f=$('sgFight');if(f)f.onclick=()=>{G.phase='battle';sfx('turn');msg('夜襲開始！ 見つからないうちに近づこう。部隊を選んで地図を押すと移動、敵を押すとそこを攻撃');renderCards();};}
 function renderCmd(){const el=$('sgCmd');if(!el)return;const n=G.sel.size;
-  el.innerHTML=n?`<span>${n}部隊を選択中</span><button data-cmd="auto">自動で戦う</button><button data-cmd="hold">固守</button>${G.retreat?'<button data-cmd="flee">撤退させる</button>':''}<button data-cmd="none">選択を解除</button>`:`<button data-cmd="all">全部隊を選ぶ</button><span class="muted">ドラッグで範囲選択</span>`;
+  el.innerHTML=n?`<span>${n}部隊を選択中</span>${G.phase==='deploy'?'<button data-cmd="back">置いた部隊を戻す</button>':''}<button data-cmd="auto">自動で戦う</button><button data-cmd="hold">固守</button>${G.retreat?'<button data-cmd="flee">撤退させる</button>':''}<button data-cmd="none">選択を解除</button>`:`<button data-cmd="all">全部隊を選ぶ</button><span class="muted">ドラッグで範囲選択</span>`;
   el.querySelectorAll('[data-cmd]').forEach(b=>b.onclick=()=>{const c=b.dataset.cmd;const us=G.units.filter(u=>G.sel.has(u.id)&&alive(u));
     if(c==='all'){G.units.filter(alive).forEach(u=>G.sel.add(u.id));}else if(c==='none')G.sel.clear();
+    else if(c==='back'){for(const u of us){G.pool[u.t]=(G.pool[u.t]||0)+1;if(u.hero&&G.hUsed)G.hUsed.delete(u.hero.id);}G.units=G.units.filter(u=>!us.includes(u));G.sel.clear();renderCards();msg(`${us.length}部隊を戻しました`);}   // 配置中だけ：置いた部隊を札に戻す
     else for(const u of us){u.tx=u.ty=null;u.tg=null;u.focus=false;u.hold=c==='hold';u.flee=c==='flee';u.fl=null;}
     sfx('click');renderCmd();});}
 function msg(t){const m=$('sgMsg');if(!m)return;m.textContent=t;m.classList.toggle('on',!!t);clearTimeout(m._t);if(t)m._t=setTimeout(()=>m.classList.remove('on'),4500);}
@@ -249,7 +250,9 @@ function toW(ev){const r=cv.getBoundingClientRect(),dpr=cv.width/r.width;return 
 function bindInput(){let down=null,pinch=null;const pts=new Map();
   cv.oncontextmenu=e=>e.preventDefault();
   cv.onwheel=ev=>{ev.preventDefault();const [sx,sy]=cvPt(ev);zoomAt(sx,sy,Math.exp(-ev.deltaY*0.0015));};
-  if(!window.__sgKeys){window.__sgKeys=1;addEventListener('keydown',e=>{if(!G||!cv||!document.getElementById('sgCv'))return;const m={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1],a:[-1,0],d:[1,0],w:[0,-1],s:[0,1]}[e.key];if(!m)return;G.camX+=m[0]*80/G.zoom;G.camY+=m[1]*80/G.zoom;cam();});}
+  if(!window.__sgKeys){window.__sgKeys=1;addEventListener('keydown',e=>{if(!G||!cv||!document.getElementById('sgCv'))return;
+    if(/^[0-9]$/.test(e.key)&&G.phase!=='end'){const L=ORDER.filter(k=>G.pool[k]>0||G.units.some(u=>u.t===k)),i=(+e.key+9)%10,k=L[i];if(k&&G.pool[k]>0){G.card=G.card===k?null:k;sfx('click');renderCards();msg(G.card?`${SU[k].n}：陣のまわりの明るい所をタップして置く`:'');}e.preventDefault();return;}   // 1〜9・0：札を選ぶ
+    if(e.key==='Escape'){G.card=null;G.sel.clear();renderCards();renderCmd();return;}const m={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1],a:[-1,0],d:[1,0],w:[0,-1],s:[0,1]}[e.key];if(!m)return;G.camX+=m[0]*80/G.zoom;G.camY+=m[1]*80/G.zoom;cam();});}
   const pinchInfo=()=>{const [a,b]=[...pts.values()];return {d:Math.hypot(a[0]-b[0],a[1]-b[1])||1,mx:(a[0]+b[0])/2,my:(a[1]+b[1])/2};};
   cv.onpointerdown=ev=>{try{cv.setPointerCapture(ev.pointerId);}catch(e){}pts.set(ev.pointerId,cvPt(ev));
     if(pts.size===2){down=null;G.box=null;const q=pinchInfo();pinch={d:q.d,mx:q.mx,my:q.my};return;}
@@ -271,8 +274,9 @@ function reachMap(){if(G.reach&&G.reach.blk===gridT())return G.reach.a;const T=g
 function reachable(x,y){const c=Math.floor(x/GS),r=Math.floor(y/GS);if(c<0||r<0||c>=GCOL||r>=GROW)return false;return !!reachMap()[r*GCOL+c];}
 function canDeploy(p){return p.x>12&&p.y>12&&p.x<W-12&&p.y<H-12&&farFromCamp(p.x,p.y,90)&&!tBlock(p.x,p.y)&&reachable(p.x,p.y);}
 function tap(p,shift){
-  if(G.card&&!(G.pool[G.card]>0))G.card=ORDER.find(k=>G.pool[k]>0)||null;   // 置く部隊が残っていない札は外す（移動の指示が置く操作に吸われない）
-  if(G.card&&G.phase!=='end'&&!G.retreat){if(canDeploy(p)){if(G.pool[G.card]>0){spawnSquad(G.card,p.x,p.y);G.pool[G.card]--;sfx('build');if(!G.pool[G.card])G.card=ORDER.find(k=>G.pool[k]>0)||null;renderCards();}return;}
+  if(G.card&&!(G.pool[G.card]>0)){G.card=null;renderCards();}   // 置く部隊が残っていない札は外す（ほかの札に自動で切り替えない）
+  {const near=G.units.filter(alive).sort((a,b)=>dist(a,p)-dist(b,p))[0];if(G.card&&near&&dist(near,p)<14){G.card=null;renderCards();}}   // 札を選んでいても、置いた部隊を押したら選ぶ（戻すため）
+  if(G.card&&G.phase!=='end'&&!G.retreat){if(canDeploy(p)){if(G.pool[G.card]>0){spawnSquad(G.card,p.x,p.y);G.pool[G.card]--;sfx('build');if(!G.pool[G.card])G.card=null;renderCards();}return;}
     else{msg('部隊は陣のまわりの明るい所にだけ置けます（陣に近すぎる所・山や川の向こうで陣まで行けない所には置けない）');return;}}
   const u=G.units.filter(alive).sort((a,b)=>dist(a,p)-dist(b,p))[0];
   if(u&&dist(u,p)<22){if(!shift&&!G.sel.has(u.id))G.sel.clear();if(shift&&G.sel.has(u.id))G.sel.delete(u.id);else G.sel.add(u.id);sfx('click');renderCmd();return;}
@@ -361,7 +365,7 @@ function hitBld(b,dmg){if(b.hp<=0)return;b.hp-=dmg;if(b.hp<=0&&(b.kind==='post'|
     if(b.kind==='tower'){G.foes.push(mkFoe('gobarcher',b.x,b.y+8,{awake:true,def:'tower'}));msg('物見櫓が崩れて、ゴブリンアーチャーが落ちてきた！');}
     if(isTent(b)){G.fires=(G.fires||[]);G.fires.push({x:b.x,y:b.y});vfx('fire',b.x,b.y-6,2.2);}else if(b.kind!=='post')vfx('explosion',b.x,b.y,1.8);}}
 function hitUnit(u,dmg,ranged,src){if(src){u.hitBy=src;u.hitT=G.t;}   // 撃ってきた物見櫓・大弓台を覚えておく（やり返す）
-  if(ranged&&SU[u.t].role!=='shield'&&G.units.some(o=>o!==u&&alive(o)&&SU[o.t].role==='shield'&&dist(o,u)<48)){dmg*=0.65;u.guardT=0.3;}   // 盾兵がそばにいれば、矢などを防いでくれる
+  if(ranged&&SU[u.t].role!=='shield'&&G.units.some(o=>o!==u&&alive(o)&&SU[o.t].role==='shield'&&dist(o,u)<48)){dmg*=0.65;u.guardT=0.3;}   // 重装歩兵がそばにいれば、矢などを防いでくれる
   dmg*=(1-(u.red||0))*(u.fukT>0?0.5:1)*(u.yugT>0?0.7:1);u.hp-=dmg;if(u.hp<=0){u.hp=0;G.sel.delete(u.id);if(SU[u.t].carry&&!u.spawned)releaseRam(u);}}
 function hitFoe(f,dmg){const d=E[f.k];f.hp-=dmg*(1-(d.armor||0));f.awake=true;if(!G.alarm)raiseAlarm('戦いに気づかれた',f);if(f.hp<=0){f.hp=0;if(f.def==='drum')msg('戦太鼓が止んだ！');}}
 // 襲われたテント・小屋から、眠っていた魔物が飛び出してくる（最初に叩かれたとき・体力6割・3割で）。焼け落ちたら残りは焼け死ぬ
@@ -705,8 +709,14 @@ let hudT=0;function hud(){const now=performance.now();if(now-hudT<200)return;hud
 
 // ---------- 見た目 ----------
 const css=document.createElement('style');css.textContent=`
+#sgMusic{position:fixed;inset:0;z-index:960;background:rgba(5,8,6,.82);display:none;align-items:center;justify-content:center;color:#e8e0c8;font-family:inherit}
+#sgMusic .sgMBox{width:min(520px,94vw);max-height:92vh;overflow:auto;background:#121a14;box-shadow:0 0 0 2px #f2b33d;padding:14px 18px}#sgMusic h2{margin:0 0 4px;color:#f2b33d;font-size:18px}
+#sgMusic .sgML{display:flex;flex-direction:column;gap:6px;margin:10px 0}#sgMusic .sgML button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:8px 10px}#sgMusic .sgML button.on{box-shadow:inset 0 0 0 2px #f2b33d}#sgMusic .sgML small{font-size:11px;color:#9ab0a0}
+#sgMusic .sgMT{display:flex;flex-wrap:wrap;gap:4px 8px;font-size:11px;color:#7f9a82;margin:6px 0}#sgMusic .sgMT b{width:100%;color:#9ab0a0}#sgMusic .sgMT span{padding:1px 6px;box-shadow:inset 0 0 0 1px #2f3f33}
+#sgMusic .sgFoot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
 #siege .sgHero{display:flex;flex-direction:column;gap:4px;margin:6px 0;padding:6px 8px;background:rgba(255,255,255,.04);border:1px solid #2f3f33}
 #siege .sgHR{display:flex;align-items:center;gap:8px}#siege .sgHN{flex:1 1 auto;display:flex;flex-direction:column;min-width:0;width:auto}#siege .sgHN small{font-size:10px;color:#9ab0a0}#siege .sgHR select{width:auto!important;flex:0 0 auto;max-width:42%;background:#141a16;color:#e8e0c8;border:1px solid #3a4a3e;padding:3px}
+#siege .sgKey{font-style:normal;font-size:9px;color:#8aa48d;margin-right:2px;align-self:flex-start}
 #siege .sgRk{font-size:10px;font-weight:normal;color:#9ab0a0;margin-left:4px;padding:0 4px;box-shadow:inset 0 0 0 1px #3a4a3e}#siege .sgRk.late{color:#ff9a6a;box-shadow:inset 0 0 0 1px #6a3a2a}
 #siege .sgHeroes{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;margin:6px 0}
 #siege .sgLossBox,#siege .sgLog{margin:6px 0;font-size:12px}#siege .sgLossBox summary,#siege .sgLog summary{cursor:pointer;color:#f2b33d}
@@ -757,8 +767,31 @@ body.siegeOn #boot{display:none}
 `;document.head.appendChild(css);
 
 // ---------- タイトルに「攻城戦（試作）」を足す ----------
+// ---------- 音楽室（ホームから BGM を聴く）。曲はゲーム本体が音を合成して鳴らす（AU）。聴いている間だけ曲を固定する ----------
+const TRACKS=[
+  {n:'昼（準備）',d:'昼の街づくりの曲。ゆったり',track:'prep',it:0},
+  {n:'敵の襲撃（序盤）',d:'第1〜3襲撃',track:'battle',it:0},
+  {n:'敵の襲撃（第4襲撃から）',d:'旋律が加わる',track:'battle',it:1},
+  {n:'敵の襲撃（最後の襲撃）',d:'いちばん激しい',track:'battle',it:2},
+];
+const TRACKS_TODO=['ホーム','静かな夜','祭りの夜','駐留地攻撃（夜襲）','ボス襲来','ステージごとのアレンジ（エルム・グレイヴェル・ハルデン・ヴィンター）'];
+let musicHooked=false,MUS=null;
+function musicHook(){if(musicHooked||typeof auMusicFor!=='function')return;musicHooked=true;const orig=auMusicFor;
+  window.auMusicFor=auMusicFor=function(){if(MUS&&typeof AU!=='undefined'&&AU.ctx){AU.intensity=MUS.it;if(AU.track!==MUS.track){AU.track=MUS.track;AU.step=0;AU.nextT=AU.ctx.currentTime+0.2;}return;}return orig.apply(this,arguments);};}
+function playTrack(i){musicHook();try{if(typeof auInit==='function')auInit();}catch(e){}if(typeof AU==='undefined')return;const t=TRACKS[i];MUS={track:t.track,it:t.it,i};
+  if(AU.ctx){AU.track=null;auMusicFor();}renderMusic();}
+function openMusic(){musicHook();let root=document.getElementById('sgMusic');if(!root){root=document.createElement('div');root.id='sgMusic';document.body.appendChild(root);}root.style.display='flex';renderMusic();}
+function closeMusic(){MUS=null;if(typeof AU!=='undefined'&&AU.ctx){AU.track=null;try{auMusicFor();}catch(e){}}const r=document.getElementById('sgMusic');if(r){r.style.display='none';r.innerHTML='';}}
+function renderMusic(){const r=document.getElementById('sgMusic');if(!r)return;const on=typeof AU!=='undefined'&&AU.on;
+  r.innerHTML=`<div class="sgMBox"><h2>♪ 音楽室</h2><small class="muted">押すとその曲が流れます。音量は設定の「BGM」で変えられます${on?'':'（今は消音中です）'}</small>
+    <div class="sgML">${TRACKS.map((t,i)=>`<button data-tr="${i}" class="${MUS&&MUS.i===i?'on':''}"><b>${MUS&&MUS.i===i?'▶ ':''}${t.n}</b><small>${t.d}</small></button>`).join('')}</div>
+    <div class="sgMT"><b>これから作る曲</b>${TRACKS_TODO.map(n=>`<span>${n}</span>`).join('')}</div>
+    <div class="sgFoot"><button id="sgMStop">止める</button><button id="sgMClose" class="primary">閉じる</button></div></div>`;
+  r.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>playTrack(+b.dataset.tr));
+  document.getElementById('sgMStop').onclick=()=>{MUS=null;if(typeof AU!=='undefined'&&AU.ctx){AU.track=null;}renderMusic();};   // 止める（閉じると元の曲に戻る）
+  document.getElementById('sgMClose').onclick=closeMusic;}
 function hook(){if(typeof showTitle!=='function'||typeof E==='undefined'||typeof SPR==='undefined'){setTimeout(hook,200);return;}
-  const orig=showTitle;window.showTitle=showTitle=function(){const r=orig.apply(this,arguments);try{const nb=document.getElementById('tNew');if(nb&&!document.getElementById('tSiege')){const b=document.createElement('button');b.id='tSiege';b.textContent='攻城戦（試作）';b.style.padding='8px';b.onclick=openSiege;nb.insertAdjacentElement('afterend',b);}}catch(e){}return r;};
+  const orig=showTitle;window.showTitle=showTitle=function(){const r=orig.apply(this,arguments);try{const nb=document.getElementById('tNew');if(nb&&!document.getElementById('tSiege')){const b=document.createElement('button');b.id='tSiege';b.textContent='攻城戦（試作）';b.style.padding='8px';b.onclick=openSiege;nb.insertAdjacentElement('afterend',b);}if(nb&&!document.getElementById('tMusic')){const m=document.createElement('button');m.id='tMusic';m.textContent='♪ 音楽室';m.style.padding='8px';m.onclick=openMusic;(document.getElementById('tSiege')||nb).insertAdjacentElement('afterend',m);}}catch(e){}return r;};
   if(typeof S!=='undefined'&&S&&S.overlay==='title')showTitle();
   window.openSiege=openSiege;window.__siege=()=>G;window.__siegeUpd=dt=>update(dt);window.__tb=tBlock;window.__fp=findPath;window.__reach=reachable;}
 hook();
