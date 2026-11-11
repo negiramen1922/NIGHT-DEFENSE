@@ -12,14 +12,16 @@ const AWAKE_SHARE=0.3;                           // 陣で起きている（戦�
 // こちらの部隊（攻め）。m：人数、hp：1人の体力、dmg：1人の1回の攻撃、rate：攻撃の間隔（秒）、rng：射程、spd：速さ、bld：建物へのダメージ倍率
 const SU={
   sword: {n:'兵士',  spr:'pawn',   m:5,hp:40, dmg:8, rate:0.8,rng:16, spd:42,bld:1,  role:'melee', d:'近くの魔物に向かい、いなければテントへ'},
-  shield:{n:'盾兵',  spr:'guard',  m:4,hp:95, dmg:4, rate:1.0,rng:16, spd:32,bld:0.7,role:'shield',red:0.45,d:'体力が高く、魔物の攻撃を引きつける壁役（受けるダメージ−45%）'},
+  shield:{n:'盾兵',  spr:'guard',  m:4,hp:95, dmg:4, rate:1.0,rng:16, spd:32,bld:0.7,role:'shield',red:0.45,d:'壁役。受けるダメージ−45%・近くの魔物を引きつける。まわりの味方を盾でかばう（矢・見張り台・大弓のダメージ−35%）'},
   archer:{n:'弓兵',  spr:'archer', m:5,hp:24, dmg:6, rate:1.1,rng:130,spd:38,bld:0.5,role:'ranged',d:'近接の味方の後ろから撃つ。柵の向こうにも届く'},
   cav:   {n:'騎兵',  spr:'rider',  m:3,hp:70, dmg:11,rate:0.9,rng:16, spd:72,bld:0.8,role:'cav',   d:'足が速い。見張りと弓の魔物・見張り台を先に狙う'},
-  eng:   {n:'工兵',  spr:'farmer', m:4,hp:34, dmg:6, rate:0.9,rng:16, spd:38,bld:5,  role:'eng',   d:'門・柵・テントを壊すのが得意（建物へ×5）。近くの罠を外す'},
+  eng:   {n:'工兵',  spr:'farmer', m:4,hp:34, dmg:6, rate:0.9,rng:16, spd:38,bld:5,  role:'eng',   d:'門・柵に爆薬をしかけて吹き飛ばす（14秒ごと）。破城槌・投石機を修理する。近くの罠を外す'},
+  drake: {n:'竜騎兵',spr:'dragon', m:2,hp:120,dmg:14,rate:1.3,rng:70, spd:62,bld:1.5,role:'drake',fly:true,splash:22,tentMul:2.5,d:'空を飛んで柵を越える。火を吐いて範囲攻撃（テントを燃やすのが得意 ×2.5）。地上の近接の魔物には攻撃されない'},
+  gun:   {n:'砲兵',  spr:'cannoneer',m:3,hp:30,dmg:20,rate:2.4,rng:200,minR:40,spd:30,bld:2,role:'gun',splash:26,d:'大砲で遠くから撃つ（範囲）。見張り台・大弓台・テントを壊す。近づかれると弱い'},
   ram:   {n:'破城槌',draw:'ram',   m:1,hp:900,dmg:70,rate:1.6,rng:20, spd:44,bld:3,  role:'ram',isBld:true,carry:2,d:'いちばん近い門へまっすぐ進んで打ち破り、次の門、大将のテントへ。壊れるか大将のテントに着くと兵士2部隊が出る。建物あつかい（建物に強い魔物に弱い）'},
   cat:   {n:'移動式投石機',draw:'cat',m:1,hp:320,dmg:55,rate:3.2,rng:270,minR:60,spd:16,bld:2.5,role:'cat',isBld:true,splash:34,d:'とても遅い。遠くから見張り台・テントを壊す（まわりにも当たる）'},
 };
-const ORDER=['sword','shield','archer','cav','eng','ram','cat'];
+const ORDER=['sword','shield','archer','cav','drake','gun','eng','ram','cat'];
 // 陣の形。b：柵（外側から）。circle は半径 r、rect は半幅 a・半高 b。gates：門の位置（circle は角度、rect は 'l','r','t','b'）
 const LAYOUTS={
   ring:  {n:'丸い陣',   b:[{t:'circle',r:170,gates:[180,0]}],towers:[{r:128,n:4}],tents:{r:80,n:5}},
@@ -48,7 +50,7 @@ const total=o=>Object.values(o).reduce((s,v)=>s+v,0);
 // ---------- 画面（編成） ----------
 function openSiege(){
   if(typeof S!=='undefined'&&S&&S.overlay&&typeof closeOverlay==='function')closeOverlay();
-  G={phase:'setup',pool:{sword:4,shield:2,archer:3,cav:1,eng:1,ram:1,cat:1},raid:3,layout:'auto',speed:1,paused:false};
+  G={phase:'setup',pool:{sword:4,shield:2,archer:3,cav:1,drake:1,gun:1,eng:1,ram:1,cat:1},raid:3,layout:'auto',speed:1,paused:false};
   try{const v=JSON.parse(localStorage.getItem('nd_siege')||'null');if(v){if(v.pool)for(const k of ORDER)if(v.pool[k]!=null)G.pool[k]=v.pool[k];if(v.raid)G.raid=v.raid;if(v.layout)G.layout=v.layout;}}catch(e){}   // 前の編成を覚えておく
   let root=$('siege');if(!root){root=document.createElement('div');root.id='siege';document.body.appendChild(root);}
   root.style.display='flex';document.body.classList.add('siegeOn');renderSetup();
@@ -97,7 +99,13 @@ function buildField(){
   // 見張り台
   const towers=[];if(L.towers==='corners'){const bd=G.bounds[0];for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]])towers.push([CX+sx*(bd.a-30),CY+sy*(bd.b-30),0]);}
   else L.towers.forEach((t,li)=>{for(let i=0;i<t.n;i++){const a=(i+0.5)/t.n*Math.PI*2;towers.push([CX+Math.cos(a)*t.r,CY+Math.sin(a)*t.r,li]);}});
+  // 襲撃が進むほど見張り台を足す（外側の柵の内側に）
+  {const extra=Math.floor(G.raid/3),bd=G.bounds[0];for(let i=0;i<extra;i++){const a=(i+0.25)/Math.max(1,extra)*Math.PI*2+0.6;const r=(bd.t==='circle'?bd.r:Math.min(bd.a,bd.b))-34;towers.push([CX+Math.cos(a)*r*(bd.t==='rect'?bd.a/Math.min(bd.a,bd.b):1)*0.95,CY+Math.sin(a)*r,0]);}}
   for(const [x,y,li] of towers)B('tower',x,y,15,li?520:420,{rng:150,dmg:li?10:8,rate:li?1.0:1.1});
+  // 大弓台：門の内側。遠くまで届き、破城槌・投石機に強い（襲撃が進むほど増える）
+  {const gs=G.bounds[0].gateB,n=Math.min(gs.length,1+Math.floor(G.raid/4));for(let i=0;i<n;i++){const g=gs[i];B('bow',g.x-g.nx*48+g.ny*26,g.y-g.ny*48-g.nx*26,14,480,{rng:230,dmg:34,rate:2.6});}}
+  // 逆茂木：門の外の守り（通れない・壊すまでふさぐ）
+  {const n=G.raid>=3?2:0;for(const g of G.bounds[0].gateB)for(let i=0;i<n;i++){const s2=i?1:-1;B('abatis',g.x+g.nx*54+g.ny*22*s2,g.y+g.ny*54-g.nx*22*s2,11,260);}}
   // テント（眠っている魔物）と大将のテント
   B('chief',CX,CY,26,1600);
   const T=L.tents,tp=[];
@@ -106,7 +114,7 @@ function buildField(){
   else for(let i=0;i<T.n;i++){const a=i/T.n*Math.PI*2+0.3;tp.push([CX+Math.cos(a)*T.r,CY+Math.sin(a)*T.r]);}
   for(const [x,y] of tp)B('tent',x,y,16,280);
   // 罠：いちばん外の柵の外側、門の前を中心に
-  for(const gb of G.bounds[0].gateB)for(let i=0;i<3;i++){const px=-gb.ny,py=gb.nx;G.traps.push({x:gb.x+gb.nx*(30+i*14)+px*((i%2)?14:-14),y:gb.y+gb.ny*(30+i*14)+py*((i%2)?14:-14),hp:1});}
+  const tpg=3+Math.floor(G.raid/3);for(const gb of G.bounds[0].gateB)for(let i=0;i<tpg;i++){const px=-gb.ny,py=gb.nx;G.traps.push({x:gb.x+gb.nx*(30+(i%4)*14)+px*((i%2)?14:-14)*(1+Math.floor(i/4)),y:gb.y+gb.ny*(30+(i%4)*14)+py*((i%2)?14:-14)*(1+Math.floor(i/4)),hp:1});}
   // 魔物：起きている3割。1割ほどは柵の外の見張り（巡回）、ほかは陣の中（夜襲なので寝ぼけている＝見つかるまで動かない）
   const aw=Object.entries(G.aw).flatMap(([k,n])=>Array(n).fill(k));const nSent=Math.max(2,Math.round(aw.length*0.12));
   const sentK=aw.filter(k=>k==='swarm'||k==='gobarcher'||k==='charger');
@@ -183,7 +191,7 @@ function loopStart(){cancelAnimationFrame(raf);last=performance.now();const step
 function nearest(o,list,max,filt){let best=null,bd=max||1e9;for(const t of list){if(!alive(t)||(filt&&!filt(t)))continue;const d=dist(o,t);if(d<bd){bd=d;best=t;}}return best;}
 function chief(){return G.blds.find(b=>b.kind==='chief');}
 // こちらの部隊は柵の杭と門にぶつかる（壊して進む）。魔物は門を通る
-function blocker(x,y,r){for(const b of G.blds)if((b.kind==='post'||b.kind==='gate')&&b.hp>0&&Math.hypot(b.x-x,b.y-y)<b.r+r)return b;return null;}
+function blocker(x,y,r){for(const b of G.blds)if((b.kind==='post'||b.kind==='gate'||b.kind==='abatis')&&b.hp>0&&Math.hypot(b.x-x,b.y-y)<b.r+r)return b;return null;}
 function stepTo(u,tx,ty,spd,dt){const dx=tx-u.x,dy=ty-u.y,d=Math.hypot(dx,dy);if(d<2)return null;const s=Math.min(d,spd*dt),nx=u.x+dx/d*s,ny=u.y+dy/d*s;
   if(Math.abs(dx)>0.5)u.face=dx>0?1:-1;const b=blocker(nx,ny,u.t==='ram'?14:7);if(b)return b;u.x=Math.max(6,Math.min(W-6,nx));u.y=Math.max(6,Math.min(H-6,ny));u.walk+=dt*8;return null;}
 // こちらの部隊の歩き方：柵の内と外を行き来するときは、壊れた門・柵のすき間（なければ門）を通る。柵にぶつかったら回り込む
@@ -197,7 +205,8 @@ function navPoint(u,tx,ty){const la=layerOf(u.x,u.y),lt=layerOf(tx,ty);if(la===l
   const [nx,ny]=normalAt(bd,o.x,o.y),sg=inward?1:-1,p1=[o.x+nx*20*sg,o.y+ny*20*sg],p2=[o.x-nx*20*sg,o.y-ny*20*sg];
   if(u.nav.stage===0&&Math.hypot(u.x-p1[0],u.y-p1[1])<12)u.nav.stage=1;
   return u.nav.stage===0?[p1[0],p1[1],o]:[p2[0],p2[1],o];}
-function moveNav(u,tx,ty,spd,dt){const [gx,gy,op]=navPoint(u,tx,ty);const b=stepTo(u,gx,gy,spd,dt);if(!b)return null;
+function moveNav(u,tx,ty,spd,dt){if(SU[u.t].fly){const dx=tx-u.x,dy=ty-u.y,d=Math.hypot(dx,dy);if(d>1){const st=Math.min(d,spd*dt);u.x+=dx/d*st;u.y+=dy/d*st;if(Math.abs(dx)>0.5)u.face=dx>0?1:-1;u.walk+=dt*8;}return null;}
+  const [gx,gy,op]=navPoint(u,tx,ty);const b=stepTo(u,gx,gy,spd,dt);if(!b)return null;
   if(op&&b===op)return b;                              // 通り道の門がまだ立っている → 壊す
   // 柵の杭にぶつかった → 杭に沿って回り込む（行き先に近づく向きへ）
   const ax=u.x-b.x,ay=u.y-b.y,l=Math.hypot(ax,ay)||1,dx=gx-u.x,dy=gy-u.y;let tx1=-ay/l,ty1=ax/l;if(tx1*dx+ty1*dy<0){tx1=-tx1;ty1=-ty1;}
@@ -213,7 +222,8 @@ function foeStep(f,tx,ty,spd,dt){const la=layerOf(f.x,f.y),lt=layerOf(tx,ty);let
 function raiseAlarm(why){if(G.alarm)return;G.alarm=true;sfx('alarm');msg(`${why}！ 陣の魔物が起きてきた`);for(const f of G.foes)f.awake=true;}
 function hitBld(b,dmg){if(b.hp<=0)return;b.hp-=dmg;raiseAlarm('物音で気づかれた');if(b.hp<=0){b.hp=0;G.fx.push({x:b.x,y:b.y,r:b.r*1.6,t:0,dur:0.5,c:b.kind==='tent'||b.kind==='chief'?'#ff8a3a':'#ffb14e'});if(b.kind!=='post')sfx('destroy');
     if(b.kind==='tent'||b.kind==='chief'){G.fires=(G.fires||[]);G.fires.push({x:b.x,y:b.y});}}}
-function hitUnit(u,dmg){u.hp-=dmg;if(u.hp<=0){u.hp=0;G.sel.delete(u.id);if(SU[u.t].carry&&!u.spawned)releaseRam(u);}}
+function hitUnit(u,dmg,ranged){if(ranged&&SU[u.t].role!=='shield'&&G.units.some(o=>o!==u&&alive(o)&&SU[o.t].role==='shield'&&dist(o,u)<48)){dmg*=0.65;u.guardT=0.3;}   // 盾兵がそばにいれば、矢などを防いでくれる
+  u.hp-=dmg;if(u.hp<=0){u.hp=0;G.sel.delete(u.id);if(SU[u.t].carry&&!u.spawned)releaseRam(u);}}
 function hitFoe(f,dmg){const d=E[f.k];f.hp-=dmg*(1-(d.armor||0));f.awake=true;if(!G.alarm)raiseAlarm('戦いに気づかれた');if(f.hp<=0)f.hp=0;}
 function releaseRam(u){u.spawned=true;for(let i=0;i<SU[u.t].carry;i++){const s=spawnSquad('sword',u.x+(i?14:-14),u.y+(i?10:-10));s.face=u.face;}G.fx.push({x:u.x,y:u.y,r:30,t:0,dur:0.5,c:'#f2b33d'});msg('破城槌から兵士2部隊が出てきた！');sfx('upgrade');}
 function shoot(a,b,col){G.shots.push({x:a.x,y:a.y,tx:b.x,ty:b.y,t:0,c:col||'#e8d8a0'});}
@@ -225,29 +235,32 @@ function update(dt){G.t+=dt;
   // --- こちらの部隊 ---
   for(const u of G.units){if(!alive(u))continue;const d=SU[u.t];u.cd-=dt;const n=mem(u),atk=d.dmg*n;
     if(d.role==='eng')for(const tr of G.traps)if(tr.hp>0&&Math.hypot(tr.x-u.x,tr.y-u.y)<40){tr.hp=0;G.fx.push({x:tr.x,y:tr.y,r:10,t:0,dur:0.4,c:'#6fe08a'});}
-    if(!d.isBld)for(const tr of G.traps)if(tr.hp>0&&Math.hypot(tr.x-u.x,tr.y-u.y)<11)hitUnit(u,14*dt);
+    if(!d.isBld&&!d.fly)for(const tr of G.traps)if(tr.hp>0&&Math.hypot(tr.x-u.x,tr.y-u.y)<11)hitUnit(u,14*dt);
     let tg=u.tg&&alive(u.tg)?u.tg:null;if(!tg)u.focus=false;
     if(u.tx!=null){const b=d.role==='ram'?stepTo(u,u.tx,u.ty,d.spd,dt):moveNav(u,u.tx,u.ty,d.spd,dt);
-      if(b){if(d.role==='ranged'||d.role==='cat'){/* 門が開くまで待つ */}else if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}continue;}
+      if(b){if(d.role==='ranged'||d.role==='cat'||d.role==='gun'){/* 門が開くまで待つ */}else if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}continue;}
       if(Math.hypot(u.tx-u.x,u.ty-u.y)<4){u.tx=u.ty=null;}continue;}
     if(!tg||!u.focus){
       const bldT=b=>b.kind!=='post';   // 柵の杭そのものは狙わない（道をふさいだら叩く）
       if(d.role==='ram')tg=ramTarget(u);
-      else if(d.role==='cat')tg=nearest(u,G.blds,d.rng*1.6,b=>b.kind==='tower')||nearest(u,G.blds,d.rng*1.6,b=>b.kind==='tent'||b.kind==='chief')||nearest(u,G.blds,1e9,b=>b.kind!=='post');
-      else if(d.role==='eng')tg=nearest(u,G.foes,60)||nearest(u,G.blds,1e9,b=>b.kind==='gate'||b.kind==='tent'||b.kind==='chief');
+      else if(d.role==='cat')tg=nearest(u,G.blds,d.rng*1.6,b=>b.kind==='tower'||b.kind==='bow')||nearest(u,G.blds,d.rng*1.6,b=>b.kind==='tent'||b.kind==='chief')||nearest(u,G.blds,1e9,b=>b.kind!=='post');
+      else if(d.role==='eng'){const hurt=nearest(u,G.units,160,o=>SU[o.t].isBld&&o.hp<o.maxhp-1);tg=nearest(u,G.foes,50)||(hurt&&!nearest(u,G.foes,70)?hurt:null)||nearest(u,G.blds,1e9,b=>b.kind==='gate'||b.kind==='abatis')||nearest(u,G.blds,1e9,b=>b.kind==='tent'||b.kind==='chief');}
+      else if(d.role==='drake')tg=nearest(u,G.blds,1e9,b=>b.kind==='tent'||b.kind==='chief')||nearest(u,G.foes,1e9);
+      else if(d.role==='gun')tg=nearest(u,G.blds,d.rng*1.5,b=>b.kind==='tower'||b.kind==='bow')||nearest(u,G.foes,d.rng+20)||nearest(u,G.blds,1e9,b=>b.kind==='tent'||b.kind==='chief');
       else if(d.role==='cav')tg=nearest(u,G.foes,320,f=>f.sentry||!!(E[f.k].archers||E[f.k].ranged))||nearest(u,G.blds,320,b=>b.kind==='tower')||nearest(u,G.foes,240)||nearest(u,G.blds,1e9,b=>b.kind==='tent'||b.kind==='chief');
       else if(d.role==='ranged')tg=nearest(u,G.foes,d.rng+40)||nearest(u,G.blds,d.rng+10,b=>b.kind==='tower'||b.kind==='tent'||b.kind==='chief')||null;
       else tg=nearest(u,G.foes,240,f=>f.awake||f.sentry)||nearest(u,G.blds,1e9,b=>b.kind==='tent'||b.kind==='chief')||nearest(u,G.blds,1e9,bldT);
       if(!u.focus)u.tg=tg;}
     if(u.hold){if(tg&&dist(u,tg)<=d.rng+(tg.r||6)+6&&u.cd<=0){u.cd=d.rate;attack(u,tg,atk);}continue;}
-    if(d.role==='ranged'&&!tg){const fr=nearest(u,G.units,1e9,o=>o!==u&&!SU[o.t].isBld&&SU[o.t].role!=='ranged');let gx,gy;
+    if((d.role==='ranged'||d.role==='gun')&&!tg){const fr=nearest(u,G.units,1e9,o=>o!==u&&!SU[o.t].isBld&&SU[o.t].role!=='ranged');let gx,gy;
       if(fr){const dx=fr.x-CX,dy=fr.y-CY,dl=Math.hypot(dx,dy)||1;gx=fr.x+dx/dl*30;gy=fr.y+dy/dl*30;}else{const dx=u.x-CX,dy=u.y-CY,dl=Math.hypot(dx,dy)||1,r=Math.max(outerR()+70,dl-40);gx=CX+dx/dl*r;gy=CY+dy/dl*r;}
       stepTo(u,gx,gy,d.spd,dt);continue;}
     if(!tg)continue;
     const reach=d.rng+(tg.r||E[tg.k]&&E[tg.k].r||6)+2,dd=dist(u,tg);
     if(d.minR&&dd<d.minR){stepTo(u,u.x-(tg.x-u.x),u.y-(tg.y-u.y),d.spd,dt);continue;}
-    if(dd>reach){const b=d.role==='ram'?stepTo(u,tg.x,tg.y,d.spd,dt):moveNav(u,tg.x,tg.y,d.spd,dt);if(b&&d.role!=='ranged'&&d.role!=='cat'){if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}}continue;}
+    if(dd>reach){const b=d.role==='ram'?stepTo(u,tg.x,tg.y,d.spd,dt):moveNav(u,tg.x,tg.y,d.spd,dt);if(b&&d.role!=='ranged'&&d.role!=='cat'&&d.role!=='gun'){if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}}continue;}
     if(d.role==='ram'&&!u.spawned&&tg===ch)releaseRam(u);
+    if(d.role==='eng'&&!tg.kind&&!tg.k&&SU[tg.t]&&SU[tg.t].isBld){tg.hp=Math.min(tg.maxhp,tg.hp+30*dt);u.fixT=0.3;continue;}   // 修理
     if(u.cd<=0){u.cd=d.rate;attack(u,tg,atk);}
   }
   // --- 魔物 ---
@@ -259,18 +272,24 @@ function update(dt){G.t+=dt;
     if(!f.awake&&!f.sentry){// 寝ている：すぐそばに来られたら起きる
       if(nearest(f,G.units,45)){f.awake=true;raiseAlarm('陣に踏み込まれた');}else continue;}
     let tg=null;if((d.bldMul||1)>1)tg=nearest(f,G.units,170,u=>!!SU[u.t].isBld);
+    if(tg&&!rng&&SU[tg.t].fly)tg=null;
     if(!tg)tg=nearest(f,G.units,70,u=>SU[u.t].role==='shield');
-    if(!tg)tg=nearest(f,G.units,rng?rng+40:200);
+    if(!tg)tg=nearest(f,G.units,rng?rng+40:200,u=>rng||!SU[u.t].fly);
     if(tg&&Math.hypot(tg.x-CX,tg.y-CY)>outerR()+200)tg=null;   // 陣から離れすぎた相手は追わない
     if(!tg){if(Math.hypot(f.px-f.x,f.py-f.y)>6)foeStep(f,f.px,f.py,d.spd,dt);continue;}
     const reach=(rng||d.r+8)+(SU[tg.t].isBld?14:6),dd=dist(f,tg);
     if(dd>reach){foeStep(f,tg.x,tg.y,d.spd,dt);continue;}
     if(f.cd<=0){const ar=d.archers;f.cd=ar?ar.rate:d.rate;let dm=ar?ar.dmg:d.dmg*(d.vsS||1);
       if(SU[tg.t].isBld)dm=d.dmg*(d.bldMul||1)*1.5;if(SU[tg.t].red)dm*=1-SU[tg.t].red;
-      if(rng)shoot(f,tg,'#b0e070');hitUnit(tg,dm);}
+      if(rng)shoot(f,tg,'#b0e070');hitUnit(tg,dm,!!rng);}
   }
   // --- 見張り台：見つけたら知らせ、撃つ ---
-  for(const b of G.blds){if(b.kind!=='tower'||!alive(b))continue;b.cd-=dt;const t=nearest(b,G.units,b.rng);if(!t)continue;if(!G.alarm)raiseAlarm('見張り台に見つかった');if(b.cd>0)continue;b.cd=b.rate;let dm=b.dmg*(SU[t.t].isBld?0.3:1);if(SU[t.t].red)dm*=1-SU[t.t].red;shoot(b,t);hitUnit(t,dm);}
+  for(const b of G.blds){if(b.kind!=='tower'||!alive(b))continue;b.cd-=dt;const t=nearest(b,G.units,b.rng);if(!t)continue;if(!G.alarm)raiseAlarm('見張り台に見つかった');if(b.cd>0)continue;b.cd=b.rate;let dm=b.dmg*(SU[t.t].isBld?0.3:1);if(SU[t.t].red)dm*=1-SU[t.t].red;shoot(b,t);hitUnit(t,dm,true);}
+  // 大弓台：遠くまで届く太い矢。破城槌・投石機を先に狙う
+  for(const b of G.blds){if(b.kind!=='bow'||!alive(b))continue;b.cd-=dt;if(!G.alarm||b.cd>0)continue;const t=nearest(b,G.units,b.rng,u=>!!SU[u.t].isBld)||nearest(b,G.units,b.rng);if(!t)continue;b.cd=b.rate;let dm=b.dmg*(SU[t.t].isBld?2:1);if(SU[t.t].red)dm*=1-SU[t.t].red;shoot(b,t,'#e0c080');hitUnit(t,dm,true);}
+  for(const bm of (G.bombs||[])){bm.t-=dt;if(bm.t<=0&&!bm.done){bm.done=true;sfx('boom');G.fx.push({x:bm.x,y:bm.y,r:46,t:0,dur:0.6,c:'#ffb040'});G.fx.push({x:bm.x,y:bm.y,r:24,t:0,dur:0.4,c:'#fff0a0'});
+    for(const b of G.blds)if(alive(b)&&b.kind!=='chief'&&Math.hypot(b.x-bm.x,b.y-bm.y)<40+b.r)hitBld(b,b.kind==='post'||b.kind==='abatis'?999:550);for(const f of G.foes)if(alive(f)&&Math.hypot(f.x-bm.x,f.y-bm.y)<40)hitFoe(f,80);}}
+  if(G.bombs)G.bombs=G.bombs.filter(b=>!b.done);
   for(const s of G.shots)s.t+=dt*4;G.shots=G.shots.filter(s=>s.t<1);for(const f of G.fx)f.t+=dt;G.fx=G.fx.filter(f=>f.t<f.dur);
   // 終わり：夜明け・テントを全部焼いた・全滅
   if(G.t>=NIGHT_SEC)return endBattle('dawn');
@@ -278,25 +297,37 @@ function update(dt){G.t+=dt;
   if(!G.units.some(alive)&&!ORDER.some(k=>G.pool[k]>0))return endBattle('lose');
 }
 function attack(u,tg,atk){const d=SU[u.t];
+  if(d.role==='eng'&&tg.kind&&['gate','post','abatis'].includes(tg.kind)&&(u.bombCd||0)<=G.t){u.bombCd=G.t+14;(G.bombs=G.bombs||[]).push({x:tg.x,y:tg.y,t:2.2});msg('工兵が爆薬をしかけた！');sfx('click');return;}
   if(d.role==='cat'){shoot(u,tg,'#c8a070');setTimeout(()=>{if(!G||!G.blds)return;const sp=d.splash;G.fx.push({x:tg.x,y:tg.y,r:sp,t:0,dur:0.4,c:'#c8a070'});
       for(const b of G.blds)if(alive(b)&&Math.hypot(b.x-tg.x,b.y-tg.y)<sp+b.r)hitBld(b,atk*d.bld);for(const f of G.foes)if(alive(f)&&Math.hypot(f.x-tg.x,f.y-tg.y)<sp)hitFoe(f,atk*0.6);},250/G.speed);sfx('how');return;}
+  if(d.role==='drake'||d.role==='gun'){shoot(u,tg,d.role==='drake'?'#ff7a2a':'#c8c8c8');const sp=d.splash,x=tg.x,y=tg.y;G.fx.push({x,y,r:sp,t:0,dur:0.35,c:d.role==='drake'?'#ff5a1e':'#d0d0d0'});
+    for(const b of G.blds)if(alive(b)&&Math.hypot(b.x-x,b.y-y)<sp+b.r)hitBld(b,atk*d.bld*((b.kind==='tent'||b.kind==='chief')&&d.tentMul?d.tentMul:1));for(const f of G.foes)if(alive(f)&&Math.hypot(f.x-x,f.y-y)<sp)hitFoe(f,atk*0.8);sfx(d.role==='gun'?'boom':'hit');return;}
   if(d.role==='ranged')shoot(u,tg);
   if(tg.kind)hitBld(tg,atk*d.bld);else hitFoe(tg,atk);
   if(d.role==='ram')sfx('hit');
 }
 // 敵へのダメージ：起きていた魔物（3割）のうち倒した割合 ＋ テントの焼けた割合 × 眠っていた魔物（7割）
-function result(){const awN=G.foes.length,kill=G.foes.filter(f=>!alive(f)).length;
+function result(){const awN=G.foes.length,kill=G.foes.filter(f=>!alive(f)).length,sN=G.foes.filter(f=>f.sentry).length,sK=G.foes.filter(f=>f.sentry&&!alive(f)).length;
+  const tN=G.blds.filter(b=>b.kind==='tent').length+1,tB=G.blds.filter(b=>(b.kind==='tent'||b.kind==='chief')&&b.hp<=0).length,chiefDown=G.blds.some(b=>b.kind==='chief'&&b.hp<=0);
   const burned=G.blds.filter(b=>(b.kind==='tent'||b.kind==='chief')&&b.hp<=0).reduce((a,b)=>a+(b.kind==='chief'?2:1),0);
   const tentPct=burned/G.tentTotal,killPct=awN?kill/awN:0;const all=total(G.st),dmgN=Math.round(kill+G.sleeping*tentPct);
-  return {kill,awN,tentPct:Math.round(tentPct*100),killPct:Math.round(killPct*100),dmgN,all,dmgPct:Math.round(dmgN/Math.max(1,all)*100)};}
+  return {kill,awN,sN,sK,tN,tB,chiefDown,sleepKill:Math.round(G.sleeping*tentPct),sleeping:G.sleeping,tentPct:Math.round(tentPct*100),killPct:Math.round(killPct*100),dmgN,all,dmgPct:Math.round(dmgN/Math.max(1,all)*100)};}
 function endBattle(why){if(!G||G.phase==='end')return;G.phase='end';const r=result(),lostSq=G.units.filter(u=>!alive(u)).length;
   const men0=G.units.reduce((a,u)=>a+(SU[u.t].m>1?SU[u.t].m:0),0),men=G.units.filter(alive).reduce((a,u)=>a+(SU[u.t].m>1?mem(u):0),0);
   sfx(r.dmgPct>=50?'clear':'turn');
   const t={dawn:'夜が明けた',burned:'陣のテントを焼き払った！',lose:'夜襲の部隊が全滅した',retreat:'撤退した'}[why];
-  const box=document.createElement('div');box.className='sgEnd';box.innerHTML=`<h2>${t}</h2>
-    <div class="sgBig">敵へのダメージ <b>${r.dmgPct}%</b><small>（駐留していた ${r.all}体のうち ${r.dmgN}体ぶん）</small></div>
-    <div class="sgEG"><span>倒した魔物（起きていた3割）</span><b>${r.kill} / ${r.awN}（${r.killPct}%）</b><span>焼いたテント（眠っていた7割）</span><b>${r.tentPct}%</b><span>失った部隊</span><b>${lostSq} / ${G.units.length}</b><span>生き残った兵</span><b>${men} / ${men0}</b><span>かかった時間</span><b>${Math.round(G.t)}秒</b></div>
-    <div class="muted" style="margin:6px 0 10px">本番なら（案）：この駐留地から来る次の襲撃が <b>${r.dmgPct}%</b> 減る</div><div class="sgFoot"><button id="sgAgain">同じ編成でもう一度</button><button id="sgEdit">編成を変える</button><button id="sgClose">タイトルへ</button></div>`;
+  const killW=r.all?r.kill/r.all*100:0,burnW=r.all?r.sleepKill/r.all*100:0,grade=r.dmgPct>=90?['大戦果','#ffd060']:r.dmgPct>=60?['戦果あり','#ffb040']:r.dmgPct>=30?['小さな戦果','#c8c8a0']:['戦果わずか','#8aa48d'];
+  const bar=(v,m,c)=>`<i class="sgMini"><b style="width:${m?Math.round(v/m*100):0}%;background:${c}"></b></i>`;
+  const box=document.createElement('div');box.className='sgEnd';box.innerHTML=`<div class="sgEH"><span>${t}</span><em style="color:${grade[1]}">${grade[0]}</em></div>
+    <div class="sgBig"><div><small>敵へのダメージ</small><b>${r.dmgPct}%</b></div><div class="sgSum">駐留していた魔物 <b>${r.all}</b> 体のうち、<b style="color:#ffb040">${r.dmgN}</b> 体ぶんを減らした<br><small>本番なら（案）：この駐留地から来る次の襲撃が ${r.dmgPct}% 減る</small></div></div>
+    <div class="sgStack" title="倒した魔物＋焼いたテントで眠っていた魔物"><b style="width:${killW}%;background:#ff5a4e"></b><b style="width:${burnW}%;background:#ff9a2a"></b></div>
+    <div class="sgLeg"><span><i style="background:#ff5a4e"></i>倒した ${r.kill}体</span><span><i style="background:#ff9a2a"></i>テントごと焼いた ${r.sleepKill}体</span><span><i style="background:#2a1410"></i>残った ${r.all-r.dmgN}体</span></div>
+    <div class="sgCards2">
+      <div class="sgCard"><h4>起きていた魔物（3割）</h4><div class="sgL"><span>見張り</span><b>${r.sK} / ${r.sN}</b>${bar(r.sK,r.sN,'#ff5a4e')}</div><div class="sgL"><span>陣の中</span><b>${r.kill-r.sK} / ${r.awN-r.sN}</b>${bar(r.kill-r.sK,r.awN-r.sN,'#ff5a4e')}</div><div class="sgL tot"><span>倒した</span><b>${r.kill} / ${r.awN}</b></div></div>
+      <div class="sgCard"><h4>眠っていた魔物（7割・${r.sleeping}体）</h4><div class="sgL"><span>テント</span><b>${r.tB} / ${r.tN}</b>${bar(r.tB,r.tN,'#ff9a2a')}</div><div class="sgL"><span>大将のテント</span><b>${r.chiefDown?'焼いた':'残った'}</b><small>（2つ分）</small></div><div class="sgL tot"><span>焼けた割合</span><b>${r.tentPct}%</b></div></div>
+      <div class="sgCard"><h4>こちらの被害</h4><div class="sgL"><span>生き残った兵</span><b>${men} / ${men0}</b>${bar(men,men0,'#6fe08a')}</div><div class="sgL"><span>失った部隊</span><b>${lostSq} / ${G.units.length}</b></div><div class="sgL tot"><span>かかった時間</span><b>${Math.floor(G.t/60)}:${String(Math.round(G.t)%60).padStart(2,'0')}</b></div></div>
+    </div>
+    <div class="sgFoot"><button id="sgAgain">同じ編成でもう一度</button><button id="sgEdit">編成を変える</button><button id="sgClose">タイトルへ</button></div>`;
   $('siege').appendChild(box);
   const keep=G.start,raid=G.raid,lay=G.layout;
   $('sgAgain').onclick=()=>{G={phase:'setup',pool:Object.assign({},keep),raid,layout:lay,speed:G.speed,paused:false,start:keep};G.st=stationed(raid);G.aw=awakeOf(G.st);startDeploy();};
@@ -327,11 +358,15 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
       g.fillStyle='#5a5a62';if(hz){g.fillRect(b.x-7,b.y-19,14,3);g.fillRect(b.x-7,b.y+12,14,3);}else{g.fillRect(b.x-19,b.y-13,3,20);g.fillRect(b.x+16,b.y-13,3,20);}}
     else if(b.kind==='tower'){g.fillStyle='#3a2a1a';g.fillRect(b.x-12,b.y-22,24,30);g.fillStyle='#6a4a2a';g.fillRect(b.x-14,b.y-28,28,8);g.fillStyle='#8a2a20';g.beginPath();g.moveTo(b.x-15,b.y-28);g.lineTo(b.x,b.y-40);g.lineTo(b.x+15,b.y-28);g.fill();g.fillStyle='#1c1210';g.fillRect(b.x-4,b.y-4,8,12);
       g.fillStyle='#ffb040';g.fillRect(b.x-2,b.y-34+Math.sin(tt*9+b.id)*1,3,4);}
+    else if(b.kind==='bow'){g.fillStyle='#3a2a1a';g.fillRect(b.x-12,b.y-6,24,14);g.strokeStyle='#8a6a3a';g.lineWidth=3;g.beginPath();g.arc(b.x,b.y-4,13,Math.PI*1.15,Math.PI*1.85);g.stroke();g.strokeStyle='#c8c0a8';g.lineWidth=1;g.beginPath();g.moveTo(b.x-11,b.y-9);g.lineTo(b.x+11,b.y-9);g.stroke();g.fillStyle='#d0d0d0';g.fillRect(b.x-1,b.y-20,2,14);}
+    else if(b.kind==='abatis'){g.strokeStyle='#6a4422';g.lineWidth=3;for(let i=-1;i<=1;i++){g.beginPath();g.moveTo(b.x-10,b.y+6+i*2);g.lineTo(b.x+10,b.y-8+i*2);g.stroke();g.beginPath();g.moveTo(b.x-10,b.y-8+i*2);g.lineTo(b.x+10,b.y+6+i*2);g.stroke();}g.lineWidth=1;}
     else if(b.kind==='tent'){g.fillStyle='#6a5030';g.beginPath();g.moveTo(b.x-18,b.y+8);g.lineTo(b.x,b.y-18);g.lineTo(b.x+18,b.y+8);g.fill();g.fillStyle='#8a6a40';g.beginPath();g.moveTo(b.x,b.y-18);g.lineTo(b.x+18,b.y+8);g.lineTo(b.x+6,b.y+8);g.fill();g.fillStyle='#2a1c10';g.beginPath();g.moveTo(b.x-5,b.y+8);g.lineTo(b.x,b.y-4);g.lineTo(b.x+5,b.y+8);g.fill();
       if(!G.alarm){g.fillStyle='rgba(220,230,255,.7)';g.font='9px sans-serif';g.fillText('z',b.x+10,b.y-16-((tt*8+b.id)%10));}}
     else if(b.kind==='chief'){g.fillStyle='#5a1a20';g.beginPath();g.moveTo(b.x-28,b.y+12);g.lineTo(b.x,b.y-30);g.lineTo(b.x+28,b.y+12);g.fill();g.fillStyle='#8a2a30';g.beginPath();g.moveTo(b.x,b.y-30);g.lineTo(b.x+28,b.y+12);g.lineTo(b.x+10,b.y+12);g.fill();g.fillStyle='#1c0c0c';g.fillRect(b.x-6,b.y-2,12,14);
       g.fillStyle='#8a1a1a';g.fillRect(b.x-1,b.y-56,3,28);g.fillStyle='#c03030';g.beginPath();g.moveTo(b.x+2,b.y-56);g.lineTo(b.x+22,b.y-50+Math.sin(tt*4)*2);g.lineTo(b.x+2,b.y-44);g.fill();}
     if(b.hp<b.maxhp&&b.kind!=='post'){const w=b.r*2;g.fillStyle='#000';g.fillRect(b.x-w/2,b.y+b.r*0.6+4,w,4);g.fillStyle=b.kind==='tent'||b.kind==='chief'?'#ff8a3a':'#f2b33d';g.fillRect(b.x-w/2,b.y+b.r*0.6+4,w*b.hp/b.maxhp,4);}}
+  for(const bm of (G.bombs||[])){g.fillStyle='#2a1a10';g.fillRect(bm.x-5,bm.y-5,10,8);g.fillStyle=Math.sin(tt*20)>0?'#ffe080':'#ff5a1e';g.fillRect(bm.x+3,bm.y-9,3,3);g.fillStyle='#fff';g.font='9px sans-serif';g.textAlign='center';g.fillText(Math.ceil(bm.t),bm.x,bm.y-12);}
+  if(G.phase!=='setup')for(const u of G.units)if(alive(u)&&SU[u.t].role==='shield'){g.strokeStyle='rgba(120,180,255,.22)';g.setLineDash([3,4]);g.beginPath();g.arc(u.x,u.y,48,0,7);g.stroke();g.setLineDash([]);}
   // 焼けたテントの火
   for(const f of (G.fires||[])){for(let i=0;i<3;i++){const h=8+((tt*30+i*7)%10);g.fillStyle=['#ff5a1e','#ffb040','#ffe080'][i];g.fillRect(f.x-6+i*4,f.y-h,4,h);}}
   // 魔物
@@ -343,8 +378,11 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
   for(const u of G.units){if(!alive(u))continue;const d=SU[u.t],n=mem(u),sel=G.sel.has(u.id);
     if(sel){g.strokeStyle='#62c6d9';g.lineWidth=1.5;g.beginPath();g.ellipse(u.x,u.y+4,d.isBld?20:16,d.isBld?9:7,0,0,7);g.stroke();}
     if(d.draw){(d.draw==='ram'?drawRam:drawCat)(g,u.x,u.y,1.4,u.face);}
-    else{const im=sprFrame('units',d.spr,u.walk);const off=[[0,0],[-9,4],[9,4],[-5,-6],[6,-6],[0,8]];for(let i=n-1;i>=0;i--){const [ox,oy]=off[i%off.length];g.save();g.translate(u.x+ox,u.y+oy);if(u.face<0)g.scale(-1,1);if(im)g.drawImage(im,-10,-18,20,20);g.restore();}}
+    else{const im=sprFrame('units',d.spr,u.walk);const off=[[0,0],[-9,4],[9,4],[-5,-6],[6,-6],[0,8]];const z=d.fly?30:20;for(let i=n-1;i>=0;i--){const [ox,oy]=off[i%off.length];g.save();g.translate(u.x+ox*(d.fly?1.6:1),u.y+oy-(d.fly?10+Math.sin(tt*4+u.id)*2:0));if(u.face<0)g.scale(-1,1);if(im)g.drawImage(im,-z/2,-z+2,z,z);g.restore();}
+      if(d.fly){g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(u.x,u.y+6,14,4,0,0,7);g.fill();}}
     const r=u.hp/u.maxhp;g.fillStyle='#000';g.fillRect(u.x-12,u.y+(d.isBld?14:9),24,3);g.fillStyle=r<0.3?'#ff5a4e':r<0.6?'#f2b33d':'#6fe08a';g.fillRect(u.x-12,u.y+(d.isBld?14:9),24*r,3);
+    if(u.guardT>0){u.guardT-=1/60;g.fillStyle='rgba(120,180,255,.9)';g.fillRect(u.x-2,u.y-24,4,5);}
+    if(u.fixT>0){u.fixT-=1/60;g.fillStyle='#6fe08a';g.fillRect(u.x-1,u.y-26,2,6);g.fillRect(u.x-3,u.y-24,6,2);}
     if(u.hold){g.fillStyle='#f2b33d';g.font='8px sans-serif';g.textAlign='center';g.fillText('固守',u.x,u.y-22);}}
   for(const s of G.shots){const x=s.x+(s.tx-s.x)*s.t,y=s.y+(s.ty-s.y)*s.t-Math.sin(s.t*Math.PI)*12;g.fillStyle=s.c;g.fillRect(x-1.5,y-1.5,3,3);}
   for(const f of G.fx){const k=f.t/f.dur;g.globalAlpha=1-k;g.strokeStyle=f.c;g.lineWidth=2;g.beginPath();g.arc(f.x,f.y,f.r*(0.5+k*0.7),0,7);g.stroke();}g.globalAlpha=1;
@@ -352,7 +390,7 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
   {const k=G.phase==='battle'||G.phase==='end'?Math.min(1,G.t/NIGHT_SEC):0,a=0.62-0.4*Math.max(0,k-0.75)/0.25;
     if(!G.dark){G.dark=document.createElement('canvas');G.dark.width=W;G.dark.height=H;}const q=G.dark.getContext('2d');q.globalCompositeOperation='source-over';q.clearRect(0,0,W,H);q.fillStyle=`rgba(6,10,26,${a})`;q.fillRect(0,0,W,H);q.globalCompositeOperation='destination-out';
     const light=(x,y,r)=>{const gr=q.createRadialGradient(x,y,2,x,y,r);gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(1,'rgba(0,0,0,0)');q.fillStyle=gr;q.beginPath();q.arc(x,y,r,0,7);q.fill();};
-    for(const b of G.blds)if(b.hp>0&&(b.kind==='tower'||b.kind==='gate'))light(b.x,b.y,70);for(const f of (G.fires||[]))light(f.x,f.y,90);for(const u of G.units)if(alive(u))light(u.x,u.y,55);for(const f of G.foes)if(alive(f)&&f.sentry)light(f.x,f.y,40);
+    for(const b of G.blds)if(b.hp>0&&(b.kind==='tower'||b.kind==='gate'||b.kind==='bow'))light(b.x,b.y,70);for(const bm of (G.bombs||[]))light(bm.x,bm.y,40);for(const f of (G.fires||[]))light(f.x,f.y,90);for(const u of G.units)if(alive(u))light(u.x,u.y,55);for(const f of G.foes)if(alive(f)&&f.sentry)light(f.x,f.y,40);
     g.drawImage(G.dark,0,0);}
   if(G.box){const {a,b}=G.box;g.strokeStyle='#62c6d9';g.setLineDash([5,3]);g.fillStyle='rgba(98,198,217,.12)';g.fillRect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(a.x-b.x),Math.abs(a.y-b.y));g.strokeRect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(a.x-b.x),Math.abs(a.y-b.y));g.setLineDash([]);}
 }
@@ -387,7 +425,17 @@ body.siegeOn #boot{display:none}
 #siege .sgMsg{position:absolute;left:50%;top:52px;transform:translateX(-50%);background:rgba(10,14,11,.92);box-shadow:inset 0 0 0 1px #f2b33d;padding:6px 14px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center;z-index:2}
 #siege .sgMsg.on{opacity:1}
 #siege .sgEnd{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--panel,#121a14);box-shadow:0 0 0 2px #f2b33d,0 10px 30px #000;padding:14px 20px;min-width:min(460px,92vw);z-index:3}
-#siege .sgBig{font-size:14px;margin:0 0 8px}#siege .sgBig b{font-family:var(--px-font,inherit);font-weight:400;font-size:28px;color:#ff8a6a;margin:0 6px}#siege .sgBig small{color:var(--dim,#7f9a82)}
+#siege .sgEnd{width:min(720px,94vw);max-height:94vh;overflow:auto}
+#siege .sgEH{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}#siege .sgEH span{font-family:var(--px-font,inherit);font-size:20px;color:#f2b33d}#siege .sgEH em{font-style:normal;font-family:var(--px-font,inherit);font-size:18px}
+#siege .sgBig{display:flex;align-items:center;gap:18px;margin:0 0 8px}#siege .sgBig>div:first-child{display:flex;flex-direction:column;align-items:center}#siege .sgBig>div small{font-size:11px;color:var(--dim,#7f9a82)}
+#siege .sgBig>div:first-child b{font-family:var(--px-font,inherit);font-weight:400;font-size:44px;line-height:1;color:#ff8a6a}#siege .sgSum{font-size:13px;line-height:1.7}#siege .sgSum b{font-size:15px}
+#siege .sgStack{display:flex;height:16px;background:#2a1410;box-shadow:inset 0 0 0 1px #5a2a20;margin:4px 0}#siege .sgStack b{display:block;height:100%}
+#siege .sgLeg{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;margin-bottom:10px}#siege .sgLeg i{display:inline-block;width:10px;height:10px;margin-right:4px;vertical-align:-1px}
+#siege .sgCards2{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}#siege .sgCard{background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line,#2a3a2d);padding:8px 10px}#siege .sgCard h4{margin:0 0 6px;font-size:12px;color:var(--dim,#7f9a82);font-weight:400}
+#siege .sgL{display:grid;grid-template-columns:1fr auto;align-items:center;gap:0 8px;font-size:12px;margin:3px 0}#siege .sgL b{font-family:var(--px-font,inherit);font-weight:400;font-size:15px}#siege .sgL small{grid-column:1/-1;font-size:10px;color:var(--dim,#7f9a82)}#siege .sgL .sgMini{grid-column:1/-1}
+#siege .sgL.tot{border-top:1px solid var(--line,#2a3a2d);padding-top:4px;margin-top:6px}#siege .sgL.tot b{color:#f2b33d}
+#siege .sgMini{display:block;height:5px;background:#1a221c}#siege .sgMini b{display:block;height:100%}
+@media (max-width:900px){#siege .sgCards2{grid-template-columns:1fr 1fr 1fr;gap:4px}#siege .sgCard{padding:4px 6px}#siege .sgBig>div:first-child b{font-size:32px}#siege .sgEnd{padding:8px 12px}}
 #siege .sgEG{display:grid;grid-template-columns:auto auto;gap:4px 18px}#siege .sgEG b{text-align:right;font-family:var(--px-font,inherit);font-weight:400;font-size:15px}
 @media (max-width:900px){
   #siege .sgTop{flex-wrap:nowrap;gap:6px;padding:2px 6px;font-size:11px}#siege .sgTop>b{display:none}#siege .sgTop #sgStat{font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
