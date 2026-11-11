@@ -1867,8 +1867,9 @@ const MTC={};for(const k in MODEL)MTC[k]=Object.assign({},UT[MODEL[k].ut],MODEL[
 function defModel(ut){return {art:'cannoneer',guard:'guard',mil:'farmer',cav:'rider',drake:'dragon',mage:'wizard',inf:'pawn',arch:'archer',tank:'t10',ship:'dd',air:'heli'}[ut]||'geki';}
 const UNIT_HOME={hq:'mil',train:'inf',stable:'cav',aerie:'drake',magic:'mage'};
 function modelsAt(bt){return Object.keys(MODEL).filter(k=>UT[MODEL[k].ut].home===bt&&!MODEL[k].buy&&(!MODEL[k].req||has(MODEL[k].req)));}
-// 試作：城のレベルごとに持てる部隊の上限（Lv1は12、Lvごとに+3 → Lv7で30。中隊3・大隊9・師団27にそろう）
-function squadCap(){return 12+3*((S.baseLv||1)-1);}
+// 試作：城のレベルごとに持てる部隊の上限（2026-11-11 ユーザー案）
+const SQUAD_CAP=[12,20,30,40,52,65,80];
+function squadCap(){return SQUAD_CAP[Math.max(0,Math.min(SQUAD_CAP.length-1,(S.baseLv||1)-1))];}
 function squadCount(){return S.squads.filter(q=>q.hp==null||q.hp>0).length+S.blds.reduce((a,b)=>a+(b.queue||0),0);}
 function capOf(b){return B[b.type].cap||UT[UNIT_HOME[b.type]].cap;}
 function MT(u){return MTC[typeof u==='string'?(MODEL[u]?u:defModel(u)):(u.model||defModel(u.ut))];}
@@ -6669,7 +6670,7 @@ function cancelTrain(b,i){const mk=b.qm[i];const m=MTC[mk];for(const k in m.cost
 function showArmy(target){
   const sl=trainSlots();
   let h=target?'':`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">部隊</h2><button id="ovClose">閉じる [K]</button></div>`;
-  h+=`<div class="help"><b>部隊 ${squadCount()}/${squadCap()}</b>（城Lv${S.baseLv||1}の上限。城を強化すると+3）。部隊の数は施設の数でも決まります。どの施設で訓練するかは自動で選ばれます。</div><div style="display:flex;flex-wrap:wrap;gap:6px 14px;margin:6px 0">`;
+  h+=`<div class="help"><b>部隊 ${squadCount()}/${squadCap()}</b>（城Lv${S.baseLv||1}の上限。城を強化すると増える）。部隊の数は施設の数でも決まります。どの施設で訓練するかは自動で選ばれます。</div><div style="display:flex;flex-wrap:wrap;gap:6px 14px;margin:6px 0">`;
   for(const bt in UNIT_HOME){const o=sl[bt];if(!o.n&&B[bt].req&&!has(B[bt].req))continue;h+=`<span>${icSvg(bt,18)} ${B[bt].name}×${o.n}　<b>${o.used}/${o.cap}</b>部隊</span>`;}
   h+=`</div>`;
   h+=`<h3 style="margin:8px 0 4px">訓練する</h3><div style="display:flex;flex-wrap:wrap;gap:6px">`;
