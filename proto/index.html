@@ -7215,8 +7215,11 @@ const BAT_CH=[[62,65,69],[62,65,69],[58,62,65],[60,64,67],[62,65,69],[62,65,69],
 const MELO=[74,null,72,74,77,null,76,74, 72,null,70,69,70,null,72,null, 74,null,72,74,77,null,79,77, 76,null,74,72,73,null,null,null];
 function auMusicFor(){
   if(!AU.ctx||!S)return;
-  const want=S.over?null:(S.waveActive||S.skirm?'battle':'prep');
+  // 場面ごとの曲：ホーム（タイトル）・昼・静かな夜・祭りの夜・敵の襲撃・ボス襲来（攻城戦は siege.js が上書きする）
+  const boss=(S.waveActive||S.skirm)&&S.enemies&&S.enemies.some(e=>e.hp>0&&E[e.type]&&E[e.type].boss);
+  const want=(S.overlay==='title'||S.overlay==='intro')?'home':S.over?null:(S.waveActive||S.skirm)?(boss?'boss':'battle'):S.night?(S.night.plan==='fest'?'fest':'night'):'prep';
   AU.intensity=S.waveActive?(S.wave>=finalWave()?2:S.wave>=4?1:0):0;
+  AU.map=AU.mapForce||S.mapId||'f';
   if(want!==AU.track){
     const t=AU.ctx.currentTime;
     AU.music.gain.cancelScheduledValues(t);AU.music.gain.setValueAtTime(AU.music.gain.value,t);
@@ -7229,21 +7232,27 @@ function auSched(){
   if(!AU.ctx||!AU.track)return;
   const c=AU.ctx;if(AU.nextT<c.currentTime-0.5)AU.nextT=c.currentTime+0.05;
   while(AU.nextT<c.currentTime+0.15){
-    if(AU.track==='prep'){playPrep(AU.step,AU.nextT);AU.nextT+=60/72/4;}
-    else{playBattle(AU.step,AU.nextT);AU.nextT+=60/150/4;}
+    const T=TRACK[AU.track]||TRACK.battle;T.f(AU.step,AU.nextT);AU.nextT+=60/(typeof T.bpm==='function'?T.bpm():T.bpm)/4;
     AU.step++;
   }
+  if(((AU.chk=(AU.chk||0)+1)%40)===0)try{auMusicFor();}catch(e){}   // 場面が変わったら曲を替える（1秒ごとに見る）
 }
+// ステージごとのアレンジ：同じ曲でも音の高さ・笛／角笛／鐘を変える
+function stg(){return ({t:{tr:2,lead:'triangle',flute:1},m:{tr:-2,lead:'sawtooth',horn:1},s:{tr:1,lead:'sine',bells:1}})[AU.map]||{tr:0,lead:'square'};}
+const mt=n=>mtof(n+stg().tr);
 function playPrep(st,t){
   const M=AU.music;const bar=Math.floor(st/32)%4;const ch=PREP_CH[bar];const sp=60/72/4;
   if(st%32===0){
-    for(const n of ch){tone(mtof(n),t,sp*32+1.2,{type:'sawtooth',vol:0.048,a:1.6,r:1.5,lp:650,dest:M,det:-6});tone(mtof(n+12),t,sp*32+1.2,{type:'triangle',vol:0.04,a:2,r:1.5,dest:M,det:5});}
-    tone(mtof(ch[0]-24),t,sp*32+0.5,{vol:0.198,a:1,r:1,dest:M});
+    for(const n of ch){tone(mt(n),t,sp*32+1.2,{type:'sawtooth',vol:0.048,a:1.6,r:1.5,lp:650,dest:M,det:-6});tone(mt(n+12),t,sp*32+1.2,{type:'triangle',vol:0.04,a:2,r:1.5,dest:M,det:5});}
+    tone(mt(ch[0]-24),t,sp*32+0.5,{vol:0.198,a:1,r:1,dest:M});
   }
-  if(st%2===0){const arp=[0,1,2,1,2,0,1,2];const i=(st/2)%8;const n=ch[arp[i]]+24;if(!(i===7&&bar%2))tone(mtof(n),t,0.5,{type:'triangle',vol:0.048,dest:M,send:true,r:0.45});}
+  if(st%2===0){const arp=[0,1,2,1,2,0,1,2];const i=(st/2)%8;const n=ch[arp[i]]+24;if(!(i===7&&bar%2))tone(mt(n),t,0.5,{type:'triangle',vol:0.048,dest:M,send:true,r:0.45});}
   if(st%64===40)tone(1320,t,0.9,{vol:0.044,dest:M,send:true});           // ソナー音
   if(st%16===0)noise(t,0.15,{ft:'bandpass',f:120,vol:0.066,dest:M});      // 遠くの心拍のような低音
   if(st%16===3)noise(t,0.12,{ft:'bandpass',f:110,vol:0.044,dest:M});
+  const V=stg();if(V.bells&&st%8===4&&((st*7)%5)<2)tone(mt([86,89,93,96][(st/8)%4|0]),t,1.2,{vol:0.03,dest:M,send:true});   // 雪原：鐘
+  if(V.horn&&st%64===0)tone(mt(ch[0]-12),t,sp*24,{type:'sawtooth',vol:0.05,lp:500,a:0.8,r:1.5,dest:M});   // 山：角笛
+  if(V.flute&&st%4===2&&(st%32)<24)tone(mt(ch[(st/4)%3|0]+24),t,0.35,{type:'triangle',vol:0.035,dest:M,send:true});   // 廃村：笛
 }
 function playBattle(st,t){
   const M=AU.music;const s=st%16;const bar=Math.floor(st/16)%8;const root=BAT_ROOT[bar];const it=AU.intensity;
@@ -7254,13 +7263,70 @@ function playBattle(st,t){
   if(s%2===0||it>=2)noise(t,s%4===2?0.07:0.03,{ft:'highpass',f:7000,vol:s%4===2?0.05:0.025,dest:M});
   // ベース（16分の刻み）
   const bp=[0,0,12,0,0,0,12,0,0,0,12,0,0,7,12,10];
-  tone(mtof(root+bp[s]),t,0.09,{type:'sawtooth',vol:0.119,lp:700,lpTo:200,dest:M});
+  tone(mt(root+bp[s]),t,0.09,{type:'sawtooth',vol:0.119,lp:700,lpTo:200,dest:M});
   // ブラスの刻み
-  if(s===3||s===11||(s===14&&bar%2)){for(const n of BAT_CH[bar])tone(mtof(n-12),t,0.16,{type:'sawtooth',vol:0.043,lp:2600,lpTo:500,dest:M});}
+  if(s===3||s===11||(s===14&&bar%2)){for(const n of BAT_CH[bar])tone(mt(n-12),t,0.16,{type:'sawtooth',vol:0.043,lp:2600,lpTo:500,dest:M});}
   // 旋律（第4襲撃以降）
-  if(it>=1&&s%2===0){const i=(Math.floor(st/2))%32;const m=MELO[i];if(m)tone(mtof(m),t,0.22,{type:'square',vol:0.048,lp:2200,dest:M,send:true});}
-  if(st%128===0)tone(mtof(root-12),t,60/150*8,{type:'sawtooth',vol:0.051,lp:300,a:0.5,dest:M});
+  if(it>=1&&s%2===0){const i=(Math.floor(st/2))%32;const m=MELO[i];if(m)tone(mt(m),t,0.22,{type:'square',vol:0.048,lp:2200,dest:M,send:true});}
+  if(st%128===0)tone(mt(root-12),t,60/150*8,{type:'sawtooth',vol:0.051,lp:300,a:0.5,dest:M});
 }
+
+// ---- 追加の曲（2026-11-11）----
+const TRACK={
+  prep:{bpm:72,f:(s,t)=>playPrep(s,t)},
+  battle:{bpm:150,f:(s,t)=>playBattle(s,t)},
+  home:{bpm:66,f:(s,t)=>playHome(s,t)},
+  night:{bpm:56,f:(s,t)=>playNight(s,t)},
+  fest:{bpm:128,f:(s,t)=>playFest(s,t)},
+  siege:{bpm:()=>AU.intensity?140:84,f:(s,t)=>playSiege(s,t)},
+  boss:{bpm:96,f:(s,t)=>playBoss(s,t)},
+};
+// ホーム：ゆっくり・少し寂しげ（Dマイナー）。弦のような和音と、ゆっくりした旋律
+const HOME_CH=[[50,53,57],[46,50,53],[41,45,48],[43,46,50],[50,53,57],[46,50,53],[45,49,52],[45,49,52]];
+const HOME_M=[69,null,null,72,74,null,72,69, 70,null,69,67,65,null,null,null, 65,null,67,69,72,null,70,69, 67,null,null,64,65,null,null,null];
+function playHome(st,t){const M=AU.music,sp=60/66/4,bar=Math.floor(st/16)%8,ch=HOME_CH[bar];
+  if(st%16===0){for(const n of ch){tone(mtof(n+12),t,sp*16+0.8,{type:'sawtooth',vol:0.042,a:1.2,r:1.2,lp:900,dest:M,det:-7});tone(mtof(n+12),t,sp*16+0.8,{type:'triangle',vol:0.045,a:1.4,r:1.2,dest:M,det:6});}tone(mtof(ch[0]-12),t,sp*16+0.4,{vol:0.225,a:0.6,dest:M});}
+  if(st%4===0){const m=HOME_M[(st/4)%32];if(m)tone(mtof(m),t,sp*7,{type:'triangle',vol:0.09,a:0.05,r:sp*5,dest:M,send:true});}
+  if(st%8===6)tone(mtof(ch[2]+24),t,0.6,{vol:0.027,dest:M,send:true});}
+// 静かな夜：低い持続音・ときどき鈴（五音音階）・虫の声
+const NIGHT_P=[62,65,67,69,72,74,77,79];
+function playNight(st,t){const M=AU.music,sp=60/56/4,V=stg();
+  if(st%64===0){tone(mt(38),t,sp*64+1,{type:'sine',vol:0.083,a:3,r:3,dest:M});tone(mt(45),t,sp*64+1,{type:'triangle',vol:0.022,a:4,r:3,lp:500,dest:M,det:4});}
+  if(st%32===16)tone(mt(41),t,sp*32,{type:'triangle',vol:0.019,a:2,r:2,lp:400,dest:M});
+  const h=(st*2654435761>>>0)%97;
+  if(st%2===0&&h<9)tone(mt(NIGHT_P[h%8]+(V.bells?12:0)),t,2.2,{vol:0.026,dest:M,send:true});   // 鈴
+  if(st%3===0&&h%11<3)for(let i=0;i<3;i++)noise(t+i*0.045,0.03,{ft:'bandpass',f:4200+h*20,q:8,vol:0.009,dest:M});   // 虫の声
+  if(st%128===96)tone(mt(57),t,1.4,{type:'sine',to:mt(55),vol:0.019,dest:M,send:true});}   // 遠くのふくろう
+// 祭りの夜：にぎやか（Dメジャー）。太鼓・手拍子・笛
+const FEST_CH=[[62,66,69],[67,71,74],[69,73,76],[62,66,69]];
+const FEST_M=[74,76,78,81,78,76,74,null, 76,78,79,81,83,81,79,null, 78,76,74,76,78,null,74,null, 76,73,71,73,74,null,null,null];
+function playFest(st,t){const M=AU.music,s=st%16,bar=Math.floor(st/16)%4,ch=FEST_CH[bar],V=stg();
+  if(s===0||s===6||s===10)tone(mt(ch[0]-24),t,0.3,{to:mt(ch[0]-36),vol:0.264,dest:M});            // 大太鼓
+  if(s===4||s===12){noise(t,0.06,{ft:'bandpass',f:1600,q:1.2,vol:0.144,dest:M});noise(t+0.02,0.05,{ft:'bandpass',f:2100,q:1.2,vol:0.096,dest:M});}   // 手拍子
+  if(s%2===1)tone(2600,t,0.03,{type:'square',vol:0.014,lp:5000,dest:M});                            // 鉦
+  if(s%4===2)for(const n of ch)tone(mt(n),t,0.12,{type:'triangle',vol:0.036,dest:M});              // 和音の刻み
+  if(s%2===0){const m=FEST_M[(st/2)%32];if(m)tone(mt(m+(V.horn?-12:0)),t,0.2,{type:V.flute?'triangle':'square',vol:0.048,lp:3000,dest:M,send:true});}}
+// 駐留地攻撃（夜襲）：見つかる前は忍び寄る低音（84）、見つかったら太鼓が入って速く（140）
+function playSiege(st,t){const M=AU.music,s=st%16,bar=Math.floor(st/16)%4,root=[40,40,43,38][bar];
+  if(!AU.intensity){
+    if(s%4===0)tone(mtof(root),t,0.35,{type:'triangle',vol:0.338,lp:500,dest:M});
+    if(s===2||s===10)tone(mtof(root+12+(s===10?3:0)),t,0.12,{type:'triangle',vol:0.13,dest:M});   // はじく音
+    if(s%2===1)noise(t,0.02,{ft:'highpass',f:6000,vol:0.031,dest:M});                             // 刻み
+    if(st%64===48)tone(mtof(root+27),t,1.5,{vol:0.052,dest:M,send:true});
+    return;}
+  if(s===0||s===3||s===8||s===11)tone(130,t,0.25,{to:45,vol:0.36,dest:M});                        // 戦太鼓
+  if(s===4||s===12){noise(t,0.14,{ft:'bandpass',f:1500,q:0.8,vol:0.21,dest:M});}
+  if(s%2===0)noise(t,0.03,{ft:'highpass',f:7000,vol:0.045,dest:M});
+  tone(mtof(root+[0,0,12,0,0,0,12,3][s%8]),t,0.1,{type:'sawtooth',vol:0.15,lp:650,lpTo:200,dest:M});
+  if(s===6||s===14)for(const n of [0,3,7])tone(mtof(root+24+n),t,0.18,{type:'sawtooth',vol:0.045,lp:2000,lpTo:600,dest:M});}
+// ボス襲来：重い（Cマイナー・96）。低い金管の和音・ティンパニ・下がっていく低音
+const BOSS_B=[36,35,34,33,32,31,32,31];
+function playBoss(st,t){const M=AU.music,s=st%16,bar=Math.floor(st/16)%8,b=BOSS_B[bar],sp=60/96/4;
+  if(s===0){tone(mt(b),t,sp*16,{type:'sawtooth',vol:0.15,lp:300,a:0.2,dest:M});for(const n of [0,3,7])tone(mt(b+24+n),t,sp*14,{type:'sawtooth',vol:0.044,lp:900,a:0.3,dest:M,det:(n-3)*3});}
+  if(s===0||s===6||s===8||(bar%2&&s===14))tone(95,t,0.5,{to:42,vol:0.325,dest:M});                  // ティンパニ
+  if(s===12)noise(t,0.3,{ft:'bandpass',f:900,q:0.6,vol:0.125,dest:M});
+  if(s%4===2)tone(mt(b+12),t,0.12,{type:'square',vol:0.037,lp:700,dest:M});
+  if(bar>=4&&s%8===4)tone(mt(b+36+(bar%2?1:0)),t,sp*3,{type:'square',vol:0.037,lp:1600,dest:M,send:true});}
 function auSetBgm(v){AU.bgmVol=v;if(AU.ctx)AU.music.gain.setTargetAtTime(v*0.9,AU.ctx.currentTime,0.05);auSave();}
 function auSetSe(v){AU.seVol=v;if(AU.ctx)AU.sfx.gain.setTargetAtTime(v,AU.ctx.currentTime,0.05);auSave();}
 function auToggle(){AU.on=!AU.on;if(AU.ctx)AU.master.gain.setTargetAtTime(AU.on?1:0,AU.ctx.currentTime,0.05);auSave();auUi();}

@@ -114,7 +114,7 @@ function renderSetup(){const root=$('siege');saveSetup();const st=stationed(G.ra
   {const c=$('sgLogClr');if(c)c.onclick=()=>{try{localStorage.removeItem('nd_siege_log');}catch(e){}renderSetup();};}
   $('sgBack').onclick=closeSiege;$('sgGo').onclick=startDeploy;
 }
-function closeSiege(){cancelAnimationFrame(raf);raf=0;const root=$('siege');if(root){root.style.display='none';root.innerHTML='';}document.body.classList.remove('siegeOn');G=null;if(typeof showTitle==='function')showTitle();}
+function closeSiege(){setTimeout(()=>{try{if(typeof AU!=='undefined'&&AU.ctx)auMusicFor();}catch(e){}},50);cancelAnimationFrame(raf);raf=0;const root=$('siege');if(root){root.style.display='none';root.innerHTML='';}document.body.classList.remove('siegeOn');G=null;if(typeof showTitle==='function')showTitle();}
 function unitIcon(k,sz){const d=SU[k];if(d.draw){const c=document.createElement('canvas');c.width=c.height=32;const g=c.getContext('2d');g.translate(16,18);(d.draw==='ram'?drawRam:drawCat)(g,0,0,1,0);return `<img src="${c.toDataURL()}" width="${sz}" height="${sz}" style="image-rendering:pixelated">`;}
   const sp=typeof SPR!=='undefined'&&SPR.units&&SPR.units[d.spr];if(!sp)return '';return `<img src="${sp.img.walk[0].toDataURL()}" width="${sz}" height="${sz}" style="image-rendering:pixelated">`;}
 
@@ -712,6 +712,7 @@ const css=document.createElement('style');css.textContent=`
 #sgMusic{position:fixed;inset:0;z-index:960;background:rgba(5,8,6,.82);display:none;align-items:center;justify-content:center;color:#e8e0c8;font-family:inherit}
 #sgMusic .sgMBox{width:min(520px,94vw);max-height:92vh;overflow:auto;background:#121a14;box-shadow:0 0 0 2px #f2b33d;padding:14px 18px}#sgMusic h2{margin:0 0 4px;color:#f2b33d;font-size:18px}
 #sgMusic .sgML{display:flex;flex-direction:column;gap:6px;margin:10px 0}#sgMusic .sgML button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:8px 10px}#sgMusic .sgML button.on{box-shadow:inset 0 0 0 2px #f2b33d}#sgMusic .sgML small{font-size:11px;color:#9ab0a0}
+#sgMusic .sgMS{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0;font-size:11px;align-items:center}#sgMusic .sgMS b{width:100%;color:#9ab0a0}#sgMusic .sgMS button{display:flex;flex-direction:column;padding:4px 8px;font-size:11px}#sgMusic .sgMS button small{font-size:9px;color:#8aa48d}#sgMusic .sgMS button.on{box-shadow:inset 0 0 0 2px #f2b33d}
 #sgMusic .sgMT{display:flex;flex-wrap:wrap;gap:4px 8px;font-size:11px;color:#7f9a82;margin:6px 0}#sgMusic .sgMT b{width:100%;color:#9ab0a0}#sgMusic .sgMT span{padding:1px 6px;box-shadow:inset 0 0 0 1px #2f3f33}
 #sgMusic .sgFoot{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
 #siege .sgHero{display:flex;flex-direction:column;gap:4px;margin:6px 0;padding:6px 8px;background:rgba(255,255,255,.04);border:1px solid #2f3f33}
@@ -769,30 +770,42 @@ body.siegeOn #boot{display:none}
 // ---------- タイトルに「攻城戦（試作）」を足す ----------
 // ---------- 音楽室（ホームから BGM を聴く）。曲はゲーム本体が音を合成して鳴らす（AU）。聴いている間だけ曲を固定する ----------
 const TRACKS=[
-  {n:'昼（準備）',d:'昼の街づくりの曲。ゆったり',track:'prep',it:0},
-  {n:'敵の襲撃（序盤）',d:'第1〜3襲撃',track:'battle',it:0},
-  {n:'敵の襲撃（第4襲撃から）',d:'旋律が加わる',track:'battle',it:1},
-  {n:'敵の襲撃（最後の襲撃）',d:'いちばん激しい',track:'battle',it:2},
+  {n:'ホーム',d:'タイトル画面。ゆっくり・少し寂しげ',track:'home',it:0},
+  {n:'昼（準備）',d:'昼の街づくり',track:'prep',it:0,stage:1},
+  {n:'静かな夜',d:'襲撃のない夜。鈴と虫の声',track:'night',it:0,stage:1},
+  {n:'祭りの夜',d:'太鼓と手拍子と笛',track:'fest',it:0,stage:1},
+  {n:'敵の襲撃（序盤）',d:'第1〜3襲撃',track:'battle',it:0,stage:1},
+  {n:'敵の襲撃（第4襲撃から）',d:'旋律が加わる',track:'battle',it:1,stage:1},
+  {n:'敵の襲撃（最後の襲撃）',d:'いちばん激しい',track:'battle',it:2,stage:1},
+  {n:'ボス襲来',d:'ゴブリンキングが来た夜。重い金管とティンパニ',track:'boss',it:0,stage:1},
+  {n:'駐留地攻撃（忍び寄る）',d:'夜襲。見つかる前',track:'siege',it:0},
+  {n:'駐留地攻撃（見つかった）',d:'夜襲。戦太鼓が入る',track:'siege',it:1},
 ];
-const TRACKS_TODO=['ホーム','静かな夜','祭りの夜','駐留地攻撃（夜襲）','ボス襲来','ステージごとのアレンジ（エルム・グレイヴェル・ハルデン・ヴィンター）'];
-let musicHooked=false,MUS=null;
-function musicHook(){if(musicHooked||typeof auMusicFor!=='function')return;musicHooked=true;const orig=auMusicFor;
-  window.auMusicFor=auMusicFor=function(){if(MUS&&typeof AU!=='undefined'&&AU.ctx){AU.intensity=MUS.it;if(AU.track!==MUS.track){AU.track=MUS.track;AU.step=0;AU.nextT=AU.ctx.currentTime+0.2;}return;}return orig.apply(this,arguments);};}
-function playTrack(i){musicHook();try{if(typeof auInit==='function')auInit();}catch(e){}if(typeof AU==='undefined')return;const t=TRACKS[i];MUS={track:t.track,it:t.it,i};
+const STAGES=[['t','廃村エルム','笛'],['f','辺境の街グレイヴェル','基本'],['m','山上の砦ハルデン','低く・角笛'],['s','雪原の関所ヴィンター','鐘']];
+let musicHooked=false,MUS=null,MUS_MAP='f';
+function musicHook(){if(musicHooked||typeof auMusicFor!=='function'||typeof AU==='undefined')return;musicHooked=true;const orig=auMusicFor;
+  const setT=(tr,it)=>{AU.intensity=it;if(AU.track!==tr){AU.track=tr;AU.step=0;AU.nextT=AU.ctx.currentTime+0.2;}};
+  window.auMusicFor=auMusicFor=function(){if(!AU.ctx)return orig.apply(this,arguments);
+    if(MUS){AU.map=MUS_MAP;setT(MUS.track,MUS.it);return;}                                   // 音楽室で聴いている曲
+    if(G&&G.phase&&G.phase!=='setup'&&G.phase!=='end'){setT('siege',G.alarm?1:0);return;}   // 攻城戦：見つかる前／見つかった
+    return orig.apply(this,arguments);};}
+function playTrack(i){musicHook();try{if(typeof auInit==='function')auInit();}catch(e){}if(typeof AU==='undefined')return;const t=TRACKS[i];MUS={track:t.track,it:t.it,i};AU.map=MUS_MAP;
   if(AU.ctx){AU.track=null;auMusicFor();}renderMusic();}
 function openMusic(){musicHook();let root=document.getElementById('sgMusic');if(!root){root=document.createElement('div');root.id='sgMusic';document.body.appendChild(root);}root.style.display='flex';renderMusic();}
 function closeMusic(){MUS=null;if(typeof AU!=='undefined'&&AU.ctx){AU.track=null;try{auMusicFor();}catch(e){}}const r=document.getElementById('sgMusic');if(r){r.style.display='none';r.innerHTML='';}}
 function renderMusic(){const r=document.getElementById('sgMusic');if(!r)return;const on=typeof AU!=='undefined'&&AU.on;
   r.innerHTML=`<div class="sgMBox"><h2>♪ 音楽室</h2><small class="muted">押すとその曲が流れます。音量は設定の「BGM」で変えられます${on?'':'（今は消音中です）'}</small>
-    <div class="sgML">${TRACKS.map((t,i)=>`<button data-tr="${i}" class="${MUS&&MUS.i===i?'on':''}"><b>${MUS&&MUS.i===i?'▶ ':''}${t.n}</b><small>${t.d}</small></button>`).join('')}</div>
-    <div class="sgMT"><b>これから作る曲</b>${TRACKS_TODO.map(n=>`<span>${n}</span>`).join('')}</div>
+    <div class="sgML">${TRACKS.map((t,i)=>`<button data-tr="${i}" class="${MUS&&MUS.i===i?'on':''}"><b>${MUS&&MUS.i===i?'▶ ':''}${t.n}</b><small>${t.d}${t.stage?'（ステージで変わる）':''}</small></button>`).join('')}</div>
+    <div class="sgMS"><b>ステージ</b>${STAGES.map(([k,n,d])=>`<button data-st="${k}" class="${MUS_MAP===k?'on':''}" title="${d}">${n}<small>${d}</small></button>`).join('')}<small class="muted">昼・夜・祭り・襲撃・ボスの曲は、ステージごとに音の高さや楽器が変わります</small></div>
     <div class="sgFoot"><button id="sgMStop">止める</button><button id="sgMClose" class="primary">閉じる</button></div></div>`;
   r.querySelectorAll('[data-tr]').forEach(b=>b.onclick=()=>playTrack(+b.dataset.tr));
+  r.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{MUS_MAP=b.dataset.st;if(typeof AU!=='undefined')AU.map=MUS_MAP;renderMusic();});
   document.getElementById('sgMStop').onclick=()=>{MUS=null;if(typeof AU!=='undefined'&&AU.ctx){AU.track=null;}renderMusic();};   // 止める（閉じると元の曲に戻る）
   document.getElementById('sgMClose').onclick=closeMusic;}
 function hook(){if(typeof showTitle!=='function'||typeof E==='undefined'||typeof SPR==='undefined'){setTimeout(hook,200);return;}
   const orig=showTitle;window.showTitle=showTitle=function(){const r=orig.apply(this,arguments);try{const nb=document.getElementById('tNew');if(nb&&!document.getElementById('tSiege')){const b=document.createElement('button');b.id='tSiege';b.textContent='攻城戦（試作）';b.style.padding='8px';b.onclick=openSiege;nb.insertAdjacentElement('afterend',b);}if(nb&&!document.getElementById('tMusic')){const m=document.createElement('button');m.id='tMusic';m.textContent='♪ 音楽室';m.style.padding='8px';m.onclick=openMusic;(document.getElementById('tSiege')||nb).insertAdjacentElement('afterend',m);}}catch(e){}return r;};
   if(typeof S!=='undefined'&&S&&S.overlay==='title')showTitle();
+  musicHook();
   window.openSiege=openSiege;window.__siege=()=>G;window.__siegeUpd=dt=>update(dt);window.__tb=tBlock;window.__fp=findPath;window.__reach=reachable;}
 hook();
 })();
