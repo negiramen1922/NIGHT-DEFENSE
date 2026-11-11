@@ -1867,6 +1867,9 @@ const MTC={};for(const k in MODEL)MTC[k]=Object.assign({},UT[MODEL[k].ut],MODEL[
 function defModel(ut){return {art:'cannoneer',guard:'guard',mil:'farmer',cav:'rider',drake:'dragon',mage:'wizard',inf:'pawn',arch:'archer',tank:'t10',ship:'dd',air:'heli'}[ut]||'geki';}
 const UNIT_HOME={hq:'mil',train:'inf',stable:'cav',aerie:'drake',magic:'mage'};
 function modelsAt(bt){return Object.keys(MODEL).filter(k=>UT[MODEL[k].ut].home===bt&&!MODEL[k].buy&&(!MODEL[k].req||has(MODEL[k].req)));}
+// 試作：城のレベルごとに持てる部隊の上限（Lv1は12、Lvごとに+3 → Lv7で30。中隊3・大隊9・師団27にそろう）
+function squadCap(){return 12+3*((S.baseLv||1)-1);}
+function squadCount(){return S.squads.filter(q=>q.hp==null||q.hp>0).length+S.blds.reduce((a,b)=>a+(b.queue||0),0);}
 function capOf(b){return B[b.type].cap||UT[UNIT_HOME[b.type]].cap;}
 function MT(u){return MTC[typeof u==='string'?(MODEL[u]?u:defModel(u)):(u.model||defModel(u.ut))];}
 function modelsFor(ut){return Object.keys(MODEL).filter(k=>MODEL[k].ut===ut&&!MODEL[k].buy&&(!MODEL[k].req||has(MODEL[k].req)));}
@@ -6660,17 +6663,17 @@ function showResearch(){
 }
 // ===== 部隊：編成・訓練の順番待ち・全部隊の一覧と一括指示 =====
 function trainSlots(){const o={};for(const bt in UNIT_HOME){const bs=S.blds.filter(b=>b.type===bt&&!(b.bt>0&&!b.upg));let cap=0,used=0;for(const b of bs){cap+=capOf(b);used+=unitsOf(b).length+(b.queue||0);}o[bt]={n:bs.length,cap,used};}return o;}
-function trainModel(mk){const m=MTC[mk],bt=UT[m.ut].home;const bs=S.blds.filter(b=>b.type===bt&&!(b.bt>0)&&unitsOf(b).length+(b.queue||0)<capOf(b)).sort((a,b)=>(a.queue||0)-(b.queue||0));
+function trainModel(mk){if(squadCount()>=squadCap()){toast(`部隊は城Lv${S.baseLv||1}で${squadCap()}部隊までです（城を強化すると増えます）`,'bad');return false;}const m=MTC[mk],bt=UT[m.ut].home;const bs=S.blds.filter(b=>b.type===bt&&!(b.bt>0)&&unitsOf(b).length+(b.queue||0)<capOf(b)).sort((a,b)=>(a.queue||0)-(b.queue||0));
   if(!bs.length||!canAfford(m.cost,m.popEach*m.members))return false;const b=bs[0];for(const k in m.cost)S[k]-=m.cost[k];S.pop-=m.popEach*m.members;b.queue++;(b.qm=b.qm||[]).push(mk);return true;}
 function cancelTrain(b,i){const mk=b.qm[i];const m=MTC[mk];for(const k in m.cost)S[k]+=m.cost[k];S.pop+=m.popEach*m.members;b.qm.splice(i,1);b.queue--;if(i===0)b.qt=0;log(`${m.name}の訓練を取り消した（費用を返却）`);}
 function showArmy(target){
   const sl=trainSlots();
   let h=target?'':`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">部隊</h2><button id="ovClose">閉じる [K]</button></div>`;
-  h+=`<div class="help">部隊の数は施設の数で決まります。どの施設で訓練するかは自動で選ばれます。</div><div style="display:flex;flex-wrap:wrap;gap:6px 14px;margin:6px 0">`;
+  h+=`<div class="help"><b>部隊 ${squadCount()}/${squadCap()}</b>（城Lv${S.baseLv||1}の上限。城を強化すると+3）。部隊の数は施設の数でも決まります。どの施設で訓練するかは自動で選ばれます。</div><div style="display:flex;flex-wrap:wrap;gap:6px 14px;margin:6px 0">`;
   for(const bt in UNIT_HOME){const o=sl[bt];if(!o.n&&B[bt].req&&!has(B[bt].req))continue;h+=`<span>${icSvg(bt,18)} ${B[bt].name}×${o.n}　<b>${o.used}/${o.cap}</b>部隊</span>`;}
   h+=`</div>`;
   h+=`<h3 style="margin:8px 0 4px">訓練する</h3><div style="display:flex;flex-wrap:wrap;gap:6px">`;
-  for(const bt in UNIT_HOME)for(const mk of modelsAt(bt)){const m=MTC[mk],o=sl[bt],ok=o.used<o.cap&&canAfford(m.cost,m.popEach*m.members)&&!S.waveActive;
+  for(const bt in UNIT_HOME)for(const mk of modelsAt(bt)){const m=MTC[mk],o=sl[bt],ok=squadCount()<squadCap()&&o.used<o.cap&&canAfford(m.cost,m.popEach*m.members)&&!S.waveActive;
     h+=`<button data-train="${mk}" ${ok?'':'disabled'} style="text-align:left;min-width:190px"><span style="display:flex;gap:6px;align-items:center">${icSvg(mk,26)}<span><b style="color:${m.color}">${m.name}</b> <span class="muted" style="font-size:10px">${B[bt].name}</span><br><span style="font-size:11px">${costText(m.cost,m.popEach*m.members)}・${Math.ceil(unitTime(mk)/TURN_SEC)}T</span>${o.used>=o.cap?`<br><span style="font-size:10.5px;color:var(--amber)">${B[bt].name}の枠がいっぱい（${o.used}/${o.cap}）</span>`:''}</span></span></button>`;}
   h+=`</div>`;
   const qs=[];for(const b of S.blds)if(b.qm&&b.qm.length)b.qm.forEach((mk,i)=>qs.push({b,i,mk,p:i===0?Math.min(1,b.qt/unitTime(mk,b)):0}));
