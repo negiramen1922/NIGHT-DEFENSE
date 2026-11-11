@@ -26,6 +26,11 @@ const SU={
 };
 const UNIT_SPD=1.25;   // こちらの部隊の足の速さ（上の数字に掛ける）。魔物（ゴブリン40）より少し速く
 for(const k in SU)SU[k].spd=Math.round(SU[k].spd*UNIT_SPD);
+// ランク（2026-11-11 決めた案）：魔物は「第◯襲撃から出てくる」。こちらの部隊も同じランクで解放する想定（試作では選べるが目安を出す）
+const RANK_RAID=[0,1,2,3,4,7,10];   // ランク → 第何襲撃から
+const FOE_RANK={swarm:1,charger:2,harpy:3,troll:3,wolf:3,grappler:4,spitter:4,redcap:4,heavy:5,gobarcher:5,tiger:5,king:6,wyvern:6,mammoth:6};
+const UNIT_RANK={sword:1,archer:1,cav:2,shield:2,eng:2,mage:3,gun:3,ram:4,cat:4,drake:4};
+const DEF_FROM={wolf:1,tower:1,drum:2,rock:7};   // 陣の守りの魔物が出てくる襲撃
 const ORDER=['sword','shield','archer','mage','cav','drake','gun','eng','ram','cat'];
 // 陣の形。b：柵（外側から）。circle は半径 r、rect は半幅 a・半高 b。gates：門の位置（circle は角度、rect は 'l','r','t','b'）
 const CAMP_SC=1.2;   // 陣の大きさ（下の数字に掛ける）
@@ -91,10 +96,10 @@ function saveSetup(){try{localStorage.setItem('nd_siege',JSON.stringify({pool:G.
 function renderSetup(){const root=$('siege');saveSetup();const st=stationed(G.raid),aw=awakeOf(st);G.st=st;G.aw=aw;
   root.innerHTML=`<div class="sgSetup"><h2>攻城戦（試作）<small>駐留地への夜襲</small></h2>
     <div class="sgRow"><b>どの駐留地</b><span class="sgRaid"><button data-raid="-1">−</button><b>第${G.raid}襲撃</b><button data-raid="1">＋</button></span>
-      <small class="muted">駐留している魔物 ${total(st)}体（${Object.entries(st).map(([k,v])=>ename(k)+v).join('・')}）<br>夜襲なので、起きて出てくるのは3割の <b style="color:#ff8a6a">${total(aw)}体</b>。残りはテントで眠っている</small></div>
+      <small class="muted">駐留している魔物 ${total(st)}体（${Object.entries(st).map(([k,v])=>ename(k)+v).join('・')}）<br>陣の守り：${['物見櫓','見張りオオカミ'].concat(G.raid>=DEF_FROM.drum?['戦太鼓のゴブリン']:[]).concat(G.raid>=DEF_FROM.rock?['岩投げオーガ']:[]).join('・')}<br>夜襲なので、起きて出てくるのは3割の <b style="color:#ff8a6a">${total(aw)}体</b>。残りはテントで眠っている</small></div>
     <div class="sgRow"><b>陣の形</b>${['auto'].concat(Object.keys(LAYOUTS)).map(k=>`<button data-lay="${k}" class="${G.layout===k?'on':''}">${k==='auto'?'おまかせ':LAYOUTS[k].n}</button>`).join('')}</div>
     <div class="sgHelp">部隊を自由に選べます（試作なので費用なし）。陣のまわりのどこからでも攻められます。部隊はいちばん近い相手を狙います（得意な相手は優先）。夜明け（${NIGHT_SEC/60}分）まで戦えます。<br>敵へのダメージ＝倒した魔物（起きていた3割）＋焼いたテント（眠っている7割）。</div>
-    <div class="sgUnits">${ORDER.map(k=>{const d=SU[k];return `<div class="sgU"><span class="sgI">${unitIcon(k,32)}</span><span class="sgN"><b>${d.n}</b><small>${d.d}</small><small class="muted">${d.m>1?`${d.m}人・`:''}体力${d.hp*d.m}・攻撃${d.dmg*d.m}${d.rng>40?`・射程${d.rng}`:''}</small></span><span class="sgC"><button data-dec="${k}">−</button><b>${G.pool[k]}</b><button data-inc="${k}">＋</button></span></div>`;}).join('')}</div>
+    <div class="sgUnits">${ORDER.map(k=>{const d=SU[k];return `<div class="sgU"><span class="sgI">${unitIcon(k,32)}</span><span class="sgN"><b>${d.n} <span class="sgRk${RANK_RAID[UNIT_RANK[k]]>G.raid?' late':''}" title="本編では第${RANK_RAID[UNIT_RANK[k]]}襲撃のころに解放する想定${RANK_RAID[UNIT_RANK[k]]>G.raid?'（この襲撃ではまだ。試作なので使える）':''}">ランク${UNIT_RANK[k]}・第${RANK_RAID[UNIT_RANK[k]]}襲撃〜</span></b><small>${d.d}</small><small class="muted">${d.m>1?`${d.m}人・`:''}体力${d.hp*d.m}・攻撃${d.dmg*d.m}${d.rng>40?`・射程${d.rng}`:''}</small></span><span class="sgC"><button data-dec="${k}">−</button><b>${G.pool[k]}</b><button data-inc="${k}">＋</button></span></div>`;}).join('')}</div>
     ${(()=>{const HL=heroList();if(!HL.length)return '';G.hsel=G.hsel||{};const opts=k=>`<option value="">連れて行かない</option>`+ORDER.filter(t=>G.pool[t]>0||G.hsel[k]===t).map(t=>`<option value="${t}" ${G.hsel[k]===t?'selected':''}>${SU[t].n}${''}</option>`).join('');
       return `<div class="sgHero"><b>英雄</b><small class="muted">${HL[0].demo?'（セーブに英雄がいないので、試作用の英雄です）':'（本編の英雄。ここでの戦いは本編には影響しません）'}　部隊に入れると、その部隊が強くなりスキルが発動します。適任の部隊に入れると効果が大きい</small>
         ${HL.map(c=>{const k=hSkill(c);const fit=(HFIT[c.spec]||[]).map(t=>SU[t].n).join('・')||'なし（スキルだけ）';return `<div class="sgHR"><span>${heroIcon(c,28)}</span><span class="sgHN"><b style="color:${hColor(c)}">${c.name}</b><small>${c.spec} Lv${c.lv||1}　適任：${fit}</small>${k?`<small title="${k.desc}">スキル「${k.name}」${k.desc}</small>`:''}</span><select data-hero="${c.id}">${opts(c.id)}</select></div>`;}).join('')}</div>`;})()}
@@ -156,11 +161,11 @@ function buildField(){
   for(const [x,y,li] of towers)B('tower',x,y,15,li?520:420,{rng:150,dmg:li?10:8,rate:li?1.0:1.1});
   // 守りの魔物（駐留している魔物とは別。ダメージの計算には入れない）
   // 岩投げオーガ：門の内側に陣取って大きな岩を投げる。破城槌・投石機に強い（襲撃が進むほど増える）
-  {const gs=G.bounds[0].gateB,n=Math.min(gs.length,1+Math.floor(G.raid/4));for(let i=0;i<n;i++){const g=gs[i];G.foes.push(mkFoe('grappler',g.x-g.nx*48+g.ny*26,g.y-g.ny*48-g.nx*26,{def:'rock',hp:700,maxhp:700,rng:190,rdmg:34,rrate:2.6}));}}
+  if(G.raid>=DEF_FROM.rock){const gs=G.bounds[0].gateB,n=Math.min(gs.length,1+Math.floor((G.raid-DEF_FROM.rock)/3));for(let i=0;i<n;i++){const g=gs[i];G.foes.push(mkFoe('grappler',g.x-g.nx*48+g.ny*26,g.y-g.ny*48-g.nx*26,{def:'rock',hp:700,maxhp:700,rng:190,rdmg:34,rrate:2.6}));}}
   // 見張りオオカミ：門の外に鎖でつながれている。近づくと吠えて騒ぎになる（見つける範囲は広いが弱い）
   {const per=G.raid>=6?2:1;for(const g of G.bounds[0].gateB)for(let i=0;i<per;i++){const sd=per>1?(i?16:-16):0;G.foes.push(mkFoe('wolf',g.x+g.nx*34-g.ny*sd,g.y+g.ny*34+g.nx*sd,{def:'wolf'}));}}
   // 戦太鼓のゴブリン：大将のテントのそば。生きている間は、陣の魔物が早く起きて足も速くなる
-  if(G.raid>=2)G.foes.push(mkFoe('swarm',CX+46,CY+34,{def:'drum',hp:260,maxhp:260}));
+  if(G.raid>=DEF_FROM.drum)G.foes.push(mkFoe('swarm',CX+46,CY+34,{def:'drum',hp:260,maxhp:260}));
   // 逆茂木：門の外の守り（通れない・壊すまでふさぐ）
   {const n=G.raid>=3?2:0;for(const g of G.bounds[0].gateB)for(let i=0;i<n;i++){const s2=i?1:-1;B('abatis',g.x+g.nx*54+g.ny*22*s2,g.y+g.ny*54-g.nx*22*s2,11,260);}}
   // テント（眠っている魔物）と大将のテント
@@ -229,7 +234,7 @@ function renderCards(){const el=$('sgCards');if(!el)return;
     rest.forEach((k,i)=>{const side=i%4,a0=[Math.PI,-Math.PI/2,0,Math.PI/2][side]+((Math.floor(i/4)%5)-2)*0.12;let r=outerR()+110+Math.floor(i/20)*26;let x=CX+Math.cos(a0)*r*1.3,y=CY+Math.sin(a0)*r;
       x=Math.max(20,Math.min(W-20,x));y=Math.max(20,Math.min(H-20,y));
       if(!canDeploy({x,y})){let best=null,bd=1e9;for(let yy=20;yy<H-10;yy+=12)for(let xx=20;xx<W-10;xx+=12){if(!canDeploy({x:xx,y:yy})||G.units.some(o=>Math.hypot(o.x-xx,o.y-yy)<16))continue;const dd=Math.hypot(xx-x,yy-y);if(dd<bd){bd=dd;best=[xx,yy];}}if(best){x=best[0];y=best[1];}}   // 置けない所なら、いちばん近い置ける所へ
-      spawnSquad(k,x,y);G.pool[k]--;});sfx('build');renderCards();};
+      spawnSquad(k,x,y);G.pool[k]--;});G.card=null;sfx('build');renderCards();};
   const f=$('sgFight');if(f)f.onclick=()=>{G.phase='battle';sfx('turn');msg('夜襲開始！ 見つからないうちに近づこう。部隊を選んで地図を押すと移動、敵を押すとそこを攻撃');renderCards();};}
 function renderCmd(){const el=$('sgCmd');if(!el)return;const n=G.sel.size;
   el.innerHTML=n?`<span>${n}部隊を選択中</span><button data-cmd="auto">自動で戦う</button><button data-cmd="hold">固守</button>${G.retreat?'<button data-cmd="flee">撤退させる</button>':''}<button data-cmd="none">選択を解除</button>`:`<button data-cmd="all">全部隊を選ぶ</button><span class="muted">ドラッグで範囲選択</span>`;
@@ -266,13 +271,14 @@ function reachMap(){if(G.reach&&G.reach.blk===gridT())return G.reach.a;const T=g
 function reachable(x,y){const c=Math.floor(x/GS),r=Math.floor(y/GS);if(c<0||r<0||c>=GCOL||r>=GROW)return false;return !!reachMap()[r*GCOL+c];}
 function canDeploy(p){return p.x>12&&p.y>12&&p.x<W-12&&p.y<H-12&&farFromCamp(p.x,p.y,90)&&!tBlock(p.x,p.y)&&reachable(p.x,p.y);}
 function tap(p,shift){
+  if(G.card&&!(G.pool[G.card]>0))G.card=ORDER.find(k=>G.pool[k]>0)||null;   // 置く部隊が残っていない札は外す（移動の指示が置く操作に吸われない）
   if(G.card&&G.phase!=='end'&&!G.retreat){if(canDeploy(p)){if(G.pool[G.card]>0){spawnSquad(G.card,p.x,p.y);G.pool[G.card]--;sfx('build');if(!G.pool[G.card])G.card=ORDER.find(k=>G.pool[k]>0)||null;renderCards();}return;}
     else{msg('部隊は陣のまわりの明るい所にだけ置けます（陣に近すぎる所・山や川の向こうで陣まで行けない所には置けない）');return;}}
   const u=G.units.filter(alive).sort((a,b)=>dist(a,p)-dist(b,p))[0];
   if(u&&dist(u,p)<22){if(!shift&&!G.sel.has(u.id))G.sel.clear();if(shift&&G.sel.has(u.id))G.sel.delete(u.id);else G.sel.add(u.id);sfx('click');renderCmd();return;}
   if(!G.sel.size)return;
   const f=G.foes.filter(alive).find(o=>dist(o,p)<16)||G.blds.filter(alive).find(o=>dist(o,p)<o.r+6);
-  for(const id of G.sel){const s=G.units.find(x=>x.id===id);if(!alive(s))continue;s.flee=false;s.fl=null;if(f){s.tg=f;s.tx=s.ty=null;s.focus=true;}else{s.tx=p.x+(Math.random()-0.5)*24;s.ty=p.y+(Math.random()-0.5)*24;s.tg=null;s.focus=false;}s.hold=false;}
+  for(const id of G.sel){const s=G.units.find(x=>x.id===id);if(!alive(s))continue;s.flee=false;s.fl=null;if(f){s.tg=f;s.tx=s.ty=null;s.focus=true;}else if(atEdge(p)){const e=edgeSpot(p);s.tx=e[0];s.ty=e[1];s.tg=null;s.focus=false;}   /* 赤い所（撤退ライン）を押したら、その部隊はそこから逃げる（ばらけさせない） */else{s.tx=p.x+(Math.random()-0.5)*24;s.ty=p.y+(Math.random()-0.5)*24;s.tg=null;s.focus=false;}s.hold=false;}
   G.fx.push({x:p.x,y:p.y,r:14,t:0,dur:0.4,c:f?'#ff5a4e':'#62c6d9'});sfx('click');
 }
 
@@ -449,7 +455,7 @@ function update(dt){G.t+=dt;
       let b;if(gp)b=stepTo(u,gp[0],gp[1],fsp,dt);else{if(!u.fl)u.fl=edgeSpot(u);b=d.role==='ram'||d.fly?stepTo(u,u.fl[0],u.fl[1],fsp,dt):moveNav(u,u.fl[0],u.fl[1],fsp,dt);}   // 柵の中で出口がないときは門・柵を壊して出る
       if(b&&u.cd<=0&&d.role!=='ranged'&&d.role!=='gun'&&d.role!=='cat'){u.cd=d.rate;attack(u,b,atk);}continue;}
     let tg=u.tg&&alive(u.tg)?u.tg:null;if(!tg)u.focus=false;
-    if(u.tx!=null){if(G.retreat&&atEdge(u)){escapeU(u);continue;}   // 撤退中に赤い所まで来たら、指示で動かした部隊も逃げ切り
+    if(u.tx!=null){if(atEdge(u)&&(G.retreat||atEdge({x:u.tx,y:u.ty}))){escapeU(u);continue;}   // 赤い所（撤退ライン）に着いたら逃げ切り。撤退を押していなくても、赤い所へ動かした部隊はそこで戦場を離れる
       if(d.role!=='ram'&&u.cd<=0){const pt=passTarget(u);if(pt){u.cd=d.rate;attack(u,pt,atk);}}
       const b=d.role==='ram'?stepTo(u,u.tx,u.ty,uspd,dt):moveNav(u,u.tx,u.ty,uspd,dt);
       if(b){if(d.role==='ranged'||d.role==='cat'||d.role==='gun'){/* 門が開くまで待つ */}else if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}continue;}
@@ -534,7 +540,8 @@ function update(dt){G.t+=dt;
   const tentsLeft=G.blds.some(b=>isTent(b)&&b.hp>0),foesLeft=G.foes.some(alive);
   if(!tentsLeft&&!foesLeft)return endBattle('complete');
   if(!tentsLeft&&!G.burnedAll){G.burnedAll=true;msg('テントを全部焼いた！ 残りの魔物も倒すか、「引き上げる」で戻ろう');sfx('upgrade');const q=$('sgQuit');if(q&&!G.retreat)q.textContent='引き上げる';}
-  if(G.retreat&&!G.units.some(alive))return endBattle(G.units.some(u=>u.out)?'retreat':'lose');
+  if(!G.units.some(alive)&&G.units.some(u=>u.out)&&(G.retreat||!ORDER.some(k=>G.pool[k]>0)))return endBattle('retreat');
+  if(G.retreat&&!G.units.some(alive))return endBattle('lose');
   if(!G.units.some(alive)&&!ORDER.some(k=>G.pool[k]>0))return endBattle('lose');
 }
 function attack(u,tg,atk){const d=SU[u.t];if(tg.k&&flyF(tg)&&!hitsAir(d))return;   // 空の魔物には届かない
@@ -700,6 +707,7 @@ let hudT=0;function hud(){const now=performance.now();if(now-hudT<200)return;hud
 const css=document.createElement('style');css.textContent=`
 #siege .sgHero{display:flex;flex-direction:column;gap:4px;margin:6px 0;padding:6px 8px;background:rgba(255,255,255,.04);border:1px solid #2f3f33}
 #siege .sgHR{display:flex;align-items:center;gap:8px}#siege .sgHN{flex:1 1 auto;display:flex;flex-direction:column;min-width:0;width:auto}#siege .sgHN small{font-size:10px;color:#9ab0a0}#siege .sgHR select{width:auto!important;flex:0 0 auto;max-width:42%;background:#141a16;color:#e8e0c8;border:1px solid #3a4a3e;padding:3px}
+#siege .sgRk{font-size:10px;font-weight:normal;color:#9ab0a0;margin-left:4px;padding:0 4px;box-shadow:inset 0 0 0 1px #3a4a3e}#siege .sgRk.late{color:#ff9a6a;box-shadow:inset 0 0 0 1px #6a3a2a}
 #siege .sgHeroes{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;margin:6px 0}
 #siege .sgLossBox,#siege .sgLog{margin:6px 0;font-size:12px}#siege .sgLossBox summary,#siege .sgLog summary{cursor:pointer;color:#f2b33d}
 #siege table.sgLoss{border-collapse:collapse;width:100%;margin-top:4px;font-size:11.5px}#siege table.sgLoss th,#siege table.sgLoss td{padding:2px 6px;border-bottom:1px solid #2a3a2d;text-align:center}#siege table.sgLoss th{color:#9ab0a0;font-weight:normal}
