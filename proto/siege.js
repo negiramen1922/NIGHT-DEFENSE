@@ -11,15 +11,15 @@ const NIGHT_SEC=180;                             // 夜明けまでの時間（�
 const AWAKE_SHARE=0.3;                           // 陣で起きている（戦いに出てくる）のは、駐留している魔物の3割
 // こちらの部隊（攻め）。m：人数、hp：1人の体力、dmg：1人の1回の攻撃、rate：攻撃の間隔（秒）、rng：射程、spd：速さ、bld：建物へのダメージ倍率
 const SU={
-  sword: {n:'兵士',  spr:'pawn',   m:5,hp:40, dmg:8, rate:0.8,rng:16, spd:42,bld:1,  role:'melee', d:'近くの魔物に向かい、いなければテントへ'},
-  shield:{n:'盾兵',  spr:'guard',  m:4,hp:170,dmg:4, rate:1.0,rng:16, spd:32,bld:0.7,role:'shield',d:'壁役。体力がとても高く、近くの魔物を引きつける。まわりの味方を盾でかばう（矢・見張り台・大弓のダメージ−35%）'},
-  archer:{n:'弓兵',  spr:'archer', m:5,hp:24, dmg:6, rate:1.1,rng:130,spd:38,bld:0.5,role:'ranged',d:'近接の味方の後ろから撃つ。柵の向こうにも届く'},
-  cav:   {n:'騎兵',  spr:'rider',  m:3,hp:70, dmg:11,rate:0.9,rng:16, spd:72,bld:0.8,role:'cav',   d:'足が速い。見張りと弓の魔物・見張り台を先に狙う'},
-  eng:   {n:'工兵',  spr:'farmer', m:4,hp:34, dmg:6, rate:0.9,rng:16, spd:38,bld:5,  role:'eng',   d:'門・柵に爆薬をしかけて吹き飛ばす（14秒ごと）。破城槌・投石機を修理する。近くの罠を外す'},
-  drake: {n:'竜騎兵',spr:'dragon', m:2,hp:120,dmg:14,rate:1.3,rng:70, spd:62,bld:1.5,role:'drake',fly:true,splash:22,tentMul:2.5,d:'空を飛んで柵を越える。火を吐いて範囲攻撃（テントを燃やすのが得意 ×2.5）。地上の近接の魔物には攻撃されない'},
-  gun:   {n:'砲兵',  spr:'cannoneer',m:3,hp:30,dmg:20,rate:2.4,rng:200,minR:40,spd:30,bld:2,role:'gun',splash:26,d:'大砲で遠くから撃つ（範囲）。見張り台・大弓台・テントを壊す。近づかれると弱い'},
-  ram:   {n:'破城槌',draw:'ram',   m:1,hp:900,dmg:70,rate:1.6,rng:20, spd:44,bld:3,  role:'ram',isBld:true,carry:2,d:'大将のテントへまっすぐ進む。途中の柵・門は打ち破る。壊れるか大将のテントに着くと兵士2部隊が出る。建物あつかい（建物に強い魔物に弱い）'},
-  cat:   {n:'移動式投石機',draw:'cat',m:1,hp:320,dmg:55,rate:3.2,rng:270,minR:60,spd:16,bld:2.5,role:'cat',isBld:true,splash:34,d:'とても遅い。遠くから見張り台・テントを壊す（まわりにも当たる）'},
+  sword: {n:'兵士',  spr:'pawn',   m:5,hp:40, dmg:8, rate:0.8,rng:16, spd:42,bld:1,  role:'melee', d:'いちばん近い魔物・建物を狙う'},
+  shield:{n:'盾兵',  spr:'guard',  m:4,hp:170,dmg:4, rate:1.0,rng:16, spd:32,bld:0.7,role:'shield',d:'壁役。体力がとても高く、近くの魔物を引きつける。まわりの味方を盾でかばう（矢・物見櫓・岩のダメージ−35%）'},
+  archer:{n:'弓兵',  spr:'archer', m:5,hp:24, dmg:6, rate:1.1,rng:130,spd:38,bld:0.5,role:'ranged',d:'いちばん近い相手を撃つ。柵の向こうにも届く。空の魔物を撃てる'},
+  cav:   {n:'騎兵',  spr:'rider',  m:3,hp:70, dmg:11,rate:0.9,rng:16, spd:72,bld:0.8,role:'cav',   d:'足が速い。いちばん近い相手を狙う'},
+  eng:   {n:'工兵',  spr:'farmer', m:4,hp:34, dmg:6, rate:0.9,rng:16, spd:38,bld:5,  role:'eng',   d:'門・柵・物見櫓を狙うのが得意。爆薬で吹き飛ばす（14秒ごと）。破城槌・投石機を修理する。近くの罠を外す'},
+  drake: {n:'竜騎兵',spr:'dragon', m:2,hp:120,dmg:14,rate:1.3,rng:70, spd:62,bld:1.5,role:'drake',fly:true,splash:22,tentMul:2.5,d:'空を飛んで柵を越える。テント・小屋・巣を狙うのが得意（×2.5）。火で範囲攻撃。空の魔物とも戦える'},
+  gun:   {n:'砲兵',  spr:'cannoneer',m:3,hp:30,dmg:20,rate:2.4,rng:200,minR:40,spd:30,bld:2,role:'gun',splash:26,d:'大砲で遠くから撃つ（範囲）。物見櫓・岩投げオーガを狙うのが得意。近づかれると弱い'},
+  ram:   {n:'破城槌',draw:'ram',   m:1,hp:900,dmg:70,rate:1.6,rng:20, spd:44,bld:3,  role:'ram',isBld:true,carry:2,d:'大将のテントへまっすぐ進む。途中の柵・門・建物は打ち破る。壊れるか大将のテントに着くと兵士2部隊が出る（建物に強い魔物に弱い）'},
+  cat:   {n:'移動式投石機',draw:'cat',m:1,hp:320,dmg:55,rate:3.2,rng:270,minR:60,spd:16,bld:2.5,role:'cat',isBld:true,splash:34,d:'とても遅い。遠くから撃つ（まわりにも当たる）。物見櫓・岩投げオーガを狙うのが得意'},
 };
 const ORDER=['sword','shield','archer','cav','drake','gun','eng','ram','cat'];
 // 陣の形。b：柵（外側から）。circle は半径 r、rect は半幅 a・半高 b。gates：門の位置（circle は角度、rect は 'l','r','t','b'）
@@ -41,7 +41,7 @@ const flyF=f=>!!(E[f.k]&&E[f.k].fly);
 const hitsAir=d=>d.role==='ranged'||d.role==='drake';   // 空の魔物を攻撃できる部隊：弓兵・竜騎兵
 function nearF(u,max,filt){const d=SU[u.t];return nearest(u,G.foes,max,f=>(hitsAir(d)||!flyF(f))&&(!filt||filt(f)));}
 const BIG=['grappler','troll','heavy','mammoth','tiger','wolf'];   // 大きな魔物・獣は小屋で眠る（ほかはテント）
-function mem(u){const d=SU[u.t];return d.m>1?Math.max(0,Math.ceil(u.hp/d.hp-1e-6)):(u.hp>0?1:0);}
+function mem(u){const d=SU[u.t];return d.m>1?Math.max(0,Math.ceil(u.hp/(d.hp*(u.hpMul||1))-1e-6)):(u.hp>0?1:0);}
 function sfx(n){try{if(typeof se==='function')se(n);}catch(e){}}
 const ename=k=>(typeof E!=='undefined'&&E[k]?E[k].name:k);
 
@@ -55,27 +55,50 @@ function stationed(n){let q=[];
 function awakeOf(c){const a={};for(const k in c){const v=Math.round(c[k]*AWAKE_SHARE);if(v>0)a[k]=v;}return a;}
 const total=o=>Object.values(o).reduce((s,v)=>s+v,0);
 
+// ---------- 英雄：ゲーム本体の英雄（S.cmds）を部隊に入れる。能力で部隊が強くなり、スキルが発動する ----------
+const HFIT={'歩兵':['sword','shield'],'弓兵':['archer'],'騎兵':['cav'],'竜騎':['drake'],'魔導':[],'守備':['gun','cat','ram'],'内政':['eng']};   // 適任の部隊（ほかの部隊に入れると効果は3割）
+const HSPR={'歩兵':'h_inf','弓兵':'h_arch','工兵':'h_eng','騎兵':'h_cav','魔導':'h_mage','内政':'h_admin','守備':'h_guard','竜騎':'h_drake'};
+const TU=28;   // 1マス
+let DEMO_H=null;   // 試作用の英雄（ページを開いている間は同じ）
+function heroList(){if(G.heroL)return G.heroL;let L=[];const ok=c=>c&&c.alive&&c.spec!=='内政';
+  try{if(typeof S!=='undefined'&&S&&S.cmds&&S.turn>1)L=S.cmds.filter(ok);}catch(e){}   // 遊んでいる途中なら今のゲームの英雄
+  if(L.filter(c=>c.spec!=='守備').length===0){try{const sv=JSON.parse(localStorage.getItem(typeof SAVE_KEY!=='undefined'?SAVE_KEY:'')||'null');const L2=sv&&sv.S&&sv.S.cmds?sv.S.cmds.filter(ok):[];if(L2.length>L.length)L=L2;}catch(e){}}   // タイトルからなら、セーブの英雄
+  if(L.filter(c=>c.spec!=='守備').length)return G.heroL=L;
+  if(!DEMO_H&&typeof makeCmd==='function'){try{DEMO_H=['歩兵','弓兵','騎兵','竜騎','魔導','守備'].map(sp=>Object.assign(makeCmd(sp,3),{demo:true}));}catch(e){DEMO_H=[];}}
+  return DEMO_H||[];}
+function hSkill(c){try{return typeof heroSkills==='function'?heroSkills(c)[0]:null;}catch(e){return null;}}
+function hColor(c){return typeof SPECS!=='undefined'&&SPECS[c.spec]?SPECS[c.spec].color:'#f2b33d';}
+function heroIcon(c,sz){const sp=typeof SPR!=='undefined'&&SPR.units&&SPR.units[HSPR[c.spec]];if(!sp||!sp.img||!sp.img.walk)return '';const cv0=document.createElement('canvas');cv0.width=cv0.height=sz;const g=cv0.getContext('2d');g.imageSmoothingEnabled=false;const im=sp.img.walk[0]||sp.img.walk;try{g.drawImage(im,0,0,sz,sz);}catch(e){}return `<img src="${cv0.toDataURL()}" width="${sz}" height="${sz}" style="image-rendering:pixelated;vertical-align:middle">`;}
+function attachHero(u){const c=heroList().find(h=>G.hsel&&G.hsel[h.id]===u.t&&!(G.hUsed||(G.hUsed=new Set())).has(h.id));if(!c)return;G.hUsed.add(c.id);
+  const m=(HFIT[c.spec]||[]).includes(u.t)?1:0.3,L=(typeof HERO_CORE!=='undefined'?HERO_CORE[Math.min(typeof HERO_MAX!=='undefined'?HERO_MAX:5,c.lv||1)-1]:0.5);
+  u.hero=c;u.hm=m;u.dmul=1+m*(L*0.8+(c.atk||0)*0.01);u.hpMul=1+m*(L*0.5+(c.def||0)*0.01);u.red=Math.min(0.4,m*(0.1+(c.def||0)*0.01));u.hp*=u.hpMul;u.maxhp*=u.hpMul;
+  u.sk=hSkill(c);u.skT=u.sk&&u.sk.cd?u.sk.cd*0.4:0;u.skN=0;}
+
 // ---------- 画面（編成） ----------
 function openSiege(){
   if(typeof S!=='undefined'&&S&&S.overlay&&typeof closeOverlay==='function')closeOverlay();
   G={phase:'setup',pool:{sword:4,shield:2,archer:3,cav:1,drake:1,gun:1,eng:1,ram:1,cat:1},raid:3,layout:'auto',speed:1,paused:false};
-  try{const v=JSON.parse(localStorage.getItem('nd_siege')||'null');if(v){if(v.pool)for(const k of ORDER)if(v.pool[k]!=null)G.pool[k]=v.pool[k];if(v.raid)G.raid=v.raid;if(v.layout)G.layout=v.layout;}}catch(e){}   // 前の編成を覚えておく
+  try{const v=JSON.parse(localStorage.getItem('nd_siege')||'null');if(v){if(v.pool)for(const k of ORDER)if(v.pool[k]!=null)G.pool[k]=v.pool[k];if(v.raid)G.raid=v.raid;if(v.layout)G.layout=v.layout;if(v.hsel)G.hsel=v.hsel;}}catch(e){}   // 前の編成を覚えておく
   let root=$('siege');if(!root){root=document.createElement('div');root.id='siege';document.body.appendChild(root);}
   root.style.display='flex';document.body.classList.add('siegeOn');renderSetup();
 }
-function saveSetup(){try{localStorage.setItem('nd_siege',JSON.stringify({pool:G.start||G.pool,raid:G.raid,layout:G.layout}));}catch(e){}}
+function saveSetup(){try{localStorage.setItem('nd_siege',JSON.stringify({pool:G.start||G.pool,raid:G.raid,layout:G.layout,hsel:G.hsel||{}}));}catch(e){}}
 function renderSetup(){const root=$('siege');saveSetup();const st=stationed(G.raid),aw=awakeOf(st);G.st=st;G.aw=aw;
   root.innerHTML=`<div class="sgSetup"><h2>攻城戦（試作）<small>駐留地への夜襲</small></h2>
     <div class="sgRow"><b>どの駐留地</b><span class="sgRaid"><button data-raid="-1">−</button><b>第${G.raid}襲撃</b><button data-raid="1">＋</button></span>
       <small class="muted">駐留している魔物 ${total(st)}体（${Object.entries(st).map(([k,v])=>ename(k)+v).join('・')}）<br>夜襲なので、起きて出てくるのは3割の <b style="color:#ff8a6a">${total(aw)}体</b>。残りはテントで眠っている</small></div>
     <div class="sgRow"><b>陣の形</b>${['auto'].concat(Object.keys(LAYOUTS)).map(k=>`<button data-lay="${k}" class="${G.layout===k?'on':''}">${k==='auto'?'おまかせ':LAYOUTS[k].n}</button>`).join('')}</div>
-    <div class="sgHelp">部隊を自由に選べます（試作なので費用なし）。陣のまわりのどこからでも攻められます。夜明け（${NIGHT_SEC/60}分）まで戦えます。<br>敵へのダメージ＝倒した魔物（起きていた3割）＋焼いたテント（眠っている7割）。</div>
+    <div class="sgHelp">部隊を自由に選べます（試作なので費用なし）。陣のまわりのどこからでも攻められます。部隊はいちばん近い相手を狙います（得意な相手は優先）。夜明け（${NIGHT_SEC/60}分）まで戦えます。<br>敵へのダメージ＝倒した魔物（起きていた3割）＋焼いたテント（眠っている7割）。</div>
     <div class="sgUnits">${ORDER.map(k=>{const d=SU[k];return `<div class="sgU"><span class="sgI">${unitIcon(k,32)}</span><span class="sgN"><b>${d.n}</b><small>${d.d}</small><small class="muted">${d.m>1?`${d.m}人・`:''}体力${d.hp*d.m}・攻撃${d.dmg*d.m}${d.rng>40?`・射程${d.rng}`:''}</small></span><span class="sgC"><button data-dec="${k}">−</button><b>${G.pool[k]}</b><button data-inc="${k}">＋</button></span></div>`;}).join('')}</div>
+    ${(()=>{const HL=heroList();if(!HL.length)return '';G.hsel=G.hsel||{};const opts=k=>`<option value="">連れて行かない</option>`+ORDER.filter(t=>G.pool[t]>0||G.hsel[k]===t).map(t=>`<option value="${t}" ${G.hsel[k]===t?'selected':''}>${SU[t].n}${''}</option>`).join('');
+      return `<div class="sgHero"><b>英雄</b><small class="muted">${HL[0].demo?'（セーブに英雄がいないので、試作用の英雄です）':'（本編の英雄。ここでの戦いは本編には影響しません）'}　部隊に入れると、その部隊が強くなりスキルが発動します。適任の部隊に入れると効果が大きい</small>
+        ${HL.map(c=>{const k=hSkill(c);const fit=(HFIT[c.spec]||[]).map(t=>SU[t].n).join('・')||'なし（スキルだけ）';return `<div class="sgHR"><span>${heroIcon(c,28)}</span><span class="sgHN"><b style="color:${hColor(c)}">${c.name}</b><small>${c.spec} Lv${c.lv||1}　適任：${fit}</small>${k?`<small title="${k.desc}">スキル「${k.name}」${k.desc}</small>`:''}</span><select data-hero="${c.id}">${opts(c.id)}</select></div>`;}).join('')}</div>`;})()}
     <div class="sgFoot"><button id="sgBack">やめる（タイトルへ）</button><button id="sgGo" class="primary" ${ORDER.some(k=>G.pool[k]>0)?'':'disabled'}>出撃（配置へ）</button></div></div>`;
   root.querySelectorAll('[data-raid]').forEach(b=>b.onclick=()=>{G.raid=Math.max(1,Math.min(20,G.raid+(+b.dataset.raid)));sfx('click');renderSetup();});
   root.querySelectorAll('[data-lay]').forEach(b=>b.onclick=()=>{G.layout=b.dataset.lay;sfx('click');renderSetup();});
   root.querySelectorAll('[data-inc]').forEach(b=>b.onclick=()=>{G.pool[b.dataset.inc]=Math.min(30,G.pool[b.dataset.inc]+1);sfx('click');renderSetup();});
   root.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>{G.pool[b.dataset.dec]=Math.max(0,G.pool[b.dataset.dec]-1);sfx('click');renderSetup();});
+  root.querySelectorAll('[data-hero]').forEach(el=>el.onchange=()=>{G.hsel[el.dataset.hero]=el.value||undefined;if(!el.value)delete G.hsel[el.dataset.hero];saveSetup();});
   $('sgBack').onclick=closeSiege;$('sgGo').onclick=startDeploy;
 }
 function closeSiege(){cancelAnimationFrame(raf);raf=0;const root=$('siege');if(root){root.style.display='none';root.innerHTML='';}document.body.classList.remove('siegeOn');G=null;if(typeof showTitle==='function')showTitle();}
@@ -117,14 +140,19 @@ function buildField(){
       for(const [s,sx,sy] of sides){const len=sx?bd.b:bd.a,n=Math.round(len*2/14),hasG=bd.gates.includes(s);
         for(let i=0;i<=n;i++){const tt=-len+i*(len*2/n),x=CX+(sx?sx*bd.a:tt),y=CY+(sy?sy*bd.b:tt);if(hasG&&Math.abs(tt)<16)continue;if(!sx&&(i===0||i===n))continue;B('post',x,y,8,php,{layer:li});}
         if(hasG){const gb=B('gate',CX+sx*bd.a,CY+sy*bd.b,13,ghp,{nx:sx,ny:sy,layer:li});bd.gateB.push(gb);}}}});
-  // 見張り台
+  // 物見櫓
   const towers=[];if(L.towers==='corners'){const bd=G.bounds[0];for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]])towers.push([CX+sx*(bd.a-30),CY+sy*(bd.b-30),0]);}
   else L.towers.forEach((t,li)=>{for(let i=0;i<t.n;i++){const a=(i+0.5)/t.n*Math.PI*2;towers.push([CX+Math.cos(a)*t.r,CY+Math.sin(a)*t.r,li]);}});
-  // 襲撃が進むほど見張り台を足す（外側の柵の内側に）
+  // 襲撃が進むほど物見櫓を足す（外側の柵の内側に）
   {const extra=Math.floor(G.raid/3),bd=G.bounds[0];for(let i=0;i<extra;i++){const a=(i+0.25)/Math.max(1,extra)*Math.PI*2+0.6;const r=(bd.t==='circle'?bd.r:Math.min(bd.a,bd.b))-34;towers.push([CX+Math.cos(a)*r*(bd.t==='rect'?bd.a/Math.min(bd.a,bd.b):1)*0.95,CY+Math.sin(a)*r,0]);}}
   for(const [x,y,li] of towers)B('tower',x,y,15,li?520:420,{rng:150,dmg:li?10:8,rate:li?1.0:1.1});
-  // 大弓台：門の内側。遠くまで届き、破城槌・投石機に強い（襲撃が進むほど増える）
-  {const gs=G.bounds[0].gateB,n=Math.min(gs.length,1+Math.floor(G.raid/4));for(let i=0;i<n;i++){const g=gs[i];B('bow',g.x-g.nx*48+g.ny*26,g.y-g.ny*48-g.nx*26,14,480,{rng:190,dmg:34,rate:2.6});}}
+  // 守りの魔物（駐留している魔物とは別。ダメージの計算には入れない）
+  // 岩投げオーガ：門の内側に陣取って大きな岩を投げる。破城槌・投石機に強い（襲撃が進むほど増える）
+  {const gs=G.bounds[0].gateB,n=Math.min(gs.length,1+Math.floor(G.raid/4));for(let i=0;i<n;i++){const g=gs[i];G.foes.push(mkFoe('grappler',g.x-g.nx*48+g.ny*26,g.y-g.ny*48-g.nx*26,{def:'rock',hp:700,maxhp:700,rng:190,rdmg:34,rrate:2.6}));}}
+  // 見張りオオカミ：門の外に鎖でつながれている。近づくと吠えて騒ぎになる（見つける範囲は広いが弱い）
+  {const per=G.raid>=6?2:1;for(const g of G.bounds[0].gateB)for(let i=0;i<per;i++){const sd=per>1?(i?16:-16):0;G.foes.push(mkFoe('wolf',g.x+g.nx*34-g.ny*sd,g.y+g.ny*34+g.nx*sd,{def:'wolf'}));}}
+  // 戦太鼓のゴブリン：大将のテントのそば。生きている間は、陣の魔物が早く起きて足も速くなる
+  if(G.raid>=2)G.foes.push(mkFoe('swarm',CX+46,CY+34,{def:'drum',hp:260,maxhp:260}));
   // 逆茂木：門の外の守り（通れない・壊すまでふさぐ）
   {const n=G.raid>=3?2:0;for(const g of G.bounds[0].gateB)for(let i=0;i<n;i++){const s2=i?1:-1;B('abatis',g.x+g.nx*54+g.ny*22*s2,g.y+g.ny*54-g.nx*22*s2,11,260);}}
   // テント（眠っている魔物）と大将のテント
@@ -160,9 +188,9 @@ function buildField(){
   G.ground=null;
 }
 function mkFoe(k,x,y,ex){const d=E[k];return Object.assign({id:nid++,k,x,y,px:x,py:y,hp:d.hp,maxhp:d.hp,cd:Math.random(),face:-1,tg:null,walk:Math.random()*4},ex||{});}
-function startDeploy(){if(!ORDER.some(k=>G.pool[k]>0))return;if(!G.start)G.start=Object.assign({},G.pool);G.phase='deploy';buildField();renderField();loopStart();
-  msg('夜襲です。陣は寝静まっている。見張りや見張り台に見つかると、陣の魔物が起きてくる（ホイール・ピンチ・＋－で拡大、右ドラッグ・2本指で移動）');}
-function spawnSquad(k,x,y){const d=SU[k];const u={id:nid++,t:k,x,y,hp:d.hp*d.m,maxhp:d.hp*d.m,cd:Math.random()*d.rate,face:x<CX?1:-1,tg:null,tx:null,ty:null,hold:false,walk:Math.random()*4,spawned:false};G.units.push(u);return u;}
+function startDeploy(){if(!ORDER.some(k=>G.pool[k]>0))return;G.hUsed=new Set();if(!G.start)G.start=Object.assign({},G.pool);G.phase='deploy';buildField();renderField();loopStart();
+  msg('夜襲です。陣は寝静まっている。見張りや物見櫓に見つかると、陣の魔物が起きてくる（ホイール・ピンチ・＋－で拡大、右ドラッグ・2本指で移動）');}
+function spawnSquad(k,x,y,noHero){const d=SU[k];const u={id:nid++,t:k,x,y,hp:d.hp*d.m,maxhp:d.hp*d.m,cd:Math.random()*d.rate,face:x<CX?1:-1,tg:null,tx:null,ty:null,hold:false,walk:Math.random()*4,spawned:false};G.units.push(u);if(!noHero)attachHero(u);return u;}
 
 // ---------- 戦場の画面 ----------
 function renderField(){const root=$('siege');
@@ -300,15 +328,18 @@ function foeStep(f,tx,ty,spd,dt){if(flyF(f)){const dx=tx-f.x,dy=ty-f.y,d=Math.hy
   if(!fp){const pts=findPath(f.x,f.y,tx,ty,'f');if(pts.length)f.path={key,pts,t:G.t};return;}   // 山などにぶつかった → 次から道をたどる
   f.x=fp[0];f.y=fp[1];if(Math.abs(dx)>0.5)f.face=dx>0?1:-1;f.walk=(f.walk||0)+dt*8;}
 function raiseAlarm(why,p){if(G.alarm)return;G.alarm=true;sfx('alarm');msg(`${why}！ 陣の魔物が起きてきた`);
-  for(const f of G.foes)if(!f.awake)f.wakeAt=G.t+(p?Math.hypot(f.x-p.x,f.y-p.y)/90:0)+Math.random()*1.5;}   // 騒ぎの近くから順に起きてくる（一斉には来ない）
+  const dr=drumOn(true);for(const f of G.foes)if(!f.awake)f.wakeAt=G.t+((p?Math.hypot(f.x-p.x,f.y-p.y)/90:0)+Math.random()*1.5)*(dr&&f.def!=='drum'?0.5:1);
+  if(dr){const df=G.foes.find(f=>f.def==='drum');df.awake=true;setTimeout(()=>{if(G&&drumOn())msg('戦太鼓が鳴り響く！ 魔物がすぐ起きて、足も速くなった');},1600);}}
+function drumOn(any){return G.foes.some(f=>f.def==='drum'&&alive(f)&&(any||f.awake));}   // 騒ぎの近くから順に起きてくる（一斉には来ない）
 function hitBld(b,dmg){if(b.hp<=0)return;b.hp-=dmg;if(b.hp<=0&&(b.kind==='post'||b.kind==='gate'||b.kind==='abatis'))G.blkM=null;raiseAlarm('物音で気づかれた',b);
   if(b.kind==='chief'&&!G.chiefAtk){G.chiefAtk=true;msg('大将のテントが襲われた！ 魔物が大将を守りに集まってくる');}
   if(isTent(b)&&b.sl)emerge(b);if(b.hp<=0){b.hp=0;G.fx.push({x:b.x,y:b.y,r:b.r*1.6,t:0,dur:0.5,c:isTent(b)?'#ff8a3a':'#ffb14e'});if(b.kind!=='post')sfx('destroy');
+    if(b.kind==='tower'){G.foes.push(mkFoe('gobarcher',b.x,b.y+8,{awake:true,def:'tower'}));msg('物見櫓が崩れて、ゴブリンアーチャーが落ちてきた！');}
     if(isTent(b)){G.fires=(G.fires||[]);G.fires.push({x:b.x,y:b.y});vfx('fire',b.x,b.y-6,2.2);}else if(b.kind!=='post')vfx('explosion',b.x,b.y,1.8);}}
-function hitUnit(u,dmg,ranged,src){if(src){u.hitBy=src;u.hitT=G.t;}   // 撃ってきた見張り台・大弓台を覚えておく（やり返す）
+function hitUnit(u,dmg,ranged,src){if(src){u.hitBy=src;u.hitT=G.t;}   // 撃ってきた物見櫓・大弓台を覚えておく（やり返す）
   if(ranged&&SU[u.t].role!=='shield'&&G.units.some(o=>o!==u&&alive(o)&&SU[o.t].role==='shield'&&dist(o,u)<48)){dmg*=0.65;u.guardT=0.3;}   // 盾兵がそばにいれば、矢などを防いでくれる
-  u.hp-=dmg;if(u.hp<=0){u.hp=0;G.sel.delete(u.id);if(SU[u.t].carry&&!u.spawned)releaseRam(u);}}
-function hitFoe(f,dmg){const d=E[f.k];f.hp-=dmg*(1-(d.armor||0));f.awake=true;if(!G.alarm)raiseAlarm('戦いに気づかれた',f);if(f.hp<=0)f.hp=0;}
+  dmg*=(1-(u.red||0))*(u.fukT>0?0.5:1)*(u.yugT>0?0.7:1);u.hp-=dmg;if(u.hp<=0){u.hp=0;G.sel.delete(u.id);if(SU[u.t].carry&&!u.spawned)releaseRam(u);}}
+function hitFoe(f,dmg){const d=E[f.k];f.hp-=dmg*(1-(d.armor||0));f.awake=true;if(!G.alarm)raiseAlarm('戦いに気づかれた',f);if(f.hp<=0){f.hp=0;if(f.def==='drum')msg('戦太鼓が止んだ！');}}
 // 襲われたテント・小屋から、眠っていた魔物が飛び出してくる（最初に叩かれたとき・体力6割・3割で）。焼け落ちたら残りは焼け死ぬ
 function emerge(b){const lv=b.hp<=0?Math.max(1,b.em||0):b.hp<b.maxhp*0.3?3:b.hp<b.maxhp*0.6?2:1;
   while((b.em||0)<lv){b.em=(b.em||0)+1;const rem=total(b.sl);if(!rem)break;let n=Math.min(6,Math.ceil(rem*0.15));
@@ -325,70 +356,111 @@ function startRetreat(){if(G.retreat)return;G.retreat=true;G.card=null;
   for(const u of G.units)if(alive(u)){u.flee=true;u.fl=null;u.tg=null;u.tx=u.ty=null;u.hold=false;u.focus=false;}
   renderCards();renderCmd();sfx('alarm');msg('撤退！ 赤い端まで逃げ切れば助かる。部隊を選んで指示すると殿（しんがり）として残せる');
   const q=$('sgQuit');if(q)q.textContent='残りを置いて終える';}
-function releaseRam(u){u.spawned=true;for(let i=0;i<SU[u.t].carry;i++){const s=spawnSquad('sword',u.x+(i?14:-14),u.y+(i?10:-10));s.face=u.face;}G.fx.push({x:u.x,y:u.y,r:30,t:0,dur:0.5,c:'#f2b33d'});msg('破城槌から兵士2部隊が出てきた！');sfx('upgrade');}
+function releaseRam(u){u.spawned=true;for(let i=0;i<SU[u.t].carry;i++){const s=spawnSquad('sword',u.x+(i?14:-14),u.y+(i?10:-10),true);s.face=u.face;}G.fx.push({x:u.x,y:u.y,r:30,t:0,dur:0.5,c:'#f2b33d'});msg('破城槌から兵士2部隊が出てきた！');sfx('upgrade');}
 // 弾：kind はゲーム本体の SPR.projectiles の名前。fx は着いたときの演出（SPR.effects）
 function shoot(a,b,col,kind,fx,arc){const d=Math.hypot(b.x-a.x,b.y-a.y);G.shots.push({x:a.x,y:a.y-6,tx:b.x,ty:b.y-6,t:0,dur:Math.max(0.15,Math.min(0.7,d/(kind==='stone_big'||kind==='cannonball'?320:420))),c:col||'#e8d8a0',kind:kind||null,fx:fx||null,arc:arc!=null?arc:(kind==='stone_big'?40:kind==='cannonball'?14:10)});}
 function vfx(k,x,y,z){(G.vfx=G.vfx||[]).push({k,x,y,z:z||1.5,t:0});}
 // 破城槌のねらい：いま居る場所から内へ向かう、いちばん近い（壊れていない）門。門を全部抜けたら大将のテント
+// 狙う相手：基本は「いちばん近いもの」（魔物でも建物でも）。得意な相手は半分の距離に見える。柵・門は道をふさいだときだけ叩く（工兵は得意）
+const FAV={drake:['sleep'],gun:['def'],cat:['def'],eng:['wall','def']};
+function bldCat(b){return b.kind==='tower'||b.kind==='bow'?'def':b.kind==='chief'?'chief':isTent(b)?'sleep':'wall';}
+function pickTarget(u){const d=SU[u.t],fav=FAV[d.role]||[],air=hitsAir(d);let best=null,bs=1e9;
+  for(const f of G.foes){if(!alive(f)||(flyF(f)&&!air))continue;const c=f.def==='rock'?'def':'foe';const sc=dist(u,f)*(fav.includes(c)?0.5:1);if(sc<bs){bs=sc;best=f;}}
+  for(const b of G.blds){if(!alive(b))continue;const c=bldCat(b);if(c==='wall'&&!fav.includes('wall'))continue;const sc=Math.max(0,dist(u,b)-b.r)*(fav.includes(c)?0.5:1);if(sc<bs){bs=sc;best=b;}}
+  return best;}
+// 英雄のスキル（本編の SKILLS と同じ名前・だいたい同じ効果。1マス＝28）
+function txt(x,y,t,c,big){(G.ftx=G.ftx||[]).push({x,y,t,c,big,a:0});}
+function ringFx(x,y,r,c){G.fx.push({x,y,r,t:0,dur:0.7,c});}
+function heroTick(u,dt){const k=u.sk;if(!k||!k.cd)return;u.skT-=dt;if(u.skT>0)return;
+  const d=SU[u.t],atk=d.dmg*mem(u)*(u.dmul||1),air=hitsAir(d),col=hColor(u.hero);
+  const foesIn=(x,y,r,a)=>G.foes.filter(f=>alive(f)&&(a||!flyF(f))&&Math.hypot(f.x-x,f.y-y)<r);
+  const dense=(reach,rad)=>{let best=null,bn=0;const cs=foesIn(u.x,u.y,reach,air);for(const e of cs){const m=cs.filter(o=>dist(o,e)<rad).length;if(m>bn){bn=m;best=e;}}return best;};
+  const allies=r=>G.units.filter(o=>alive(o)&&dist(o,u)<r);let ok=true;
+  switch(k.id){
+    case 'nagi':{const fs=foesIn(u.x,u.y,3.2*TU);if(!fs.length){ok=false;break;}for(const f of fs)hitFoe(f,atk*3);ringFx(u.x,u.y,3.2*TU,col);vfx('dust',u.x,u.y,2.5);break;}
+    case 'kobu':{if(!G.alarm){ok=false;break;}for(const o of allies(6*TU)){o.buffT=6;o.hp=Math.min(o.maxhp,o.hp+o.maxhp*0.1);}ringFx(u.x,u.y,6*TU,col);break;}
+    case 'fukutsu':{const fs=foesIn(u.x,u.y,6*TU);if(!fs.length){ok=false;break;}u.fukT=6;for(const f of fs){f.taunt=u;f.tauntT=G.t+6;}ringFx(u.x,u.y,6*TU,col);break;}
+    case 'ame':{const e=dense(d.rng+2*TU,70);if(!e){ok=false;break;}for(let i=0;i<8;i++)shoot(u,{x:e.x+(Math.random()-0.5)*80,y:e.y+(Math.random()-0.5)*60},null,'arrow',null,true);setTimeout(()=>{if(!G||!G.foes)return;for(const f of foesIn(e.x,e.y,70,true))hitFoe(f,40);ringFx(e.x,e.y,70,col);},300/(G.speed||1));break;}
+    case 'sokusha':{if(!foesIn(u.x,u.y,d.rng+20,air).length){ok=false;break;}u.rapidT=4;break;}
+    case 'shoumei':{const e=dense(d.rng+2*TU,100);if(!e){ok=false;break;}(G.flares=G.flares||[]).push({x:e.x,y:e.y,r:8*TU,t:8});shoot(u,e,null,'arrow',null,true);break;}
+    case 'yuugeki':{if(!u.tg&&u.tx==null){ok=false;break;}u.yugT=5;break;}
+    case 'kaen':{const e=dense(Math.max(d.rng,90)+TU,67);if(!e){ok=false;break;}shoot(u,e,null,'fireball','explosion');for(const f of foesIn(e.x,e.y,67,true))hitFoe(f,80);ringFx(e.x,e.y,67,'#ff7a2a');break;}
+    case 'rai':{let cur=nearest(u,G.foes,Math.max(d.rng,120)+TU,f=>air||!flyF(f));if(!cur){ok=false;break;}const hit=new Set();let from=u;
+      for(let i=0;i<5&&cur;i++){hit.add(cur);hitFoe(cur,60);(G.bolts=G.bolts||[]).push({a:{x:from.x,y:from.y-8},b:{x:cur.x,y:cur.y-8},t:0.3});from=cur;cur=nearest(cur,G.foes,110,f=>!hit.has(f));}break;}
+    case 'inseki':{const e=dense(16*TU,100);if(!e){ok=false;break;}vfx('explosion',e.x,e.y,4);sfx('boom');for(const f of foesIn(e.x,e.y,100,true)){hitFoe(f,300);f.stunT=2;}ringFx(e.x,e.y,100,'#ff5a1e');break;}
+    case 'ibuki':{const fs=foesIn(u.x,u.y,5*TU,true);if(!fs.length){ok=false;break;}for(const f of fs)hitFoe(f,60);vfx('fire',u.x,u.y,3);ringFx(u.x,u.y,5*TU,'#ff7a2a');break;}
+    case 'houkou':{const fs=foesIn(u.x,u.y,8*TU,true);if(!fs.length){ok=false;break;}for(const f of fs)f.stunT=3;ringFx(u.x,u.y,8*TU,col);break;}
+    case 'rensha':{if(!u.tg){ok=false;break;}u.rapidT=3;break;}
+    case 'gourei':{if(!G.alarm){ok=false;break;}for(const o of allies(6*TU))o.gourT=4;ringFx(u.x,u.y,6*TU,col);break;}
+    case 'oukyu':{const ws=allies(6*TU).filter(o=>SU[o.t].isBld&&o.hp<o.maxhp);if(!ws.length){ok=false;break;}for(const o of ws)o.hp=Math.min(o.maxhp,o.hp+o.maxhp*0.2);ringFx(u.x,u.y,6*TU,'#6fe08a');break;}
+    default:ok=false;}
+  if(!ok){u.skT=1;return;}u.skT=k.cd;u.skN=(u.skN||0)+1;txt(u.x,u.y-30,k.name,col,true);sfx('upgrade');}
 function ramTarget(u){const la=layerOf(u.x,u.y);for(let i=la;i<G.bounds.length;i++){const g=nearest(u,G.bounds[i].gateB,1e9);if(g)return g;}return chief();}
 
 function update(dt){G.t+=dt;
   const ch=chief();
   // --- こちらの部隊 ---
-  for(const u of G.units){if(!alive(u))continue;const d=SU[u.t];u.cd-=dt;const n=mem(u),atk=d.dmg*n;
+  for(const u of G.units){if(!alive(u))continue;const d=SU[u.t];for(const k of ['buffT','rapidT','gourT','fukT','yugT'])if(u[k]>0)u[k]-=dt;
+    u.cd-=dt*((u.rapidT>0?2:1)+(u.gourT>0?0.5:0));const n=mem(u),atk=d.dmg*n*(u.dmul||1)*(u.buffT>0?1.3:1),uspd=d.spd*(u.yugT>0?1.6:1);
+    if(u.hero&&!u.flee)heroTick(u,dt);
     if(d.role==='eng')for(const tr of G.traps)if(tr.hp>0&&Math.hypot(tr.x-u.x,tr.y-u.y)<40){tr.hp=0;G.fx.push({x:tr.x,y:tr.y,r:10,t:0,dur:0.4,c:'#6fe08a'});}
     if(!d.isBld&&!d.fly)for(const tr of G.traps)if(tr.hp>0&&Math.hypot(tr.x-u.x,tr.y-u.y)<11)hitUnit(u,14*dt);
     if(u.flee){if(atEdge(u)){u.out=true;u.keepHp=u.hp;u.hp=0;G.sel.delete(u.id);G.fx.push({x:u.x,y:u.y,r:16,t:0,dur:0.4,c:'#ff5a4e'});continue;}   // 逃げ切った
-      if(!u.fl)u.fl=edgeSpot(u);const b=d.role==='ram'?stepTo(u,u.fl[0],u.fl[1],d.spd,dt):moveNav(u,u.fl[0],u.fl[1],d.spd,dt);
+      if(!u.fl)u.fl=edgeSpot(u);const b=d.role==='ram'?stepTo(u,u.fl[0],u.fl[1],uspd,dt):moveNav(u,u.fl[0],u.fl[1],uspd,dt);
       if(b&&u.cd<=0&&d.role!=='ranged'&&d.role!=='gun'&&d.role!=='cat'){u.cd=d.rate;attack(u,b,atk);}continue;}
     let tg=u.tg&&alive(u.tg)?u.tg:null;if(!tg)u.focus=false;
-    if(u.tx!=null){const b=d.role==='ram'?stepTo(u,u.tx,u.ty,d.spd,dt):moveNav(u,u.tx,u.ty,d.spd,dt);
+    if(u.tx!=null){const b=d.role==='ram'?stepTo(u,u.tx,u.ty,uspd,dt):moveNav(u,u.tx,u.ty,uspd,dt);
       if(b){if(d.role==='ranged'||d.role==='cat'||d.role==='gun'){/* 門が開くまで待つ */}else if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}continue;}
       if(Math.hypot(u.tx-u.x,u.ty-u.y)<4){u.tx=u.ty=null;}continue;}
     if(!tg||!u.focus){
       const bldT=b=>b.kind!=='post';   // 柵の杭そのものは狙わない（道をふさいだら叩く）
-      if(d.role==='ram'){tg=ch;const dx=ch.x-u.x,dy=ch.y-u.y,L=Math.hypot(dx,dy)||1;let bt=1e9;   // 大将のテントまでの道すじにある建物（テント・小屋・見張り台・大弓台・門など）は壊して進む
+      if(d.role==='ram'){tg=ch;const dx=ch.x-u.x,dy=ch.y-u.y,L=Math.hypot(dx,dy)||1;let bt=1e9;   // 大将のテントまでの道すじにある建物（テント・小屋・物見櫓・大弓台・門など）は壊して進む
         for(const b of G.blds){if(!alive(b)||b===ch||b.kind==='post')continue;const px=b.x-u.x,py=b.y-u.y,t=(px*dx+py*dy)/L;if(t<-10||t>L)continue;if(Math.abs(px*dy-py*dx)/L<b.r+16&&t<bt){bt=t;tg=b;}}}   // まっすぐ大将のテントへ（ぶつかった柵・門は下で叩く）
-      else if(d.role==='cat')tg=nearest(u,G.blds,d.rng*1.6,b=>b.kind==='tower'||b.kind==='bow')||nearest(u,G.blds,d.rng*1.6,b=>isTent(b))||nearest(u,G.blds,1e9,b=>b.kind!=='post')||nearF(u,1e9);
-      else if(d.role==='eng'){const hurt=nearest(u,G.units,160,o=>SU[o.t].isBld&&o.hp<o.maxhp-1);tg=nearF(u,50)||(hurt&&!nearF(u,70)?hurt:null)||nearest(u,G.blds,1e9,b=>b.kind==='gate'||b.kind==='abatis')||nearest(u,G.blds,1e9,b=>isTent(b));}
-      else if(d.role==='drake'){let best=null,bs=1e9;for(const b of G.blds){if(!alive(b)||!isTent(b))continue;const thr=G.blds.filter(t=>(t.kind==='tower'||t.kind==='bow')&&alive(t)&&dist(t,b)<t.rng+10).length;const sc=dist(u,b)+thr*220;if(sc<bs){bs=sc;best=b;}}tg=best||nearF(u,1e9);}   // 見張り台・大弓台に守られていないテントから焼く
-      else if(d.role==='gun')tg=nearest(u,G.blds,d.rng*1.5,b=>b.kind==='tower'||b.kind==='bow')||nearF(u,d.rng+20)||nearest(u,G.blds,1e9,b=>isTent(b));
-      else if(d.role==='cav')tg=nearF(u,320,f=>f.sentry||!!(E[f.k].archers||E[f.k].ranged))||nearest(u,G.blds,320,b=>b.kind==='tower')||nearF(u,240)||nearest(u,G.blds,1e9,b=>isTent(b));
-      else if(d.role==='ranged')tg=nearF(u,d.rng+40)||nearest(u,G.blds,d.rng+10,b=>b.kind==='tower'||isTent(b))||null;
-      else tg=nearF(u,240,f=>f.awake||f.sentry)||nearest(u,G.blds,1e9,b=>isTent(b))||nearF(u,1e9)||nearest(u,G.blds,1e9,bldT);   // テントがなくなったら残りの魔物を探しに行く
-      // 見張り台・大弓台に撃たれたら、近くの魔物と戦っている最中でなければやり返す（破城槌はまっすぐ進む）
-      if(['ranged','gun','cat','drake'].includes(d.role)&&u.hitBy&&alive(u.hitBy)&&G.t-u.hitT<4&&dist(u,u.hitBy)<d.rng+u.hitBy.r+30&&!(tg&&tg.k&&dist(u,tg)<d.rng+40))tg=u.hitBy;   // やり返すのは撃てる部隊だけ、届く所にいるときだけ（陣の奥まで深追いしない）
+      else{const hurt=d.role==='eng'&&nearest(u,G.units,160,o=>SU[o.t].isBld&&o.hp<o.maxhp-1);tg=hurt&&!nearF(u,70)?hurt:pickTarget(u);}   // 工兵は傷んだ破城槌・投石機を先に直す
+      // 物見櫓・大弓台に撃たれたら、近くの魔物と戦っている最中でなければやり返す（破城槌はまっすぐ進む）
+      if(['ranged','gun','cat','drake'].includes(d.role)&&u.hitBy&&alive(u.hitBy)&&G.t-u.hitT<4&&dist(u,u.hitBy)<d.rng+(u.hitBy.r||8)+30&&!(tg&&tg.k&&dist(u,tg)<d.rng+40))tg=u.hitBy;   // やり返すのは撃てる部隊だけ、届く所にいるときだけ（陣の奥まで深追いしない）
       if(!u.focus)u.tg=tg;}
     if(u.hold){if(tg&&dist(u,tg)<=d.rng+(tg.r||6)+6&&u.cd<=0){u.cd=d.rate;attack(u,tg,atk);}continue;}
     if((d.role==='ranged'||d.role==='gun')&&!tg){const fr=nearest(u,G.units,1e9,o=>o!==u&&!SU[o.t].isBld&&SU[o.t].role!=='ranged');let gx,gy;
       const nf=!fr&&nearF(u,1e9);   // 前に立つ味方がもういなければ、残りの魔物に近づいて撃つ
-      if(nf){const bk=moveNav(u,nf.x,nf.y,d.spd,dt);if(bk&&u.cd<=0){u.cd=d.rate;attack(u,bk,atk);}continue;}
+      if(nf){const bk=moveNav(u,nf.x,nf.y,uspd,dt);if(bk&&u.cd<=0){u.cd=d.rate;attack(u,bk,atk);}continue;}
       if(fr){const dx=fr.x-CX,dy=fr.y-CY,dl=Math.hypot(dx,dy)||1;gx=fr.x+dx/dl*30;gy=fr.y+dy/dl*30;}else{const dx=u.x-CX,dy=u.y-CY,dl=Math.hypot(dx,dy)||1,r=Math.max(outerR()+70,dl-40);gx=CX+dx/dl*r;gy=CY+dy/dl*r;}
-      stepTo(u,gx,gy,d.spd,dt);continue;}
+      stepTo(u,gx,gy,uspd,dt);continue;}
     if(!tg)continue;
     const reach=d.rng+(tg.r||E[tg.k]&&E[tg.k].r||6)+2,dd=dist(u,tg);
-    if(d.minR&&dd<d.minR){stepTo(u,u.x-(tg.x-u.x),u.y-(tg.y-u.y),d.spd,dt);continue;}
-    if(dd>reach){const b=d.role==='ram'?stepTo(u,tg.x,tg.y,d.spd,dt):moveNav(u,tg.x,tg.y,d.spd,dt);if(b&&d.role!=='ranged'&&d.role!=='cat'&&d.role!=='gun'){if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}}continue;}
+    if(d.minR&&dd<d.minR){stepTo(u,u.x-(tg.x-u.x),u.y-(tg.y-u.y),uspd,dt);continue;}
+    if(dd>reach){const b=d.role==='ram'?stepTo(u,tg.x,tg.y,uspd,dt):moveNav(u,tg.x,tg.y,uspd,dt);if(b&&d.role!=='ranged'&&d.role!=='cat'&&d.role!=='gun'){if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}}continue;}
     if(d.role==='ram'&&!u.spawned&&tg===ch)releaseRam(u);
     if(d.role==='eng'&&!tg.kind&&!tg.k&&SU[tg.t]&&SU[tg.t].isBld){tg.hp=Math.min(tg.maxhp,tg.hp+30*dt);u.fixT=0.3;continue;}   // 修理
     if(u.cd<=0){u.cd=d.rate;attack(u,tg,atk);}
   }
   // --- 魔物 ---
-  for(const f of G.foes){if(!alive(f))continue;const d=E[f.k];f.cd-=dt;if(d.regen)f.hp=Math.min(f.maxhp,f.hp+d.regen*dt);
+  const drum=drumOn();
+  for(const f of G.foes){if(!alive(f))continue;const d0=E[f.k];f.cd-=dt;if(d0.regen)f.hp=Math.min(f.maxhp,f.hp+d0.regen*dt);
+    if(f.stunT>0){f.stunT-=dt;continue;}   // 英雄のスキルで動けない
+    const d=drum&&f.def!=='drum'&&G.alarm?Object.assign({},d0,{spd:d0.spd*1.12}):d0;   // 戦太鼓が鳴っている間は足が速い
     const rng=d.archers?d.archers.range*28:d.ranged?d.ranged*28:0;
+    // 見張りオオカミ：つながれていて動かない。近くに来たら吠える
+    if(f.def==='wolf'&&!G.alarm){const seen=nearest(f,G.units,170,u=>!tForest(u.x,u.y)||dist(u,f)<80);if(seen){f.barkT=1.2;raiseAlarm('見張りのオオカミが吠えた',f);}continue;}
+    if(f.def&&!f.awake&&G.alarm)f.awake=true;
+    // 岩投げオーガ：持ち場から岩を投げる。破城槌・投石機を先に狙う。すぐそばに来られたら殴る
+    if(f.def==='rock'){if(!G.alarm)continue;const t=nearest(f,G.units,f.rng,u=>!!SU[u.t].isBld)||nearest(f,G.units,f.rng,u=>!SU[u.t].fly);
+      if(!t){if(Math.hypot(f.px-f.x,f.py-f.y)>6)foeStep(f,f.px,f.py,d.spd,dt);continue;}
+      if(dist(f,t)>44){f.face=t.x>f.x?1:-1;if(f.cd<=0){f.cd=f.rrate;f.atkT=G.t;shoot(f,t,'#a09080','stone_big','explosion',true);hitUnit(t,f.rdmg*(SU[t.t].isBld?2:1),true,f);sfx('how');}continue;}}
     // 見張り：柵の外を巡回。部隊を見つけたら知らせる
     if(f.sentry&&!G.alarm){const seen=nearest(f,G.units,120,u=>!tForest(u.x,u.y)||dist(u,f)<60);if(seen)raiseAlarm('見張りに見つかった',f);
       else{f.ang+=f.dir*dt*0.12;const pt=a=>[CX+Math.cos(a)*f.pr*(G.bounds[0].t==='rect'?1.25:1),CY+Math.sin(a)*f.pr*(G.bounds[0].t==='rect'?0.85:1)];if(tBlock(...pt(f.ang+f.dir*0.25)))f.dir=-f.dir;   /* 山にぶつかったら引き返す */const tx=CX+Math.cos(f.ang)*f.pr*(G.bounds[0].t==='rect'?1.25:1),ty=CY+Math.sin(f.ang)*f.pr*(G.bounds[0].t==='rect'?0.85:1);foeStep(f,tx,ty,d.spd*0.5,dt);continue;}}
     if(!f.awake&&!f.sentry){// 寝ている：すぐそばに来られたら起きる
       if(f.wakeAt!=null&&G.t>=f.wakeAt)f.awake=true;else if(nearest(f,G.units,45)){f.awake=true;raiseAlarm('陣に踏み込まれた',f);}else if(!f.awake)continue;}
     let tg=f.tg&&alive(f.tg)&&dist(f,f.tg)<(rng?rng+90:320)&&(d.fly||rng||!SU[f.tg.t].fly)?f.tg:null;   // 追い始めた相手は少し離れても追い続ける（門の前で行ったり来たりしない）
+    if(f.taunt&&alive(f.taunt)&&G.t<f.tauntT)tg=f.taunt;   // 英雄の「不屈」で引きつけられている
     if(!tg&&(d.bldMul||1)>1)tg=nearest(f,G.units,170,u=>!!SU[u.t].isBld);
     if(tg&&!rng&&!d.fly&&SU[tg.t].fly)tg=null;
     if(!tg)tg=nearest(f,G.units,70,u=>SU[u.t].role==='shield');
     if(!tg)tg=nearest(f,G.units,rng?rng+40:200,u=>rng||d.fly||!SU[u.t].fly);
     if(tg&&Math.hypot(tg.x-CX,tg.y-CY)>outerR()+(G.retreat?480:200))tg=null;   // 陣から離れすぎた相手は追わない（撤退のときは遠くまで追ってくる＝殿が要る）
     // 持ち場：自分の場所（大将のテントが襲われたら大将のテント）から離れすぎた相手は追わない。魔物がひとかたまりにならないように
-    {const home=G.chiefAtk&&alive(ch)?ch:{x:f.px,y:f.py},lim=(G.retreat?480:G.chiefAtk?200:230)+rng;if(tg&&Math.hypot(tg.x-home.x,tg.y-home.y)>lim)tg=null;}
+    {const home=G.chiefAtk&&alive(ch)&&!f.def?ch:{x:f.px,y:f.py},lim=f.def==='wolf'?80:f.def==='drum'?90:f.def==='rock'?60:(G.retreat?480:G.chiefAtk?200:230)+rng;if(tg&&Math.hypot(tg.x-home.x,tg.y-home.y)>lim)tg=null;}
     f.tg=tg;
     if(!tg){const c=G.chiefAtk&&alive(ch)?ch:null;   // 大将のテントが襲われたら、戦っていない魔物（外の見張りも）は大将のもとへ
       if(c){if(dist(f,c)>c.r+30)foeStep(f,c.x,c.y,d.spd,dt);}else if(Math.hypot(f.px-f.x,f.py-f.y)>6)foeStep(f,f.px,f.py,d.spd,dt);continue;}
@@ -400,14 +472,15 @@ function update(dt){G.t+=dt;
       else if(d.breath){shoot(f,tg,'#ff7a2a','fireball','fire');for(const o of G.units)if(alive(o)&&dist(o,tg)<26)hitUnit(o,dm*(o===tg?1:0.6),true);}   // ドラゴン：炎で範囲攻撃
       else{if(rng)shoot(f,tg,'#b0e070','arrow_goblin');else if(Math.random()<0.5)vfx('dust',tg.x,tg.y-4,1.2);hitUnit(tg,dm,!!rng);}}
   }
-  // --- 見張り台：見つけたら知らせ、撃つ ---
-  for(const b of G.blds){if(b.kind!=='tower'||!alive(b))continue;b.cd-=dt;const t=nearest(b,G.units,b.rng);if(!t)continue;if(!G.alarm)raiseAlarm('見張り台に見つかった',b);if(b.cd>0)continue;b.cd=b.rate;let dm=b.dmg*(SU[t.t].isBld?0.3:1);if(SU[t.t].red)dm*=1-SU[t.t].red;shoot(b,t,null,'arrow_goblin');hitUnit(t,dm,true,b);}
+  // --- 物見櫓：見つけたら知らせ、撃つ ---
+  for(const b of G.blds){if(b.kind!=='tower'||!alive(b))continue;b.cd-=dt;const t=nearest(b,G.units,b.rng);if(!t)continue;if(!G.alarm)raiseAlarm('物見櫓に見つかった',b);if(b.cd>0)continue;b.cd=b.rate;let dm=b.dmg*(SU[t.t].isBld?0.3:1);if(SU[t.t].red)dm*=1-SU[t.t].red;b.atkT=G.t;b.face=t.x>b.x?1:-1;shoot(b,t,null,'arrow_goblin');hitUnit(t,dm,true,b);}
   // 大弓台：遠くまで届く太い矢。破城槌・投石機を先に狙う
   for(const b of G.blds){if(b.kind!=='bow'||!alive(b))continue;b.cd-=dt;if(!G.alarm||b.cd>0)continue;const t=nearest(b,G.units,b.rng,u=>!!SU[u.t].isBld)||nearest(b,G.units,b.rng);if(!t)continue;b.cd=b.rate;let dm=b.dmg*(SU[t.t].isBld?2:1);if(SU[t.t].red)dm*=1-SU[t.t].red;shoot(b,t,'#e0c080','bolt');hitUnit(t,dm,true,b);}
   for(const bm of (G.bombs||[])){bm.t-=dt;if(bm.t<=0&&!bm.done){bm.done=true;sfx('boom');vfx('explosion',bm.x,bm.y,2.6);G.fx.push({x:bm.x,y:bm.y,r:46,t:0,dur:0.6,c:'#ffb040'});G.fx.push({x:bm.x,y:bm.y,r:24,t:0,dur:0.4,c:'#fff0a0'});
     for(const b of G.blds)if(alive(b)&&b.kind!=='chief'&&Math.hypot(b.x-bm.x,b.y-bm.y)<40+b.r)hitBld(b,b.kind==='post'||b.kind==='abatis'?999:550);for(const f of G.foes)if(alive(f)&&!flyF(f)&&Math.hypot(f.x-bm.x,f.y-bm.y)<40)hitFoe(f,80);}}
   if(G.bombs)G.bombs=G.bombs.filter(b=>!b.done);
   for(const s of G.shots){s.t+=dt;if(s.t>=s.dur&&s.fx&&!s.done){s.done=true;vfx(s.fx,s.tx,s.ty,s.fx==='explosion'?2:1.5);}}G.shots=G.shots.filter(s=>s.t<s.dur);
+  for(const t of (G.ftx||[]))t.a+=dt;if(G.ftx)G.ftx=G.ftx.filter(t=>t.a<1.6);for(const f of (G.flares||[]))f.t-=dt;if(G.flares)G.flares=G.flares.filter(f=>f.t>0);for(const b of (G.bolts||[]))b.t-=dt;if(G.bolts)G.bolts=G.bolts.filter(b=>b.t>0);
   for(const v of (G.vfx||[]))v.t+=dt;if(G.vfx)G.vfx=G.vfx.filter(v=>v.t<0.5);for(const f of G.fx)f.t+=dt;G.fx=G.fx.filter(f=>f.t<f.dur);
   // 終わり：夜明け・テントを全部焼いた・全滅
   if(G.t>=NIGHT_SEC)return endBattle('dawn');
@@ -426,15 +499,15 @@ function attack(u,tg,atk){const d=SU[u.t];if(tg.k&&flyF(tg)&&!hitsAir(d))return;
     for(const b of G.blds)if(alive(b)&&Math.hypot(b.x-x,b.y-y)<sp+b.r)hitBld(b,atk*d.bld*(isTent(b)&&d.tentMul?d.tentMul:1));for(const f of G.foes)if(alive(f)&&(d.role==='drake'||!flyF(f))&&Math.hypot(f.x-x,f.y-y)<sp)hitFoe(f,atk*0.8);sfx(d.role==='gun'?'boom':'hit');return;}
   if(d.role==='ranged')shoot(u,tg,null,'arrow');
   else if(Math.random()<0.5)vfx('dust',tg.x+(Math.random()-0.5)*8,tg.y-4,d.role==='ram'?2:1.2);   // 近接：当たったところに土ぼこり
-  if(tg.kind)hitBld(tg,atk*d.bld);else hitFoe(tg,atk);
+  if(tg.kind)hitBld(tg,atk*d.bld);else{let a=atk;if(u.sk&&u.sk.id==='moutotsu'&&G.t-(u.chgT||-9)>2){a*=2;tg.stunT=1;u.chgT=G.t;txt(tg.x,tg.y-20,'猛突！',hColor(u.hero));}hitFoe(tg,a);}
   if(d.role==='ram')sfx('hit');
 }
 // 敵へのダメージ：起きていた魔物（3割）のうち倒した割合 ＋ テントの焼けた割合 × 眠っていた魔物（7割）
-function result(){const awF=G.foes.filter(f=>!f.fromTent),awN=awF.length,kill=G.foes.filter(f=>!alive(f)).length,kAw=awF.filter(f=>!alive(f)).length,emN=G.foes.length-awN,emK=kill-kAw,sN=G.foes.filter(f=>f.sentry).length,sK=G.foes.filter(f=>f.sentry&&!alive(f)).length;
+function result(){const FF=G.foes.filter(f=>!f.def),dF=G.foes.filter(f=>f.def),awF=FF.filter(f=>!f.fromTent),awN=awF.length,kill=FF.filter(f=>!alive(f)).length,defN=dF.length,defK=dF.filter(f=>!alive(f)).length,kAw=awF.filter(f=>!alive(f)).length,emN=FF.length-awN,emK=kill-kAw,sN=G.foes.filter(f=>f.sentry).length,sK=G.foes.filter(f=>f.sentry&&!alive(f)).length;
   const tN=G.blds.filter(isTent).length,tB=G.blds.filter(b=>isTent(b)&&b.hp<=0).length,chiefDown=G.blds.some(b=>b.kind==='chief'&&b.hp<=0);
   const burned=G.blds.filter(b=>isTent(b)&&b.hp<=0).reduce((a,b)=>a+(b.kind==='chief'?2:1),0);
   const tentPct=burned/G.tentTotal,killPct=awN?kill/awN:0;const all=total(G.st),sleepKill=G.blds.reduce((a,b)=>a+(b.burnK||0),0),dmgN=kill+sleepKill;
-  return {kill,awN,sN,sK,tN,tB,chiefDown,sleepKill,kAw,emN,emK,huts:G.blds.filter(b=>b.kind==='hut'||b.kind==='nest').length,sleeping:G.sleeping,tentPct:Math.round(tentPct*100),killPct:Math.round(killPct*100),dmgN,all,dmgPct:Math.round(dmgN/Math.max(1,all)*100)};}
+  return {kill,awN,sN,sK,tN,tB,chiefDown,sleepKill,kAw,emN,emK,defN,defK,huts:G.blds.filter(b=>b.kind==='hut'||b.kind==='nest').length,sleeping:G.sleeping,tentPct:Math.round(tentPct*100),killPct:Math.round(killPct*100),dmgN,all,dmgPct:Math.round(dmgN/Math.max(1,all)*100)};}
 function endBattle(why){if(!G||G.phase==='end')return;G.phase='end';const r=result(),lostSq=G.units.filter(u=>!u.out&&(!alive(u)||G.retreat)).length,outSq=G.units.filter(u=>u.out).length;
   const men0=G.units.reduce((a,u)=>a+(SU[u.t].m>1?SU[u.t].m:0),0),men=G.units.filter(u=>u.out||(alive(u)&&!G.retreat)).reduce((a,u)=>a+(SU[u.t].m>1?mem(u.out?Object.assign({},u,{hp:u.keepHp}):u):0),0);
   sfx(r.dmgPct>=50?'clear':'turn');
@@ -446,10 +519,11 @@ function endBattle(why){if(!G||G.phase==='end')return;G.phase='end';const r=resu
     <div class="sgStack" title="倒した魔物＋焼いたテントで眠っていた魔物"><b style="width:${killW}%;background:#ff5a4e"></b><b style="width:${burnW}%;background:#ff9a2a"></b></div>
     <div class="sgLeg"><span><i style="background:#ff5a4e"></i>倒した ${r.kill}体</span><span><i style="background:#ff9a2a"></i>建物ごと焼いた ${r.sleepKill}体</span><span><i style="background:#2a1410"></i>残った ${r.all-r.dmgN}体</span></div>
     <div class="sgCards2">
-      <div class="sgCard"><h4>起きていた魔物（3割）</h4><div class="sgL"><span>見張り</span><b>${r.sK} / ${r.sN}</b>${bar(r.sK,r.sN,'#ff5a4e')}</div><div class="sgL"><span>陣の中</span><b>${r.kAw-r.sK} / ${r.awN-r.sN}</b>${bar(r.kAw-r.sK,r.awN-r.sN,'#ff5a4e')}</div><div class="sgL tot"><span>倒した</span><b>${r.kAw} / ${r.awN}</b></div></div>
+      <div class="sgCard"><h4>起きていた魔物（3割）</h4><div class="sgL"><span>見張り</span><b>${r.sK} / ${r.sN}</b>${bar(r.sK,r.sN,'#ff5a4e')}</div><div class="sgL"><span>陣の中</span><b>${r.kAw-r.sK} / ${r.awN-r.sN}</b>${bar(r.kAw-r.sK,r.awN-r.sN,'#ff5a4e')}</div><div class="sgL tot"><span>倒した</span><b>${r.kAw} / ${r.awN}</b></div>${r.defN?`<div class="sgL"><span>守りの魔物</span><b>${r.defK} / ${r.defN}</b><small>（数には入れない）</small></div>`:''}</div>
       <div class="sgCard"><h4>眠っていた魔物（7割・${r.sleeping}体）</h4><div class="sgL"><span>${r.huts?'テント・小屋・巣':'テント'}</span><b>${r.tB} / ${r.tN}</b>${bar(r.tB,r.tN,'#ff9a2a')}</div><div class="sgL"><span>飛び出してきて倒した</span><b>${r.emK} / ${r.emN}</b>${bar(r.emK,r.emN,'#ff5a4e')}</div><div class="sgL"><span>大将のテント</span><b>${r.chiefDown?'焼いた':'残った'}</b></div><div class="sgL tot"><span>焼け死んだ</span><b>${r.sleepKill}体</b></div></div>
       <div class="sgCard"><h4>こちらの被害</h4><div class="sgL"><span>生き残った兵</span><b>${men} / ${men0}</b>${bar(men,men0,'#6fe08a')}</div>${G.retreat?`<div class="sgL"><span>逃げ切った部隊</span><b>${outSq} / ${G.units.length}</b>${bar(outSq,G.units.length,'#62c6d9')}</div>`:''}<div class="sgL"><span>${G.retreat?'失った・取り残された部隊':'失った部隊'}</span><b>${lostSq} / ${G.units.length}</b></div><div class="sgL tot"><span>かかった時間</span><b>${Math.floor(G.t/60)}:${String(Math.round(G.t)%60).padStart(2,'0')}</b></div></div>
     </div>
+    ${G.units.some(u=>u.hero)?`<div class="sgHeroes">${G.units.filter(u=>u.hero).map(u=>`<span style="color:${hColor(u.hero)}">${u.hero.name}（${SU[u.t].n}）スキル「${u.sk?u.sk.name:'-'}」${u.skN||0}回${alive(u)||u.out?'':'・部隊は倒れた'}</span>`).join('')}</div>`:''}
     <div class="sgFoot"><button id="sgAgain">同じ編成でもう一度</button><button id="sgEdit">編成を変える</button><button id="sgClose">タイトルへ</button></div>`;
   $('siege').appendChild(box);
   const keep=G.start,raid=G.raid,lay=G.layout;
@@ -483,8 +557,9 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
     if(b.kind==='post'){g.fillStyle='#4a3018';g.fillRect(b.x-4,b.y-11,8,15);g.fillStyle='#7a5430';g.fillRect(b.x-3,b.y-11,3,14);g.fillStyle='#a07848';g.beginPath();g.moveTo(b.x-4,b.y-11);g.lineTo(b.x,b.y-16);g.lineTo(b.x+4,b.y-11);g.fill();}
     else if(b.kind==='gate'){const hz=Math.abs(b.nx)>0.7;g.fillStyle='#3a2410';if(hz)g.fillRect(b.x-6,b.y-18,12,32);else g.fillRect(b.x-18,b.y-12,36,18);g.fillStyle='#6a4422';if(hz)for(let i=-14;i<12;i+=6)g.fillRect(b.x-5,b.y+i,10,3);else for(let i=-16;i<16;i+=6)g.fillRect(b.x+i,b.y-11,3,16);
       g.fillStyle='#5a5a62';if(hz){g.fillRect(b.x-7,b.y-19,14,3);g.fillRect(b.x-7,b.y+12,14,3);}else{g.fillRect(b.x-19,b.y-13,3,20);g.fillRect(b.x+16,b.y-13,3,20);}}
-    else if(b.kind==='tower'){g.fillStyle='#3a2a1a';g.fillRect(b.x-12,b.y-22,24,30);g.fillStyle='#6a4a2a';g.fillRect(b.x-14,b.y-28,28,8);g.fillStyle='#8a2a20';g.beginPath();g.moveTo(b.x-15,b.y-28);g.lineTo(b.x,b.y-40);g.lineTo(b.x+15,b.y-28);g.fill();g.fillStyle='#1c1210';g.fillRect(b.x-4,b.y-4,8,12);
-      g.fillStyle='#ffb040';g.fillRect(b.x-2,b.y-34+Math.sin(tt*9+b.id)*1,3,4);}
+    else if(b.kind==='tower'){g.fillStyle='#3a2410';g.fillRect(b.x-11,b.y-22,3,30);g.fillRect(b.x+8,b.y-22,3,30);g.strokeStyle='#5a3a1c';g.lineWidth=2;g.beginPath();g.moveTo(b.x-9,b.y+4);g.lineTo(b.x+9,b.y-18);g.moveTo(b.x+9,b.y+4);g.lineTo(b.x-9,b.y-18);g.stroke();g.lineWidth=1;   // 物見櫓：丸太を組んだ台の上にゴブリンアーチャー
+      g.fillStyle='#6a4a2a';g.fillRect(b.x-15,b.y-26,30,6);g.fillStyle='#4a3018';for(let i=-14;i<=12;i+=5)g.fillRect(b.x+i,b.y-32,2,7);
+      {const im=sprFrame('enemies','e_gobarcher',tt*3+b.id,b.atkT!=null&&G.t-b.atkT<0.4?G.t-b.atkT:null);if(im){g.save();g.translate(b.x,b.y-25);if(b.face>0)g.scale(-1,1);g.drawImage(im,-10,-18,20,20);g.restore();}}}
     else if(b.kind==='bow'){g.fillStyle='#3a2a1a';g.fillRect(b.x-12,b.y-6,24,14);g.strokeStyle='#8a6a3a';g.lineWidth=3;g.beginPath();g.arc(b.x,b.y-4,13,Math.PI*1.15,Math.PI*1.85);g.stroke();g.strokeStyle='#c8c0a8';g.lineWidth=1;g.beginPath();g.moveTo(b.x-11,b.y-9);g.lineTo(b.x+11,b.y-9);g.stroke();g.fillStyle='#d0d0d0';g.fillRect(b.x-1,b.y-20,2,14);}
     else if(b.kind==='abatis'){g.strokeStyle='#6a4422';g.lineWidth=3;for(let i=-1;i<=1;i++){g.beginPath();g.moveTo(b.x-10,b.y+6+i*2);g.lineTo(b.x+10,b.y-8+i*2);g.stroke();g.beginPath();g.moveTo(b.x-10,b.y-8+i*2);g.lineTo(b.x+10,b.y+6+i*2);g.stroke();}g.lineWidth=1;}
     else if(b.kind==='nest'){g.fillStyle='#4a4038';g.beginPath();g.ellipse(b.x,b.y+4,22,9,0,0,7);g.fill();g.fillStyle='#5a4a3a';g.beginPath();g.ellipse(b.x,b.y-2,19,9,0,0,7);g.fill();   // 竜の巣：岩の上に枝を組んだ巣と卵
@@ -518,6 +593,10 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
     const r=u.hp/u.maxhp;g.fillStyle='#000';g.fillRect(u.x-12,u.y+(d.isBld?14:9),24,3);g.fillStyle=r<0.3?'#ff5a4e':r<0.6?'#f2b33d':'#6fe08a';g.fillRect(u.x-12,u.y+(d.isBld?14:9),24*r,3);
     if(u.guardT>0){u.guardT-=1/60;g.fillStyle='rgba(120,180,255,.9)';g.fillRect(u.x-2,u.y-24,4,5);}
     if(u.fixT>0){u.fixT-=1/60;g.fillStyle='#6fe08a';g.fillRect(u.x-1,u.y-26,2,6);g.fillRect(u.x-3,u.y-24,6,2);}
+    if(u.hero){const c=u.hero,col=hColor(c),sp=sprFrame('units',HSPR[c.spec],u.walk,u.atkT!=null&&G.t-u.atkT<0.4?G.t-u.atkT:null);const hy=u.y-(d.fly?14:0)-(d.isBld?10:0);   // 英雄：部隊の先頭に立ち、兵科の色の旗
+      if(sp){g.save();g.translate(u.x+u.face*10,hy+2);if(u.face<0)g.scale(-1,1);g.drawImage(sp,-12,-22,24,24);g.restore();}
+      g.fillStyle='#2a2018';g.fillRect(u.x-1,hy-34,2,16);g.fillStyle=col;g.fillRect(u.x+1,hy-34,9,6);
+      if(u.sk&&u.sk.cd){const r=1-Math.max(0,u.skT)/u.sk.cd;g.fillStyle='rgba(0,0,0,.6)';g.fillRect(u.x-12,u.y+(d.isBld?18:13),24,2);g.fillStyle=col;g.fillRect(u.x-12,u.y+(d.isBld?18:13),24*r,2);}}
     if(u.hold){g.fillStyle='#f2b33d';g.font='8px sans-serif';g.textAlign='center';g.fillText('固守',u.x,u.y-22);}}
   {const P=typeof SPR!=='undefined'&&SPR.projectiles;
    for(const s of G.shots){const k=Math.min(1,s.t/s.dur),x=s.x+(s.tx-s.x)*k,y=s.y+(s.ty-s.y)*k-Math.sin(k*Math.PI)*s.arc;const sp=P&&s.kind&&P[s.kind];
@@ -531,8 +610,11 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
   {const k=G.phase==='battle'||G.phase==='end'?Math.min(1,G.t/NIGHT_SEC):0,a=0.62-0.4*Math.max(0,k-0.75)/0.25;
     if(!G.dark){G.dark=document.createElement('canvas');G.dark.width=W;G.dark.height=H;}const q=G.dark.getContext('2d');q.globalCompositeOperation='source-over';q.clearRect(0,0,W,H);q.fillStyle=`rgba(6,10,26,${a})`;q.fillRect(0,0,W,H);q.globalCompositeOperation='destination-out';
     const light=(x,y,r)=>{const gr=q.createRadialGradient(x,y,2,x,y,r);gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(1,'rgba(0,0,0,0)');q.fillStyle=gr;q.beginPath();q.arc(x,y,r,0,7);q.fill();};
-    for(const b of G.blds)if(b.hp>0&&(b.kind==='tower'||b.kind==='gate'||b.kind==='bow'))light(b.x,b.y,70);for(const bm of (G.bombs||[]))light(bm.x,bm.y,40);for(const f of (G.fires||[]))light(f.x,f.y,90);for(const u of G.units)if(alive(u))light(u.x,u.y,55);for(const f of G.foes)if(alive(f)&&f.sentry)light(f.x,f.y,40);
+    for(const b of G.blds)if(b.hp>0&&(b.kind==='tower'||b.kind==='gate'||b.kind==='bow'))light(b.x,b.y,70);for(const bm of (G.bombs||[]))light(bm.x,bm.y,40);for(const f of (G.fires||[]))light(f.x,f.y,90);for(const f of (G.flares||[]))light(f.x,f.y,f.r);for(const u of G.units)if(alive(u))light(u.x,u.y,55);for(const f of G.foes)if(alive(f)&&f.sentry)light(f.x,f.y,40);
     g.drawImage(G.dark,0,0);}
+  // 雷・スキル名の大きな文字
+  for(const b of (G.bolts||[])){g.strokeStyle=`rgba(200,220,255,${Math.min(1,b.t*4)})`;g.lineWidth=2;g.beginPath();g.moveTo(b.a.x,b.a.y);const n=5;for(let i=1;i<n;i++){g.lineTo(b.a.x+(b.b.x-b.a.x)*i/n+(Math.random()-0.5)*10,b.a.y+(b.b.y-b.a.y)*i/n+(Math.random()-0.5)*10);}g.lineTo(b.b.x,b.b.y);g.stroke();g.lineWidth=1;}
+  for(const t of (G.ftx||[])){g.globalAlpha=Math.max(0,1-t.a/1.6);g.font=`bold ${t.big?16:11}px sans-serif`;g.textAlign='center';g.lineWidth=3;g.strokeStyle='rgba(0,0,0,.8)';g.strokeText(t.t,t.x,t.y-t.a*14);g.fillStyle=t.c||'#fff';g.fillText(t.t,t.x,t.y-t.a*14);g.globalAlpha=1;g.lineWidth=1;}
   // 撤退する所（戦場の端）。撤退中は赤く光る
   if(G.phase!=='deploy'){const on=G.retreat,a=on?0.3+0.1*Math.sin(tt*5):0.08;g.fillStyle=`rgba(220,40,40,${a})`;g.fillRect(0,0,W,EDGE);g.fillRect(0,H-EDGE,W,EDGE);g.fillRect(0,EDGE,EDGE,H-EDGE*2);g.fillRect(W-EDGE,EDGE,EDGE,H-EDGE*2);
     if(on){g.strokeStyle='rgba(255,90,78,.85)';g.setLineDash([6,4]);g.strokeRect(EDGE,EDGE,W-EDGE*2,H-EDGE*2);g.setLineDash([]);g.fillStyle='#ffd8d0';g.font='bold 13px sans-serif';g.textAlign='center';g.fillText('ここまで逃げれば撤退成功',W/2,22);g.fillText('ここまで逃げれば撤退成功',W/2,H-12);}}
@@ -545,6 +627,9 @@ let hudT=0;function hud(){const now=performance.now();if(now-hudT<200)return;hud
 
 // ---------- 見た目 ----------
 const css=document.createElement('style');css.textContent=`
+#siege .sgHero{display:flex;flex-direction:column;gap:4px;margin:6px 0;padding:6px 8px;background:rgba(255,255,255,.04);border:1px solid #2f3f33}
+#siege .sgHR{display:flex;align-items:center;gap:8px}#siege .sgHN{flex:1 1 auto;display:flex;flex-direction:column;min-width:0;width:auto}#siege .sgHN small{font-size:10px;color:#9ab0a0}#siege .sgHR select{width:auto!important;flex:0 0 auto;max-width:42%;background:#141a16;color:#e8e0c8;border:1px solid #3a4a3e;padding:3px}
+#siege .sgHeroes{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;margin:6px 0}
 #siege{position:fixed;inset:0;z-index:95;background:#0b0f0c;display:none;flex-direction:column;color:var(--text,#cfe3cf);font-size:13px}
 body.siegeOn #boot{display:none}
 #siege .sgSetup{margin:auto;width:min(780px,96vw);max-height:96vh;overflow:auto;background:var(--panel,#121a14);box-shadow:0 0 0 2px #f2b33d;padding:14px 18px}
