@@ -49,10 +49,12 @@ const total=o=>Object.values(o).reduce((s,v)=>s+v,0);
 function openSiege(){
   if(typeof S!=='undefined'&&S&&S.overlay&&typeof closeOverlay==='function')closeOverlay();
   G={phase:'setup',pool:{sword:4,shield:2,archer:3,cav:1,eng:1,ram:1,cat:1},raid:3,layout:'auto',speed:1,paused:false};
+  try{const v=JSON.parse(localStorage.getItem('nd_siege')||'null');if(v){if(v.pool)for(const k of ORDER)if(v.pool[k]!=null)G.pool[k]=v.pool[k];if(v.raid)G.raid=v.raid;if(v.layout)G.layout=v.layout;}}catch(e){}   // 前の編成を覚えておく
   let root=$('siege');if(!root){root=document.createElement('div');root.id='siege';document.body.appendChild(root);}
   root.style.display='flex';document.body.classList.add('siegeOn');renderSetup();
 }
-function renderSetup(){const root=$('siege');const st=stationed(G.raid),aw=awakeOf(st);G.st=st;G.aw=aw;
+function saveSetup(){try{localStorage.setItem('nd_siege',JSON.stringify({pool:G.start||G.pool,raid:G.raid,layout:G.layout}));}catch(e){}}
+function renderSetup(){const root=$('siege');saveSetup();const st=stationed(G.raid),aw=awakeOf(st);G.st=st;G.aw=aw;
   root.innerHTML=`<div class="sgSetup"><h2>攻城戦（試作）<small>駐留地への夜襲</small></h2>
     <div class="sgRow"><b>どの駐留地</b><span class="sgRaid"><button data-raid="-1">−</button><b>第${G.raid}襲撃</b><button data-raid="1">＋</button></span>
       <small class="muted">駐留している魔物 ${total(st)}体（${Object.entries(st).map(([k,v])=>ename(k)+v).join('・')}）<br>夜襲なので、起きて出てくるのは3割の <b style="color:#ff8a6a">${total(aw)}体</b>。残りはテントで眠っている</small></div>
@@ -86,11 +88,11 @@ function buildField(){
   // 柵と門
   L.b.forEach((bd0,li)=>{const bd=Object.assign({},bd0,{gateB:[]});G.bounds.push(bd);const php=li?220:170,ghp=li?900:700;
     if(bd.t==='circle'){const ga=bd.gates.map(a=>a*Math.PI/180);const N=Math.round(2*Math.PI*bd.r/14);
-      for(let i=0;i<N;i++){const a=i/N*Math.PI*2;if(ga.some(g=>Math.abs(((a-g+Math.PI*3)%(Math.PI*2))-Math.PI)<16/bd.r))continue;B('post',CX+Math.cos(a)*bd.r,CY+Math.sin(a)*bd.r,8,php);}
+      for(let i=0;i<N;i++){const a=i/N*Math.PI*2;if(ga.some(g=>Math.abs(((a-g+Math.PI*3)%(Math.PI*2))-Math.PI)<16/bd.r))continue;B('post',CX+Math.cos(a)*bd.r,CY+Math.sin(a)*bd.r,8,php,{layer:li});}
       for(const g of ga){const gb=B('gate',CX+Math.cos(g)*bd.r,CY+Math.sin(g)*bd.r,13,ghp,{nx:Math.cos(g),ny:Math.sin(g),layer:li});bd.gateB.push(gb);}}
     else{const sides=[['t',0,-1],['b',0,1],['l',-1,0],['r',1,0]];
       for(const [s,sx,sy] of sides){const len=sx?bd.b:bd.a,n=Math.round(len*2/14),hasG=bd.gates.includes(s);
-        for(let i=0;i<=n;i++){const tt=-len+i*(len*2/n),x=CX+(sx?sx*bd.a:tt),y=CY+(sy?sy*bd.b:tt);if(hasG&&Math.abs(tt)<16)continue;if(!sx&&(i===0||i===n))continue;B('post',x,y,8,php);}
+        for(let i=0;i<=n;i++){const tt=-len+i*(len*2/n),x=CX+(sx?sx*bd.a:tt),y=CY+(sy?sy*bd.b:tt);if(hasG&&Math.abs(tt)<16)continue;if(!sx&&(i===0||i===n))continue;B('post',x,y,8,php,{layer:li});}
         if(hasG){const gb=B('gate',CX+sx*bd.a,CY+sy*bd.b,13,ghp,{nx:sx,ny:sy,layer:li});bd.gateB.push(gb);}}}});
   // 見張り台
   const towers=[];if(L.towers==='corners'){const bd=G.bounds[0];for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]])towers.push([CX+sx*(bd.a-30),CY+sy*(bd.b-30),0]);}
@@ -123,7 +125,7 @@ function spawnSquad(k,x,y){const d=SU[k];const u={id:nid++,t:k,x,y,hp:d.hp*d.m,m
 
 // ---------- 戦場の画面 ----------
 function renderField(){const root=$('siege');
-  root.innerHTML=`<div class="sgTop"><b>夜襲（試作）</b><span id="sgStat"></span><span class="grow"></span>
+  root.innerHTML=`<div class="sgTop"><b>夜襲（試作）</b><span class="sgProg" title="敵へのダメージ（倒した魔物＋焼いたテント）"><small>敵へのダメージ</small><i><b id="sgPB"></b></i><em id="sgPT">0%</em></span><span id="sgStat"></span><span class="grow"></span>
       <button id="sgSpd">速度 ×${G.speed}</button><button id="sgPause">${G.paused?'再開':'一時停止'}</button><button id="sgQuit">撤退</button></div>
     <canvas id="sgCv"></canvas>
     <div class="sgMsg" id="sgMsg"></div>
@@ -184,6 +186,23 @@ function chief(){return G.blds.find(b=>b.kind==='chief');}
 function blocker(x,y,r){for(const b of G.blds)if((b.kind==='post'||b.kind==='gate')&&b.hp>0&&Math.hypot(b.x-x,b.y-y)<b.r+r)return b;return null;}
 function stepTo(u,tx,ty,spd,dt){const dx=tx-u.x,dy=ty-u.y,d=Math.hypot(dx,dy);if(d<2)return null;const s=Math.min(d,spd*dt),nx=u.x+dx/d*s,ny=u.y+dy/d*s;
   if(Math.abs(dx)>0.5)u.face=dx>0?1:-1;const b=blocker(nx,ny,u.t==='ram'?14:7);if(b)return b;u.x=Math.max(6,Math.min(W-6,nx));u.y=Math.max(6,Math.min(H-6,ny));u.walk+=dt*8;return null;}
+// こちらの部隊の歩き方：柵の内と外を行き来するときは、壊れた門・柵のすき間（なければ門）を通る。柵にぶつかったら回り込む
+function normalAt(bd,x,y){if(bd.t==='circle'){const dx=x-CX,dy=y-CY,l=Math.hypot(dx,dy)||1;return [dx/l,dy/l];}const dx=(x-CX)/bd.a,dy=(y-CY)/bd.b;return Math.abs(dx)>Math.abs(dy)?[Math.sign(dx),0]:[0,Math.sign(dy)];}
+function navPoint(u,tx,ty){const la=layerOf(u.x,u.y),lt=layerOf(tx,ty);if(la===lt){u.nav=null;return [tx,ty,null];}
+  const inward=la<lt,bi=inward?la:la-1,bd=G.bounds[bi];
+  const ops=G.blds.filter(b=>(b.kind==='gate'||b.kind==='post')&&b.layer===bi&&b.hp<=0);
+  const score=o=>dist(u,o)+Math.hypot(o.x-tx,o.y-ty);
+  let o=u.nav&&u.nav.bi===bi&&u.nav.inward===inward?u.nav.o:null;
+  if(!o||(o.hp>0&&ops.length)){o=ops.sort((a,b)=>score(a)-score(b))[0]||bd.gateB.slice().sort((a,b)=>score(a)-score(b))[0];u.nav={bi,inward,o,stage:0};}
+  const [nx,ny]=normalAt(bd,o.x,o.y),sg=inward?1:-1,p1=[o.x+nx*20*sg,o.y+ny*20*sg],p2=[o.x-nx*20*sg,o.y-ny*20*sg];
+  if(u.nav.stage===0&&Math.hypot(u.x-p1[0],u.y-p1[1])<12)u.nav.stage=1;
+  return u.nav.stage===0?[p1[0],p1[1],o]:[p2[0],p2[1],o];}
+function moveNav(u,tx,ty,spd,dt){const [gx,gy,op]=navPoint(u,tx,ty);const b=stepTo(u,gx,gy,spd,dt);if(!b)return null;
+  if(op&&b===op)return b;                              // 通り道の門がまだ立っている → 壊す
+  // 柵の杭にぶつかった → 杭に沿って回り込む（行き先に近づく向きへ）
+  const ax=u.x-b.x,ay=u.y-b.y,l=Math.hypot(ax,ay)||1,dx=gx-u.x,dy=gy-u.y;let tx1=-ay/l,ty1=ax/l;if(tx1*dx+ty1*dy<0){tx1=-tx1;ty1=-ty1;}
+  for(const k of [1,0.6]){const sx=u.x+(tx1*k+ax/l*(1-k))*spd*dt,sy=u.y+(ty1*k+ay/l*(1-k))*spd*dt;if(!blocker(sx,sy,7)){u.x=sx;u.y=sy;u.walk+=dt*8;if(Math.abs(tx1)>0.3)u.face=tx1>0?1:-1;return null;}}
+  return b;}
 // 魔物の歩き方：柵の内と外を行き来するときは、いちばん近い門を通る
 function foeStep(f,tx,ty,spd,dt){const la=layerOf(f.x,f.y),lt=layerOf(tx,ty);let gx=tx,gy=ty;
   if(la!==lt){const bi=la>lt?la-1:la,bd=G.bounds[bi];const g=bd.gateB.slice().sort((a,b)=>dist(a,f)-dist(b,f))[0];
@@ -208,8 +227,8 @@ function update(dt){G.t+=dt;
     if(d.role==='eng')for(const tr of G.traps)if(tr.hp>0&&Math.hypot(tr.x-u.x,tr.y-u.y)<40){tr.hp=0;G.fx.push({x:tr.x,y:tr.y,r:10,t:0,dur:0.4,c:'#6fe08a'});}
     if(!d.isBld)for(const tr of G.traps)if(tr.hp>0&&Math.hypot(tr.x-u.x,tr.y-u.y)<11)hitUnit(u,14*dt);
     let tg=u.tg&&alive(u.tg)?u.tg:null;if(!tg)u.focus=false;
-    if(u.tx!=null){const b=stepTo(u,u.tx,u.ty,d.spd,dt);
-      if(b){if(d.role==='ranged'||d.role==='cat'){u.tx=u.ty=null;}else if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}continue;}
+    if(u.tx!=null){const b=d.role==='ram'?stepTo(u,u.tx,u.ty,d.spd,dt):moveNav(u,u.tx,u.ty,d.spd,dt);
+      if(b){if(d.role==='ranged'||d.role==='cat'){/* 門が開くまで待つ */}else if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}continue;}
       if(Math.hypot(u.tx-u.x,u.ty-u.y)<4){u.tx=u.ty=null;}continue;}
     if(!tg||!u.focus){
       const bldT=b=>b.kind!=='post';   // 柵の杭そのものは狙わない（道をふさいだら叩く）
@@ -227,7 +246,7 @@ function update(dt){G.t+=dt;
     if(!tg)continue;
     const reach=d.rng+(tg.r||E[tg.k]&&E[tg.k].r||6)+2,dd=dist(u,tg);
     if(d.minR&&dd<d.minR){stepTo(u,u.x-(tg.x-u.x),u.y-(tg.y-u.y),d.spd,dt);continue;}
-    if(dd>reach){const b=stepTo(u,tg.x,tg.y,d.spd,dt);if(b&&d.role!=='ranged'&&d.role!=='cat'){if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}}continue;}
+    if(dd>reach){const b=d.role==='ram'?stepTo(u,tg.x,tg.y,d.spd,dt):moveNav(u,tg.x,tg.y,d.spd,dt);if(b&&d.role!=='ranged'&&d.role!=='cat'){if(u.cd<=0){u.cd=d.rate;attack(u,b,atk);}}continue;}
     if(d.role==='ram'&&!u.spawned&&tg===ch)releaseRam(u);
     if(u.cd<=0){u.cd=d.rate;attack(u,tg,atk);}
   }
@@ -338,7 +357,8 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
   if(G.box){const {a,b}=G.box;g.strokeStyle='#62c6d9';g.setLineDash([5,3]);g.fillStyle='rgba(98,198,217,.12)';g.fillRect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(a.x-b.x),Math.abs(a.y-b.y));g.strokeRect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(a.x-b.x),Math.abs(a.y-b.y));g.setLineDash([]);}
 }
 let hudT=0;function hud(){const now=performance.now();if(now-hudT<200)return;hudT=now;const el=$('sgStat');if(!el||!G||!G.blds)return;const r=result(),left=Math.max(0,Math.ceil(NIGHT_SEC-G.t));
-  el.innerHTML=`第${G.raid}襲撃の駐留地（${LAYOUTS[G.lay].n}）　夜明けまで <b>${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}</b>　敵へのダメージ <b style="color:#ff8a6a">${r.dmgPct}%</b>　テント ${r.tentPct}%　魔物 ${G.foes.filter(alive).length}/${G.foes.length}　味方 ${G.units.filter(alive).length}部隊　${G.phase==='deploy'?'<b style="color:#62c6d9">配置中</b>':G.alarm?'<b style="color:#ff5a4e">見つかった！</b>':G.phase==='battle'?'<b style="color:#9ab0ff">寝静まっている</b>':''}`;
+  {const pb=$('sgPB');if(pb)pb.style.width=r.dmgPct+'%';const pt=$('sgPT');if(pt)pt.textContent=r.dmgPct+'%';}
+  el.innerHTML=`第${G.raid}襲撃の駐留地（${LAYOUTS[G.lay].n}）　夜明けまで <b>${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}</b>　テント ${r.tentPct}%　魔物 ${G.foes.filter(alive).length}/${G.foes.length}　味方 ${G.units.filter(alive).length}部隊　${G.phase==='deploy'?'<b style="color:#62c6d9">配置中</b>':G.alarm?'<b style="color:#ff5a4e">見つかった！</b>':G.phase==='battle'?'<b style="color:#9ab0ff">寝静まっている</b>':''}`;
   if(G.phase==='battle'&&G.units.some(u=>!alive(u)&&G.sel.has(u.id)))renderCmd();}
 
 // ---------- 見た目 ----------
@@ -358,7 +378,8 @@ body.siegeOn #boot{display:none}
 #siege .sgC{display:flex;align-items:center;gap:6px}#siege .sgC b{min-width:24px;text-align:center;font-size:16px}#siege .sgC button{width:30px;padding:2px 0}
 #siege .sgFoot{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;flex-wrap:wrap}
 #siege .sgTop{display:flex;align-items:center;gap:10px;padding:4px 10px;background:var(--panel,#121a14);box-shadow:0 1px 0 var(--line,#2a3a2d);flex-shrink:0;flex-wrap:wrap}
-#siege .sgTop .grow{flex:1}#siege .sgTop #sgStat{font-size:12px}
+#siege .sgTop .grow{flex:1}
+#siege .sgProg{display:inline-flex;align-items:center;gap:6px}#siege .sgProg small{font-size:11px;color:var(--dim,#7f9a82)}#siege .sgProg i{display:block;width:180px;height:10px;background:#2a1410;box-shadow:inset 0 0 0 1px #5a2a20}#siege .sgProg i b{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff5a1e,#ffb040);transition:width .3s}#siege .sgProg em{font-style:normal;font-family:var(--px-font,inherit);color:#ffb040;min-width:40px}#siege .sgTop #sgStat{font-size:12px}
 #siege canvas{flex:1;min-height:0;width:100%;display:block;touch-action:none}
 #siege .sgBot{display:flex;gap:10px;align-items:center;padding:4px 8px;background:var(--panel,#121a14);flex-shrink:0;flex-wrap:wrap}
 #siege .sgCards{display:flex;gap:4px;flex-wrap:wrap;flex:1}#siege .sgCards button{display:inline-flex;align-items:center;gap:4px;padding:3px 8px}#siege .sgCards button b{color:#f2b33d}
@@ -370,7 +391,7 @@ body.siegeOn #boot{display:none}
 #siege .sgEG{display:grid;grid-template-columns:auto auto;gap:4px 18px}#siege .sgEG b{text-align:right;font-family:var(--px-font,inherit);font-weight:400;font-size:15px}
 @media (max-width:900px){
   #siege .sgTop{flex-wrap:nowrap;gap:6px;padding:2px 6px;font-size:11px}#siege .sgTop>b{display:none}#siege .sgTop #sgStat{font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
-  #siege .sgTop .grow{display:none}#siege .sgTop button{padding:2px 8px;font-size:11px;flex-shrink:0}
+  #siege .sgTop .grow{display:none}#siege .sgProg small{display:none}#siege .sgProg i{width:80px}#siege .sgTop button{padding:2px 8px;font-size:11px;flex-shrink:0}
   #siege .sgBot{flex-wrap:nowrap;gap:4px;padding:2px 4px;overflow-x:auto}#siege .sgCards{flex-wrap:nowrap}#siege .sgCards button span{display:none}#siege .sgCards button{padding:2px 6px;flex-shrink:0}
   #siege .sgCmd .muted{display:none}#siege .sgCmd{flex-wrap:nowrap}#siege .sgCmd button{padding:2px 6px;font-size:11px;flex-shrink:0}#siege .sgCmd>span{font-size:10.5px;white-space:nowrap}
   #siege .sgSetup{padding:8px 10px}#siege .sgU{padding:2px 6px}#siege .sgN small:first-of-type{display:none}
