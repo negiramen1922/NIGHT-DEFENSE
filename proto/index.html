@@ -1888,7 +1888,7 @@ function ready(b){return !(b.bt>0);}
 
 // ===== 経済バランス（3段階案） =====
 (function(){const C={barracks:{steel:40},quarry:{steel:40},ironmine:{steel:50,stone:20},market:{steel:60,stone:30},tavern:{steel:50,stone:20,gold:30},well:{steel:60,stone:40},ammo:{steel:60,stone:20},
- brazier:{steel:15},mg:{steel:60,iron:10,gold:20},tower:{steel:60,stone:40,gold:10},how:{steel:80,stone:40,gold:40},wall:{stone:60,iron:10,gold:20},cannon:{steel:80,iron:60,gold:80}};
+ brazier:{steel:15},mg:{steel:60,stone:20,iron:10,gold:20},tower:{steel:60,stone:40,gold:10},how:{steel:80,stone:40,gold:40},wall:{stone:60,iron:10,gold:20},cannon:{steel:80,iron:60,gold:80}};
  for(const k in C)B[k].cost=C[k];B.ammo.pop=3;
  const TIER={farm:1,fishery:1,miner:1,quarry:1,barracks:1,ammo:1,lab:1,fence:1,brazier:1,spike:1,pit:1,mg:1,tower:1,train:1,outpost:1,ironmine:2,market:2,tavern:2,well:2,swall:2,how:2,stable:2,magic:4,wall:2,cannon:3,aerie:4};
  for(const k in TIER)if(B[k])B[k].tier=TIER[k];
