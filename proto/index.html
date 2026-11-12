@@ -2060,6 +2060,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
  set('steelarmor',{cat:'部隊',tier:2,name:'鋼の鎧',cost:{iron:45,steel:30},t:2,pre:['ironarmor'],icon:'heavy',eff:'鎧が「鋼の鎧」になる：体力 +20%（補給で鎧と鉄を使う）'});
  set('alloyarmor',{cat:'部隊',tier:3,name:'合金の鎧',cost:{iron:80,gold:50},t:3,pre:['steelarmor'],icon:'heavy',eff:'鎧が「合金の鎧」になる：体力 +30%。補給で「合金」を使う'});
+ set('chainmail',{cat:'部隊',tier:2,name:'鎖帷子',cost:{iron:30,steel:20},t:2,pre:[],icon:'archer',eff:'弓兵・砲兵・魔術師のローブが「皮のローブ」から「鎖帷子」になる：体力 +15%（補給で鎧を使う）'});
  set('alloyarms',{cat:'部隊',tier:3,name:'合金の武具',cost:{iron:70,gold:50},t:3,pre:['heavyarms'],icon:'heavy',eff:'全部隊の武器が「合金」になる（鋼の剣→合金の剣など）：攻撃 190%（鉄の武器を100%として）。補給で「合金」（金と鉄から作る素材。精錬所はこれから）を使う'});
  set('battalion',{cat:'部隊',tier:3,name:'大隊',cost:{gold:80,fuel:60,sword:20},t:3,pre:['formation'],icon:'heavy',eff:'中隊3つまでを「大隊」にまとめられる。ほかの中隊が8マス以内にいると火力+10%・耐久+5%（中隊の効果と重なる）'});
  set('division',{cat:'部隊',tier:3,name:'師団',cost:{gold:160,fuel:120,iron:60},t:4,pre:['battalion'],icon:'heavy',eff:'大隊3つまでを「師団」にまとめられる。ほかの大隊が12マス以内にいると火力+10%・耐久+5%（今はランクⅢ。ランクを伸ばしたらⅥのつもり）'});
@@ -3102,7 +3103,7 @@ function gunOf(b){if(b.bt>0)return null;if(B[b.type].garrison&&!garOf(b))return 
 function rangeOf(b){return rangeOf0(b);}
 function rangeOf0(b){const g=gunOf(b)||B[b.type];let r=(g.range||0)+wallRange(b)+elevRange(b);if(b.type==='field'&&b.shell==='can')r=r*0.65;if(has('fcs')){if(b.type==='mg'||b.type==='tower'||b.type==='field')r+=1;if(b.type==='tower'&&has('tower'))r+=1;if(HOW_FAM.includes(b.type)||b.type==='mlrs')r+=2;}if(HOW_FAM.includes(b.type)&&has('longhow'))r+=3;if(b.type==='mg'&&has('heavymg'))r+=0.5;if(B[b.type].grp==='def')r+=UP.range[(b.lv||1)-1];return r;}
 // 1機（1両）あたりの耐久
-function memberHp(u){const t=MT(u);return Math.round(t.hpEach*(100+(typeof aTier==='function'?A_PCT[aTier(u)]:0))/100);}   // 鎧の段で1人あたりの体力が増える（骨鎧はやめた）   // 鎧の段で1人あたりの体力が増える
+function memberHp(u){const t=MT(u);const k=u&&typeof u==='object'&&typeof armK==='function'?armK(u.ut):null;return Math.round(t.hpEach*(100+(k?AR[k].pct[aTier(u)]:0))/100);}   // 防具の段で「元の体力」が変わる（整数）   // 鎧の段で1人あたりの体力が増える（骨鎧はやめた）   // 鎧の段で1人あたりの体力が増える
 function unitMaxHp(u){const t=MT(u);return memberHp(u)*UT[u.ut].members*(1+(bonus(u).hp-1)+(u.kind==='s'&&vetLv(u)>=2?0.1:0));}
 function unitTime(m,b){const t=MT(m);return t.time*(has('assembly')?0.6:1)*(t.ut==='mech'&&has('mobile')?0.8:1)/UP.prod[(b?b.lv:1)-1];}
 function squadTime(b){return unitTime((b.qm&&b.qm[0])||defModel(UNIT_HOME[b.type])||'mech',b);}
@@ -4638,7 +4639,7 @@ const SUP={
 // 冒険者も補給が必要：剣士→武具、狩人→矢筒、魔導士→魔力（エーテル）
 const ADV_SUP={advSword:'inf',advBow:'arch',advMage:'mage'};
 function supT(s){const b=s.ut==='adv'?SUP[ADV_SUP[s.model]]:SUP[s.ut];if(!b||s.ut==='adv')return b;const wt=wTier(s),at=aTier(s);if(!wt&&!at)return b;
-  const c=Object.assign({},b.costs||{[b.key]:b.per});for(const x of [W_SUP[wt]||{},A_SUP[at]||{}])for(const k in x)c[k]=(c[k]||0)+x[k]*(b.per||1);return Object.create(b,{costs:{value:c}});}   // 武器・鎧の段が上なほど補給で使う資材が増える
+  const c=Object.assign({},b.costs||{[b.key]:b.per});for(const x of [W_SUP[wt]||{},(armK(s.ut)&&AR[armK(s.ut)].sup[at])||{}])for(const k in x)c[k]=(c[k]||0)+x[k]*(b.per||1);return Object.create(b,{costs:{value:c}});}   // 武器・鎧の段が上なほど補給で使う資材が増える
 function supOf(s){const sp=supT(s);if(!sp)return null;if(s.sup==null)s.sup=sp.max;return sp;}
 function supNeed(s){const sp=supOf(s);return sp?Math.max(0,sp.max-s.sup):0;}
 function needsSupply(s){return supNeed(s)>0.01||refillNeed(s)>0||healNeed(s)>=1;}
@@ -4675,7 +4676,7 @@ function squadResBonus(s){let r=(has('analysis')?0.1:0)+vetDmg(s);
   return r;}
 function dmgPctS(s){const L=[];const add=(n,v)=>{if(v)L.push([n,v]);};const v=vetDmg(s);add('英雄',bonus0(s).dmg-1);add('研究',squadResBonus(s)-v);add('熟練度',v);
   if(coBonus(s))add('中隊',0.15);if(bnBonus(s))add('大隊',0.1);if(dvBonus(s))add('師団',0.1);if(s.buffT>0)add('鼓舞',0.3);if(s.ut==='guard'&&nearCastle(s))add('城のそば',1.0);return L;}
-function dmgBaseS(s){const t=MT(s);return t.dmg*eqP(s,'dmg')*W_DMG[wTier(s)];}   // 武器の段で攻撃が上がる
+function dmgBaseS(s){const t=MT(s);return Math.max(1,Math.round(t.dmg*W_PCT[wTier(s)]/100))*eqP(s,'dmg');}   // 武器の段で「元の攻撃」が変わる（整数）。研究・英雄などの%はこのあと足し算で   // 武器の段で攻撃が上がる
 function unitDmg(s){
   const t=MT(s);return dmgBaseS(s)*(1+pctSum(dmgPctS(s)))*Math.max(0,s.members)/t.members;
 }
@@ -4746,24 +4747,30 @@ const W_NAME={inf:'剣',mil:'剣',guard:'剣',arch:'矢じり',cav:'騎槍',mage
 const A_MAT=['革','鉄','鋼','合金','魔金属','聖銀','竜晶'],A_REQ=[null,'ironarmor','steelarmor','alloyarmor'],A_RANK=['Ⅰ','Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ','Ⅶ'];   // 鎧：革→鉄→鋼→合金→魔金属→聖銀→竜晶（2026-11-12）
 const A_PCT=[0,10,20,30,45,60,80];   // 鎧の段ごとに、1人あたりの体力が元の何%増えるか（決まった数を足すと体力の少ない兵科ほど伸びすぎるので割合に）                            // 鎧の段ごとに、1人あたり増える体力
 const A_SUP=[{},{armor:0.5},{armor:0.7,iron:0.2},{armor:0.9,alloy:0.4}];   // 鎧の段ごとの補給の資材
-const ARMORED=['inf','cav','guard','mil'];                   // 鎧を着る兵科：兵士・重装歩兵・騎兵（騎士）・近衛
+const ARMORED=['inf','cav','guard','mil'];
+// 防具は2系統：鎧（兵士・重装歩兵・騎兵・近衛）とローブ（弓兵・砲兵・魔術師）
+const AR={a:{n:['革の鎧','鉄の鎧','鋼の鎧','合金の鎧','魔金属の鎧','聖銀の鎧','竜晶の鎧'],get req(){return A_REQ;},get rank(){return A_RANK;},get pct(){return A_PCT;},get sup(){return A_SUP;},ut:ARMORED},
+  r:{n:['皮のローブ','鎖帷子','エーテルローブ','銀のローブ','竜のローブ'],req:[null,'chainmail'],rank:['Ⅰ','Ⅱ','Ⅳ','Ⅵ','Ⅶ'],pct:[0,15,30,50,75],sup:[{},{armor:0.4}],ut:['arch','art','mage']}};
+const R_COL=['#9a6a3a','#9aa0a6','#62c6d9','#f6faff','#e05a4e'];
+function armK(ut){return ARMORED.includes(ut)?'a':AR.r.ut.includes(ut)?'r':null;}                   // 鎧を着る兵科：兵士・重装歩兵・騎兵（騎士）・近衛
 function wMat(s){let m=0;for(let i=1;i<W_REQ.length;i++)if(W_REQ[i]&&has(W_REQ[i]))m=i;return m;}   // 研究した武器の段
-function aMat(){let m=0;for(let i=1;i<A_REQ.length;i++)if(A_REQ[i]&&has(A_REQ[i]))m=i;return m;}
+function aMat(k){const L=AR[k||'a'].req;let m=0;for(let i=1;i<L.length;i++)if(L[i]&&has(L[i]))m=i;return m;}
 function wTier(s){const a=wMat(s);return s&&s.wT!=null?Math.min(s.wT,a):a;}
-function aTier(s){if(!s||typeof s!=='object'||!ARMORED.includes(s.ut))return 0;const a=aMat();return s.aT!=null?Math.min(s.aT,a):a;}
+function aTier(s){if(!s||typeof s!=='object')return 0;const k=armK(s.ut);if(!k)return 0;const a=aMat(k);return s.aT!=null?Math.min(s.aT,a):a;}
 const W_COL=['#9aa0a6','#b9d3ec','#e2c779','#a774ec','#f6faff','#e05a4e'],A_COL=['#9a6a3a','#9aa0a6','#b9d3ec','#e2c779','#a774ec','#f6faff','#e05a4e'];
 // 装備の段のアイコン（色で材料が分かる）：武器＝剣の形、鎧＝胴の形
-function eqIcon(kind,m,sz){sz=sz||16;const c=(kind==='w'?W_COL:A_COL)[m]||'#999',d='#1c1824',gl=(kind==='w'?m===4:m===5)?`<rect x="0" y="0" width="16" height="16" fill="${c}" opacity=".18"/>`:'';
+function eqIcon(kind,m,sz){sz=sz||16;const c=(kind==='w'?W_COL:kind==='r'?R_COL:A_COL)[m]||'#999',d='#1c1824',gl=(kind==='w'?m===4:m===5)?`<rect x="0" y="0" width="16" height="16" fill="${c}" opacity=".18"/>`:'';
   const body=kind==='w'?`<path d="M12 1h3v3l-8 8-2-2z" fill="${c}" stroke="${d}" stroke-width="1"/><path d="M3 9l4 4-1 1-1-1-2 2-2-2 2-2-1-1z" fill="#6a4a2a" stroke="${d}" stroke-width="1"/>`
+    :kind==='r'?`<path d="M5 2h6l2 3-1 9H4L3 5z" fill="${c}" stroke="${d}" stroke-width="1"/><path d="M7 2h2v12H7z" fill="${d}" opacity=".25"/>`
     :`<path d="M4 2h8l3 3-2 2v7H3V7L1 5z" fill="${c}" stroke="${d}" stroke-width="1"/><path d="M6 2h4v3H6z" fill="${d}" opacity=".35"/>`;
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" style="vertical-align:-3px;image-rendering:pixelated" shape-rendering="crispEdges">${gl}${body}</svg>`;}
-function eqOpts(o,kind){const t=MT(o),av=kind==='w'?wMat(o):aMat(),cur=kind==='w'?o.wT:o.aT;const nm=i=>kind==='w'?wName(o,i):aName(i),val=i=>kind==='w'?`攻撃${Math.round(t.dmg*W_DMG[i])}`:`体力${Math.round(t.hpEach*(100+A_PCT[i])/100)}`;
+function eqOpts(o,kind){const t=MT(o),k=armK(o.ut)||'a',av=kind==='w'?wMat(o):aMat(k),cur=kind==='w'?o.wT:o.aT;const nm=i=>kind==='w'?wName(o,i):aName(i,k),val=i=>kind==='w'?`攻撃${Math.max(1,Math.round(t.dmg*W_PCT[i]/100))}`:`体力${Math.round(t.hpEach*(100+AR[k].pct[i])/100)}`;
   let h=`<option value="auto" ${cur==null?'selected':''}>最新（自動）：${nm(av)} ${val(av)}</option>`;for(let i=0;i<=av;i++)h+=`<option value="${i}" ${cur===i?'selected':''}>${nm(i)} ${val(i)}</option>`;return h;}
-function eqSel(o,kind){return `${eqIcon(kind,kind==='w'?wTier(o):aTier(o),16)}<select data-eqs="${kind}:${o.id}" style="width:auto;max-width:150px;font-size:11px;padding:1px">${eqOpts(o,kind)}</select>`;}
-function eqSet(list,kind,v){for(const x of list){if(kind==='w')x.wT=v==='auto'?null:+v;else if(ARMORED.includes(x.ut))x.aT=v==='auto'?null:+v;}}
+function eqSel(o,kind){return `${eqIcon(kind==='w'?'w':armK(o.ut),kind==='w'?wTier(o):aTier(o),16)}<select data-eqs="${kind}:${o.id}" style="width:auto;max-width:150px;font-size:11px;padding:1px">${eqOpts(o,kind)}</select>`;}
+function eqSet(list,kind,v){for(const x of list){if(kind==='w')x.wT=v==='auto'?null:+v;else if(armK(x.ut))x.aT=v==='auto'?null:+v;}}
 function supCostTxt(c){return Object.entries(c).map(([k,v])=>`${RES_NAME[k]||k}${Math.max(1,Math.round(v*60))}`).join('・');}   // 補給をいっぱいにするのに使う量（だいたい）
 function wName(s,m){return W_MAT[m]+'の'+(W_NAME[s.ut]||'武器');}
-function aName(m){return A_MAT[m]+'の鎧';}
+function aName(m,k){return AR[k||'a'].n[m]||'';}
 function eqKey(s,slot){return (EQ_DEF[s.ut]||{})[slot];}
 function eqList(s){return (EQ_SLOTS[s.ut]||[]).map(sl=>EQ[eqKey(s,sl)]).filter(Boolean);}
 function eqP(s,k){let v=1;for(const e of eqList(s))if(e[k]!=null)v*=e[k];return v;}
@@ -4797,9 +4804,14 @@ function vetIc(s,sz){const l=vetLv(s);return `<span class="vetic" title="熟練�
 function vetBar(s){const v=Math.floor(s.vet||0),l=vetLv(s),cap=has('elite')?2:1,nx=VET[l+1];
   if(l>=cap||!nx)return {txt:l>=2?`${v}（最大）`:`${v}（上限：研究「精鋭」で解放）`,pct:100};
   const a=VET[l].xp;return {txt:`${v} / ${nx.xp}`,pct:Math.max(0,Math.min(100,Math.round((v-a)/(nx.xp-a)*100)))};}
-function damageSquad(s,dmg){if(s.invT>0)return;if(s.shieldT>0)dmg*=0.5;if(s.yugT>0)dmg*=0.7;
+// 試作（2026-11-12）：受ける被害を減らす効果は、全部「耐久」として**足し算**し、最後に (1＋合計) で割る。
+// 前は「被害−35%×被害−25%×…」と掛け合わせていて、重ねるほど極端になった（100%で無敵になる形を避ける）。ひとつだけのときの効き目は前と同じになるように換算（被害−r → 耐久 r÷(1−r)）
+const durOf=r=>r>0?r/(1-r):0;
+function squadDur(s){const t=MT(s);return durOf(bonus(s).red)+durOf(t.armor||0)+durOf(t.red||0)+(has('shieldwall')&&s.model==='heavy'?durOf(0.25):0)+(s.ut==='guard'&&nearCastle(s)?durOf(0.5):0)+durOf(eqS(s,'red'))+(has('dragonscale')&&s.ut==='drake'?durOf(0.3):0)
+  +(coBonus(s)?0.1:0)+(bnBonus(s)?0.05:0)+(dvBonus(s)?0.05:0)+(s.ut==='mech'&&has('blade')?durOf(0.15):0)+(s.shieldT>0?durOf(0.5):0)+(s.yugT>0?durOf(0.3):0);}
+function damageSquad(s,dmg){if(s.invT>0)return;
   const t=MT(s);
-  dmg*=(t.frail||1)*(1-bonus(s).red)*(1-(t.armor||0))*(1-(t.red||0))*(has('shieldwall')&&s.model==='heavy'?0.75:1)*(s.ut==='guard'&&nearCastle(s)?0.5:1)*(1-eqS(s,'red'))*(has('dragonscale')&&s.ut==='drake'?0.7:1)*(1/(1+(coBonus(s)?0.1:0)+(bnBonus(s)?0.05:0)+(dvBonus(s)?0.05:0)))*coverAt(s.x,s.y)*(s.ut==='mech'&&has('blade')?0.85:1);
+  dmg*=(t.frail||1)*coverAt(s.x,s.y)/(1+squadDur(s));
   s.hp-=dmg;
   // 1機ぶんの耐久を割り込むごとに兵（と衛士）を失う
   const m=Math.max(0,Math.ceil(s.hp/(memberHp(s)*bonus(s).hp)-1e-6));
@@ -6335,7 +6347,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
       }
     }
     if(W_NAME[o.ut]&&o.ut!=='adv'){const sp=supT(o);
-      h+=`<div class="upg"><b>装備</b><div style="display:flex;flex-direction:column;gap:3px;margin-top:4px;font-size:11px"><span>武器 ${eqSel(o,'w')}</span>${ARMORED.includes(o.ut)?`<span>鎧　 ${eqSel(o,'a')}</span>`:''}</div>
+      h+=`<div class="upg"><b>装備</b><div style="display:flex;flex-direction:column;gap:3px;margin-top:4px;font-size:11px"><span>武器 ${eqSel(o,'w')}</span>${armK(o.ut)?`<span>${armK(o.ut)==='r'?'ローブ':'鎧'}　 ${eqSel(o,'a')}</span>`:''}</div>
         <div class="muted" style="font-size:10.5px;margin-top:3px">補給をいっぱいにする資材：${sp?supCostTxt(supCosts(sp)):'—'}。古い段にすると資材を節約できる。軍事の部隊リストでまとめて変えられる</div>
         <button id="eqAllSame" style="font-size:11px;margin-top:3px">同じ兵科の全部隊をこの装備に</button></div>`;}
     if(o.ut==='adv')h+=`<div class="upg"><b>冒険者との契約</b><div class="muted" style="font-size:11px">毎ターン給金 ${MT(o).wage}。契約を終えると帰っていき、給金もかからなくなる（返金なし）</div><button id="advBye" style="margin-top:4px" ${S.waveActive?'disabled':''}>契約を終えて帰ってもらう${S.waveActive?'（戦闘中は不可）':''}</button></div>`;
@@ -6790,9 +6802,9 @@ function showArmy(target){
   h+=qs.length?qs.map((q,j)=>`<div class="row" style="align-items:center"><span>${j===0?'<b style="color:var(--green)">次 </b>':''}${icSvg(q.mk,18)} ${MTC[q.mk].name}　<span class="muted" style="font-size:11px">${B[q.b.type].name}${q.i===0?`・${Math.round(q.p*100)}%`:'・待機中'}</span></span><button data-cancel="${q.b.id}:${q.i}" style="padding:2px 8px">取り消す</button></div>`).join(''):'<div class="muted">なし</div>';
   if(!target&&S.squads.length){const uts=[...new Set(S.squads.filter(u=>W_NAME[u.ut]&&u.ut!=='adv').map(u=>u.ut))];   // 装備をまとめて変える（兵科ごと）
     if(uts.length){h+=`<h3 style="margin:10px 0 4px">装備をまとめて変える</h3><div class="help" style="margin-bottom:4px">兵科ごとに、全部隊の武器・鎧の段を変えます。「最新（自動）」なら研究するたびに上がる。古い段にすると補給の資材を節約できる</div>`;
-      for(const ut of uts){const r=S.squads.find(u=>u.ut===ut);h+=`<div class="row" style="align-items:center"><span>${icSvg(r.model||defModel(ut),18)} <b>${UT[ut].name}</b> <span class="muted" style="font-size:11px">${S.squads.filter(u=>u.ut===ut).length}部隊</span></span><span style="font-size:11px;display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">${eqIcon('w',wMat(r),14)}<select data-eqall="w:${ut}" style="font-size:11px;width:auto;max-width:170px">${eqOpts(Object.assign({},r,{wT:undefined}),'w').replace(/ selected/g,'').replace('<option value="auto"','<option value="" selected>まとめて変える…</option><option value="auto"')}</select>${ARMORED.includes(ut)?`${eqIcon('a',aMat(),14)}<select data-eqall="a:${ut}" style="font-size:11px;width:auto;max-width:170px">${eqOpts(Object.assign({},r,{aT:undefined}),'a').replace(/ selected/g,'').replace('<option value="auto"','<option value="" selected>まとめて変える…</option><option value="auto"')}</select>`:''}</span></div>`;}}}
+      for(const ut of uts){const r=S.squads.find(u=>u.ut===ut);h+=`<div class="row" style="align-items:center"><span>${icSvg(r.model||defModel(ut),18)} <b>${UT[ut].name}</b> <span class="muted" style="font-size:11px">${S.squads.filter(u=>u.ut===ut).length}部隊</span></span><span style="font-size:11px;display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">${eqIcon('w',wMat(r),14)}<select data-eqall="w:${ut}" style="font-size:11px;width:auto;max-width:170px">${eqOpts(Object.assign({},r,{wT:undefined}),'w').replace(/ selected/g,'').replace('<option value="auto"','<option value="" selected>まとめて変える…</option><option value="auto"')}</select>${armK(ut)?`${eqIcon(armK(ut),aMat(armK(ut)),14)}<select data-eqall="a:${ut}" style="font-size:11px;width:auto;max-width:170px">${eqOpts(Object.assign({},r,{aT:undefined}),'a').replace(/ selected/g,'').replace('<option value="auto"','<option value="" selected>まとめて変える…</option><option value="auto"')}</select>`:''}</span></div>`;}}}
   if(!target){  h+=`<h3 style="margin:10px 0 4px">全部隊（${S.squads.length}）</h3><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px"><button data-all="sel">全部隊を選択</button><button data-all="sup">一括補給（${supCostText(supCost(S.squads))}）</button>${['guard','hold','return'].map(m=>`<button data-all="${m}">全部隊：${MODE_NAME[m]}</button>`).join('')}</div>`;
-  h+=S.squads.length?S.squads.map(u=>`<div class="row" style="align-items:center"><span>${icSvg(u.model||defModel(u.ut),18)} <b>${unitLabel(u)}</b> <span class="muted" style="font-size:11px">${u.members}/${UT[u.ut].members}${UT[u.ut].unit}・体力${Math.round(u.hp/u.maxhp*100)}%${supT(u)?`・<span style="color:${u.sup/supT(u).max<0.25?'var(--red)':'inherit'}">${supT(u).name}${Math.round(supOf(u)&&u.sup/supT(u).max*100)}%</span>`:''}・${u.gar?'物見櫓':MODE_NAME[u.mode]}</span></span><span>${W_NAME[u.ut]&&u.ut!=='adv'?`<span style="margin-right:6px;font-size:11px">${eqSel(u,'w')}${ARMORED.includes(u.ut)?' '+eqSel(u,'a'):''}</span>`:''}<button data-pick="${u.id}" style="padding:2px 8px">選ぶ</button></span></div>`).join(''):'<div class="muted">部隊がいません</div>';
+  h+=S.squads.length?S.squads.map(u=>`<div class="row" style="align-items:center"><span>${icSvg(u.model||defModel(u.ut),18)} <b>${unitLabel(u)}</b> <span class="muted" style="font-size:11px">${u.members}/${UT[u.ut].members}${UT[u.ut].unit}・体力${Math.round(u.hp/u.maxhp*100)}%${supT(u)?`・<span style="color:${u.sup/supT(u).max<0.25?'var(--red)':'inherit'}">${supT(u).name}${Math.round(supOf(u)&&u.sup/supT(u).max*100)}%</span>`:''}・${u.gar?'物見櫓':MODE_NAME[u.mode]}</span></span><span>${W_NAME[u.ut]&&u.ut!=='adv'?`<span style="margin-right:6px;font-size:11px">${eqSel(u,'w')}${armK(u.ut)?' '+eqSel(u,'a'):''}</span>`:''}<button data-pick="${u.id}" style="padding:2px 8px">選ぶ</button></span></div>`).join(''):'<div class="muted">部隊がいません</div>';
   }
   let card;if(target){target.innerHTML=h;card=target;}else{card=openOverlay('army',h,true);document.getElementById('ovClose').onclick=closeOverlay;}
   card.querySelectorAll('[data-train]').forEach(b=>b.onclick=()=>{if(trainModel(b.dataset.train))se('click');showArmy(target);});
