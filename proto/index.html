@@ -2057,8 +2057,9 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('highmagic',{cat:'部隊',tier:2,name:'高等魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard',eff:'魔術師の魔法の範囲 +30%、魔力の消費 −30%'});
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館か所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
- set('ironarmor',{cat:'部隊',tier:2,name:'鉄の鎧',cost:{iron:30,steel:20},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +25／人（補給で鎧を使う）'});
- set('alloyarmor',{cat:'部隊',tier:3,name:'合金の鎧',cost:{iron:80,gold:50},t:3,pre:['ironarmor'],icon:'heavy',eff:'鎧が「合金の鎧」になる：体力 +55／人。補給で「合金」を使う'});
+ set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
+ set('steelarmor',{cat:'部隊',tier:2,name:'鋼の鎧',cost:{iron:45,steel:30},t:2,pre:['ironarmor'],icon:'heavy',eff:'鎧が「鋼の鎧」になる：体力 +20%（補給で鎧と鉄を使う）'});
+ set('alloyarmor',{cat:'部隊',tier:3,name:'合金の鎧',cost:{iron:80,gold:50},t:3,pre:['steelarmor'],icon:'heavy',eff:'鎧が「合金の鎧」になる：体力 +30%。補給で「合金」を使う'});
  set('alloyarms',{cat:'部隊',tier:3,name:'合金の武具',cost:{iron:70,gold:50},t:3,pre:['heavyarms'],icon:'heavy',eff:'全部隊の武器が「合金」になる（鋼の剣→合金の剣など）：攻撃 190%（鉄の武器を100%として）。補給で「合金」（金と鉄から作る素材。精錬所はこれから）を使う'});
  set('battalion',{cat:'部隊',tier:3,name:'大隊',cost:{gold:80,fuel:60,sword:20},t:3,pre:['formation'],icon:'heavy',eff:'中隊3つまでを「大隊」にまとめられる。ほかの中隊が8マス以内にいると火力+10%・耐久+5%（中隊の効果と重なる）'});
  set('division',{cat:'部隊',tier:3,name:'師団',cost:{gold:160,fuel:120,iron:60},t:4,pre:['battalion'],icon:'heavy',eff:'大隊3つまでを「師団」にまとめられる。ほかの大隊が12マス以内にいると火力+10%・耐久+5%（今はランクⅢ。ランクを伸ばしたらⅥのつもり）'});
@@ -3101,7 +3102,7 @@ function gunOf(b){if(b.bt>0)return null;if(B[b.type].garrison&&!garOf(b))return 
 function rangeOf(b){return rangeOf0(b);}
 function rangeOf0(b){const g=gunOf(b)||B[b.type];let r=(g.range||0)+wallRange(b)+elevRange(b);if(b.type==='field'&&b.shell==='can')r=r*0.65;if(has('fcs')){if(b.type==='mg'||b.type==='tower'||b.type==='field')r+=1;if(b.type==='tower'&&has('tower'))r+=1;if(HOW_FAM.includes(b.type)||b.type==='mlrs')r+=2;}if(HOW_FAM.includes(b.type)&&has('longhow'))r+=3;if(b.type==='mg'&&has('heavymg'))r+=0.5;if(B[b.type].grp==='def')r+=UP.range[(b.lv||1)-1];return r;}
 // 1機（1両）あたりの耐久
-function memberHp(u){const t=MT(u);return t.hpEach+(typeof aTier==='function'?A_HP[aTier(u)]:0);}   // 鎧の段で1人あたりの体力が増える（骨鎧はやめた）   // 鎧の段で1人あたりの体力が増える
+function memberHp(u){const t=MT(u);return Math.round(t.hpEach*(100+(typeof aTier==='function'?A_PCT[aTier(u)]:0))/100);}   // 鎧の段で1人あたりの体力が増える（骨鎧はやめた）   // 鎧の段で1人あたりの体力が増える
 function unitMaxHp(u){const t=MT(u);return memberHp(u)*UT[u.ut].members*(1+(bonus(u).hp-1)+(u.kind==='s'&&vetLv(u)>=2?0.1:0));}
 function unitTime(m,b){const t=MT(m);return t.time*(has('assembly')?0.6:1)*(t.ut==='mech'&&has('mobile')?0.8:1)/UP.prod[(b?b.lv:1)-1];}
 function squadTime(b){return unitTime((b.qm&&b.qm[0])||defModel(UNIT_HOME[b.type])||'mech',b);}
@@ -4742,21 +4743,21 @@ const W_MAT=['鉄','鋼','合金','魔金属','聖銀','竜晶'],W_REQ=[null,'he
 const W_PCT=[100,140,190,260,350,460];const W_DMG=W_PCT.map(v=>v/100);                       // 武器の段ごとの攻撃（鉄を1として）。部隊の数・防衛施設も増えるので、伸びは控えめ（2026-11-12）
 const W_SUP=[{},{iron:0.3},{alloy:0.4}];   // 鋼の武器は鉄、合金の武器は合金（金＋鉄の素材）で補給            // 武器の段ごとに、補給1あたり余分に使う資材
 const W_NAME={inf:'剣',mil:'剣',guard:'剣',arch:'矢じり',cav:'騎槍',mage:'杖',art:'砲弾',drake:'竜具',adv:'武器'};
-const A_MAT=['革','鉄','合金','魔金属','聖銀','竜晶'],A_REQ=[null,'ironarmor','alloyarmor'],A_RANK=['Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ','Ⅶ'];   // 鎧：革→鉄→合金→魔金属→聖銀→竜晶（2026-11-12）
-const A_HP=[0,25,55,90,130,180];                            // 鎧の段ごとに、1人あたり増える体力
-const A_SUP=[{},{armor:0.5},{armor:0.8,alloy:0.4}];   // 鎧の段ごとの補給の資材
+const A_MAT=['革','鉄','鋼','合金','魔金属','聖銀','竜晶'],A_REQ=[null,'ironarmor','steelarmor','alloyarmor'],A_RANK=['Ⅰ','Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ','Ⅶ'];   // 鎧：革→鉄→鋼→合金→魔金属→聖銀→竜晶（2026-11-12）
+const A_PCT=[0,10,20,30,45,60,80];   // 鎧の段ごとに、1人あたりの体力が元の何%増えるか（決まった数を足すと体力の少ない兵科ほど伸びすぎるので割合に）                            // 鎧の段ごとに、1人あたり増える体力
+const A_SUP=[{},{armor:0.5},{armor:0.7,iron:0.2},{armor:0.9,alloy:0.4}];   // 鎧の段ごとの補給の資材
 const ARMORED=['inf','cav','guard','mil'];                   // 鎧を着る兵科：兵士・重装歩兵・騎兵（騎士）・近衛
 function wMat(s){let m=0;for(let i=1;i<W_REQ.length;i++)if(W_REQ[i]&&has(W_REQ[i]))m=i;return m;}   // 研究した武器の段
 function aMat(){let m=0;for(let i=1;i<A_REQ.length;i++)if(A_REQ[i]&&has(A_REQ[i]))m=i;return m;}
 function wTier(s){const a=wMat(s);return s&&s.wT!=null?Math.min(s.wT,a):a;}
 function aTier(s){if(!s||typeof s!=='object'||!ARMORED.includes(s.ut))return 0;const a=aMat();return s.aT!=null?Math.min(s.aT,a):a;}
-const W_COL=['#9aa0a6','#b9d3ec','#e2c779','#a774ec','#f6faff','#e05a4e'],A_COL=['#9a6a3a','#9aa0a6','#e2c779','#a774ec','#f6faff','#e05a4e'];
+const W_COL=['#9aa0a6','#b9d3ec','#e2c779','#a774ec','#f6faff','#e05a4e'],A_COL=['#9a6a3a','#9aa0a6','#b9d3ec','#e2c779','#a774ec','#f6faff','#e05a4e'];
 // 装備の段のアイコン（色で材料が分かる）：武器＝剣の形、鎧＝胴の形
-function eqIcon(kind,m,sz){sz=sz||16;const c=(kind==='w'?W_COL:A_COL)[m]||'#999',d='#1c1824',gl=m===4?`<rect x="0" y="0" width="16" height="16" fill="${c}" opacity=".18"/>`:'';
+function eqIcon(kind,m,sz){sz=sz||16;const c=(kind==='w'?W_COL:A_COL)[m]||'#999',d='#1c1824',gl=(kind==='w'?m===4:m===5)?`<rect x="0" y="0" width="16" height="16" fill="${c}" opacity=".18"/>`:'';
   const body=kind==='w'?`<path d="M12 1h3v3l-8 8-2-2z" fill="${c}" stroke="${d}" stroke-width="1"/><path d="M3 9l4 4-1 1-1-1-2 2-2-2 2-2-1-1z" fill="#6a4a2a" stroke="${d}" stroke-width="1"/>`
     :`<path d="M4 2h8l3 3-2 2v7H3V7L1 5z" fill="${c}" stroke="${d}" stroke-width="1"/><path d="M6 2h4v3H6z" fill="${d}" opacity=".35"/>`;
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" style="vertical-align:-3px;image-rendering:pixelated" shape-rendering="crispEdges">${gl}${body}</svg>`;}
-function eqOpts(o,kind){const t=MT(o),av=kind==='w'?wMat(o):aMat(),cur=kind==='w'?o.wT:o.aT;const nm=i=>kind==='w'?wName(o,i):aName(i),val=i=>kind==='w'?`攻撃${Math.round(t.dmg*W_DMG[i])}`:`体力${Math.round(t.hpEach+A_HP[i])}`;
+function eqOpts(o,kind){const t=MT(o),av=kind==='w'?wMat(o):aMat(),cur=kind==='w'?o.wT:o.aT;const nm=i=>kind==='w'?wName(o,i):aName(i),val=i=>kind==='w'?`攻撃${Math.round(t.dmg*W_DMG[i])}`:`体力${Math.round(t.hpEach*(100+A_PCT[i])/100)}`;
   let h=`<option value="auto" ${cur==null?'selected':''}>最新（自動）：${nm(av)} ${val(av)}</option>`;for(let i=0;i<=av;i++)h+=`<option value="${i}" ${cur===i?'selected':''}>${nm(i)} ${val(i)}</option>`;return h;}
 function eqSel(o,kind){return `${eqIcon(kind,kind==='w'?wTier(o):aTier(o),16)}<select data-eqs="${kind}:${o.id}" style="width:auto;max-width:150px;font-size:11px;padding:1px">${eqOpts(o,kind)}</select>`;}
 function eqSet(list,kind,v){for(const x of list){if(kind==='w')x.wT=v==='auto'?null:+v;else if(ARMORED.includes(x.ut))x.aT=v==='auto'?null:+v;}}
