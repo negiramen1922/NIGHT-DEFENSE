@@ -3039,8 +3039,8 @@ function tintPal(pal,chars,col){if(!col)return pal;const rgb=h=>[1,3,5].map(i=>p
 function sprTinted(cat,key,wt,at,ut){const base=SPR[cat]&&SPR[cat][key];const mk=Object.keys(TINT).find(k=>key===k||key.startsWith(k+'_'));if(!base||!mk)return base;
   const T=TINT[mk],wc=ut==='mage'?M_TINT[wt]:W_TINT[wt],ac=T.r?R_TINT[at]:A_TINT[at];if(!wc&&!ac)return base;
   const id=cat+'/'+key+'|'+wt+'|'+at;if(SPR_T[id])return SPR_T[id];const sp=NDSPR[cat][key];let pal=tintPal(sp.pal,T.w,wc);pal=tintPal(pal,T.a||T.r||'',ac);
-  if(at===3&&T.g)pal=tintPal(pal,T.g,'#f0c850');/* 合金：黒い鋼に金の縁（兜の縁・えり。羽根飾りは赤のまま） */
-  const o={size:sp.size,pal,img:{}};for(const a in sp.anims)o.img[a]=sp.anims[a].map(rows=>{const c=document.createElement('canvas');c.width=rows[0].length;c.height=rows.length;const g=c.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=pal[r[x]];if(!col)continue;g.fillStyle=col;g.fillRect(x,y,1,1);}});return c;});
+  const gp=at===3&&T.g?tintPal(pal,T.g,'#f0c850'):null;/* 合金：黒い鋼に金の帯。T.g の色のうち、横に2つ以上並んだところだけ金（えり・兜の額の帯）。点々は金にしない */
+  const o={size:sp.size,pal,img:{}};for(const a in sp.anims)o.img[a]=sp.anims[a].map(rows=>{const c=document.createElement('canvas');c.width=rows[0].length;c.height=rows.length;const g=c.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const ch=r[x];let col=pal[ch];if(!col)continue;if(gp&&T.g.includes(ch)&&(r[x-1]===ch||r[x+1]===ch))col=gp[ch];g.fillStyle=col;g.fillRect(x,y,1,1);}});return c;});
   return SPR_T[id]=o;}
 (function(){for(const cat in NDSPR){if(cat[0]==='_')continue;SPR[cat]={};for(const k in NDSPR[cat]){const sp=NDSPR[cat][k];const o={size:sp.size,pal:sp.pal,img:{}};
   for(const a in sp.anims)o.img[a]=sp.anims[a].map(rows=>{const c=document.createElement('canvas');c.width=rows[0].length;c.height=rows.length;const g=c.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=sp.pal[r[x]];if(!col)continue;g.fillStyle=col;g.fillRect(x,y,1,1);}});return c;});
