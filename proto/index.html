@@ -2043,8 +2043,8 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('upg_def2',{gate:3,tier:3,pre:[],eff:'防衛タブのランクⅢの研究を解放。防衛施設をLv3まで改築できる'});
  set('thorn',{cat:'防衛',tier:2,pre:['masonry'],icon:'swall',eff:'石の壁・城壁を攻撃した魔物に、受けた被害の40%を返す'});
  // 部隊
- set('swordplay',{tier:1,max:3,pre:[],cost:{sword:10,fuel:30},icon:'pawn',eff:'近接部隊（農兵・兵士・重装歩兵・騎兵）の火力 +30%（Lvごと・最大3）'});
- set('archery',{tier:1,max:3,pre:[],cost:{steel:30,ammo:30},icon:'archer',eff:'弓兵隊（物見櫓に配置した弓兵も）の火力 +30%（Lvごと・最大3）'});
+ set('swordplay',{tier:1,max:3,pre:[],cost:{sword:10,fuel:30},icon:'pawn',eff:'近接部隊（農兵・兵士・重装歩兵・騎兵）の火力 +15%（Lvごと・最大3）'});
+ set('archery',{tier:1,max:3,pre:[],cost:{steel:30,ammo:30},icon:'archer',eff:'弓兵隊（物見櫓に配置した弓兵も）の火力 +15%（Lvごと・最大3）'});
  set('formation',{tier:1,pre:[],cost:{fuel:40,sword:10},icon:'heavy',eff:'小隊（部隊）3つまでを「中隊」にまとめられる。一緒に動き、近くにいる間は火力 +15%・耐久 +10%'});
  set('armcare',{cat:'部隊',tier:1,name:'武具の手入れ',cost:{steel:30,iron:15},t:1,pre:[],icon:'pawn',eff:'近接部隊・竜騎兵の武具の傷み −40%'});
  set('bigquiver',{cat:'部隊',tier:1,name:'大矢筒',cost:{steel:30,ammo:30},t:1,pre:[],icon:'archer',eff:'弓兵隊の矢筒 60本→100本'});
@@ -2057,9 +2057,8 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('highmagic',{cat:'部隊',tier:2,name:'高等魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard',eff:'魔術師の魔法の範囲 +30%、魔力の消費 −30%'});
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館か所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
- set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「鉄の鎧」になる：体力 +20／人（補給で鎧を使う）'});
- set('steelarmor',{cat:'部隊',tier:2,name:'鋼の鎧',cost:{iron:45,steel:30},t:2,pre:['ironarmor'],icon:'heavy',eff:'鎧が「鋼の鎧」になる：体力 +45／人'});
- set('alloyarmor',{cat:'部隊',tier:3,name:'合金の鎧',cost:{iron:80,gold:50},t:3,pre:['steelarmor'],icon:'heavy',eff:'鎧が「合金の鎧」になる：体力 +75／人。補給で「合金」を使う'});
+ set('ironarmor',{cat:'部隊',tier:2,name:'鉄の鎧',cost:{iron:30,steel:20},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +25／人（補給で鎧を使う）'});
+ set('alloyarmor',{cat:'部隊',tier:3,name:'合金の鎧',cost:{iron:80,gold:50},t:3,pre:['ironarmor'],icon:'heavy',eff:'鎧が「合金の鎧」になる：体力 +55／人。補給で「合金」を使う'});
  set('alloyarms',{cat:'部隊',tier:3,name:'合金の武具',cost:{iron:70,gold:50},t:3,pre:['heavyarms'],icon:'heavy',eff:'全部隊の武器が「合金」になる（鋼の剣→合金の剣など）：攻撃 190%（鉄の武器を100%として）。補給で「合金」（金と鉄から作る素材。精錬所はこれから）を使う'});
  set('battalion',{cat:'部隊',tier:3,name:'大隊',cost:{gold:80,fuel:60,sword:20},t:3,pre:['formation'],icon:'heavy',eff:'中隊3つまでを「大隊」にまとめられる。ほかの中隊が8マス以内にいると火力+10%・耐久+5%（中隊の効果と重なる）'});
  set('division',{cat:'部隊',tier:3,name:'師団',cost:{gold:160,fuel:120,iron:60},t:4,pre:['battalion'],icon:'heavy',eff:'大隊3つまでを「師団」にまとめられる。ほかの大隊が12マス以内にいると火力+10%・耐久+5%（今はランクⅢ。ランクを伸ばしたらⅥのつもり）'});
@@ -2776,7 +2775,7 @@ function nearestOre(cx,cy){let best=null,bd=1e9;for(let y=0;y<ROWS;y++)for(let x
 function lvl(id){return S.tech[id]||0;}
 function has(id){return lvl(id)>0;}
 const MERGED={mine2:'mine',quarry2:'quarrying',farm2:'farming',fish2:'fishing',autoammo2:'autoammo'};   // 試作：「Ⅱ」の研究は元の研究のⅡ段目にまとめた（効果の計算は元から両方を足しているのでそのまま）
-const HIDDEN_T=new Set(['polearm','firecraft','horsearch','elemental','shells','dragongear',...Object.keys(MERGED)]);   // 装備の種類の研究は武器の材料の段にまとめた
+const HIDDEN_T=new Set(['bonearmor','polearm','firecraft','horsearch','elemental','shells','dragongear',...Object.keys(MERGED)]);   // 装備の種類の研究は武器の材料の段にまとめた
 for(const t of TECH)if(t&&HIDDEN_T.has(t.id)){t.cat0=t.cat;t.cat='（まとめた）';}
 for(const t of TECH){if(t&&t.max>1&&/Lvごと|／Lv/.test(t.eff||'')){t.lvRank=true;t.eff=t.eff.replace(/[・、]?最大\d+/,'・最大は城のランクまで');}}   // 試作：重ねる研究は城のランクまで
 function techOf(id){return TECH.find(x=>x.id===id);}
@@ -2833,7 +2832,7 @@ function hpOf(type,lv,mat){
   return Math.round(h);
 }
 // 研究による防衛施設ごとの補正
-function defTechMul(b){let r=1+(has('analysis')?0.1:0);if(b.type==='mg')r+=0.2*lvl('kougen');if(b.type==='tower'){r+=0.2*lvl('goukyu');const gs=b.gar&&S.squads.find(x=>x.id===b.gar);if(gs&&gs.ut==='arch')r+=0.3*lvl('archery')+vetDmg(gs);}if(b.type==='cannon'&&has('tetsudan'))r+=0.3;return r;}
+function defTechMul(b){let r=1+(has('analysis')?0.1:0);if(b.type==='mg')r+=0.2*lvl('kougen');if(b.type==='tower'){r+=0.2*lvl('goukyu');const gs=b.gar&&S.squads.find(x=>x.id===b.gar);if(gs&&gs.ut==='arch')r+=0.15*lvl('archery')+vetDmg(gs);}if(b.type==='cannon'&&has('tetsudan'))r+=0.3;return r;}
 // 防衛施設の火力：基礎値（種類＋施設Lvの固定値）と、上乗せ％の一覧
 const LV_DMG_ADD=[0,0.42,0.92];
 function dmgBaseB(b){const g=gunOf(b)||B[b.type];const d=B[b.type];return (g.dmg||0)*(1+(d.grp==='def'?LV_DMG_ADD[(b.lv||1)-1]:0));}
@@ -3102,8 +3101,8 @@ function gunOf(b){if(b.bt>0)return null;if(B[b.type].garrison&&!garOf(b))return 
 function rangeOf(b){return rangeOf0(b);}
 function rangeOf0(b){const g=gunOf(b)||B[b.type];let r=(g.range||0)+wallRange(b)+elevRange(b);if(b.type==='field'&&b.shell==='can')r=r*0.65;if(has('fcs')){if(b.type==='mg'||b.type==='tower'||b.type==='field')r+=1;if(b.type==='tower'&&has('tower'))r+=1;if(HOW_FAM.includes(b.type)||b.type==='mlrs')r+=2;}if(HOW_FAM.includes(b.type)&&has('longhow'))r+=3;if(b.type==='mg'&&has('heavymg'))r+=0.5;if(B[b.type].grp==='def')r+=UP.range[(b.lv||1)-1];return r;}
 // 1機（1両）あたりの耐久
-function memberHp(u){const t=MT(u);return (t.hpEach+(typeof aTier==='function'?A_HP[aTier(u)]:0))*(has('bonearmor')&&['inf','cav','mil','guard'].includes(t.ut)?1.25:1);}   // 鎧の段で1人あたりの体力が増える
-function unitMaxHp(u){const t=MT(u);return t.hpEach*UT[u.ut].members*(1+(bonus(u).hp-1)+(has('bonearmor')&&['inf','cav','mil','guard'].includes(t.ut)?0.25:0)+(u.kind==='s'&&vetLv(u)>=2?0.1:0));}
+function memberHp(u){const t=MT(u);return t.hpEach+(typeof aTier==='function'?A_HP[aTier(u)]:0);}   // 鎧の段で1人あたりの体力が増える（骨鎧はやめた）   // 鎧の段で1人あたりの体力が増える
+function unitMaxHp(u){const t=MT(u);return memberHp(u)*UT[u.ut].members*(1+(bonus(u).hp-1)+(u.kind==='s'&&vetLv(u)>=2?0.1:0));}
 function unitTime(m,b){const t=MT(m);return t.time*(has('assembly')?0.6:1)*(t.ut==='mech'&&has('mobile')?0.8:1)/UP.prod[(b?b.lv:1)-1];}
 function squadTime(b){return unitTime((b.qm&&b.qm[0])||defModel(UNIT_HOME[b.type])||'mech',b);}
 function unitRange(u){return unitRange0(u)+(u.ut==='art'&&has('gunnery')?1.5:0)+(u.kind==='s'?eqS(u,'range'):0);}
@@ -4669,9 +4668,9 @@ function supCostHTML(list){const c=supCost(list),pop=Math.ceil(c.pop||0);delete 
 function supCostText(c){return Object.keys(c).map(k=>`${k==='pop'?'人員':RES_NAME[k]}${Math.round(c[k]*10)/10}`).join('・')||'なし';}
 // 火力の重なり方：研究どうしは足し算 → 研究・英雄・その場の効果はそれぞれ掛け算
 function squadResBonus(s){let r=(has('analysis')?0.1:0)+vetDmg(s);
-  if(s.ut==='arch')r+=0.3*lvl('archery');
+  if(s.ut==='arch')r+=0.15*lvl('archery');
   if(s.ut==='art')r+=has('gunnery')?0.3:0;
-  if(s.ut==='inf'||s.ut==='cav'||s.ut==='mil'||s.ut==='guard')r+=0.3*lvl('swordplay');
+  if(s.ut==='inf'||s.ut==='cav'||s.ut==='mil'||s.ut==='guard')r+=0.15*lvl('swordplay');
   return r;}
 function dmgPctS(s){const L=[];const add=(n,v)=>{if(v)L.push([n,v]);};const v=vetDmg(s);add('英雄',bonus0(s).dmg-1);add('研究',squadResBonus(s)-v);add('熟練度',v);
   if(coBonus(s))add('中隊',0.15);if(bnBonus(s))add('大隊',0.1);if(dvBonus(s))add('師団',0.1);if(s.buffT>0)add('鼓舞',0.3);if(s.ut==='guard'&&nearCastle(s))add('城のそば',1.0);return L;}
@@ -4743,17 +4742,17 @@ const W_MAT=['鉄','鋼','合金','魔金属','聖銀','竜晶'],W_REQ=[null,'he
 const W_PCT=[100,140,190,260,350,460];const W_DMG=W_PCT.map(v=>v/100);                       // 武器の段ごとの攻撃（鉄を1として）。部隊の数・防衛施設も増えるので、伸びは控えめ（2026-11-12）
 const W_SUP=[{},{iron:0.3},{alloy:0.4}];   // 鋼の武器は鉄、合金の武器は合金（金＋鉄の素材）で補給            // 武器の段ごとに、補給1あたり余分に使う資材
 const W_NAME={inf:'剣',mil:'剣',guard:'剣',arch:'矢じり',cav:'騎槍',mage:'杖',art:'砲弾',drake:'竜具',adv:'武器'};
-const A_MAT=['革','鉄','鋼','合金','魔金属','聖銀'],A_REQ=[null,'ironarmor','steelarmor','alloyarmor'],A_RANK=['Ⅰ','Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ'];
-const A_HP=[0,20,45,75,110,160];                            // 鎧の段ごとに、1人あたり増える体力
-const A_SUP=[{},{armor:0.5},{armor:0.8,iron:0.3},{armor:1.2,alloy:0.4}];   // 鎧の段ごとの補給の資材
+const A_MAT=['革','鉄','合金','魔金属','聖銀','竜晶'],A_REQ=[null,'ironarmor','alloyarmor'],A_RANK=['Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ','Ⅶ'];   // 鎧：革→鉄→合金→魔金属→聖銀→竜晶（2026-11-12）
+const A_HP=[0,25,55,90,130,180];                            // 鎧の段ごとに、1人あたり増える体力
+const A_SUP=[{},{armor:0.5},{armor:0.8,alloy:0.4}];   // 鎧の段ごとの補給の資材
 const ARMORED=['inf','cav','guard','mil'];                   // 鎧を着る兵科：兵士・重装歩兵・騎兵（騎士）・近衛
 function wMat(s){let m=0;for(let i=1;i<W_REQ.length;i++)if(W_REQ[i]&&has(W_REQ[i]))m=i;return m;}   // 研究した武器の段
 function aMat(){let m=0;for(let i=1;i<A_REQ.length;i++)if(A_REQ[i]&&has(A_REQ[i]))m=i;return m;}
 function wTier(s){const a=wMat(s);return s&&s.wT!=null?Math.min(s.wT,a):a;}
 function aTier(s){if(!s||typeof s!=='object'||!ARMORED.includes(s.ut))return 0;const a=aMat();return s.aT!=null?Math.min(s.aT,a):a;}
-const W_COL=['#9aa0a6','#b9d3ec','#e2c779','#a774ec','#f6faff','#e05a4e'],A_COL=['#9a6a3a','#9aa0a6','#b9d3ec','#e2c779','#a774ec','#f6faff'];
+const W_COL=['#9aa0a6','#b9d3ec','#e2c779','#a774ec','#f6faff','#e05a4e'],A_COL=['#9a6a3a','#9aa0a6','#e2c779','#a774ec','#f6faff','#e05a4e'];
 // 装備の段のアイコン（色で材料が分かる）：武器＝剣の形、鎧＝胴の形
-function eqIcon(kind,m,sz){sz=sz||16;const c=(kind==='w'?W_COL:A_COL)[m]||'#999',d='#1c1824',gl=m===4&&kind==='w'||m===5&&kind==='a'?`<rect x="0" y="0" width="16" height="16" fill="${c}" opacity=".18"/>`:'';
+function eqIcon(kind,m,sz){sz=sz||16;const c=(kind==='w'?W_COL:A_COL)[m]||'#999',d='#1c1824',gl=m===4?`<rect x="0" y="0" width="16" height="16" fill="${c}" opacity=".18"/>`:'';
   const body=kind==='w'?`<path d="M12 1h3v3l-8 8-2-2z" fill="${c}" stroke="${d}" stroke-width="1"/><path d="M3 9l4 4-1 1-1-1-2 2-2-2 2-2-1-1z" fill="#6a4a2a" stroke="${d}" stroke-width="1"/>`
     :`<path d="M4 2h8l3 3-2 2v7H3V7L1 5z" fill="${c}" stroke="${d}" stroke-width="1"/><path d="M6 2h4v3H6z" fill="${d}" opacity=".35"/>`;
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" style="vertical-align:-3px;image-rendering:pixelated" shape-rendering="crispEdges">${gl}${body}</svg>`;}
