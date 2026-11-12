@@ -3031,7 +3031,7 @@ const SPR={};
 // 試作（2026-11-12）：兵士たちの見た目を装備の段で変える。絵の中の「武器の色」と「鎧（ローブ）の色」だけを、段の色に塗り替える（明るさの差は残す）。描き直しまでの仮
 const TINT={pawn:{w:'h',a:'ef'},heavy:{w:'d',a:'bcfgiklmqr'},rider:{w:'c',a:'efh'},archer:{w:'c',r:'bdenpqrsuv'},guard:{w:'j',a:'efgkl'},wizard:{w:'degh',r:'bcfiko'}};
 const W_TINT=[null,'#a8c4e0','#e8c860','#a774ec','#ffffff','#ff6a5a'],M_TINT=[null,'#62c6d9','#a774ec','#ffffff','#ff5a4e'];
-const A_TINT=['#a0703c',null,'#a8c4e0','#e8c860','#a774ec','#ffffff','#ff6a5a'],R_TINT=[null,'#9aa0a6','#62c6d9','#f0f4ff','#d0504a'];
+const A_TINT=['#a0703c',null,'#a8c4e0','#e8c860','#8c86a6','#ffffff','#ff6a5a'],R_TINT=[null,'#9aa0a6','#62c6d9','#f0f4ff','#d0504a'];
 const SPR_T={};
 function tintPal(pal,chars,col){if(!col)return pal;const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),lum=c=>0.3*c[0]+0.59*c[1]+0.11*c[2];const cs=[...chars].filter(c=>pal[c]);if(!cs.length)return pal;
   const ref=Math.max(...cs.map(c=>lum(rgb(pal[c]))))||1,t=rgb(col),o=Object.assign({},pal);
