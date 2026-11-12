@@ -1771,7 +1771,7 @@ Object.assign(B,{
 B.lab.pop=0;B.lab.desc='研究員の詰め所。1つにつき研究員の上限 +3人（Lv2で+5人・Lv3で+8人）。研究員は待機中の住民から研究のたびに就く';
 B.gate={name:'門',glyph:'門',hp:140,heat:0,cost:{steel:40,stone:20},pop:0,power:0,spec:'工兵',grp:'def',desc:'味方だけが通れる出入り口。壁は敵も味方も通れないので、部隊は門から出入りする。敵には壁と同じで、壊されるまで通れない。柵や壁の列の上に建てると置き換わる'};
 B.hisou={name:'風船爆弾',glyph:'風',hp:300,heat:1,cost:{steel:80,stone:30,iron:30,gold:40},pop:3,power:0,spec:'守備',grp:'def',desc:'風船をつけた爆弾を打ち上げる。爆弾はふわふわと魔物を追いかけ、近づくと爆発して周りを吹き飛ばす。空の敵にも地上の敵にも効く。壁や建物は越えて飛ぶ（山は越えられない）。1発ごとに火薬1',req:'hisousha',range:8,dmg:130,rate:3,splash:1.2,balloon:true,antiAir:true,ammoKey:'powder',ammoUse:1};
-B.magetower={name:'魔術師の塔',glyph:'魔',hp:500,heat:1,cost:{steel:60,stone:60,elec:20},pop:3,power:0,spec:'守備',grp:'def',desc:'魔術師（人員）を配置して使う塔。高所から魔術の火の玉を撃ち、当たった所の周りを焼く（範囲攻撃）。空の敵も撃てる。エーテルを使う',req:'magetower',range:5,dmg:100,rate:2.5,splash:1.1,flat:true,direct:true,ammoUse:0.5,ammoKey:'elec',antiAir:true};
+B.magetower={name:'メイジの塔',glyph:'魔',hp:500,heat:1,cost:{steel:60,stone:60,elec:20},pop:3,power:0,spec:'守備',grp:'def',desc:'魔術師（人員）を配置して使う塔。高所から魔術の火の玉を撃ち、当たった所の周りを焼く（範囲攻撃）。空の敵も撃てる。エーテルを使う',req:'magetower',range:5,dmg:100,rate:2.5,splash:1.1,flat:true,direct:true,ammoUse:0.5,ammoKey:'elec',antiAir:true};
 B.tower.garUt='arch';B.spike.req='spikes';
 B.furnace={name:'精製炉',glyph:'炉',hp:260,heat:3,cost:{steel:60,stone:40},pop:2,power:0,spec:'内政',grp:'prod',req:'furnace',desc:'魔核のエネルギーを取り出してエーテル結晶を精製する（魔核 −2 → エーテル結晶 +4／T）。魔核が尽きると止まる'};
 B.totem={name:'呪骸の柱',glyph:'呪',hp:420,heat:1,cost:{stone:40,mat:30},pop:0,power:0,spec:'工兵',grp:'def',req:'totem',desc:'魔物の骨で組んだ呪いの柱。周り6マスの魔物の足を30%遅くし、攻撃の間隔を伸ばす（与える被害 −25%）'};
@@ -2024,7 +2024,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('yariana',{cat:'防衛',tier:2,name:'槍穴',cost:{steel:40,iron:20},t:2,pre:[],icon:'pit',eff:'落とし穴の底に槍を立てる：落とし穴の威力 2倍'});
  set('resetpit',{cat:'防衛',tier:2,name:'罠の再設置',cost:{steel:60,stone:30},t:2,pre:['yariana'],icon:'pit',eff:'落とし穴が一晩に使える回数 3回→5回'});
  set('pitch',{cat:'防衛',tier:1,name:'松脂',pre:[],eff:'篝火の照らす範囲 +8マス（照らされた敵しか狙えない）'});
- set('magetower',{cat:'防衛',tier:4,name:'魔術師の塔',cost:{stone:60,elec:30},t:2,pre:['magic'],icon:'magetower',eff:'「魔術師の塔」を建設できる（魔術師隊を配置して、高所から範囲魔法・対空）'});
+ set('magetower',{cat:'防衛',tier:4,name:'メイジの塔',cost:{stone:60,elec:30},t:2,pre:['magic'],icon:'magetower',eff:'「メイジの塔」を建設できる（魔術師隊を配置して、高所から範囲魔法・対空）'});
  set('upg_def1',{name:'改築・防衛Ⅱ',pre:['kougen'],eff:'防衛施設をLv2まで改築できる'});
  set('upg_def2',{name:'改築・防衛Ⅲ',eff:'防衛施設をLv3まで改築できる'});
  // ===== ランク制：各タブの「ランクⅡ／Ⅲ」は門の研究で解放 =====
