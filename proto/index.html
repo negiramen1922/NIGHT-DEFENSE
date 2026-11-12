@@ -3028,6 +3028,19 @@ if(NDSPR.units&&NDSPR.units.archer&&!NDSPR.units.scout){const a=NDSPR.units.arch
 if(NDSPR.units&&NDSPR.units.cannoneer){const a=NDSPR.units.cannoneer;const sh=(hex,f)=>'#'+[1,3,5].map(i=>Math.round(parseInt(hex.slice(i,i+2),16)*f).toString(16).padStart(2,'0')).join('');
   const CC=['#676c73','#a8c4e0','#d8b860','#9a62e0','#eef4ff','#d0504a'];for(let t=1;t<CC.length;t++){const c=CC[t];NDSPR.units['cannoneer_w'+t]=Object.assign({},a,{pal:Object.assign({},a.pal,{e:c,f:sh(c,0.85),g:sh(c,0.8),k:sh(c,0.65),l:sh(c,0.5),m:sh(c,0.4)})});}}
 const SPR={};
+// 試作（2026-11-12）：兵士たちの見た目を装備の段で変える。絵の中の「武器の色」と「鎧（ローブ）の色」だけを、段の色に塗り替える（明るさの差は残す）。描き直しまでの仮
+const TINT={pawn:{w:'h',a:'ef'},heavy:{w:'d',a:'bcfgiklmqr'},rider:{w:'c',a:'efh'},archer:{w:'c',r:'bdenpqrsuv'},guard:{w:'j',a:'efgkl'},wizard:{w:'degh',r:'bcfiko'}};
+const W_TINT=[null,'#a8c4e0','#e8c860','#a774ec','#ffffff','#ff6a5a'],M_TINT=[null,'#62c6d9','#a774ec','#ffffff','#ff5a4e'];
+const A_TINT=['#a0703c',null,'#a8c4e0','#e8c860','#a774ec','#ffffff','#ff6a5a'],R_TINT=[null,'#9aa0a6','#62c6d9','#f0f4ff','#d0504a'];
+const SPR_T={};
+function tintPal(pal,chars,col){if(!col)return pal;const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),lum=c=>0.3*c[0]+0.59*c[1]+0.11*c[2];const cs=[...chars].filter(c=>pal[c]);if(!cs.length)return pal;
+  const ref=Math.max(...cs.map(c=>lum(rgb(pal[c]))))||1,t=rgb(col),o=Object.assign({},pal);
+  for(const c of cs){const f=Math.min(1.15,0.35+0.8*lum(rgb(pal[c]))/ref);o[c]='#'+t.map(v=>Math.max(0,Math.min(255,Math.round(v*f))).toString(16).padStart(2,'0')).join('')+(pal[c].length>7?pal[c].slice(7):'');}return o;}
+function sprTinted(cat,key,wt,at,ut){const base=SPR[cat]&&SPR[cat][key];const mk=Object.keys(TINT).find(k=>key===k||key.startsWith(k+'_'));if(!base||!mk)return base;
+  const T=TINT[mk],wc=ut==='mage'?M_TINT[wt]:W_TINT[wt],ac=T.r?R_TINT[at]:A_TINT[at];if(!wc&&!ac)return base;
+  const id=cat+'/'+key+'|'+wt+'|'+at;if(SPR_T[id])return SPR_T[id];const sp=NDSPR[cat][key];let pal=tintPal(sp.pal,T.w,wc);pal=tintPal(pal,T.a||T.r||'',ac);
+  const o={size:sp.size,pal,img:{}};for(const a in sp.anims)o.img[a]=sp.anims[a].map(rows=>{const c=document.createElement('canvas');c.width=rows[0].length;c.height=rows.length;const g=c.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=pal[r[x]];if(!col)continue;g.fillStyle=col;g.fillRect(x,y,1,1);}});return c;});
+  return SPR_T[id]=o;}
 (function(){for(const cat in NDSPR){if(cat[0]==='_')continue;SPR[cat]={};for(const k in NDSPR[cat]){const sp=NDSPR[cat][k];const o={size:sp.size,pal:sp.pal,img:{}};
   for(const a in sp.anims)o.img[a]=sp.anims[a].map(rows=>{const c=document.createElement('canvas');c.width=rows[0].length;c.height=rows.length;const g=c.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=sp.pal[r[x]];if(!col)continue;g.fillStyle=col;g.fillRect(x,y,1,1);}});return c;});
   SPR[cat][k]=o;}}
@@ -5079,7 +5092,7 @@ function draw(){
         const P=[[0,-3],[-6,2],[6,2]],ord=n===3?[1,2,0]:n===2?[1,0]:[0];
         // ドット絵 v2：歩く・攻撃のコマ送り。左へ進む時は反転
         const HK={'歩兵':'h_inf','弓兵':'h_arch','工兵':'h_eng','騎兵':'h_cav','魔導':'h_mage','内政':'h_admin','守備':'h_guard','竜騎':'h_drake'};
-        const base=(s.ut==='art'&&typeof wTier==='function'&&wTier(s)?SPR.units['cannoneer_w'+wTier(s)]:null)||SPR.equipment[sqKey(s)]||SPR.units[mt.key],hs=c&&SPR.units[HK[c.spec]];
+        const base=(s.ut==='art'&&typeof wTier==='function'&&wTier(s)?SPR.units['cannoneer_w'+wTier(s)]:null)||(SPR.equipment[sqKey(s)]?sprTinted('equipment',sqKey(s),wTier(s),aTier(s),s.ut):sprTinted('units',mt.key,wTier(s),aTier(s),s.ut))||SPR.units[mt.key],hs=c&&SPR.units[HK[c.spec]];
         if(s.lx!=null&&Math.abs(s.x-s.lx)>0.05)s.face=s.x<s.lx?-1:1;const moving=s.lx!=null&&Math.hypot(s.x-s.lx,s.y-s.ly)>0.05;s.lx=s.x;s.ly=s.y;
         const atk=nowS()-(s.atkT||-9)<0.8,fl=(s.face||1)<0;
         for(const i of ord){const [px,py]=n===1?[0,-1]:P[i];const sp=(hs&&i===0&&!one)?hs:base;
