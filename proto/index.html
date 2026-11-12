@@ -1890,7 +1890,7 @@ function ready(b){return !(b.bt>0);}
 (function(){const C={barracks:{steel:40},quarry:{steel:40},ironmine:{steel:50,stone:20},market:{steel:60,stone:30},tavern:{steel:50,stone:20,gold:30},well:{steel:60,stone:40},ammo:{steel:60,stone:20},
  brazier:{steel:15},mg:{steel:60,iron:10,gold:20},tower:{steel:60,stone:40,gold:10},how:{steel:80,stone:40,gold:40},wall:{stone:60,iron:10,gold:20},cannon:{steel:80,iron:60,gold:80}};
  for(const k in C)B[k].cost=C[k];B.ammo.pop=3;
- const TIER={farm:1,fishery:1,miner:1,quarry:1,barracks:1,ammo:1,lab:1,fence:1,brazier:1,spike:1,pit:1,mg:1,tower:1,train:1,outpost:1,ironmine:2,market:2,tavern:2,well:2,swall:2,how:2,stable:2,magic:2,wall:2,cannon:3,aerie:3};
+ const TIER={farm:1,fishery:1,miner:1,quarry:1,barracks:1,ammo:1,lab:1,fence:1,brazier:1,spike:1,pit:1,mg:1,tower:1,train:1,outpost:1,ironmine:2,market:2,tavern:2,well:2,swall:2,how:2,stable:2,magic:4,wall:2,cannon:3,aerie:5};
  for(const k in TIER)if(B[k])B[k].tier=TIER[k];
  // 人件費：どの建物にも金貨が必要（資材の合計の2割、最低5）
  for(const k of BUILD_ORDER){const c=B[k].cost;let sum=0;for(const r in c)if(r!=='gold')sum+=c[r];const g=Math.max(5,Math.round(sum*0.2/5)*5);c.gold=Math.max(c.gold||0,g);}})();
@@ -2024,7 +2024,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('yariana',{cat:'防衛',tier:2,name:'槍穴',cost:{steel:40,iron:20},t:2,pre:[],icon:'pit',eff:'落とし穴の底に槍を立てる：落とし穴の威力 2倍'});
  set('resetpit',{cat:'防衛',tier:2,name:'罠の再設置',cost:{steel:60,stone:30},t:2,pre:['yariana'],icon:'pit',eff:'落とし穴が一晩に使える回数 3回→5回'});
  set('pitch',{cat:'防衛',tier:1,name:'松脂',pre:[],eff:'篝火の照らす範囲 +8マス（照らされた敵しか狙えない）'});
- set('magetower',{cat:'防衛',tier:2,name:'魔術師の塔',cost:{stone:60,elec:30},t:2,pre:['magic'],icon:'magetower',eff:'「魔術師の塔」を建設できる（魔術師隊を配置して、高所から範囲魔法・対空）'});
+ set('magetower',{cat:'防衛',tier:4,name:'魔術師の塔',cost:{stone:60,elec:30},t:2,pre:['magic'],icon:'magetower',eff:'「魔術師の塔」を建設できる（魔術師隊を配置して、高所から範囲魔法・対空）'});
  set('upg_def1',{name:'改築・防衛Ⅱ',pre:['kougen'],eff:'防衛施設をLv2まで改築できる'});
  set('upg_def2',{name:'改築・防衛Ⅲ',eff:'防衛施設をLv3まで改築できる'});
  // ===== ランク制：各タブの「ランクⅡ／Ⅲ」は門の研究で解放 =====
@@ -2051,10 +2051,10 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('scout',{tier:1,pre:[]});set('doctrine',{tier:1,pre:[]});set('nighthunt',{tier:1,pre:[]});
  set('unit_r2',{cat:'部隊',gate:2,tier:2,name:'部隊強化Ⅱ',cost:{gold:60,fuel:60,sword:20},t:2,pre:[],icon:'heavy',eff:'部隊タブのランクⅡの研究を解放（重装歩兵・騎兵・魔術師など）'});
  set('scouting',{cat:'部隊',tier:2,name:'斥候隊',cost:{gold:30,fuel:30},t:1,pre:[],icon:'archer',eff:'兵舎で「斥候」を編成できる。足が速く視界が広い（20マス）。敵の駐留地の正確な場所を見つけられる唯一の部隊。打たれ弱く、受ける被害 ×1.8'});
- set('heavyinf',{tier:2,pre:[]});set('cavalry',{tier:2,pre:[]});set('magic',{tier:2,pre:[]});
+ set('heavyinf',{tier:2,pre:[]});set('cavalry',{tier:2,pre:[]});set('magic',{tier:4,pre:[]});
  set('shieldwall',{cat:'部隊',tier:2,name:'盾陣',cost:{iron:60,steel:40},t:2,pre:['heavyinf'],icon:'heavy',eff:'重装歩兵が受ける被害 −25%。周り4マスの魔物を引きつける'});
  set('charge',{cat:'部隊',tier:2,name:'騎馬突撃',cost:{gold:40,fuel:60},t:2,pre:['cavalry'],icon:'rider',eff:'騎兵の移動 +20%。しばらく戦っていない騎兵の最初の一撃が3倍'});
- set('highmagic',{cat:'部隊',tier:2,name:'高等魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard',eff:'魔術師の杖が「樫の杖」から「エーテルの杖」になる（攻撃 140%）。魔法の範囲 +30%、魔力の消費 −30%'});
+ set('highmagic',{cat:'部隊',tier:4,name:'高等魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard',eff:'魔術師の杖が「樫の杖」から「エーテルの杖」になる（攻撃 140%）。魔法の範囲 +30%、魔力の消費 −30%'});
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館か所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
  set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
@@ -2063,10 +2063,10 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('chainmail',{cat:'部隊',tier:2,name:'鎖帷子',cost:{iron:30,steel:20},t:2,pre:[],icon:'archer',eff:'弓兵・砲兵・魔術師のローブが「皮のローブ」から「鎖帷子」になる：体力 +15%（補給で鎧を使う）'});
  set('alloyarms',{cat:'部隊',tier:3,name:'合金の武具',cost:{iron:70,gold:50},t:3,pre:['heavyarms'],icon:'heavy',eff:'魔術師以外の武器が「合金」になる（鋼の剣→合金の剣など）：攻撃 190%（鉄の武器を100%として）。補給で「合金」（金と鉄から作る素材。精錬所はこれから）を使う'});
  set('battalion',{cat:'部隊',tier:3,name:'大隊',cost:{gold:80,fuel:60,sword:20},t:3,pre:['formation'],icon:'heavy',eff:'中隊3つまでを「大隊」にまとめられる。ほかの中隊が8マス以内にいると火力+10%・耐久+5%（中隊の効果と重なる）'});
- set('division',{cat:'部隊',tier:3,name:'師団',cost:{gold:160,fuel:120,iron:60},t:4,pre:['battalion'],icon:'heavy',eff:'大隊3つまでを「師団」にまとめられる。ほかの大隊が12マス以内にいると火力+10%・耐久+5%（今はランクⅢ。ランクを伸ばしたらⅥのつもり）'});
+ set('division',{cat:'部隊',tier:5,name:'師団',cost:{gold:160,fuel:120,iron:60},t:4,pre:['battalion'],icon:'heavy',eff:'大隊3つまでを「師団」にまとめられる。ほかの大隊が12マス以内にいると火力+10%・耐久+5%（今はランクⅢ。ランクを伸ばしたらⅥのつもり）'});
  set('unit_r3',{cat:'部隊',gate:3,tier:3,name:'部隊強化Ⅲ',cost:{gold:120,fuel:80,iron:40},t:3,pre:[],icon:'dragon',eff:'部隊タブのランクⅢの研究を解放（竜騎兵など）'});
- set('dragon',{tier:3,pre:[]});
- set('dragonscale',{cat:'部隊',tier:3,name:'竜鱗',cost:{gold:80,mat:40,fuel:40},t:3,pre:['dragon'],icon:'dragon',eff:'竜騎兵が受ける被害 −30%'});
+ set('dragon',{tier:5,pre:[]});
+ set('dragonscale',{cat:'部隊',tier:5,name:'竜鱗',cost:{gold:80,mat:40,fuel:40},t:3,pre:['dragon'],icon:'dragon',eff:'竜騎兵が受ける被害 −30%'});
  // 魔核（作り直しまでの仮配置）
  set('mat_r2',{cat:'魔核',gate:2,tier:2,name:'魔核学Ⅱ',cost:{mat:30,gold:40},t:2,pre:[],eff:'魔核タブのランクⅡの研究を解放'});
  set('mat_r3',{cat:'魔核',gate:3,tier:3,name:'魔核学Ⅲ',cost:{mat:60,gold:80},t:3,pre:[],eff:'魔核タブのランクⅢの研究を解放'});
@@ -2120,9 +2120,9 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
 })();
 (function(){const rnd=v=>Math.max(5,Math.round(v/5)*5);
  for(const t of TECH){const ks=Object.keys(t.cost).filter(k=>k!=='pop');const sum=ks.reduce((a,k)=>a+t.cost[k],0);if(!sum)continue;
-  const tr=t.tier||1;const lo=[0,30,100,200][tr],hi=[0,60,180,320][tr];let f=1;if(sum<lo)f=(lo+hi)/2/sum*0.85;else if(sum>hi)f=hi/sum;
+  const tr=t.tier||1;const lo=[0,30,100,200,300,420,560,720][tr],hi=[0,60,180,320,460,620,800,1000][tr];let f=1;if(sum<lo)f=(lo+hi)/2/sum*0.85;else if(sum>hi)f=hi/sum;
   if(f!==1)for(const k of ks)t.cost[k]=rnd(t.cost[k]*f);
-  t.t=Math.min([0,2,3,4][tr],Math.max([0,1,2,3][tr],t.t||1));}})();
+  t.t=Math.min([0,2,3,4,5,6,6,6][tr],Math.max([0,1,2,3,4,5,5,5][tr],t.t||1));}})();
 techOf('analysis').cost={mat:10};
 for(const t of TECH)for(const k in t.cost)t.cost[k]=Math.max(5,Math.round(t.cost[k]*0.5/5)*5);
 const CAT_COLOR={'生産':'#9be06f','内政':'#c79bff','防衛':'#f2b33d','部隊':'#d86a5a','魔核':'#c8c0b0'};
@@ -2789,7 +2789,7 @@ function tMax(t){return t.lvRank?Math.max(1,S.baseLv||1):(t.max||1);}
 function techCost(t){const L=lvl(t.id);const c={};const base=Object.assign({},t.cost);if(t.tier>=2)base.gold=(base.gold||0)+40*(t.tier-1);for(const k in base)c[k]=Math.round(base[k]*(1+0.7*L));return c;}
 function techTurns(t){return t.t+lvl(t.id);}
 const MAP_MAXTIER={f:2,m:3,t:2,s:3};
-function mapMaxTier(){return MAP_MAXTIER[CUR_MAP]||4;}
+function mapMaxTier(){return MAP_MAXTIER[CUR_MAP]||7;}
 function techState(t){
   if(lvl(t.id)>=tMax(t))return'done';
   if(S.research.find(r=>r.id===t.id))return'active';
@@ -2812,7 +2812,7 @@ function techRank(t){return t.gate?t.gate-1:(t.tier||1);}
 // ===== 研究員：住民の中から研究に就く人。城館に5人＋研究室1つにつき3／5／8人（Lv1／2／3） =====
 function resCap(){let n=5;for(const b of S.blds)if(b.type==='lab'&&ready(b))n+=[3,5,8][(b.lv||1)-1];return n;}
 function resBusy(){return S.research.reduce((a,r)=>a+(r.res||0),0);}
-function techRes(t){return [0,2,4,7][t.tier||1]+(lvl(t.id)>0?1:0);}
+function techRes(t){return [0,2,4,7,10,13,16,20][t.tier||1]+(lvl(t.id)>0?1:0);}
 function resSlots(){return 99;}
 
 // ===== 施設の値（研究・改修込み） =====
@@ -6745,7 +6745,7 @@ function showResearch(){
   if(!S.resTab)S.resTab='生産';
   const cat=S.resTab,L=treeLayout(cat);
   if(!S.resSel||techOf(S.resSel).cat!==cat)S.resSel=L.list[0].id;
-  const RN=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ'];
+  const RN=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'];
   const cap=resCap(),busy=resBusy();
   const free=cap-busy,land=isLand();
   const nowH=`<div class="rnow"><small>研究中</small>${S.research.length?S.research.map(r=>{const t=techOf(r.id);return `<button class="rnc" data-goto="${t.id}" style="--tc:${CAT_COLOR[t.cat]}"><b>${t.name}${tLvName(t,lvl(t.id)+1)}</b><span>${r.total-r.left}/${r.total}T</span>${resPips(r)}</button>`;}).join(''):'<span class="muted" style="font-size:12px">なし</span>'}${free>0?`<span class="rnf">研究員が${free}人空いています</span>`:''}</div>`;
