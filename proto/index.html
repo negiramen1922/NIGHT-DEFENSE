@@ -3026,12 +3026,12 @@ function castleImg(lv){return PXI['castle'+(lv===2?'':Math.max(1,Math.min(5,lv||
 if(NDSPR.units&&NDSPR.units.archer&&!NDSPR.units.scout){const a=NDSPR.units.archer;const pal=Object.assign({},a.pal,{b:'#8a90a0',d:'#646a7a',e:'#3c404c',n:'#4c5060',i:'#5e6272',q:'#6e6656',r:'#807868',s:'#665e50',u:'#4e4838',v:'#5a5446',p:'#2e2a24'});NDSPR.units.scout=Object.assign({},a,{pal});}
 // 試作：砲兵の大砲を武器の段の色に塗り替える（鉄・鋼・合金・魔金属・聖銀・竜晶）。見た目で装備の段が分かる
 if(NDSPR.units&&NDSPR.units.cannoneer){const a=NDSPR.units.cannoneer;const sh=(hex,f)=>'#'+[1,3,5].map(i=>Math.round(parseInt(hex.slice(i,i+2),16)*f).toString(16).padStart(2,'0')).join('');
-  const CC=['#676c73','#a8c4e0','#d8b860','#9a62e0','#eef4ff','#d0504a'];for(let t=1;t<CC.length;t++){const c=CC[t];NDSPR.units['cannoneer_w'+t]=Object.assign({},a,{pal:Object.assign({},a.pal,{e:c,f:sh(c,0.85),g:sh(c,0.8),k:sh(c,0.65),l:sh(c,0.5),m:sh(c,0.4)})});}}
+  const CC=['#676c73','#a8c4e0','#5a5e70','#9a62e0','#eef4ff','#d0504a'];for(let t=1;t<CC.length;t++){const c=CC[t];NDSPR.units['cannoneer_w'+t]=Object.assign({},a,{pal:Object.assign({},a.pal,{e:c,f:sh(c,0.85),g:sh(c,0.8),k:sh(c,0.65),l:sh(c,0.5),m:sh(c,0.4)})});}}
 const SPR={};
 // 試作（2026-11-12）：兵士たちの見た目を装備の段で変える。絵の中の「武器の色」と「鎧（ローブ）の色」だけを、段の色に塗り替える（明るさの差は残す）。描き直しまでの仮
 const TINT={pawn:{w:'h',a:'ef'},heavy:{w:'d',a:'bcfgiklmqr'},rider:{w:'c',a:'efh'},archer:{w:'c',r:'bdenpqrsuv'},guard:{w:'j',a:'efgkl'},wizard:{w:'degh',r:'bcfiko'}};
-const W_TINT=[null,'#a8c4e0','#e8c860','#a774ec','#ffffff','#ff6a5a'],M_TINT=[null,'#62c6d9','#a774ec','#ffffff','#ff5a4e'];
-const A_TINT=['#a0703c',null,'#a8c4e0','#e8c860','#8c86a6','#ffffff','#ff6a5a'],R_TINT=[null,'#9aa0a6','#62c6d9','#f0f4ff','#d0504a'];
+const W_TINT=[null,'#a8c4e0','#626678','#a774ec','#ffffff','#ff6a5a'],M_TINT=[null,'#62c6d9','#a774ec','#ffffff','#ff5a4e'];
+const A_TINT=['#a0703c',null,'#a8c4e0','#626678','#8c86a6','#ffffff','#ff6a5a'],R_TINT=[null,'#9aa0a6','#62c6d9','#f0f4ff','#d0504a'];
 const SPR_T={};
 function tintPal(pal,chars,col){if(!col)return pal;const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),lum=c=>0.3*c[0]+0.59*c[1]+0.11*c[2];const cs=[...chars].filter(c=>pal[c]);if(!cs.length)return pal;
   const ref=Math.max(...cs.map(c=>lum(rgb(pal[c]))))||1,t=rgb(col),o=Object.assign({},pal);
@@ -4776,7 +4776,7 @@ function wMat(s){const L=wTrack(s).req;let m=0;for(let i=1;i<L.length;i++)if(L[i
 function aMat(k){const L=AR[k||'a'].req;let m=0;for(let i=1;i<L.length;i++)if(L[i]&&has(L[i]))m=i;return m;}
 function wTier(s){const a=wMat(s);return s&&s.wT!=null?Math.min(s.wT,a):a;}
 function aTier(s){if(!s||typeof s!=='object')return 0;const k=armK(s.ut);if(!k)return 0;const a=aMat(k);return s.aT!=null?Math.min(s.aT,a):a;}
-const W_COL=['#9aa0a6','#b9d3ec','#e2c779','#a774ec','#f6faff','#e05a4e'],A_COL=['#9a6a3a','#9aa0a6','#b9d3ec','#e2c779','#a774ec','#f6faff','#e05a4e'];
+const W_COL=['#9aa0a6','#b9d3ec','#3a3d4a','#a774ec','#f6faff','#e05a4e'],A_COL=['#9a6a3a','#9aa0a6','#b9d3ec','#3a3d4a','#a774ec','#f6faff','#e05a4e'];
 // 装備の段のアイコン（色で材料が分かる）：武器＝剣の形、鎧＝胴の形
 function eqIcon(kind,m,sz){sz=sz||16;const c=(kind==='w'?W_COL:kind==='r'?R_COL:A_COL)[m]||'#999',d='#1c1824',gl=(kind==='w'?m===4:m===5)?`<rect x="0" y="0" width="16" height="16" fill="${c}" opacity=".18"/>`:'';
   const body=kind==='w'?`<path d="M12 1h3v3l-8 8-2-2z" fill="${c}" stroke="${d}" stroke-width="1"/><path d="M3 9l4 4-1 1-1-1-2 2-2-2 2-2-1-1z" fill="#6a4a2a" stroke="${d}" stroke-width="1"/>`
