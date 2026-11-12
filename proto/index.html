@@ -1763,22 +1763,22 @@ Object.assign(B,{
   swall:  {name:'石の壁',glyph:'',hp:450,heat:0,cost:{stone:25},pop:0,power:0,spec:'工兵',grp:'def',desc:'丈夫な石積みの壁。木の柵の上に重ねて建て替えられる',req:'masonry'},
   bastion:{name:'櫓台',glyph:'',hp:1600,heat:0,cost:{stone:120,steel:40,gold:30},pop:0,power:0,spec:'工兵',grp:'def',towerWall:true,req:'castle',desc:'石を高く積んだ2×2の台座。敵を通さず、上にバリスタ・投石機・大砲・迫撃砲などを1つ載せられる（2×2の物も可。台座を選んで「この上に建設」）。載せた施設は射程 +3・火力 +20%。敵はまず台座を壊す'},
   wall:   {name:'城壁',glyph:'',hp:800,heat:0,cost:{stone:50,steel:20,gold:20},pop:0,power:0,spec:'工兵',grp:'def',desc:'最も丈夫な壁。柵・石の壁の上に重ねて建て替えられる。上にバリスタ・投石機を置くと射程と威力が上がる',req:'castle'},
-  mg:     {name:'バリスタ',glyph:'弩',hp:260,heat:1,cost:{steel:80,iron:20,gold:30},pop:3,power:0,spec:'守備',grp:'def',desc:'大型の弩（直射）。重い矢でゴブリンなら一撃、その後ろの敵まで貫く（2体目は70%）。空の敵も撃てる。矢を使う',range:5,dmg:60,rate:1.3,ammoUse:1,direct:true,antiAir:true,bolt:true},
-  cannon: {name:'大砲',glyph:'砲',hp:320,heat:2,cost:{steel:120,iron:60,stone:30,gold:60},pop:4,power:0,spec:'守備',grp:'def',desc:'火薬で鉄の砲弾を撃ち出す直射砲。射線上の敵を最大4体まで貫き、硬い敵の装甲も無視する。撃つと轟音とともに閃光が走る。鉄を砲弾に使う。城壁の上にも置ける',req:'gunpowder',range:7,dmg:80,rate:3.4,ammoUse:1.5,ammoKey:'iron',direct:true,cannon:true},
+  mg:     {name:'バリスタ',glyph:'弩',hp:260,heat:1,cost:{steel:80,iron:20,gold:30},pop:3,power:0,spec:'守備',grp:'def',desc:'大型の弩（直射）。重い矢でゴブリンなら一撃、その後ろの敵まで貫く（2体目は70%）。空の敵も撃てる。矢を使う',range:5,dmg:50,rate:1.4,ammoUse:1,direct:true,antiAir:true,bolt:true},
+  cannon: {name:'大砲',glyph:'砲',hp:320,heat:2,cost:{steel:120,iron:60,stone:30,gold:60},pop:4,power:0,spec:'守備',grp:'def',desc:'火薬で鉄の砲弾を撃ち出す直射砲。射線上の敵を最大4体まで貫く。撃つと轟音とともに閃光が走る。鉄を砲弾に使う。城壁の上にも置ける',req:'gunpowder',range:7,dmg:150,rate:3.4,ammoUse:1.5,ammoKey:'iron',direct:true,cannon:true},
   how:    {name:'投石機',glyph:'投',hp:240,heat:1,cost:{steel:100,stone:20,gold:40},pop:4,power:0,spec:'守備',grp:'def',desc:'石材を撃ち出す曲射兵器。城壁の向こうへ範囲攻撃。最低射程4マス',req:'catapult',range:8,minRange:2,dmg:70,rate:3.0,splash:1.6,ammoUse:2,ammoKey:'stone'},
-  tower:  {name:'物見櫓',glyph:'櫓',hp:900,heat:1,cost:{steel:80,stone:60,gold:20},pop:0,power:0,spec:'弓兵',grp:'def',desc:'石積みの見張り櫓（直射）。弓兵隊を配置すると、高所からとても長い射程で連射し、空の敵も撃てる。弓兵がいないと攻撃しない。城壁並みに頑丈で、壁の列に組み込める（柵・石の壁の上に建てると置き換わる）。壁の上には載せられない。周囲を少し照らす',range:9,towerWall:true,dmg:15,rate:0.4,ammoUse:0.25,direct:true,antiAir:true,garrison:true},
+  tower:  {name:'物見櫓',glyph:'櫓',hp:900,heat:1,cost:{steel:80,stone:60,gold:20},pop:2,power:0,spec:'弓兵',grp:'def',desc:'石積みの見張り櫓（直射）。射手（人員）を配置すると、高所からとても長い射程で連射し、空の敵も撃てる。1発は軽い。城壁並みに頑丈で、壁の列に組み込める（柵・石の壁の上に建てると置き換わる）。壁の上には載せられない。周囲を少し照らす',range:9,towerWall:true,dmg:15,rate:0.5,ammoUse:0.25,direct:true,antiAir:true},
 });
 B.lab.pop=0;B.lab.desc='研究員の詰め所。1つにつき研究員の上限 +3人（Lv2で+5人・Lv3で+8人）。研究員は待機中の住民から研究のたびに就く';
 B.gate={name:'門',glyph:'門',hp:140,heat:0,cost:{steel:40,stone:20},pop:0,power:0,spec:'工兵',grp:'def',desc:'味方だけが通れる出入り口。壁は敵も味方も通れないので、部隊は門から出入りする。敵には壁と同じで、壊されるまで通れない。柵や壁の列の上に建てると置き換わる'};
-B.hisou={name:'飛槍車',glyph:'槍',hp:300,heat:1,cost:{steel:80,iron:30},pop:3,power:0,spec:'守備',grp:'def',desc:'空の敵専用の兵器。四角い箱に詰めた槍を空へ一斉に打ち上げ、ハーピーやドラゴンを群れごと落とす。地上の敵は撃てない。矢を1回3本使う',req:'hisousha',range:7,dmg:32,rate:2.4,ammoUse:3,antiAir:true,airOnly:true};
-B.magetower={name:'魔術師の塔',glyph:'魔',hp:500,heat:1,cost:{steel:60,stone:60,elec:20},pop:0,power:0,spec:'守備',grp:'def',desc:'魔術師隊を配置して使う塔。高所から範囲魔法を放ち、空の敵も撃てる。魔術師がいないと攻撃しない。配置した部隊の英雄はここからスキルを使う',req:'magetower',range:8,dmg:26,rate:1.6,splash:1.1,ammoUse:0.5,ammoKey:'elec',antiAir:true,garrison:true,garUt:'mage'};
+B.hisou={name:'飛槍車',glyph:'槍',hp:300,heat:1,cost:{steel:80,iron:30},pop:3,power:0,spec:'守備',grp:'def',desc:'空の敵専用の兵器。四角い箱に詰めた槍を空へ一斉に打ち上げ、ハーピーやドラゴンを群れごと落とす。地上の敵は撃てない。矢を1回3本使う',req:'hisousha',range:7,dmg:40,rate:2.4,ammoUse:3,antiAir:true,airOnly:true};
+B.magetower={name:'魔術師の塔',glyph:'魔',hp:500,heat:1,cost:{steel:60,stone:60,elec:20},pop:3,power:0,spec:'守備',grp:'def',desc:'魔術師（人員）を配置して使う塔。魔法の弾を高く打ち上げる曲射で、壁や建物を越えて範囲を焼く。空の敵も撃てる。エーテルを使う',req:'magetower',range:9,minRange:2,dmg:100,rate:2.5,splash:1.1,ammoUse:0.5,ammoKey:'elec',antiAir:true};
 B.tower.garUt='arch';B.spike.req='spikes';
 B.furnace={name:'精製炉',glyph:'炉',hp:260,heat:3,cost:{steel:60,stone:40},pop:2,power:0,spec:'内政',grp:'prod',req:'furnace',desc:'魔核のエネルギーを取り出してエーテル結晶を精製する（魔核 −2 → エーテル結晶 +4／T）。魔核が尽きると止まる'};
 B.totem={name:'呪骸の柱',glyph:'呪',hp:420,heat:1,cost:{stone:40,mat:30},pop:0,power:0,spec:'工兵',grp:'def',req:'totem',desc:'魔物の骨で組んだ呪いの柱。周り6マスの魔物の足を30%遅くし、攻撃の間隔を伸ばす（与える被害 −25%）'};
-B.mabou={name:'魔弾砲',glyph:'魔',hp:340,heat:2,cost:{steel:100,iron:60,mat:30,gold:60},pop:4,power:0,spec:'守備',grp:'def',req:'mabou',desc:'エーテル結晶を撃ち出す直射砲。射程内でいちばん硬い敵（トロール・シーカー・キングなど）を狙い、装甲を無視して大ダメージ。エーテル結晶を1発1つ使う',range:6.5,dmg:130,rate:2.8,pierce:true,direct:true,ammoKey:'elec',ammoUse:1};
+B.mabou={name:'魔弾砲',glyph:'魔',hp:340,heat:2,cost:{steel:100,iron:60,mat:30,gold:60},pop:4,power:0,spec:'守備',grp:'def',req:'mabou',desc:'エーテル結晶を撃ち出す直射砲。射程内でいちばん硬い敵（トロール・シーカー・キングなど）を狙って大ダメージ。エーテル結晶を1発1つ使う',range:6.5,dmg:200,rate:2.9,pierce:true,direct:true,ammoKey:'elec',ammoUse:1};
 B.powder={name:'火薬工房',glyph:'薬',hp:220,heat:3,cost:{steel:80,stone:40,gold:30},pop:3,power:0,spec:'内政',grp:'prod',req:'gunpowder',desc:'木材を焼いた木炭と魔物の脂（魔核）から火薬を作る（木材 −6・魔核 −1 → 火薬 +6／T）。大砲・迫撃砲・砲兵隊が使う'};
-B.mortar={name:'迫撃砲',glyph:'迫',hp:280,heat:2,cost:{steel:100,iron:80,stone:40,gold:80},pop:4,power:0,spec:'守備',grp:'def',req:'mortar',desc:'投石機の上位。火薬で石の砲弾を高く打ち上げる曲射砲。射程がとても長く、着弾点を大きく吹き飛ばす。壁や味方の建物越しに撃てる（山は越えられない）。最低射程4マス。1発ごとに石材1・火薬1',range:9.5,minRange:2,dmg:95,rate:3.4,splash:1.9,ammoKey:'stone',ammoUse:1,ammo2:{powder:1}};
-B.cannon.req='cannontech';B.cannon.ammoUse=1;B.cannon.ammo2={powder:1};B.cannon.desc='火薬で鉄の砲弾を撃ち出す直射砲。射線上の敵を最大4体まで貫き、硬い敵の装甲も無視する。撃つと轟音とともに閃光が走る。1発ごとに鉄1・火薬1。城壁の上にも置ける';
+B.mortar={name:'迫撃砲',glyph:'迫',hp:280,heat:2,cost:{steel:100,iron:80,stone:40,gold:80},pop:4,power:0,spec:'守備',grp:'def',req:'mortar',desc:'投石機の上位。火薬で石の砲弾を高く打ち上げる曲射砲。射程がとても長く、着弾点を大きく吹き飛ばす。壁や味方の建物越しに撃てる（山は越えられない）。最低射程4マス。1発ごとに石材1・火薬1',range:9.5,minRange:2,dmg:120,rate:3.4,splash:1.9,ammoKey:'stone',ammoUse:1,ammo2:{powder:1}};
+B.cannon.req='cannontech';B.cannon.ammoUse=1;B.cannon.ammo2={powder:1};B.cannon.desc='火薬で鉄の砲弾を撃ち出す直射砲。射線上の敵を最大4体まで貫く。撃つと轟音とともに閃光が走る。1発ごとに鉄1・火薬1。城壁の上にも置ける';
 B.apart={name:'集合住宅',glyph:'集',hp:320,heat:1,cost:{steel:110,stone:50,gold:30},pop:0,power:0,spec:'内政',grp:'prod',req:'apart',desc:'何世帯も住める大きな家。1棟に36名まで住める（改築でLv2:54名・Lv3:72名）。毎ターン5名ずつ住民が増える'};
 B.hq.hp=3000;B.hq.cap=3;B.hq.name='城';B.hq.desc='街の中心の城（4×4マス）。失うと敗北。周囲を明るく照らす。農兵と近衛兵をここで集める';
 const BUILD_ORDER=['outpost','miner','quarry','ironmine','farm','fishery','well','ammo','powder','barracks','apart','market','tavern','church','lab','furnace','fence','gate','swall','wall','bastion','brazier','spike','pit','bomb','totem','mg','how','cannon','mortar','mabou','hisou','tower','magetower','train','stable','magic','aerie'];
@@ -2014,7 +2014,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('hisousha',{cat:'防衛',tier:2,name:'飛槍車',cost:{steel:80,iron:40},t:2,pre:['kougen'],icon:'hisou',eff:'「飛槍車」を建設できる（空の敵専用。槍を一斉に打ち上げて群れごと落とす）'});
  set('catapult',{cat:'防衛',tier:1,name:'投石機',pre:[],eff:'「投石機」を建設できる（石材を撃つ曲射の範囲攻撃。味方の建物越しに撃てる）'});
  set('bighow',{cat:'防衛',tier:2,name:'大岩弾',pre:['catapult'],eff:'投石機の火力 ×1.25・範囲 ×1.3'});
- set('gunpowder',{cat:'防衛',tier:3,name:'火薬',pre:['bighow'],eff:'「大砲」を建設できる（鉄の砲弾で敵を4体まで貫く・装甲無視）'});
+ set('gunpowder',{cat:'防衛',tier:3,name:'火薬',pre:['bighow'],eff:'「大砲」を建設できる（鉄の砲弾で敵を4体まで貫く）'});
  set('tetsudan',{cat:'防衛',tier:3,name:'鉄弾',cost:{iron:120,gold:60},t:3,pre:['gunpowder'],icon:'cannon',eff:'大砲の火力 +30%'});
  set('masonry',{cat:'防衛',tier:1,name:'石積み',pre:[],eff:'「石の壁」を建設できる。門と物見櫓を石造りにできる'});
  set('castle',{cat:'防衛',tier:2,name:'築城術',pre:['masonry'],eff:'「城壁」を建設できる（上に防衛施設を置ける）。門を鉄の門、物見櫓を城塞の物見櫓にできる'});
@@ -2083,7 +2083,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('furnace',{cat:'魔核',tier:2,name:'精製炉',cost:{mat:30,stone:40},t:2,pre:[],icon:'furnace',eff:'「精製炉」を建設できる：魔核のエネルギーを取り出してエーテル結晶を精製（魔核 −2 → エーテル +4／T）'});
  set('carapace',{tier:2,pre:[],icon:'hq',eff:'生産施設と城館の耐久 +25%'});
  set('totem',{cat:'魔核',tier:3,name:'呪骸の柱',cost:{mat:80,stone:60},t:3,pre:[],icon:'totem',eff:'「呪骸の柱」を建設できる：周り6マスの魔物の足を30%遅くし、攻撃の間隔を伸ばす（与える被害 −25%）'});
- set('mabou',{cat:'魔核',tier:3,name:'魔弾砲',cost:{mat:80,iron:60,elec:30},t:3,pre:['furnace'],icon:'mabou',eff:'「魔弾砲」を建設できる：エーテルを撃ち出す直射砲。射程内でいちばん硬い敵を狙い、装甲を無視して大ダメージ'});
+ set('mabou',{cat:'魔核',tier:3,name:'魔弾砲',cost:{mat:80,iron:60,elec:30},t:3,pre:['furnace'],icon:'mabou',eff:'「魔弾砲」を建設できる：エーテルを撃ち出す直射砲。射程内でいちばん硬い敵を狙って大ダメージ'});
  set('amulet',{cat:'魔核',tier:3,name:'英雄の護符',cost:{mat:60,gold:80},t:3,pre:[],icon:'h_守備',eff:'英雄のスキルの発動間隔 −30%'});
  set('abysslamp',{tier:3,name:'蒼い炎',cost:{mat:40,fuel:40},pre:[],icon:'brazier',eff:'篝火に魔核をくべて、青く強い炎にする。篝火の照らす範囲 +8マス、物見櫓 +3マス'});
  del('abyssbolt');
@@ -2108,7 +2108,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('formation',{pre:['swordplay']});set('armcare',{pre:['swordplay']});set('polearm',{pre:['swordplay']});
  set('bigquiver',{pre:['archery']});set('firecraft',{pre:['archery']});set('nighthunt',{pre:['scout']});
  set('gunpowder',{eff:'「火薬工房」を建設できる（木材と魔核から火薬を作る。大砲・迫撃砲・砲兵隊が使う）'});
- set('cannontech',{cat:'防衛',tier:3,name:'大砲',cost:{iron:100,gold:80},t:3,pre:['gunpowder'],icon:'cannon',eff:'「大砲」を建設できる（鉄の砲弾で敵を4体まで貫く・装甲無視。1発 鉄1・火薬1）'});
+ set('cannontech',{cat:'防衛',tier:3,name:'大砲',cost:{iron:100,gold:80},t:3,pre:['gunpowder'],icon:'cannon',eff:'「大砲」を建設できる（鉄の砲弾で敵を4体まで貫く。1発 鉄1・火薬1）'});
  set('tetsudan',{pre:['cannontech']});
  set('bombtrap',{cat:'防衛',tier:3,name:'爆弾罠',cost:{iron:40,powder:20,gold:40},t:2,pre:['gunpowder'],icon:'bomb',eff:'「爆弾罠」を建設できる（火薬の使い切りの罠。踏んだ魔物の周り4マスを吹き飛ばす）'});
  set('mortar',{cat:'防衛',tier:3,name:'迫撃砲',cost:{iron:100,stone:60,gold:80},t:3,pre:['gunpowder'],icon:'mortar',eff:'「迫撃砲」を建設できる（投石機の上位：射程19・大きな範囲。石材と火薬を使う）'});
@@ -2505,7 +2505,7 @@ function elevPx(px,py){return elevAt(Math.floor(px/T),Math.floor(py/T));}
 const ELEV_NAME=['','岩場','岩場（中）','岩場（大）'];
 // 高さごとの効果：防衛施設の射程 +0.8/Lv、装甲貫通 25%/Lv、部隊の射程 +0.5/Lv。光線級からは高いほど遠くから狙われる
 function elevRange(b){return b&&b.x!=null?0.8*elevAt(b.x,b.y):0;}
-function elevAP(b){return b&&b.x!=null?0.25*elevAt(b.x,b.y):0;}
+function elevAP(b){return 0;}   /* 高所からの装甲抜きはやめた（2026-11-12） */
 // 城壁の上の防衛施設：射程 +1（城壁の改修レベルごとに+0.25）
 function wallRange(b){return b&&b.wall?(b.wall.bastion?1.5:1)+0.25*((b.wall.lv||1)-1):0;}
 function initCommon(){
@@ -2834,7 +2834,7 @@ function hpOf(type,lv,mat){
   return Math.round(h);
 }
 // 研究による防衛施設ごとの補正
-function defTechMul(b){let r=1+(has('analysis')?0.1:0);if(b.type==='mg')r+=0.2*lvl('kougen');if(b.type==='tower'){r+=0.2*lvl('goukyu');const gs=b.gar&&S.squads.find(x=>x.id===b.gar);if(gs&&gs.ut==='arch')r+=0.15*lvl('archery')+vetDmg(gs);}if(b.type==='cannon'&&has('tetsudan'))r+=0.3;return r;}
+function defTechMul(b){let r=1+(has('analysis')?0.1:0);if(b.type==='mg')r+=0.2*lvl('kougen');if(b.type==='tower'){r+=0.2*lvl('goukyu')+0.15*lvl('archery');}   /* 弓術は櫓の射手にも効く */if(b.type==='cannon'&&has('tetsudan'))r+=0.3;return r;}
 // 防衛施設の火力：基礎値（種類＋施設Lvの固定値）と、上乗せ％の一覧
 const LV_DMG_ADD=[0,0.42,0.92];
 function dmgBaseB(b){const g=gunOf(b)||B[b.type];const d=B[b.type];return (g.dmg||0)*(1+(d.grp==='def'?LV_DMG_ADD[(b.lv||1)-1]:0));}
@@ -2850,7 +2850,7 @@ function prodPctB(b){const L=[];const add=(n,v)=>{if(v>0.001)L.push([n,v]);};con
   const tm=['miner','quarry','ironmine','farm','fishery','ammo'].includes(b.type)?techMul(b.type)-1:0;add('研究',tm);return L;}
 function dmgB(b){return dmgBaseB(b)*(1+pctSum(dmgPctB(b)));}
 function gunMods(b){
-  const r={dmg:1,rate:1,splash:1,ap:b.type==='mg',cluster:false,pierceAll:false};
+  const r={dmg:1,rate:1,splash:1,ap:false,cluster:false,pierceAll:false};
   if(b.type==='tower'&&has('tower'))r.rate+=0.2;
   if(b.type==='mg'){if(has('gatling'))r.rate+=0.6;if(has('apmg'))r.ap=true;}
   if(HOW_FAM.includes(b.type)){if(has('bighow'))r.splash*=1.3;if(has('cluster'))r.cluster=true;}
@@ -4335,10 +4335,10 @@ function update(dt,sim){
             S.shots.push({x:cx,y:cy,tx:(back||tg).x,ty:(back||tg).y,t:0,dur:0.22,arrow:true,big:true});se('mg');
           }
           else if(g.cannon){
-            // 砲弾：射線上の敵を最大4体まで貫く（装甲無視・奥ほど威力減）
+            // 砲弾：射線上の敵を最大4体まで貫く（奥ほど威力減。装甲無視はやめた・2026-11-12）
             const a=Math.atan2(tg.y-cy,tg.x-cx),L=rangeOf(b)*TU,ex=cx+Math.cos(a)*L,ey=cy+Math.sin(a)*L;
             const hit=S.enemies.filter(e=>!E[e.type].fly&&segDist(e.x,e.y,cx,cy,ex,ey)<E[e.type].r+6).sort((p,q)=>Math.hypot(p.x-cx,p.y-cy)-Math.hypot(q.x-cx,q.y-cy)).slice(0,4);
-            hit.forEach((e,i)=>hitEnemy(e,dm*[1,0.75,0.55,0.4][i],b,true));
+            hit.forEach((e,i)=>hitEnemy(e,dm*[1,0.75,0.55,0.4][i],b,false));
             const last=hit.length?hit[hit.length-1]:tg;
             S.shots.push({x:cx,y:cy,tx:last.x,ty:last.y,t:0,dur:0.2,c:'#2a2a2a',w:4});
             S.fx.push({x:cx+Math.cos(a)*12,y:cy+Math.sin(a)*12,r:TU*1.1,t:0,dur:0.22,c:'#ffe0a0'});
@@ -4351,7 +4351,7 @@ function update(dt,sim){
             for(const e of S.enemies){if(segDist(e.x,e.y,cx,cy,ex,ey)<E[e.type].r+6)hitEnemy(e,dm,b,true);}
             S.shots.push({x:cx,y:cy,tx:ex,ty:ey,t:0,dur:0.3,c:'#e3c2ff',w:4});
           }
-          else{hitEnemy(tg,dm,b,g.pierce||gm.ap);S.shots.push((b.type==='mg'||b.type==='tower')?{x:cx,y:cy-(b.type==='tower'?8:0),tx:tg.x,ty:tg.y,t:0,dur:b.type==='mg'?0.16:0.22,arrow:true,big:b.type==='mg'}:{x:cx,y:cy,tx:tg.x,ty:tg.y,t:0,dur:g.pierce?0.25:0.08,c:g.pierce?'#d48cff':null,w:g.pierce?3:1});}
+          else{hitEnemy(tg,dm,b,false);S.shots.push((b.type==='mg'||b.type==='tower')?{x:cx,y:cy-(b.type==='tower'?8:0),tx:tg.x,ty:tg.y,t:0,dur:b.type==='mg'?0.16:0.22,arrow:true,big:b.type==='mg'}:{x:cx,y:cy,tx:tg.x,ty:tg.y,t:0,dur:g.pierce?0.25:0.08,c:g.pierce?'#d48cff':null,w:g.pierce?3:1});}
         }else if(tg){b.cd=0.5;b.noAmmo=true;}else b.noAmmo=false;
       }
     }
@@ -4960,7 +4960,7 @@ function econWarnings(e,f){
 let econKey='';
 // 住民の内訳：施設の要員は仕事の名前で、部隊は兵種で数える
 const JOB={miner:'木こり',quarry:'石工',ironmine:'鉱夫',farm:'農夫',fishery:'漁師',well:'エーテル掘り',ammo:'武器鍛冶',powder:'火薬職人',furnace:'精製職人',market:'商人',tavern:'酒場の店員',barracks:'',apart:'',lab:'研究員',
-  mg:'バリスタ兵',how:'投石兵',cannon:'砲手',mortar:'砲手',mabou:'魔弾砲手',hisou:'飛槍兵',outpost:'砦の守備兵',train:'兵舎の番兵',stable:'馬丁',magic:'魔導院の番人',aerie:'竜の世話係'};
+  mg:'バリスタ兵',how:'投石兵',cannon:'砲手',mortar:'砲手',mabou:'魔弾砲手',tower:'櫓の射手',magetower:'塔の魔術師',hisou:'飛槍兵',outpost:'砦の守備兵',train:'兵舎の番兵',stable:'馬丁',magic:'魔導院の番人',aerie:'竜の世話係'};
 function popBreakdown(){const work={},army={};let research=0,train=0;
   for(const b of S.blds){const n=b.crew||0;if(n){const j=JOB[b.type]||B[b.type].name+'の要員';work[j]=(work[j]||0)+n;}if(b.qm)for(const m of b.qm){const u=MTC[m];train+=u.popEach*u.members;}}
   for(const q of S.squads){const n=q.members*MT(q).popEach;if(!n)continue;const j=MT(q).name;army[j]=(army[j]||0)+n;}
@@ -6003,7 +6003,7 @@ function terTip(x,y,t,lv,full){
   const res=[];if(S.ore[y][x])res.push(`鉄鉱脈Lv${richAt(x,y)}（鉱山の産出×${RICH[richAt(x,y)]}）`);if(S.oil[y][x])res.push(`龍脈の泉Lv${richAt(x,y)}（採掘所の産出×${RICH[richAt(x,y)]}）`);
   let short='',L=[];
   if(t===1){short='射程が伸びる高台・石材';
-    L=[[`防衛施設：射程 +${(0.8*lv*U).toFixed(1)}マス・硬い敵に +${25*lv}%`,G],[`部隊：射程 +${0.5*lv*U}マス`,G],[`敵の移動 -${[0,10,20,35][lv]}%`,G],['石切り場を建てると石材が採れる'],[`注意：敵の術師から +${1.5*lv*U}マス遠くで狙われる`,Y]];}
+    L=[[`防衛施設：射程 +${Math.round(0.8*lv*U)}マス・硬い敵に +${25*lv}%`,G],[`部隊：射程 +${0.5*lv*U}マス`,G],[`敵の移動 -${[0,10,20,35][lv]}%`,G],['石切り場を建てると石材が採れる'],[`注意：敵の術師から +${1.5*lv*U}マス遠くで狙われる`,Y]];}
   else if(t===2){short='敵が遅くなる・被害が減る';
     L=[[`敵の移動 -${Math.round((1-FOREST_SLOW[lv])*100)}%`,G],[`ここの施設と部隊は被害 -${10*lv}%`,G],[`味方の部隊も移動 -${[0,20,35,50][lv]}%`,Y],['伐採所で木材が採れる']];}
   else if(t===4){short=lv===1?'敵がとても遅くなる':'敵がとても遅くなる・建設不可';
@@ -6014,7 +6014,7 @@ function terTip(x,y,t,lv,full){
 }
 // 地形ごとのレベル効果（凡例と詳細表示で共通）
 function terEffect(t,lv){
-  if(t===1)return `石切り場で石材が採れる（岩が多いほど多い）。防衛施設の射程 +${(0.8*lv*U).toFixed(1)}・硬い敵への威力 +${25*lv}%・部隊の射程 +${0.5*lv*U}。敵の移動 -${[0,10,20,35][lv]}%。<span style="color:#ffe14e">敵の術師からも +${1.5*lv*U}マス遠くで狙われる</span>`;
+  if(t===1)return `石切り場で石材が採れる（岩が多いほど多い）。防衛施設の射程 +${Math.round(0.8*lv*U)}・硬い敵への威力 +${25*lv}%・部隊の射程 +${0.5*lv*U}。敵の移動 -${[0,10,20,35][lv]}%。<span style="color:#ffe14e">敵の術師からも +${1.5*lv*U}マス遠くで狙われる</span>`;
   if(t===2)return `敵の移動 -${Math.round((1-FOREST_SLOW[lv])*100)}%・部隊 -${[0,20,35,50][lv]}%。ここの施設と部隊は被害 -${10*lv}%（遮蔽）。建設可`;
   if(t===4)return `敵の移動 -${Math.round((1-MARSH_SLOW[lv])*100)}%・部隊 -${[0,30,50,70][lv]}%。${lv===1?'建設可':'<span style="color:#ff8a7a">建設不可</span>'}`;
   return '';
@@ -6168,7 +6168,7 @@ function heroDetail(c){
   h+=`<div class="muted" style="margin:6px 0">${sp.desc}</div>`;
   h+=`<div class="row"><span class="muted">攻（火力）</span><span>${c.atk}</span></div><div class="row"><span class="muted">防（耐久・被害軽減）</span><span>${c.def}</span></div><div class="row"><span class="muted">技（連射・生産）</span><span>${c.tec}</span></div>`;
   for(const k of heroSkills(c))h+=`<div style="margin-top:8px;padding:6px;border:1px solid ${sp.color}55;background:#14110c"><div style="display:flex;align-items:center;gap:6px">${skillIcon(k.id,28)}<b style="color:${sp.color};font-size:14px">${k.name}</b>${k.cd?`<span class="muted" style="font-size:11px">${k.cd}秒ごとに自動</span>`:'<span class="muted" style="font-size:11px">常時</span>'}</div>
-    <div style="margin-top:4px;font-size:12px">${k.desc}</div><div class="muted" style="font-size:11px;margin-top:2px">威力 ×${(1+0.1*(c.lv-1)).toFixed(1)}（Lvで上がる）・<b>適任の配属先でだけ</b>使える</div></div>`;
+    <div style="margin-top:4px;font-size:12px">${k.desc}</div><div class="muted" style="font-size:11px;margin-top:2px">威力 ${100+10*(c.lv-1)}%（Lvで上がる）・<b>適任の配属先でだけ</b>使える</div></div>`;
   h+=`<div class="row" style="margin-top:8px"><span class="muted">特性</span><span>${c.trait?`<b>${c.trait}</b>`:'なし'}</span></div>${tr&&tr.d?`<div class="muted" style="font-size:11px;text-align:right">${tr.d}</div>`:''}`;
   h+=`<div class="row"><span class="muted">撃破</span><span>${c.kills||0}</span></div>`;
   h+=`<div class="row"><span class="muted">配属</span><span>${a?objName(a)+(match(c,a)===1?' <span style="color:var(--green)">★適任</span>':' <span class="muted">（不得意：効果40%・スキルなし）</span>'):'<span style="color:var(--amber)">待機中</span>'}</span></div>`;
@@ -6251,13 +6251,13 @@ function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
     const sp=supOf(o);if(sp)h+=`<div class="hpline"><span>${sp.name}</span><span id="iSup">${supText(o)}</span></div><div class="hpbar sup"><i id="iSupBar" style="width:${Math.round(o.sup/sp.max*100)}%"></i></div>`;
     {const vb=vetBar(o);h+=`<div class="hpline"><span class="vetl">${vetIc(o,12)}熟練度 <b>${VET[vetLv(o)].n}</b></span><span id="iVet">${vb.txt}</span></div><div class="hpbar vet"><i id="iVetBar" style="width:${vb.pct}%"></i></div>`;}
     h+=`<div class="cmdbtns">${['guard','hold','return'].map((m,i)=>`<button data-mode="${m}" class="${o.mode===m?'cur':''}${m==='return'?' ret':''}" title="${MODE_NAME[m]} [${'GFB'[i]}]">${MODE_NAME[m]}<kbd>${'GFB'[i]}</kbd></button>`).join('')}</div>`;
-    h+=`<div class="stats"><div><small>火力</small><b>${Math.round(unitDmg(o)/t.rate)}<span>/秒</span></b></div><div><small>射程</small><b>${(unitRange(o)*U).toFixed(1)}<span>マス${unitSplash(o)?'・範囲':''}</span></b></div><div><small>熟練度</small><b class="vetb">${vetIc(o,12)}${VET[vetLv(o)].n}</b></div></div>`;
+    h+=`<div class="stats"><div><small>火力</small><b>${Math.round(unitDmg(o)/t.rate)}<span>/秒</span></b></div><div><small>射程</small><b>${Math.round(unitRange(o)*U)}<span>マス${unitSplash(o)?'・範囲':''}</span></b></div><div><small>熟練度</small><b class="vetb">${vetIc(o,12)}${VET[vetLv(o)].n}</b></div></div>`;
     return h;}
   const d=B[o.type];
   h+=`<div class="ihead"><span class="iname">${d.name}</span>${d.grp?`<span class="ilv">Lv${o.lv||1}</span>`:''}<span class="itype">${tag}</span></div>`;
   h+=`<div class="hpline"><span>耐久</span><span id="iHp">${Math.ceil(o.hp)} / ${Math.ceil(o.maxhp)}</span></div><div class="hpbar${hc}"><i id="iHpBar" style="width:${Math.round(r*100)}%"></i></div>`;
   const tiles=[];
-  if(gunOf(o))tiles.push(`<small>射程</small><b>${(rangeOf(o)*U).toFixed(1)}<span>マス</span></b>`);
+  if(gunOf(o))tiles.push(`<small>射程</small><b>${Math.round(rangeOf(o)*U)}<span>マス</span></b>`);
   if(d.pop)tiles.push(`<div id="iCrew" class="tl">${crewTile(o)}</div>`);
   tiles.push(`<small>狙われやすさ</small><b>${heatName(o)}</b>`);
   if(tiles.length<3&&canHostHero(o))tiles.push(`<small>向いている英雄</small><b>${specOfTarget(o)}</b>`);
@@ -6329,7 +6329,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(!isS&&o.type==='market'&&!(o.bt>0))h+=marketHTML(o);
   if(!isS&&gunOf(o)&&o.type!=='hq'&&!(o.bt>0&&!o.upg))h+=brkHTML('火力（1発）',dmgBaseB(o),dmgPctB(o));
   if(!isS&&!gunOf(o)&&!(o.bt>0)){const po=prodOf(o);if(po){const k=Object.keys(po).find(x=>po[x]>0&&x!=='pop');if(k){const L=prodPctB(o);const base=po[k]/(1+pctSum(L));h+=brkHTML(`生産（${RES_NAME[k]||k}）`,base,L,'/T');}}}
-  if(!isS&&gunOf(o)&&(elevRange(o)||wallRange(o)||elevAP(o))){const er=elevRange(o),wr=wallRange(o);h+=`<div class="row"><span class="muted">射程の内訳</span><span>${(rangeOf(o)*U).toFixed(1)}マス${er||wr?`<span class="muted" style="font-size:11px">（${[er?'標高+'+(er*U).toFixed(1):'',wr?(o.wall&&o.wall.bastion?'櫓台+':'城壁+')+(wr*U).toFixed(1).replace(/\.0$/,''):''].filter(x=>x).join('・')}）</span>`:''}${elevAP(o)?`・<span class="muted" style="font-size:11px">高所：硬い敵に+${Math.round(elevAP(o)*100)}%</span>`:''}</span></div>`;}
+  if(!isS&&gunOf(o)&&(elevRange(o)||wallRange(o)||elevAP(o))){const er=elevRange(o),wr=wallRange(o);h+=`<div class="row"><span class="muted">射程の内訳</span><span>${Math.round(rangeOf(o)*U)}マス${er||wr?`<span class="muted" style="font-size:11px">（${[er?'標高+'+Math.round(er*U):'',wr?(o.wall&&o.wall.bastion?'櫓台+':'城壁+')+Math.round(wr*U).replace(/\.0$/,''):''].filter(x=>x).join('・')}）</span>`:''}${elevAP(o)?`・<span class="muted" style="font-size:11px">高所：硬い敵に+${Math.round(elevAP(o)*100)}%</span>`:''}</span></div>`;}
   if(!isS)h+=tileDesc(o.x,o.y).replace(/<div class="row">.*?<\/div>/,S.ter[o.y][o.x]?'$&':'');
   if(!isS&&o.type==='wall'&&ready(o))h+=tileBuildHTML(o.x,o.y,'この城壁の上に防衛施設を建設');
   if(!isS&&o.type==='bastion'&&ready(o))h+=tileBuildHTML(o.x,o.y,'この櫓台の上に防衛施設を建設（射程 +3・火力 +20%）');
@@ -6341,7 +6341,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     const t=MT(o);
     h+=`<div class="row"><span class="muted">兵種</span><span style="color:${t.color}">${t.name}（${t.role}）</span></div><div class="desc">${t.desc}</div>`;
     h+=brkHTML('火力（1発）',dmgBaseS(o)*Math.max(0,o.members)/t.members,dmgPctS(o));
-    h+=`<div class="row"><span class="muted">火力・射程</span><span>${Math.round(unitDmg(o)/t.rate)}/秒・${(unitRange(o)*U).toFixed(1)}マス${unitSplash(o)?'（範囲）':''}</span></div>`;
+    h+=`<div class="row"><span class="muted">火力・射程</span><span>${Math.round(unitDmg(o)/t.rate)}/秒・${Math.round(unitRange(o)*U)}マス${unitSplash(o)?'（範囲）':''}</span></div>`;
     if(0){const vl=vetLv(o),nx=VET[vl+1],cap=has('elite')?2:1;h+=`<div class="row"><span class="muted">熟練度</span><span>${VET[vl].n}${vl<cap&&nx?`　<span class="muted" style="font-size:11px">次まで ${Math.max(0,Math.ceil(nx.xp-(o.vet||0)))}</span>`:vl===1&&!has('elite')?'　<span class="muted" style="font-size:11px">（研究「精鋭」で上限解放）</span>':''}</span></div>`;
      const rb=Math.round(squadResBonus(o)*100),hb=Math.round((bonus(o).dmg-1)*100);h+=`<div class="muted" style="font-size:11px;text-align:right">火力の内訳：研究・熟練 +${rb}%／英雄 +${hb}%${coBonus(o)?'／中隊 +15%':''}${o.buffT>0?'／鼓舞 +30%':''}${o.members<t.members?`／欠員 ×${(o.members/t.members).toFixed(1)}`:''}</div>`;}
     if(true){coFix(o);
@@ -6665,7 +6665,7 @@ function dexFirst(){// このマップで初めて出てくる襲撃（genWave �
   return o;}
 function dexTraits(d){const L=[];
   if(d.fly)L.push(['空を飛ぶ','壁を越える。空を撃てる兵器でしか倒せない']);
-  if(d.armor)L.push([`装甲 ${Math.round(d.armor*100)}%`,'受けるダメージを減らす。大砲・魔弾砲・高所から撃つと装甲を抜ける']);
+  if(d.armor)L.push([`装甲 ${Math.round(d.armor*100)}%`,'受けるダメージを減らす']);
   if(d.ranged)L.push([`遠距離 ${d.ranged*U}マス`,'防衛施設を射程の外から狙う']);
   if(d.archers)L.push(['弓で攻撃',`周り${d.archers.range*U}マスの部隊・施設を撃つ`]);
   if(d.wallBreak)L.push(['壁壊し','壁を優先して壊す']);
@@ -6915,6 +6915,7 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   log(`${MAPS[CUR_MAP]?MAPS[CUR_MAP].name:''}：セーブから再開（${S.turn}日目・第${S.wave+1}襲撃の前）`,'good');
   renderAll();resizeView();auMusicFor&&auMusicFor();
   if(S.phase==='night'&&!S.waveActive&&!S.over){calcLights();setTimeout(()=>{if(!S.overlay)showNight();},0);}   // 夜にセーブしたものを再開したら、夜の画面を出し直す（暗い地図のままにしない）
+  for(const b of S.blds||[])if((b.type==='tower'||b.type==='magetower')&&b.gar){const q=S.squads.find(x=>x.id===b.gar);b.gar=null;if(q){q.gar=null;q.x=bcx(b);q.y=bcy(b)+0.9*TU;}}   /* 櫓・塔は人員で撃つようになった（2026-11-12） */
   return true;}
 function delSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
 addEventListener('beforeunload',()=>{if(canSave())saveGame(true);});
