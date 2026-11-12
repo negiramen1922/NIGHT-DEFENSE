@@ -3026,10 +3026,10 @@ function castleImg(lv){return PXI['castle'+(lv===2?'':Math.max(1,Math.min(5,lv||
 if(NDSPR.units&&NDSPR.units.archer&&!NDSPR.units.scout){const a=NDSPR.units.archer;const pal=Object.assign({},a.pal,{b:'#8a90a0',d:'#646a7a',e:'#3c404c',n:'#4c5060',i:'#5e6272',q:'#6e6656',r:'#807868',s:'#665e50',u:'#4e4838',v:'#5a5446',p:'#2e2a24'});NDSPR.units.scout=Object.assign({},a,{pal});}
 // 試作：砲兵の大砲を武器の段の色に塗り替える（鉄・鋼・合金・魔金属・聖銀・竜晶）。見た目で装備の段が分かる
 if(NDSPR.units&&NDSPR.units.cannoneer){const a=NDSPR.units.cannoneer;const sh=(hex,f)=>'#'+[1,3,5].map(i=>Math.round(parseInt(hex.slice(i,i+2),16)*f).toString(16).padStart(2,'0')).join('');
-  const CC=['#676c73','#a8c4e0','#5a5e70','#9a62e0','#eef4ff','#d0504a'];for(let t=1;t<CC.length;t++){const c=CC[t];NDSPR.units['cannoneer_w'+t]=Object.assign({},a,{pal:Object.assign({},a.pal,{e:c,f:sh(c,0.85),g:sh(c,0.8),k:sh(c,0.65),l:sh(c,0.5),m:sh(c,0.4)})});}}
+  const CC=['#676c73','#a8c4e0','#5a5e70','#9a62e0','#eef4ff','#d0504a'];for(let t=1;t<CC.length;t++){const c=CC[t];NDSPR.units['cannoneer_w'+t]=Object.assign({},a,{pal:Object.assign({},a.pal,{e:c,f:sh(c,0.85),g:sh(c,0.8),k:sh(c,0.65),l:sh(c,0.5),m:sh(c,0.4)},t===2?{g:'#f0c850',m:'#a8862e'}:{})});}}
 const SPR={};
 // 試作（2026-11-12）：兵士たちの見た目を装備の段で変える。絵の中の「武器の色」と「鎧（ローブ）の色」だけを、段の色に塗り替える（明るさの差は残す）。描き直しまでの仮
-const TINT={pawn:{w:'h',a:'ef'},heavy:{w:'d',a:'bcfgiklmqr'},rider:{w:'c',a:'efh'},archer:{w:'c',r:'bdenpqrsuv'},guard:{w:'j',a:'efgkl'},wizard:{w:'degh',r:'bcfiko'}};
+const TINT={pawn:{w:'h',a:'ef',g:'bcd'},heavy:{w:'d',a:'bcfgiklmqr',g:'c'},rider:{w:'c',a:'efh',g:'b'},archer:{w:'c',r:'bdenpqrsuv'},guard:{w:'j',a:'efgkl',g:'bcd'},wizard:{w:'degh',r:'bcfiko'}};
 const W_TINT=[null,'#a8c4e0','#626678','#a774ec','#ffffff','#ff6a5a'],M_TINT=[null,'#62c6d9','#a774ec','#ffffff','#ff5a4e'];
 const A_TINT=['#a0703c',null,'#a8c4e0','#626678','#8c86a6','#ffffff','#ff6a5a'],R_TINT=[null,'#9aa0a6','#62c6d9','#f0f4ff','#d0504a'];
 const SPR_T={};
@@ -3039,6 +3039,7 @@ function tintPal(pal,chars,col){if(!col)return pal;const rgb=h=>[1,3,5].map(i=>p
 function sprTinted(cat,key,wt,at,ut){const base=SPR[cat]&&SPR[cat][key];const mk=Object.keys(TINT).find(k=>key===k||key.startsWith(k+'_'));if(!base||!mk)return base;
   const T=TINT[mk],wc=ut==='mage'?M_TINT[wt]:W_TINT[wt],ac=T.r?R_TINT[at]:A_TINT[at];if(!wc&&!ac)return base;
   const id=cat+'/'+key+'|'+wt+'|'+at;if(SPR_T[id])return SPR_T[id];const sp=NDSPR[cat][key];let pal=tintPal(sp.pal,T.w,wc);pal=tintPal(pal,T.a||T.r||'',ac);
+  if(at===3&&T.g)pal=tintPal(pal,T.g,'#f0c850');/* 合金：黒い鋼に金のワンポイント（兜の飾り・重装歩兵は兜の縁） */
   const o={size:sp.size,pal,img:{}};for(const a in sp.anims)o.img[a]=sp.anims[a].map(rows=>{const c=document.createElement('canvas');c.width=rows[0].length;c.height=rows.length;const g=c.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=pal[r[x]];if(!col)continue;g.fillStyle=col;g.fillRect(x,y,1,1);}});return c;});
   return SPR_T[id]=o;}
 (function(){for(const cat in NDSPR){if(cat[0]==='_')continue;SPR[cat]={};for(const k in NDSPR[cat]){const sp=NDSPR[cat][k];const o={size:sp.size,pal:sp.pal,img:{}};
