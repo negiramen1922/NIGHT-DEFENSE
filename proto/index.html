@@ -1676,7 +1676,7 @@ const BASE_MAX=7;
 // 大きさ（マス）：基本は2×2、大きい施設は3×3、城は4×4
 const BIG_SZ=3;
 // 柵・石の壁・城壁は1×1（門は2×2）
-const BSIZE={hq:4,fence:1,swall:1,wall:1,brazier:1};for(const k of ['bastion','outpost','how','cannon','mortar','mabou','field','hvy','rail','mlrs','market','lab','magic','aerie','hangar','tankf','airfield','furnace','apart','reactor','elecf','power'])BSIZE[k]=BIG_SZ;BSIZE.church=BIG_SZ;for(const k of ['spike','pit','bomb','landmine'])BSIZE[k]=1;   // 罠は1×1（たくさん並べて使う）   // 馬小屋・酒場・兵舎・火薬工房は2×2（ドット絵v2）
+const BSIZE={hq:4,fence:1,swall:1,wall:1,wall2:1,wall3:1,wall4:1,wall5:1,brazier:1};for(const k of ['bastion','outpost','how','cannon','mortar','mabou','field','hvy','rail','mlrs','market','lab','magic','aerie','hangar','tankf','airfield','furnace','apart','reactor','elecf','power'])BSIZE[k]=BIG_SZ;BSIZE.church=BIG_SZ;for(const k of ['spike','pit','bomb','landmine'])BSIZE[k]=1;   // 罠は1×1（たくさん並べて使う）   // 馬小屋・酒場・兵舎・火薬工房は2×2（ドット絵v2）
 function newSz(t){return BSIZE[t]||U;}
 function bsz(b){return (b&&b.sz)||(b&&b.type?newSz(b.type):U);}
 function bcx(b){return (b.x+bsz(b)/2)*T;}
@@ -1686,7 +1686,7 @@ function bcyT(b){return b.y+(bsz(b)-1)/2;}
 function bCells(x,y,n){const a=[];for(let dy=0;dy<n;dy++)for(let dx=0;dx<n;dx++)a.push([x+dx,y+dy]);return a;}
 function gridSet(b,v){for(const [cx,cy] of bCells(b.x,b.y,bsz(b)))if(cy>=0&&cy<ROWS&&cx>=0&&cx<COLS&&(v||S.grid[cy][cx]===b))S.grid[cy][cx]=v?b:null;}
 // 施設の上限：柵・壁・門・罠・篝火・城・前哨砦は数えない
-const FAC_FREE=new Set(['hq','outpost','brazier','fence','swall','wall','gate','landmine','spike','pit','bomb']);
+const FAC_FREE=new Set(['hq','outpost','brazier','fence','swall','wall','wall2','wall3','wall4','wall5','gate','landmine','spike','pit','bomb']);
 function facCounted(t){return !FAC_FREE.has(t)&&!(B[t]&&B[t].isMine);}
 function facCount(){return S.blds.filter(b=>facCounted(b.type)).length;}
 function outpostN(){return S.blds.filter(b=>b.type==='outpost').length;}
@@ -1759,10 +1759,10 @@ Object.assign(B,{
   pit:    {name:'落とし穴',glyph:'',hp:1,heat:0,cost:{steel:25},pop:0,power:0,spec:'工兵',isMine:true,kind:'pit',desc:'1×1。落ちた魔物に大ダメージを与え、しばらく動けなくする。一晩に3回使うと埋まる。襲撃のあとに木材8で自動で掘り直す（一括修理でも）'},
   bomb:   {name:'爆弾罠',glyph:'',hp:1,heat:0,cost:{steel:15,powder:8},pop:0,power:0,spec:'工兵',isMine:true,kind:'bomb',req:'bombtrap',desc:'火薬を詰めた使い切りの罠。踏んだ魔物の周り4マスを吹き飛ばし、大きなダメージを与える（空の敵には効かない）。領地の外にも置ける'},
   brazier:{name:'篝火',glyph:'',hp:35,heat:3,cost:{steel:20},pop:0,power:0,spec:'工兵',desc:'夜の闇を照らす（半径12マス。研究「松脂」+4・「蒼い炎」+4）。夜は照らされた敵しか狙えないので、防衛施設の射程の先まで照らすのが大事。魔物にわざわざ狙われることはないが、通り道にあると叩き壊される（耐久が低い。修理は安い）。火を怖がる小さな魔物（ゴブリン・ゴブリンライダー・レッドキャップ・シャーマン・アーチャー）は、篝火の4マス以内で足が40%遅くなる。燃料として夜ごとに木材を2使い、足りないと灯らない'},
-  fence:  {name:'木の柵',glyph:'',hp:180,heat:0,cost:{steel:15},pop:0,power:0,spec:'工兵',grp:'def',desc:'安くて早く建つが、もろい'},
-  swall:  {name:'石の壁',glyph:'',hp:450,heat:0,cost:{stone:25},pop:0,power:0,spec:'工兵',grp:'def',desc:'丈夫な石積みの壁。木の柵の上に重ねて建て替えられる',req:'masonry'},
+  fence:  {name:'木の柵',glyph:'',hp:300,heat:0,cost:{steel:15},pop:0,power:0,spec:'工兵',grp:'def',desc:'安くて早く建つが、もろい'},
+  swall:  {name:'石の壁',glyph:'',hp:600,heat:0,cost:{stone:25},pop:0,power:0,spec:'工兵',grp:'def',desc:'丈夫な石積みの壁。木の柵の上に重ねて建て替えられる',req:'masonry'},
   bastion:{name:'櫓台',glyph:'',hp:1600,heat:0,cost:{stone:120,steel:40,gold:30},pop:0,power:0,spec:'工兵',grp:'def',towerWall:true,req:'castle',desc:'石を高く積んだ2×2の台座。敵を通さず、上にバリスタ・投石機・大砲・迫撃砲などを1つ載せられる（2×2の物も可。台座を選んで「この上に建設」）。載せた施設は射程 +3・火力 +20%。敵はまず台座を壊す'},
-  wall:   {name:'城壁',glyph:'',hp:800,heat:0,cost:{stone:50,steel:20,gold:20},pop:0,power:0,spec:'工兵',grp:'def',desc:'最も丈夫な壁。柵・石の壁の上に重ねて建て替えられる。上にバリスタ・投石機を置くと射程と威力が上がる',req:'castle'},
+  wall:   {name:'城壁',glyph:'',hp:900,heat:0,cost:{stone:50,steel:20,gold:20},pop:0,power:0,spec:'工兵',grp:'def',desc:'最も丈夫な壁。柵・石の壁の上に重ねて建て替えられる。上にバリスタ・投石機を置くと射程と威力が上がる',req:'castle'},
   mg:     {name:'バリスタ',glyph:'弩',hp:260,heat:1,cost:{steel:80,iron:20,gold:30},pop:3,power:0,spec:'守備',grp:'def',desc:'大型の弩（直射）。重い矢でゴブリンなら一撃、その後ろの敵まで貫く（2体目は70%）。空の敵も撃てる。矢を使う',range:5,dmg:50,rate:1.4,ammoUse:1,direct:true,antiAir:true,bolt:true},
   cannon: {name:'大砲',glyph:'砲',hp:320,heat:2,cost:{steel:120,iron:60,stone:30,gold:60},pop:4,power:0,spec:'守備',grp:'def',desc:'火薬で鉄の砲弾を撃ち出す直射砲。射線上の敵を最大4体まで貫く。撃つと轟音とともに閃光が走る。鉄を砲弾に使う。城壁の上にも置ける',req:'gunpowder',range:5,dmg:150,rate:3.4,ammoUse:1.5,ammoKey:'iron',direct:true,cannon:true},
   how:    {name:'投石機',glyph:'投',hp:240,heat:1,cost:{steel:100,stone:20,gold:40},pop:4,power:0,spec:'守備',grp:'def',desc:'石材を撃ち出す曲射兵器。城壁の向こうへ範囲攻撃。最低射程4マス',req:'catapult',range:8,minRange:2,dmg:70,rate:3.0,splash:1.6,ammoUse:2,ammoKey:'stone'},
@@ -1896,7 +1896,11 @@ function ready(b){return !(b.bt>0);}
  for(const k of BUILD_ORDER){const c=B[k].cost;let sum=0;for(const r in c)if(r!=='gold')sum+=c[r];const g=Math.max(5,Math.round(sum*0.2/5)*5);c.gold=Math.max(c.gold||0,g);}})();
 for(const k of ['fence','swall','wall']){const c=B[k].cost;for(const r in c)c[r]=Math.ceil(c[r]/2);}   // 壁は1×1になったので、同じ長さで前と同じ費用になるよう半額
 const GUN_TYPES=['mg','how','cannon','mabou','hisou','tower','magetower','field','mortar','hvy','mlrs','rail'];
-const WALL_TYPES=['fence','swall','wall'];
+/* 壁の上位（2026-11-12）：城壁の上に重ねて置くと置き換わる。城壁と同じく上に防衛施設を置ける */
+const WALL_UP=[['wall2','合金の城壁',1200,'alloywall','#3a3d4a',{stone:30,alloy:6,gold:15}],['wall3','魔金属の城壁',1500,'mwall','#a774ec',{stone:30,alloy:8,mat:6,gold:20}],['wall4','ミスリルの城壁',1800,'mithwall','#f0f6ff',{stone:35,alloy:8,elec:8,gold:25}],['wall5','竜晶の城壁',2100,'dragwall','#e05a4e',{stone:40,alloy:10,mat:12,gold:30}]];
+for(const [k,n,hp,rq,col,cost] of WALL_UP)B[k]=Object.assign({},B.wall,{name:n,hp,req:rq,cost,wcol:col,tier:{wall2:3,wall3:5,wall4:6,wall5:7}[k],desc:n+'。城壁（と下の段の壁）の上に重ねて置くと置き換わる。上に防衛施設を置ける'+(k==='wall4'?'。触れている魔物に少しずつダメージを与える（聖銀）':'')});
+const CWALL=new Set(['wall',...WALL_UP.map(w=>w[0])]);
+const WALL_TYPES=['fence','swall','wall',...WALL_UP.map(w=>w[0])];
 const HOW_FAM=['how','hvy'];
 // 要員充足率（必要人数に対する現員の割合）
 // 生産施設は改築するとそのぶん働き手が増える（Lv2:+1人・Lv3:+2人）
@@ -2058,6 +2062,10 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館か所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
  set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
+ set('alloywall',{cat:'防衛',tier:3,name:'合金の城壁',cost:{stone:80,alloy:20,gold:40},t:3,pre:['castle'],icon:'wall2',eff:'「合金の城壁」を建設できる（耐久1200。城壁の上に重ねて置くと置き換わる）'});
+ set('mwall',{cat:'防衛',tier:5,name:'魔金属の城壁',cost:{stone:100,alloy:30,mat:20,gold:60},t:4,pre:['alloywall'],icon:'wall3',eff:'「魔金属の城壁」を建設できる（耐久1500）'});
+ set('mithwall',{cat:'防衛',tier:6,name:'ミスリルの城壁',cost:{stone:120,alloy:40,elec:30,gold:80},t:5,pre:['mwall'],icon:'wall4',eff:'「ミスリルの城壁」を建設できる（耐久1800。触れている魔物に少しずつダメージ）'});
+ set('dragwall',{cat:'防衛',tier:7,name:'竜晶の城壁',cost:{stone:150,alloy:50,mat:40,gold:100},t:6,pre:['mithwall'],icon:'wall5',eff:'「竜晶の城壁」を建設できる（耐久2100。いちばん硬い）'});
  set('steelarmor',{cat:'部隊',tier:2,name:'鋼の鎧',cost:{iron:45,steel:30},t:2,pre:['ironarmor'],icon:'heavy',eff:'鎧が「鋼の鎧」になる：体力 +20%（補給で鎧と鉄を使う）'});
  set('alloyarmor',{cat:'部隊',tier:3,name:'合金の鎧',cost:{iron:80,gold:50},t:3,pre:['steelarmor'],icon:'heavy',eff:'鎧が「合金の鎧」になる：体力 +30%。補給で「合金」を使う'});
  set('chainmail',{cat:'部隊',tier:2,name:'鎖帷子',cost:{iron:30,steel:20},t:2,pre:[],icon:'archer',eff:'弓兵・砲兵・魔術師のローブが「皮のローブ」から「鎖帷子」になる：体力 +15%（補給で鎧を使う）'});
@@ -2826,11 +2834,11 @@ function bestMat(){return has('castle')?2:has('masonry')?1:0;}
 function hpOf(type,lv,mat){
   lv=lv||1;let h=MAT_HP[type]?MAT_HP[type][mat||0]:B[type].hp;
   if(WALL_TYPES.includes(type)||MAT_HP[type])h*=(1+0.3*lvl('wallplus'));
-  if(type==='wall'||type==='bastion')h*=UP.wallhp[lv-1];
+  if(CWALL.has(type)||type==='bastion')h*=UP.wallhp[lv-1];
   else if(B[type].grp==='def')h*=UP.hp[lv-1];
   else if(B[type].grp==='prod')h*=1+0.25*(lv-1);
   if(has('carapace')&&(B[type].grp==='prod'||type==='hq'))h*=1.25;
-  if(has('fort')&&(type==='wall'||B[type].range))h*=1.25;
+  if(has('fort')&&(CWALL.has(type)||B[type].range))h*=1.25;
   return Math.round(h);
 }
 // 研究による防衛施設ごとの補正
@@ -3064,6 +3072,10 @@ for(const k in PXS)if(!k.startsWith('e_')&&k!=='gunbase')WICON[k]=pxSvg(k);
 for(const k of ['spike','pit','bomb','bastion','hq','miner','quarry','ironmine','farm','fishery','well','ammo','barracks','lab','outpost','train','fence','swall','wall','tower','market','tavern','stable','aerie','magic','rider','dragon','wizard']){const im=new Image();im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">${WICON[k]}</svg>`);ICIMG[k]=im;}
 for(const k in PXS)ICIMG[k]=pxCanvas(k);
 const PXI={};for(const k in PXS)PXI[k]=ICIMG[k];
+for(const [k,,,,col] of WALL_UP){const src=ICIMG.wall;const c=document.createElement('canvas');c.width=src.width||48;c.height=src.height||48;const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(src,0,0,c.width,c.height);g.globalCompositeOperation='source-atop';g.globalAlpha=0.5;g.fillStyle=col;g.fillRect(0,0,c.width,c.height);ICIMG[k]=c;PXI[k]=c;
+  if(WICON.wall)WICON[k]=WICON.wall.split('#a09a90').join(col);}   /* 壁の上位：城壁の絵に材料の色を重ねた仮の絵 */
+if(SPR.walls&&SPR.walls.wall)for(const [k,,,,col] of WALL_UP){const W=SPR.walls.wall;const tint=c0=>{const c=document.createElement('canvas');c.width=c0.width;c.height=c0.height;const g=c.getContext('2d');g.drawImage(c0,0,0);g.globalCompositeOperation='source-atop';g.globalAlpha=0.45;g.fillStyle=col;g.fillRect(0,0,c.width,c.height);return c;};
+  const o={size:W.size,pal:W.pal,img:{}};for(const a in W.img)o.img[a]=W.img[a].map(tint);SPR.walls[k]=o;}
 function drawIcon(k,x,y,sz,ang){const im=ICIMG[k];if(!im||!im.complete)return false;ctx.save();ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(im,-sz/2,-sz/2,sz,sz);ctx.restore();return true;}
 // 明かり：夜（襲撃中）は明かりの範囲の敵しか見えず、狙えない
 function lightOf(b){if(b.bt>0&&!b.upg)return 0;if(b.type==='cannon'&&b.flashT&&performance.now()-b.flashT<350)return 5;return b.type==='hq'?8:b.type==='brazier'?(b.unlit?0:6+(has('pitch')?4:0)+(has('abysslamp')?4:0)):b.type==='outpost'?6:b.type==='tower'?3.5+(has('abysslamp')?1.5:0):GUN_TYPES.includes(b.type)?2.5:WALL_TYPES.includes(b.type)?0:1.5;}
@@ -3143,7 +3155,7 @@ function dvBonus(u){if(!u.dv||!has('division'))return false;const L=grpOf('dv',u
 // 中隊：2部隊が3マス以内にいれば火力+15%・被害-10%
 function coBonus(u){return coMates(u).some(p=>Math.hypot(p.x-u.x,p.y-u.y)<3*TU);}
 function hpB(b){return hpOf(b.type,b.lv,b.mat)*(1+0.2*(b.ench||0));}
-function rescaleHp(){for(const b of S.blds){const n=hpB(b);if(n!==b.maxhp){b.hp*=n/b.maxhp;b.maxhp=n;}if(b.wall){const m=hpOf(b.wall.bastion?'bastion':'wall',b.wall.lv);if(m!==b.wall.maxhp){b.wall.hp*=m/b.wall.maxhp;b.wall.maxhp=m;}}}}
+function rescaleHp(){for(const b of S.blds){const n=hpB(b);if(n!==b.maxhp){b.hp*=n/b.maxhp;b.maxhp=n;}if(b.wall){const m=hpOf(b.wall.bastion?'bastion':(b.wall.wt||'wall'),b.wall.lv);if(m!==b.wall.maxhp){b.wall.hp*=m/b.wall.maxhp;b.wall.maxhp=m;}}}}
 function countB(type){let n=0;for(const b of S.blds)if(b.type===type)n++;return n;}
 // 足りない資源を「木材が12・石材が5足りません」の形で返す（足りていれば空）
 function lackText(c,pop){const L=[];for(const k in (c||{})){const need=(c[k]||0)-(S[k]||0);if(need>0.5)L.push(`${RES_NAME[k]||k}が${Math.ceil(need)}`);}
@@ -3239,8 +3251,8 @@ function placeB(type,x,y,free,szo){
   else{// 足元の柵・壁（1×1）をまとめて置き換える。城壁の上の防衛施設は、城壁の耐久を土台として引き継ぐ
     const occ=[...new Set(bCells(x,y,b.sz).map(([cx,cy])=>S.grid[cy]&&S.grid[cy][cx]).filter(Boolean))];
     if(occ.length&&occ.every(o=>WALL_TYPES.includes(o.type))){
-      const ws=occ.filter(o=>o.type==='wall');
-      if(ws.length&&!WALL_TYPES.includes(type)&&type!=='gate'&&type!=='tower'){const k=2/ws.length;b.wall={hp:ws.reduce((a,o)=>a+o.hp,0)*k,maxhp:ws.reduce((a,o)=>a+o.maxhp,0)*k,lv:Math.min(...ws.map(o=>o.lv||1))};}
+      const ws=occ.filter(o=>CWALL.has(o.type));
+      if(ws.length&&!WALL_TYPES.includes(type)&&type!=='gate'&&type!=='tower'){const k=2/ws.length;b.wall={hp:ws.reduce((a,o)=>a+o.hp,0)*k,maxhp:ws.reduce((a,o)=>a+o.maxhp,0)*k,lv:Math.min(...ws.map(o=>o.lv||1)),wt:ws[0].type};}
       for(const o of occ){const oc=cmdOf(o);if(oc)oc.assign=null;}
       S.blds=S.blds.filter(o=>!occ.includes(o));}
   }
@@ -3415,7 +3427,7 @@ function skillTick(dt){
 }
 
 function cmdOf(o){return o.cmd?S.cmds.find(c=>c.id===o.cmd&&c.alive):null;}
-const NO_HERO=['fence','swall','wall','gate','bastion','brazier','market'];   // 市場は英雄の配属なし（詳細は売り買いの情報に使う）
+const NO_HERO=['fence','swall','wall','wall2','wall3','wall4','wall5','gate','bastion','brazier','market'];   // 市場は英雄の配属なし（詳細は売り買いの情報に使う）
 function canHostHero(o){return !o||o.kind==='s'||(!NO_HERO.includes(o.type)&&!(B[o.type]&&B[o.type].isMine));}
 function assign(c,target){
   if(target&&!canHostHero(target)){toast('壁・門・柵・篝火には英雄を置けません','warn');return;}
@@ -4256,7 +4268,7 @@ function update(dt,sim){
     if(b.rep){b.hp=Math.min(b.maxhp,b.hp+b.maxhp*0.25*dt);if(b.wall)b.wall.hp=Math.min(b.wall.maxhp,b.wall.hp+b.wall.maxhp*0.25*dt);if(b.hp>=b.maxhp&&(!b.wall||b.wall.hp>=b.wall.maxhp))b.rep=false;}
     if(b.wall&&has('bio')&&b.wall.hp<b.wall.maxhp)b.wall.hp=Math.min(b.wall.maxhp,b.wall.hp+b.wall.maxhp*0.005*dt);
     if(c&&d.spec==='工兵'&&c.spec==='工兵'){
-      for(const o of S.blds){if(o===b||Math.abs(o.x-b.x)>2||Math.abs(o.y-b.y)>2)continue;if(o.type==='wall'&&o.hp<o.maxhp)o.hp=Math.min(o.maxhp,o.hp+bn.regen*0.5*dt);if(o.wall&&o.wall.hp<o.wall.maxhp)o.wall.hp=Math.min(o.wall.maxhp,o.wall.hp+bn.regen*0.5*dt);}
+      for(const o of S.blds){if(o===b||Math.abs(o.x-b.x)>2||Math.abs(o.y-b.y)>2)continue;if(CWALL.has(o.type)&&o.hp<o.maxhp)o.hp=Math.min(o.maxhp,o.hp+bn.regen*0.5*dt);if(o.wall&&o.wall.hp<o.wall.maxhp)o.wall.hp=Math.min(o.wall.maxhp,o.wall.hp+bn.regen*0.5*dt);}
     }
     if((b.dep&&YIELD[b.type])||(NIGHT&&NIGHT_STOP.has(b.type))||b.off){}
     else if(b.type==='miner'){const v=1.0*um*(b.ym||1)*(techMul('miner')+bn.prod-1)*dt;S.steel+=v;S.gross.steel+=v;depleteTick(b,v);tickProdXp(b,dt);}
@@ -4357,6 +4369,9 @@ function update(dt,sim){
       }
     }
   }
+  // ミスリルの城壁：触れている魔物に少しずつダメージ（1秒に15）
+  if(S.waveActive&&S.blds.some(b=>b.type==='wall4'))for(const e of S.enemies){if(e.hp<=0||E[e.type].fly)continue;const gx=Math.floor(e.x/T),gy=Math.floor(e.y/T);let hit=false;
+    for(let dy=-1;dy<=1&&!hit;dy++)for(let dx=-1;dx<=1;dx++){const o=S.grid[gy+dy]&&S.grid[gy+dy][gx+dx];if(o&&o.type==='wall4'){hit=true;break;}}if(hit)hitEnemy(e,15*dt,null);}
   // 部隊
   for(const s of S.squads){
     if(s.ut==='guard'&&!sim){const hq=hqOf();if(hq){const [qx,qy]=castleC(hq);
@@ -4623,14 +4638,14 @@ function damageB(b,dmg,attacker){
     if(b.wall.hp<=0){const wasB=b.wall.bastion;b.wall=null;S.fx.push({x:bcx(b),y:bcy(b),r:TU,t:0,dur:0.4,c:'#9fb59f'});se('boom');log(`${B[b.type].name}の土台の${wasB?'櫓台':'城壁'}が崩壊`,'warn');}
     return;
   }
-  b.hp-=dmg;if(b.type!=='wall')se('hit');
+  b.hp-=dmg;if(!CWALL.has(b.type))se('hit');
   if(attacker&&b.type==='fence'&&has('stakes'))hitEnemy(attacker,dmg*0.6+5,null);
   if(attacker&&E[attacker.type]&&E[attacker.type].crewKill&&b.crew>0&&Math.random()<0.5){b.crew--;S.kia++;}
   // 被弾するたびに要員が死傷する
   const pp=B[b.type].pop;
   if(pp&&b.crew>0){b.dmgAcc+=dmg;const per=b.maxhp/(pp+1);while(b.dmgAcc>=per&&b.crew>0){b.dmgAcc-=per;b.crew--;S.kia++;}}
-  if(attacker&&has('thorn')&&(b.type==='swall'||b.type==='wall'))hitEnemy(attacker,dmg*0.4,null);
-  if(b.type==='wall'){
+  if(attacker&&has('thorn')&&(b.type==='swall'||CWALL.has(b.type)))hitEnemy(attacker,dmg*0.4,null);
+  if(CWALL.has(b.type)){
     b.absorbed+=dmg;const c=cmdOf(b);if(c&&b.absorbed>=60){b.absorbed-=60;gainXp(c,2);}
   }
   if(b.hp<=0)destroyB(b);
@@ -5228,7 +5243,7 @@ function draw(){
      ctx.fillStyle=ok?'#cfe3cf':'#ff8a7e';ctx.font='bold 13px sans-serif';ctx.fillText(d.glyph||(d.isMine?'雷':'壁'),(gx+NS/2)*T,(gy+NS/2)*T+1);
      ctx.font='bold 10px sans-serif';ctx.fillStyle=ok?'#6fe08a':'#ff8a7e';ctx.fillText(ok?d.name:'建設不可',(gx+NS/2)*T,gy*T-7);ctx.globalAlpha=1;}
     ctx.fillStyle=ok?'rgba(111,224,138,.25)':'rgba(255,90,78,.25)';ctx.fillRect(gx*T,gy*T,NS*T,NS*T);
-    const d=B[S.buildMode];if(d.range&&gx>=0&&gy>=0&&gx<COLS&&gy<ROWS){const ex=S.grid[gy][gx];const pb={type:S.buildMode,lv:1,x:gx,y:gy,sz:NS,wall:ex&&ex.type==='wall'?ex:null};const rg=rangeOf(pb);
+    const d=B[S.buildMode];if(d.range&&gx>=0&&gy>=0&&gx<COLS&&gy<ROWS){const ex=S.grid[gy][gx];const pb={type:S.buildMode,lv:1,x:gx,y:gy,sz:NS,wall:ex&&CWALL.has(ex.type)?ex:null};const rg=rangeOf(pb);
       ctx.strokeStyle='rgba(242,179,61,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.arc((gx+NS/2)*T,(gy+NS/2)*T,rg*TU,0,7);ctx.stroke();ctx.lineWidth=1;
       // 直射：味方の建物・尾根で撃てないマスを赤く
       if(d.range){const dl=d.direct&&!d.airOnly&&!highShot(pb);let nb=0;const cgx=gx+(NS-1)/2,cgy=gy+(NS-1)/2,R0=Math.ceil(rg*U+NS);for(let yy=gy-R0;yy<=gy+R0;yy++)for(let xx=gx-R0;xx<=gx+R0;xx++){if(xx<0||yy<0||xx>=COLS||yy>=ROWS)continue;if(Math.hypot(xx-cgx,yy-cgy)>rg*U||(xx>=gx&&xx<gx+NS&&yy>=gy&&yy<gy+NS))continue;if(dl?losFactor(pb,(xx+.5)*T,(yy+.5)*T)===0:mtnBlock(pb,(xx+.5)*T,(yy+.5)*T)){ctx.fillStyle='rgba(255,60,50,.28)';ctx.fillRect(xx*T,yy*T,T,T);nb++;}}
@@ -5283,7 +5298,7 @@ function draw(){
   ctx.globalAlpha=0.92;ctx.fillStyle='#000';ctx.fillRect(mx-2,my-2,MM.w+4,MM.h+4);if(miniCv)ctx.drawImage(miniCv,mx,my);if(miniFog)ctx.drawImage(miniFog,mx,my);ctx.globalAlpha=1;
   for(const h of hiveSpots()){ctx.fillStyle='#ff5a8a';ctx.beginPath();ctx.arc(mx+bcx(h)*(MM.w/W),my+bcy(h)*(MM.h/H),3.5,0,7);ctx.fill();}
   if(S.camps&&!S.waveActive)for(const c of S.camps){if(!c.found||c.state==='gone')continue;const x=mx+c.x*ks,y=my+c.y*ks;ctx.fillStyle='#ff9a3a';ctx.beginPath();ctx.moveTo(x,y-4);ctx.lineTo(x+4,y+3);ctx.lineTo(x-4,y+3);ctx.closePath();ctx.fill();}
-  for(const b of S.blds){ctx.fillStyle=b.type==='hq'?'#f2b33d':gunOf(b)?'#9fe0a0':b.type==='wall'?'#8a9a8c':'#4f9a62';ctx.fillRect(mx+b.x*T*ks,my+b.y*T*ks,3,3);}
+  for(const b of S.blds){ctx.fillStyle=b.type==='hq'?'#f2b33d':gunOf(b)?'#9fe0a0':CWALL.has(b.type)?'#8a9a8c':'#4f9a62';ctx.fillRect(mx+b.x*T*ks,my+b.y*T*ks,3,3);}
   ctx.fillStyle='#62c6d9';for(const q of S.squads)ctx.fillRect(mx+q.x*ks-1.5,my+q.y*ks-1.5,3,3);
   ctx.fillStyle='#ff5a4e';for(const e of S.enemies){const ex=mx+e.x*ks,ey=my+e.y*ks;if(ex>=mx&&ey>=my&&ex<mx+MM.w&&ey<my+MM.h&&isSeen(Math.floor(e.x/T),Math.floor(e.y/T)))ctx.fillRect(ex-1,ey-1,2,2);}
   ctx.strokeStyle='#f2b33d';ctx.strokeRect(mx+cam.x*ks+.5,my+cam.y*ks+.5,VW/cam.z*ks,VH/cam.z*ks);
@@ -5402,7 +5417,7 @@ function drawBldV2(b,an){const r=bldSpr(b);if(!r||!r[0])return false;const [sp,a
   const n=bsz(b),x=b.x*T,y=b.y*T,S2=n*T,cx=x+S2/2,cy=y+S2/2,building=b.bt>0&&!b.upg;ctx.imageSmoothingEnabled=false;
   // 土台：櫓台の上／城壁の上
   if(b.onB&&ICIMG.bastion)ctx.drawImage(ICIMG.bastion,x,y,S2,S2);
-  else if(b.wall){const W=SPR.walls.wall.img.tiles;for(let j=0;j<n;j++)for(let i=0;i<n;i++)ctx.drawImage(W[10],x+i*T,y+j*T,T,T);}
+  else if(b.wall){const W=(SPR.walls[b.wall.wt]||SPR.walls.wall).img.tiles;for(let j=0;j<n;j++)for(let i=0;i<n;i++)ctx.drawImage(W[10],x+i*T,y+j*T,T,T);}
   let im;const ft=(performance.now()-(b.fireT||0))/1000;
   if(anim==='dirs'){const dir=sprDir(b.ang||0);im=(dir===0&&ft>=0&&ft<0.72&&sp.img.fire)?sp.img.fire[Math.min(5,Math.floor(ft/0.12))]:sp.img.dirs[dir];}
   else if(anim==='tiles')im=sp.img.tiles[wallMaskOf(b)];
@@ -5927,7 +5942,7 @@ function placeOK(type,gx,gy){
   if(MOUNT_T.includes(type)){const ex=bastionAt(gx,gy);if(ex){if(ex.x!==gx||ex.y!==gy||!ready(ex))return false;if(B[type].req&&!has(B[type].req))return false;if(capBlock(type))return false;return true;}}
   if(B[type].req&&!has(B[type].req))return false;
   if(capBlock(type))return false;
-  const NS=newSz(type),mine=!!B[type].isMine,WR={fence:1,swall:2,wall:3};
+  const NS=newSz(type),mine=!!B[type].isMine,WR={fence:1,swall:2,wall:3,wall2:4,wall3:5,wall4:6,wall5:7};
   const occ=new Set();
   for(const [cx,cy] of bCells(gx,gy,NS)){
     if(cx<0||cy<0||cx>=COLS||cy>=ROWS)return false;
@@ -5943,7 +5958,7 @@ function placeOK(type,gx,gy){
     if(WR[type])ok=L.length===1&&L[0].x===gx&&L[0].y===gy&&WR[type]>WR[L[0].type];
     else if(type==='gate')ok=true;
     else if(type==='tower')ok=L.every(o=>o.type==='fence'||o.type==='swall');
-    else if(['mg','how','cannon','mortar'].includes(type))ok=L.every(o=>o.type==='wall');
+    else if(['mg','how','cannon','mortar'].includes(type))ok=L.every(o=>CWALL.has(o.type));
     if(!ok)return false;}
   // 土地の条件は、施設がのるすべてのマスで満たす
   if(YIELD[type]){for(const [cx,cy] of bCells(gx,gy,NS))if(!yieldAt(type,cx,cy))return false;}
@@ -6090,7 +6105,7 @@ document.getElementById('vSe').oninput=e=>auSetSe(+e.target.value);
 // ===== UI（ボタンは作り直さず中身だけ更新） =====
 function setText(el,v){if(el&&el.textContent!==v)el.textContent=v;}
 // 建設は「防衛」「生産」の2グループ。防衛は数字キー、生産はShift＋数字
-const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','spike','pit','bomb','brazier','totem','outpost']},
+const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','wall2','wall3','wall4','wall5','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','spike','pit','bomb','brazier','totem','outpost']},
   {id:'prod',name:'生産・街',keys:'⇧',list:['miner','quarry','ironmine','farm','fishery','well','ammo','powder','furnace','barracks','apart','market','tavern','church','lab']},
   {id:'unit',name:'部隊',keys:'-',list:['train','stable','magic','aerie']}];
 // 建設の分類タブ（防衛・生産・街・部隊）。押すとその見出しまで一覧をスクロールする
@@ -6339,7 +6354,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(!isS&&!gunOf(o)&&!(o.bt>0)){const po=prodOf(o);if(po){const k=Object.keys(po).find(x=>po[x]>0&&x!=='pop');if(k){const L=prodPctB(o);const base=po[k]/(1+pctSum(L));h+=brkHTML(`生産（${RES_NAME[k]||k}）`,base,L,'/T');}}}
   if(!isS&&gunOf(o)&&(elevRange(o)||wallRange(o)||elevAP(o))){const er=elevRange(o),wr=wallRange(o);h+=`<div class="row"><span class="muted">射程の内訳</span><span>${Math.round(rangeOf(o)*U)}マス${er||wr?`<span class="muted" style="font-size:11px">（${[er?'標高+'+Math.round(er*U):'',wr?(o.wall&&o.wall.bastion?'櫓台+':'城壁+')+Math.round(wr*U).replace(/\.0$/,''):''].filter(x=>x).join('・')}）</span>`:''}${elevAP(o)?`・<span class="muted" style="font-size:11px">高所：硬い敵に+${Math.round(elevAP(o)*100)}%</span>`:''}</span></div>`;}
   if(!isS)h+=tileDesc(o.x,o.y).replace(/<div class="row">.*?<\/div>/,S.ter[o.y][o.x]?'$&':'');
-  if(!isS&&o.type==='wall'&&ready(o))h+=tileBuildHTML(o.x,o.y,'この城壁の上に防衛施設を建設');
+  if(!isS&&CWALL.has(o.type)&&ready(o))h+=tileBuildHTML(o.x,o.y,'この城壁の上に防衛施設を建設');
   if(!isS&&o.type==='bastion'&&ready(o))h+=tileBuildHTML(o.x,o.y,'この櫓台の上に防衛施設を建設（射程 +3・火力 +20%）');
   if(!isS&&o.noFuel)h+=`<div class="muted" style="color:var(--red)">食料切れ：出力20%</div>`;
   if(!isS&&o.starved)h+=`<div class="muted" style="color:var(--red)">原料不足で停止中</div>`;
@@ -6444,7 +6459,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     ${S.baseUp?`<div class="gd" style="margin-top:4px">Lv${S.baseUp.to}に強化中…　残り${S.baseUp.left}ターン（強化中も城は普段どおり働きます）</div>`:S.baseLv<BASE_MAX?`<button id="iBaseUp" style="margin-top:4px;width:100%" ${canAfford(c)&&!S.waveActive?'':'disabled'}>拠点をLv${S.baseLv+1}に（${costText(c)}・${baseUpTurns()}ターン）</button>`:'<div class="gd">最大レベル</div>'}</div>`;}
   if(false)h+=`<div class="muted" style="margin-top:6px;font-size:11px">研究「城館防衛火器」で自衛火器を設置できます</div>`;
   if(!isS&&o.kind==='b'&&(WALL_TYPES.includes(o.type)||o.type==='gate'||o.type==='tower')&&ready(o)){const G=wallGroup(o);const dm=G.filter(damaged);const rc=dm.reduce((a,x)=>a+repairCost(x),0);
-    const WR=['fence','swall','wall'],nx=WR[WR.indexOf(o.type)+1];const up=nx&&(!B[nx].req||has(B[nx].req))?G.filter(x=>x.type===o.type&&placeOK(nx,x.x,x.y)):[];const uc={};for(const k in costOf(nx||'fence'))uc[k]=(costOf(nx||'fence')[k]||0)*up.length;
+    const WR=WALL_TYPES,nx=WR[WR.indexOf(o.type)+1];const up=nx&&(!B[nx].req||has(B[nx].req))?G.filter(x=>x.type===o.type&&placeOK(nx,x.x,x.y)):[];const uc={};for(const k in costOf(nx||'fence'))uc[k]=(costOf(nx||'fence')[k]||0)*up.length;
     h+=`<div class="upg"><b>つながった壁</b><span>${G.length}枚・傷み${dm.length}</span><div><button id="wgRep" class="wide" ${dm.length&&S.steel>=rc&&!S.waveActive?'':'disabled'}><span>まとめて修理（${dm.length}枚）</span><span class="cost">${costText({steel:rc})}</span></button>${up.length?`<button id="wgUp" class="wide" ${canAfford(uc)&&!S.waveActive?'':'disabled'}><span>${B[o.type].name}を${B[nx].name}にまとめて建て替え（${up.length}枚）</span><span class="cost">${costText(uc)}</span></button>`:''}</div></div>`;}
   if(!isS)h+=`<div class="iact"><button id="iRep">修理</button>${o.type!=='hq'?`<button id="iDemo" class="danger" title="${o.bt>0&&!o.upg?'全額返還':'建設費の50%返還・人員復帰'}">${o.bt>0&&!o.upg?'建設を取り消す':'解体'}</button>`:''}</div>`;
   el.innerHTML=h;detailsify(el);
@@ -6481,7 +6496,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(!isS)bindTileBuild(el,o.x,o.y);
   const br=document.getElementById('iRep');if(br)br.onclick=()=>{repair(o);renderInfo(true);};
   {const r=document.getElementById('wgRep');if(r)r.onclick=()=>{let n=0;for(const x of wallGroup(o))if(damaged(x)&&repair(x,true))n++;if(n){se('upgrade');log(`つながった壁 ${n}枚をまとめて修理した`,'good');}renderInfo(true);};
-   const u=document.getElementById('wgUp');if(u)u.onclick=()=>{const WR=['fence','swall','wall'],nx=WR[WR.indexOf(o.type)+1];let n=0;const t0=o.type;for(const x of wallGroup(o))if(x.type===t0&&canPlace(nx,x.x,x.y)){placeB(nx,x.x,x.y);n++;}if(n)log(`${B[t0].name} ${n}枚を${B[nx].name}に建て替えた`,'good');S.sel=S.grid[o.y][o.x]||null;renderBuild();renderInfo(true);};}
+   const u=document.getElementById('wgUp');if(u)u.onclick=()=>{const WR=WALL_TYPES,nx=WR[WR.indexOf(o.type)+1];let n=0;const t0=o.type;for(const x of wallGroup(o))if(x.type===t0&&canPlace(nx,x.x,x.y)){placeB(nx,x.x,x.y);n++;}if(n)log(`${B[t0].name} ${n}枚を${B[nx].name}に建て替えた`,'good');S.sel=S.grid[o.y][o.x]||null;renderBuild();renderInfo(true);};}
   const bu=document.getElementById('iUpg');if(bu)bu.onclick=()=>{upgrade(o);renderInfo(true);};
   el.querySelectorAll('[data-model]').forEach(bt=>bt.onclick=()=>{const t=MTC[bt.dataset.model];if(canAfford(t.cost,t.popEach*t.members)&&unitsOf(o).length+o.queue<capOf(o)){for(const k in t.cost)S[k]-=t.cost[k];S.pop-=t.popEach*t.members;o.queue++;(o.qm=o.qm||[]).push(t.key);renderInfo(true);}});
   const bd=document.getElementById('iDemo');if(bd)bd.onclick=()=>{
@@ -6490,7 +6505,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     if(c)assign(c,null);
     const full=o.bt>0&&!o.upg;for(const k in d.cost)S[k]+=full?d.cost[k]:Math.floor(d.cost[k]/2);S.pop+=o.crew||0;
     S.blds=S.blds.filter(x=>x!==o);gridSet(o,false);
-    if(o.wall){const w=placeB(o.wall.bastion?'bastion':'wall',o.x,o.y,true);w.hp=o.wall.hp;w.maxhp=o.wall.maxhp;w.lv=o.wall.lv;}S.sel=null;renderInfo(true);renderCmds(true);};
+    if(o.wall){const w=placeB(o.wall.bastion?'bastion':(o.wall.wt||'wall'),o.x,o.y,true);w.hp=o.wall.hp;w.maxhp=o.wall.maxhp;w.lv=o.wall.lv;}S.sel=null;renderInfo(true);renderCmds(true);};
 }
 let lastCmdKey='';
 function renderCmds(force){
