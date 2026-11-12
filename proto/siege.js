@@ -16,7 +16,7 @@ const SU={
   sword: {n:'兵士',  spr:'pawn',   m:5,hp:40, dmg:8, rate:0.8,rng:16, spd:42,bld:1,  role:'melee', d:'いちばん近い魔物・建物を狙う'},
   heavy: {n:'重装歩兵',spr:'heavy',m:4,hp:150,dmg:7, rate:1.0,rng:16, spd:30,bld:0.8,role:'shield',d:'重い鎧の歩兵。体力が高く、近くの魔物を引きつける。まわり48の味方をかばう（矢・物見櫓・岩のダメージ−35%）＝本編の研究「盾陣」'},
   archer:{n:'弓兵',  spr:'archer', m:5,hp:24, dmg:6, rate:1.1,rng:130,spd:38,bld:0.5,role:'ranged',d:'いちばん近い相手を撃つ。柵の向こうにも届く。空の魔物を撃てる'},
-  mage:  {n:'魔術師',spr:'wizard', m:3,hp:30, dmg:20,rate:1.6,rng:140,spd:30,bld:0.6,role:'ranged',magic:true,splash:30,d:'いちばん近い相手に魔法の弾（まわりにも当たる）。空の魔物も撃てる。打たれ弱い'},
+  mage:  {n:'魔術師',spr:'wizard', m:3,hp:30, dmg:20,rate:1.6,rng:140,spd:30,bld:0.6,role:'ranged',magic:true,splash:30,d:'いちばん近い相手に火の玉（まわりにも当たる）。空の魔物も撃てる。打たれ弱い'},
   cav:   {n:'騎兵',  spr:'rider',  m:3,hp:70, dmg:11,rate:0.9,rng:16, spd:72,bld:0.8,role:'cav',   d:'足が速い。いちばん近い相手を狙う'},
   eng:   {n:'工兵',  spr:'farmer', m:4,hp:34, dmg:6, rate:0.9,rng:16, spd:38,bld:5,  role:'eng',   d:'物見櫓・岩投げオーガを狙うのが得意。物見櫓や道をふさぐ柵・門は爆薬で吹き飛ばす（14秒ごと）。破城槌・投石機を修理する。近くの罠を外す'},
   drake: {n:'竜騎兵',spr:'dragon', m:2,hp:120,dmg:14,rate:1.3,rng:70, spd:62,bld:1.5,role:'drake',fly:true,splash:22,tentMul:2.5,d:'空を飛んで柵を越える。テント・小屋・巣を狙うのが得意（テントへのダメージ 250%）。火で範囲攻撃。空の魔物とも戦える'},
@@ -556,7 +556,8 @@ function attack(u,tg,atk){const d=SU[u.t];if(tg.k&&flyF(tg)&&!hitsAir(d))return;
       for(const b of G.blds)if(alive(b)&&Math.hypot(b.x-tg.x,b.y-tg.y)<sp+b.r)hitBld(b,atk*d.bld);for(const f of G.foes)if(alive(f)&&!flyF(f)&&Math.hypot(f.x-tg.x,f.y-tg.y)<sp)hitFoe(f,atk*0.6);},250/G.speed);sfx('how');return;}
   if(d.role==='drake'||d.role==='gun'){shoot(u,tg,d.role==='drake'?'#ff7a2a':'#c8c8c8',d.role==='drake'?'fireball':'cannonball',d.role==='drake'?'fire':'explosion');if(d.role==='gun')vfx('muzzle',u.x+u.face*10,u.y-8,1.2);const sp=d.splash,x=tg.x,y=tg.y;G.fx.push({x,y,r:sp,t:0,dur:0.35,c:d.role==='drake'?'#ff5a1e':'#d0d0d0'});
     for(const b of G.blds)if(alive(b)&&Math.hypot(b.x-x,b.y-y)<sp+b.r)hitBld(b,atk*d.bld*(isTent(b)&&d.tentMul?d.tentMul:1));for(const f of G.foes)if(alive(f)&&(d.role==='drake'||!flyF(f))&&Math.hypot(f.x-x,f.y-y)<sp)hitFoe(f,atk*0.8);sfx(d.role==='gun'?'boom':'hit');return;}
-  if(d.magic){shoot(u,tg,null,'arcane');const sp=d.splash;G.fx.push({x:tg.x,y:tg.y,r:sp,t:0,dur:0.35,c:'#9a7aff'});   // 魔術師：魔法の弾が弾けて、まわりにも当たる
+  if(d.magic){shoot(u,tg,null,'fireball','fire');   // 魔術師は火の玉（本編と同じ）
+   const sp=d.splash;G.fx.push({x:tg.x,y:tg.y,r:sp,t:0,dur:0.35,c:'#9a7aff'});   // 魔術師：魔法の弾が弾けて、まわりにも当たる
     if(tg.kind)hitBld(tg,atk*d.bld);for(const f of G.foes)if(alive(f)&&Math.hypot(f.x-tg.x,f.y-tg.y)<sp)hitFoe(f,atk*(f===tg?1:0.6));return;}
   if(d.role==='ranged')shoot(u,tg,null,'arrow');
   else if(Math.random()<0.5)vfx('dust',tg.x+(Math.random()-0.5)*8,tg.y-4,d.role==='ram'?2:1.2);   // 近接：当たったところに土ぼこり
