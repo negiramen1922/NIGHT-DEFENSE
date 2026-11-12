@@ -1764,18 +1764,18 @@ Object.assign(B,{
   bastion:{name:'櫓台',glyph:'',hp:1600,heat:0,cost:{stone:120,steel:40,gold:30},pop:0,power:0,spec:'工兵',grp:'def',towerWall:true,req:'castle',desc:'石を高く積んだ2×2の台座。敵を通さず、上にバリスタ・投石機・大砲・迫撃砲などを1つ載せられる（2×2の物も可。台座を選んで「この上に建設」）。載せた施設は射程 +3・火力 +20%。敵はまず台座を壊す'},
   wall:   {name:'城壁',glyph:'',hp:800,heat:0,cost:{stone:50,steel:20,gold:20},pop:0,power:0,spec:'工兵',grp:'def',desc:'最も丈夫な壁。柵・石の壁の上に重ねて建て替えられる。上にバリスタ・投石機を置くと射程と威力が上がる',req:'castle'},
   mg:     {name:'バリスタ',glyph:'弩',hp:260,heat:1,cost:{steel:80,iron:20,gold:30},pop:3,power:0,spec:'守備',grp:'def',desc:'大型の弩（直射）。重い矢でゴブリンなら一撃、その後ろの敵まで貫く（2体目は70%）。空の敵も撃てる。矢を使う',range:5,dmg:50,rate:1.4,ammoUse:1,direct:true,antiAir:true,bolt:true},
-  cannon: {name:'大砲',glyph:'砲',hp:320,heat:2,cost:{steel:120,iron:60,stone:30,gold:60},pop:4,power:0,spec:'守備',grp:'def',desc:'火薬で鉄の砲弾を撃ち出す直射砲。射線上の敵を最大4体まで貫く。撃つと轟音とともに閃光が走る。鉄を砲弾に使う。城壁の上にも置ける',req:'gunpowder',range:7,dmg:150,rate:3.4,ammoUse:1.5,ammoKey:'iron',direct:true,cannon:true},
+  cannon: {name:'大砲',glyph:'砲',hp:320,heat:2,cost:{steel:120,iron:60,stone:30,gold:60},pop:4,power:0,spec:'守備',grp:'def',desc:'火薬で鉄の砲弾を撃ち出す直射砲。射線上の敵を最大4体まで貫く。撃つと轟音とともに閃光が走る。鉄を砲弾に使う。城壁の上にも置ける',req:'gunpowder',range:5,dmg:150,rate:3.4,ammoUse:1.5,ammoKey:'iron',direct:true,cannon:true},
   how:    {name:'投石機',glyph:'投',hp:240,heat:1,cost:{steel:100,stone:20,gold:40},pop:4,power:0,spec:'守備',grp:'def',desc:'石材を撃ち出す曲射兵器。城壁の向こうへ範囲攻撃。最低射程4マス',req:'catapult',range:8,minRange:2,dmg:70,rate:3.0,splash:1.6,ammoUse:2,ammoKey:'stone'},
   tower:  {name:'物見櫓',glyph:'櫓',hp:900,heat:1,cost:{steel:80,stone:60,gold:20},pop:2,power:0,spec:'弓兵',grp:'def',desc:'石積みの見張り櫓（直射）。射手（人員）を配置すると、高所からとても長い射程で連射し、空の敵も撃てる。1発は軽い。城壁並みに頑丈で、壁の列に組み込める（柵・石の壁の上に建てると置き換わる）。壁の上には載せられない。周囲を少し照らす',range:9,towerWall:true,dmg:15,rate:0.5,ammoUse:0.25,direct:true,antiAir:true},
 });
 B.lab.pop=0;B.lab.desc='研究員の詰め所。1つにつき研究員の上限 +3人（Lv2で+5人・Lv3で+8人）。研究員は待機中の住民から研究のたびに就く';
 B.gate={name:'門',glyph:'門',hp:140,heat:0,cost:{steel:40,stone:20},pop:0,power:0,spec:'工兵',grp:'def',desc:'味方だけが通れる出入り口。壁は敵も味方も通れないので、部隊は門から出入りする。敵には壁と同じで、壊されるまで通れない。柵や壁の列の上に建てると置き換わる'};
-B.hisou={name:'飛槍車',glyph:'槍',hp:300,heat:1,cost:{steel:80,iron:30},pop:3,power:0,spec:'守備',grp:'def',desc:'空の敵専用の兵器。四角い箱に詰めた槍を空へ一斉に打ち上げ、ハーピーやドラゴンを群れごと落とす。地上の敵は撃てない。矢を1回3本使う',req:'hisousha',range:7,dmg:40,rate:2.4,ammoUse:3,antiAir:true,airOnly:true};
-B.magetower={name:'魔術師の塔',glyph:'魔',hp:500,heat:1,cost:{steel:60,stone:60,elec:20},pop:3,power:0,spec:'守備',grp:'def',desc:'魔術師（人員）を配置して使う塔。魔法の弾を高く打ち上げる曲射で、壁や建物を越えて範囲を焼く。空の敵も撃てる。エーテルを使う',req:'magetower',range:9,minRange:2,dmg:100,rate:2.5,splash:1.1,ammoUse:0.5,ammoKey:'elec',antiAir:true};
+B.hisou={name:'風船爆弾',glyph:'風',hp:300,heat:1,cost:{steel:80,iron:30,gold:40},pop:3,power:0,spec:'守備',grp:'def',desc:'風船をつけた爆弾を打ち上げる。爆弾はふわふわと魔物を追いかけ、近づくと爆発して周りを吹き飛ばす。空の敵にも地上の敵にも効く。壁や建物は越えて飛ぶ（山は越えられない）。1発ごとに火薬1',req:'hisousha',range:8,dmg:130,rate:3,splash:1.2,balloon:true,antiAir:true,ammoKey:'powder',ammoUse:1};
+B.magetower={name:'魔術師の塔',glyph:'魔',hp:500,heat:1,cost:{steel:60,stone:60,elec:20},pop:3,power:0,spec:'守備',grp:'def',desc:'魔術師（人員）を配置して使う塔。高所から魔術の火の玉を撃ち、当たった所の周りを焼く（範囲攻撃）。空の敵も撃てる。エーテルを使う',req:'magetower',range:5,dmg:100,rate:2.5,splash:1.1,flat:true,direct:true,ammoUse:0.5,ammoKey:'elec',antiAir:true};
 B.tower.garUt='arch';B.spike.req='spikes';
 B.furnace={name:'精製炉',glyph:'炉',hp:260,heat:3,cost:{steel:60,stone:40},pop:2,power:0,spec:'内政',grp:'prod',req:'furnace',desc:'魔核のエネルギーを取り出してエーテル結晶を精製する（魔核 −2 → エーテル結晶 +4／T）。魔核が尽きると止まる'};
 B.totem={name:'呪骸の柱',glyph:'呪',hp:420,heat:1,cost:{stone:40,mat:30},pop:0,power:0,spec:'工兵',grp:'def',req:'totem',desc:'魔物の骨で組んだ呪いの柱。周り6マスの魔物の足を30%遅くし、攻撃の間隔を伸ばす（与える被害 −25%）'};
-B.mabou={name:'魔弾砲',glyph:'魔',hp:340,heat:2,cost:{steel:100,iron:60,mat:30,gold:60},pop:4,power:0,spec:'守備',grp:'def',req:'mabou',desc:'エーテル結晶を撃ち出す直射砲。射程内でいちばん硬い敵（トロール・シーカー・キングなど）を狙って大ダメージ。エーテル結晶を1発1つ使う',range:6.5,dmg:200,rate:2.9,pierce:true,direct:true,ammoKey:'elec',ammoUse:1};
+B.mabou={name:'魔弾砲',glyph:'魔',hp:340,heat:2,cost:{steel:100,iron:60,mat:30,gold:60},pop:4,power:0,spec:'守備',grp:'def',req:'mabou',desc:'エーテル結晶を撃ち出す直射砲。射程内でいちばん硬い敵（トロール・シーカー・キングなど）を狙って大ダメージ。エーテル結晶を1発1つ使う',range:6,dmg:200,rate:2.9,pierce:true,direct:true,ammoKey:'elec',ammoUse:1};
 B.powder={name:'火薬工房',glyph:'薬',hp:220,heat:3,cost:{steel:80,stone:40,gold:30},pop:3,power:0,spec:'内政',grp:'prod',req:'gunpowder',desc:'木材を焼いた木炭と魔物の脂（魔核）から火薬を作る（木材 −6・魔核 −1 → 火薬 +6／T）。大砲・迫撃砲・砲兵隊が使う'};
 B.mortar={name:'迫撃砲',glyph:'迫',hp:280,heat:2,cost:{steel:100,iron:80,stone:40,gold:80},pop:4,power:0,spec:'守備',grp:'def',req:'mortar',desc:'投石機の上位。火薬で石の砲弾を高く打ち上げる曲射砲。射程がとても長く、着弾点を大きく吹き飛ばす。壁や味方の建物越しに撃てる（山は越えられない）。最低射程4マス。1発ごとに石材1・火薬1',range:9.5,minRange:2,dmg:120,rate:3.4,splash:1.9,ammoKey:'stone',ammoUse:1,ammo2:{powder:1}};
 B.cannon.req='cannontech';B.cannon.ammoUse=1;B.cannon.ammo2={powder:1};B.cannon.desc='火薬で鉄の砲弾を撃ち出す直射砲。射線上の敵を最大4体まで貫く。撃つと轟音とともに閃光が走る。1発ごとに鉄1・火薬1。城壁の上にも置ける';
@@ -2011,7 +2011,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('heavymg',{cat:'防衛',tier:2,name:'重弩',pre:['kougen'],eff:'バリスタの火力 ×1.4・射程 +1'});
  set('fcs',{cat:'防衛',tier:2,name:'照準術',pre:['kougen'],eff:'バリスタ・物見櫓の射程 +2、投石機の射程 +4'});
  set('autoload',{cat:'防衛',tier:2,name:'巻き上げ機',pre:['kougen'],eff:'全防衛施設の連射 +15%（Lvごと・最大2）'});
- set('hisousha',{cat:'防衛',tier:2,name:'飛槍車',cost:{steel:80,iron:40},t:2,pre:['kougen'],icon:'hisou',eff:'「飛槍車」を建設できる（空の敵専用。槍を一斉に打ち上げて群れごと落とす）'});
+ set('hisousha',{cat:'防衛',tier:3,name:'風船爆弾',cost:{iron:60,gold:60},t:3,pre:['gunpowder'],icon:'hisou',eff:'「風船爆弾」を建設できる（風船のついた爆弾が魔物を追いかけて爆発する。空にも地上にも効く範囲攻撃。射程8。火薬を使う）'});
  set('catapult',{cat:'防衛',tier:1,name:'投石機',pre:[],eff:'「投石機」を建設できる（石材を撃つ曲射の範囲攻撃。味方の建物越しに撃てる）'});
  set('bighow',{cat:'防衛',tier:2,name:'大岩弾',pre:['catapult'],eff:'投石機の火力 ×1.25・範囲 ×1.3'});
  set('gunpowder',{cat:'防衛',tier:3,name:'火薬',pre:['bighow'],eff:'「大砲」を建設できる（鉄の砲弾で敵を4体まで貫く）'});
@@ -4321,6 +4321,7 @@ function update(dt,sim){
           }
           else if(g.salvo){for(let i=0;i<g.salvo;i++){const a=Math.random()*7,rr=TU*Math.random()*1.8;S.navShells.push({x:tg.x+Math.cos(a)*rr,y:tg.y+Math.sin(a)*rr,t:0,delay:0.35+i*0.12,dmg:dm,splash:g.splash*TU,src:b});}
             S.shots.push({x:cx,y:cy,tx:tg.x,ty:tg.y,t:0,dur:0.35,c:'#ffb14e',w:2});}
+          else if(g.balloon){S.shots.push({balloon:true,bx:cx,by:cy-10,x:cx,y:cy,tx:tg.x,ty:tg.y,tg,t:0,dur:1,dmg:dm,splash:g.splash*gm.splash*TU,src:b});se('how');}
           else if(g.splash)S.shots.push({x:cx,y:cy,tx:tg.x,ty:tg.y,t:0,dur:g.flat?0.25:0.7,flat:!!g.flat,shell:true,dmg:dm*(sh&&has('heplus')?1.2:1),splash:g.splash*gm.splash*TU*(g.shells?2*(has('heplus')?1.4:1):1),src:b,cluster:gm.cluster});
           else if(g.airOnly){
             // 飛槍車：槍を一斉に打ち上げ、狙った敵の周り1.5マスの空の敵にまとめて当てる
@@ -4563,7 +4564,11 @@ function update(dt,sim){
   for(const bm of S.beams)bm.t+=dt;S.beams=S.beams.filter(bm=>bm.t<0.25);
   for(const q of S.eshots){q.t+=dt;if(q.t>=q.dur&&!q.done){q.done=true;if(S.blds.includes(q.b)){damageB(q.b,q.dmg,null);S.fx.push({x:bcx(q.b),y:bcy(q.b),r:8,t:0,dur:0.3,c:'#b7d433'});}}}
   S.eshots=S.eshots.filter(q=>!q.done);
-  for(const s of S.shots){s.t+=dt;if(s.shell&&s.t>=s.dur&&!s.done){s.done=true;se('boom');(S.vfx=S.vfx||[]).push({k:s.src&&s.src.kind==='s'&&s.src.ut==='mage'?'fire':'explosion',x:s.tx,y:s.ty,t0:nowS(),z:Math.max(1,Math.round((s.splash||TU)/TU))});
+  for(const s of S.shots){if(s.balloon&&!s.done){/* 風船爆弾：魔物を追いかけて、近づくと爆発 */const tg=s.tg&&s.tg.hp>0?s.tg:null;if(tg){s.tx=tg.x;s.ty=tg.y;}const dx=s.tx-s.bx,dy=s.ty-s.by,d=Math.hypot(dx,dy),v=2.2*TU*dt;
+      if(d<=Math.max(v,0.6*TU)||s.t>8){s.done=true;s.dur=0;se('boom');(S.vfx=S.vfx||[]).push({k:'explosion',x:s.bx,y:s.by,t0:nowS(),z:Math.max(1,Math.round(s.splash/TU))});S.fx.push({x:s.bx,y:s.by,r:s.splash,t:0,dur:0.35});
+        for(const e of S.enemies)if(e.hp>0&&Math.hypot(e.x-s.bx,e.y-s.by)<s.splash)hitEnemy(e,s.dmg,s.src);}
+      else{s.bx+=dx/d*v;s.by+=dy/d*v;s.dur=s.t+dt+1;}}
+    s.t+=dt;if(s.shell&&s.t>=s.dur&&!s.done){s.done=true;se('boom');(S.vfx=S.vfx||[]).push({k:s.src&&(s.src.kind==='s'&&s.src.ut==='mage'||s.src.type==='magetower')?'fire':'explosion',x:s.tx,y:s.ty,t0:nowS(),z:Math.max(1,Math.round((s.splash||TU)/TU))});
     S.fx.push({x:s.tx,y:s.ty,r:s.splash,t:0,dur:0.35});
     for(const e of S.enemies){if(Math.hypot(e.x-s.tx,e.y-s.ty)<s.splash){hitEnemy(e,s.dmg,s.src);if(s.burn){e.psn=(e.psn||0)+s.dmg*s.burn;e.psnR=Math.max(e.psnR||0,e.psn/3);}if(s.slow)e.slowT=s.slow;}}
     if(s.cluster)for(let i=0;i<4;i++){const a=Math.random()*7,d=TU*(0.6+Math.random()*0.9);S.navShells.push({x:s.tx+Math.cos(a)*d,y:s.ty+Math.sin(a)*d,t:0,delay:0.15+i*0.08,dmg:s.dmg*0.4,splash:TU*0.7});}}}
@@ -4960,7 +4965,7 @@ function econWarnings(e,f){
 let econKey='';
 // 住民の内訳：施設の要員は仕事の名前で、部隊は兵種で数える
 const JOB={miner:'木こり',quarry:'石工',ironmine:'鉱夫',farm:'農夫',fishery:'漁師',well:'エーテル掘り',ammo:'武器鍛冶',powder:'火薬職人',furnace:'精製職人',market:'商人',tavern:'酒場の店員',barracks:'',apart:'',lab:'研究員',
-  mg:'バリスタ兵',how:'投石兵',cannon:'砲手',mortar:'砲手',mabou:'魔弾砲手',tower:'櫓の射手',magetower:'塔の魔術師',hisou:'飛槍兵',outpost:'砦の守備兵',train:'兵舎の番兵',stable:'馬丁',magic:'魔導院の番人',aerie:'竜の世話係'};
+  mg:'バリスタ兵',how:'投石兵',cannon:'砲手',mortar:'砲手',mabou:'魔弾砲手',tower:'櫓の射手',magetower:'塔の魔術師',hisou:'風船兵',outpost:'砦の守備兵',train:'兵舎の番兵',stable:'馬丁',magic:'魔導院の番人',aerie:'竜の世話係'};
 function popBreakdown(){const work={},army={};let research=0,train=0;
   for(const b of S.blds){const n=b.crew||0;if(n){const j=JOB[b.type]||B[b.type].name+'の要員';work[j]=(work[j]||0)+n;}if(b.qm)for(const m of b.qm){const u=MTC[m];train+=u.popEach*u.members;}}
   for(const q of S.squads){const n=q.members*MT(q).popEach;if(!n)continue;const j=MT(q).name;army[j]=(army[j]||0)+n;}
@@ -5147,11 +5152,14 @@ function draw(){
   const P=SPR.projectiles;ctx.imageSmoothingEnabled=false;
   const pdraw=(sp,anim,x,y,dir)=>{if(!sp)return false;const L=sp.img[anim]||sp.img.dirs||sp.img.anim;const im=anim==='dirs'?L[dir]:L[Math.floor(nowS()/0.12)%L.length];ctx.drawImage(im,Math.round(x-im.width/2),Math.round(y-im.height/2));return true;};
   for(const s of S.shots){
+    if(s.balloon){if(s.done)continue;const bob=Math.sin(s.t*6)*2;ctx.strokeStyle='#d8c8a8';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(s.bx,s.by+bob);ctx.lineTo(s.bx,s.by+bob+7);ctx.stroke();
+      ctx.fillStyle='#c84a3a';ctx.beginPath();ctx.arc(s.bx,s.by+bob-3,5,0,7);ctx.fill();ctx.fillStyle='#ff9a80';ctx.fillRect(s.bx-3,s.by+bob-6,2,2);
+      ctx.fillStyle='#2a2438';ctx.beginPath();ctx.arc(s.bx,s.by+bob+9,3,0,7);ctx.fill();ctx.fillStyle='#ffd060';ctx.fillRect(s.bx+2,s.by+bob+5,1,2);continue;}
     if(s.arrow&&P){const k=Math.min(1,s.t/s.dur),x=s.x+(s.tx-s.x)*k,y=s.y+(s.ty-s.y)*k-Math.sin(k*Math.PI)*(s.big?4:10);const vy=(s.ty-s.y)-Math.cos(k*Math.PI)*Math.PI*(s.big?4:10);
       if(pdraw(s.enemy?P.arrow_goblin:s.big?P.bolt:P.arrow,'dirs',x,y,sprDir(Math.atan2(vy,s.tx-s.x))))continue;}
     if(s.shell&&P){const k=s.t/s.dur,gx=s.x+(s.tx-s.x)*k,gy=s.y+(s.ty-s.y)*k,hh=s.flat?0:Math.sin(k*Math.PI)*45;const st=s.src&&s.src.type;
       if(!s.flat&&P.shadow)pdraw(P.shadow,'anim',gx,gy);
-      const sp=s.flat?P.cannonball:st==='mortar'?P.mortar_shell:st==='how'?(P.stone_big||P.stone):s.src&&s.src.kind==='s'&&s.src.ut==='mage'?P.fireball:P.stone;
+      const sp=st==='magetower'?(P.fireball||P.cannonball):s.flat?P.cannonball:st==='mortar'?P.mortar_shell:st==='how'?(P.stone_big||P.stone):s.src&&s.src.kind==='s'&&s.src.ut==='mage'?P.fireball:P.stone;
       if(pdraw(sp,sp&&sp.img.anim?'anim':'dirs',gx,gy-hh,sprDir(Math.atan2(s.ty-s.y,s.tx-s.x))))continue;}
     if(s.arrow){const k=Math.min(1,s.t/s.dur),a=Math.atan2(s.ty-s.y,s.tx-s.x),x=s.x+(s.tx-s.x)*k,y=s.y+(s.ty-s.y)*k-Math.sin(k*Math.PI)*(s.big?4:10),L=s.big?11:7;
       ctx.save();ctx.translate(x,y);ctx.rotate(a+(s.big?0:(0.5-k)*0.5));ctx.strokeStyle=s.enemy?'#b05040':s.big?'#e8d8b0':'#d8c090';ctx.lineWidth=s.big?2.2:1.2;ctx.beginPath();ctx.moveTo(-L,0);ctx.lineTo(L*0.6,0);ctx.stroke();
