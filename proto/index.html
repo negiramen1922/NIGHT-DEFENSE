@@ -1860,13 +1860,13 @@ UT.mil={name:'農兵隊',unit:'人',members:5,hpEach:34,dmg:4.6,rate:0.7,range:1
 UT.art={name:'砲兵隊',unit:'人',members:4,hpEach:48,dmg:30,rate:2.6,range:6,splash:0.9,spd:34,cost:{gold:40,iron:30,fuel:10},popEach:1,time:20,home:'train',cap:2,fly:false,shootAmmo:0,refill:{fuel:3,iron:4}};
 MODEL.cannoneer={ut:'art',wage:4,name:'砲兵',role:'砲兵（携行砲）',color:'#a0a0b0',req:'artillery',desc:'担いで運べる小型の大砲を一人一門ずつ持つ部隊。射程12の範囲攻撃で群れを崩す。鉄を砲弾に使う。撃つ間隔が長く、近づかれると脆い'};
 UT.guard={name:'近衛隊',unit:'人',members:4,hpEach:110,dmg:12,rate:0.6,range:1.3,spd:40,cost:{gold:50,sword:12,iron:10,fuel:15},popEach:1,time:16,home:'hq',cap:3,fly:false,shootAmmo:0,refill:{fuel:3,sword:2}};
-MODEL.guard={ut:'guard',wage:4,name:'近衛兵',role:'近衛兵（城の守り）',color:'#e8c860',desc:'城を守る精兵。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内では火力2倍・受ける被害半分。離れると並の兵より少し強い程度'};
+MODEL.guard={off:true,ut:'guard',wage:4,name:'近衛兵',role:'近衛兵（城の守り）',color:'#e8c860',desc:'城を守る精兵。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内では火力2倍・受ける被害半分。離れると並の兵より少し強い程度'};
 MODEL.scout={ut:'arch',wage:2,name:'斥候',role:'斥候（スカウト）',color:'#8a94a8',req:'scouting',hpEach:18,dmg:4,rate:0.7,range:4,spd:66,vision:20,frail:1.8,scoutEye:true,cost:{gold:15,fuel:10},desc:'足が速く、遠くまで見通す偵察兵。敵の駐留地の正確な場所を見つけられるのは斥候だけ。ひどく打たれ弱く、戦闘ではすぐ倒れる'};
 MODEL.farmer={ut:'mil',name:'農兵',role:'農兵（クワ）',color:'#c8a060',wage:1,desc:'クワや鋤を手にした村人。兵舎がなくても城館で集められる。弱いが安く、食料だけで編成できる'};
 const MTC={};for(const k in MODEL)MTC[k]=Object.assign({},UT[MODEL[k].ut],MODEL[k],{key:k});
 function defModel(ut){return {art:'cannoneer',guard:'guard',mil:'farmer',cav:'rider',drake:'dragon',mage:'wizard',inf:'pawn',arch:'archer',tank:'t10',ship:'dd',air:'heli'}[ut]||'geki';}
 const UNIT_HOME={hq:'mil',train:'inf',stable:'cav',aerie:'drake',magic:'mage'};
-function modelsAt(bt){return Object.keys(MODEL).filter(k=>UT[MODEL[k].ut].home===bt&&!MODEL[k].buy&&(!MODEL[k].req||has(MODEL[k].req)));}
+function modelsAt(bt){return Object.keys(MODEL).filter(k=>UT[MODEL[k].ut].home===bt&&!MODEL[k].buy&&!MODEL[k].off&&(!MODEL[k].req||has(MODEL[k].req)));}
 // 試作：城のレベルごとに持てる部隊の上限（2026-11-11 ユーザー案）
 const SQUAD_CAP=[12,20,30,40,52,65,80];
 function squadCap(){return SQUAD_CAP[Math.max(0,Math.min(SQUAD_CAP.length-1,(S.baseLv||1)-1))];}
