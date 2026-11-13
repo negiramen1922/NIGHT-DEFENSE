@@ -1616,7 +1616,7 @@ let COLS=48, ROWS=32, W=COLS*T, H=ROWS*T;
 let VW=32*TU, VH=20*TU;   // 表示範囲（スマホ縦画面では高さを伸ばす）
 let HQX=24, HQY=16;
 // マップの種類：campaign=作戦マップ（固定・広域）／random=演習（ランダム）
-const FINAL_BY_MAP={m:15,t:6,s:20};
+const FINAL_BY_MAP={m:15,t:6,s:20,'7':40};   // 草原（グレイヴェル）は40回目まで（2026-11-13）
 function finalWave(){return (S&&S.mapId&&FINAL_BY_MAP[S.mapId])||FINAL_WAVE_BASE;}
 function setDims(mode){if(mode==='campaign'&&CUR_MAP==='s'){COLS=96;ROWS=64;HQX=46;HQY=34;}else if(mode==='campaign'&&(CUR_MAP==='f'||CUR_MAP==='t')){COLS=96;ROWS=64;HQX=44;HQY=40;}else if(mode==='campaign'&&CUR_MAP==='m'){COLS=96;ROWS=64;HQX=48;HQY=30;}else if(mode==='campaign'&&CUR_MAP==='c'){COLS=150;ROWS=96;HQX=50;HQY=58;}else if(mode==='campaign'){COLS=96;ROWS=64;HQX=28;HQY=34;}else{COLS=48;ROWS=32;HQX=24;HQY=16;}W=COLS*T;H=ROWS*T;}
 // 地形は旧タイルの解像度で作り、1タイルを U×U マスに割る（城の左上は旧城館の中心に合わせる）
@@ -1639,7 +1639,7 @@ cv.width=VW; cv.height=VH;
 const FOOD_PER=0.03;
 function foodMul(){return S&&S.mapId==='s'?1.3:1;}
 const BLOOD_NIGHTS=[5,10];   // ブラッドムーンの襲撃（山のマップは第15襲撃も）
-function bloodNights(){if(S&&S.mapId==='t')return [6];if(S&&S.mapId==='s')return [5,10,15,20];return (typeof finalWave==='function'&&finalWave()>=15)?[5,10,15]:BLOOD_NIGHTS;}
+function bloodNights(){if(S&&S.mapId==='t')return [6];if(S&&S.mapId==='7')return [5,10,15,21,25,30,35];if(S&&S.mapId==='s')return [5,10,15,20];return (typeof finalWave==='function'&&finalWave()>=15)?[5,10,15]:BLOOD_NIGHTS;}
 let BLOOD_MODE=false;
 // 税：なし／低／普通／高（住民1人あたり毎ターンの金貨）と幸福度への影響
 const TAX=[{n:'なし',g:0,h:15},{n:'低い',g:0.17,h:6},{n:'普通',g:0.35,h:0},{n:'高い',g:0.59,h:-18}];
@@ -1853,10 +1853,17 @@ const UPG_EFF={
 const E={
   swarm:  {name:'ゴブリン',desc:'アビスの影響で凶暴化した小鬼。弱いが数が多く、兵士に群がる',hp:30,spd:40,dmg:5,rate:0.6,r:5,color:'#8ac060',xp:2,mat:0.15,vsS:1.6,hunt:4},
   charger:{name:'ゴブリンライダー',desc:'魔狼に乗ったゴブリン。足が速く、群れで真っ先に突っ込んでくる。狼を倒すと乗っていたゴブリンが降りて戦う',hp:80,spd:76,dmg:10,rate:0.6,r:7,color:'#9a9aa8',xp:4,mat:0.5,vsS:1.5,hunt:5,spill:{type:'swarm',n:1}},
+  treant:{name:'トレント',desc:'歩く巨木の魔物。とても硬いが、火に弱い（ドラゴンブレス・竜騎兵・魔術師の火・メイジの塔で受けるダメージ200%）',hp:1800,spd:24,dmg:45,rate:1.0,r:13,color:'#5a4a2a',xp:20,armor:0.3,bldMul:1.5,mat:6,fireWeak:true,hunt:3},
+  shogre:{name:'盾持ちオーガ',desc:'大きな盾を構えたオーガ。正面からの矢・弾を70%防ぐ（横・後ろからと曲射・魔法の範囲はそのまま）',hp:1400,spd:34,dmg:66,rate:1.1,r:12,color:'#6a7a5a',xp:24,armor:0.2,bldMul:1.3,mat:6,vsS:1.3,hunt:4,frontShield:0.7},
+  maneater:{name:'マンイーター',desc:'根で歩いて近づく食人植物。噛みついた兵士を毒にする（3秒かけて、噛んだダメージと同じだけ追加）',hp:700,spd:32,dmg:30,rate:1.0,r:9,color:'#5aa040',xp:12,armor:0.1,mat:4,vsS:1.2,hunt:5,poison:true},
+  vampire:{name:'吸血鬼',desc:'倒した兵士をグールに変える。聖銀の攻撃（銀装兵・ミスリルレイ）で受けるダメージ200%',hp:1600,spd:50,dmg:70,rate:1.0,r:10,color:'#7a2a4a',xp:30,armor:0.2,mat:10,vsS:1.5,hunt:6,vampire:true,silverWeak:true},
+  ghoul:{name:'グール',desc:'倒れた魔物の死体を食べて回復する（近くで魔物が倒れると体力+300）',hp:900,spd:40,dmg:45,rate:1.0,r:10,color:'#7a8a6a',xp:14,armor:0.1,mat:4,vsS:1.2,hunt:4,eater:true},
+  golem:{name:'ストーンゴーレム',desc:'とても硬い石の巨人。壁を壊しに来る（建物へのダメージ300%）。魔法の攻撃で受けるダメージ150%',hp:5000,spd:18,dmg:110,rate:1.0,r:16,color:'#8a8a80',xp:50,armor:0.5,bldMul:3,mat:16,wallBreak:true,magicWeak:true},
+  werewolf:{name:'ワーウルフ',desc:'ブラッドムーンの夜（21回目から）に現れる狼の獣人。兵士にとても強い',hp:700,spd:70,dmg:80,rate:1.0,r:9,color:'#5a5a6a',xp:20,armor:0.1,mat:6,vsS:4,hunt:8,crewKill:true},
   grappler:{name:'オーガ',desc:'ゴブリンと同じ速さで来る硬い大鬼。兵士にも施設にも強い',hp:380,spd:40,dmg:44,rate:1.1,r:11,color:'#6a8a3a',xp:10,bldMul:1.3,mat:2,vsS:1.5,hunt:4},
   troll:  {name:'トロール',desc:'ゴブリンの群れの先頭に立つ破城役。壁を優先して叩き壊し、傷が自然にふさがる',hp:600,spd:40,dmg:50,rate:1.2,r:12,color:'#5a7a6a',xp:14,bldMul:2.5,mat:3,armor:0.15,regen:8,wallBreak:true},
   spitter:{name:'ゴブリンシャーマン',desc:'後方から呪いの弾で、射程12マスの外から防衛施設を狙撃する',hp:120,spd:36,dmg:18,rate:1.8,r:7,color:'#b070e0',xp:8,mat:1.5,ranged:6},
-  heavy:  {name:'シーカー',desc:'ゴブリン軍の攻城兵器になった巨大な地竜。非常に硬く、部隊には目もくれず建物（防衛施設も）を叩き潰しに行く（建物へのダメージ300%）。背中のゴブリンたちが弓で撃ってくる。倒すと中からゴブリンがあふれ出る',hp:2200,spd:22,dmg:95,rate:2.0,r:17,color:'#7a5a3a',xp:40,armor:0.4,mat:12,bldMul:3.0,hitDef:true,hunt:-1,archers:{range:5,dmg:10,rate:0.7},spill:{type:'swarm',n:8}},
+  heavy:  {name:'シーカー',desc:'ゴブリン軍の攻城兵器になった巨大な地竜。非常に硬く、部隊には目もくれず建物（防衛施設も）を叩き潰しに行く（建物へのダメージ250%）。背中のゴブリンたちが弓で撃ってくる。倒すと中からゴブリンがあふれ出る',hp:2200,spd:22,dmg:95,rate:2.0,r:17,color:'#7a5a3a',xp:40,armor:0.4,mat:12,bldMul:2.5,hitDef:true,hunt:-1,archers:{range:5,dmg:10,rate:0.7},spill:{type:'swarm',n:8}},
   wolf:{name:'魔狼',desc:'雪原を群れで駆ける狼。足がとても速いが打たれ弱い。タイガーライダーに率いられてくる',hp:45,spd:80,dmg:7,rate:0.5,r:6,color:'#a0a4ac',xp:2,mat:0.3,vsS:1.3,hunt:5},
   tiger:{name:'タイガーライダー',desc:'サーベルタイガーに乗ったゴブリンの精鋭。速く硬く、長い牙は兵士も施設も深く裂く。魔狼の群れを率いてくる。虎を倒すと乗り手が降りて戦う',hp:520,spd:56,dmg:28,rate:0.8,r:10,color:'#d8862a',xp:12,mat:3,armor:0.1,vsS:1.4,bldMul:1.2,hunt:3,spill:{type:'swarm',n:1}},
   mammoth:{name:'マンモス',desc:'凍土の巨獣。シーカー並みに硬く、防衛施設を見つけると真っ先に踏み潰しに行く',hp:2400,spd:20,dmg:80,rate:1.8,r:16,color:'#7a5030',xp:36,armor:0.35,mat:10,bldMul:2.0,defHunter:true},
@@ -3191,6 +3198,7 @@ for(const k in PXS)if(!k.startsWith('e_')&&k!=='gunbase')WICON[k]=pxSvg(k);
 for(const k of ['spike','pit','bomb','bastion','hq','miner','quarry','ironmine','farm','fishery','well','ammo','barracks','lab','outpost','train','fence','swall','wall','tower','market','tavern','stable','aerie','magic','rider','dragon','wizard']){const im=new Image();im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">${WICON[k]}</svg>`);ICIMG[k]=im;}
 for(const k in PXS)ICIMG[k]=pxCanvas(k);
 const PXI={};for(const k in PXS)PXI[k]=ICIMG[k];
+for(const [a,b] of [['e_shogre','ogre_shield'],['e_golem','e_golem'],['e_mole','mole'],['e_bat','bat'],['e_treant','e_troll'],['e_maneater','e_spitter'],['e_werewolf','e_wolf']])if(SPR.enemies&&!SPR.enemies[a]&&SPR.enemies[b])SPR.enemies[a]=SPR.enemies[b];   /* トレント・マンイーター・ワーウルフは絵ができるまで代わり */
 for(const [k,,,,col] of WALL_UP){const src=ICIMG.wall;const c=document.createElement('canvas');c.width=src.width||48;c.height=src.height||48;const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(src,0,0,c.width,c.height);g.globalCompositeOperation='source-atop';g.globalAlpha=0.5;g.fillStyle=col;g.fillRect(0,0,c.width,c.height);ICIMG[k]=c;PXI[k]=c;
   if(WICON.wall)WICON[k]=WICON.wall.split('#a09a90').join(col);}   /* 壁の上位：城壁の絵に材料の色を重ねた仮の絵 */
 if(SPR.walls&&SPR.walls.wall)for(const [k,,,,col] of WALL_UP){const W=SPR.walls.wall;const tint=c0=>{const c=document.createElement('canvas');c.width=c0.width;c.height=c0.height;const g=c.getContext('2d');g.drawImage(c0,0,0);g.globalCompositeOperation='source-atop';g.globalAlpha=0.45;g.fillStyle=col;g.fillRect(0,0,c.width,c.height);return c;};
@@ -3650,7 +3658,8 @@ function genWave(n){
   const tactic=n<=2?'swarm':n<=4?'mixed':n<=7?'vanguard':'combined';
   const tutM=S&&S.mapId==='t'?0.55:1;const BN=bloodNights(),blood=!!(S.bloodMode||BN.includes(n)),after=!S.bloodMode&&BN.includes(n-1),bm=(blood?1.45:after?0.7:1)*(1+Math.max(0,Math.min(n,10)-3)*0.04+Math.max(0,n-10)*0.04)*tutM;
   // 第10襲撃より後は数の増え方をゆるめ、そのぶん魔物を硬くする（重くなりすぎないように）
-  const ns2=Math.min(n,10)+Math.max(0,n-10)*0.35;
+  const GL=S&&S.mapId==='7';   /* 草原：40回目までの出方（2026-11-13・docs/ENEMIES.md） */
+  const ns2=Math.min(n,10)+Math.max(0,n-10)*(GL?0.2:0.35);
   const cnt={
     swarm:Math.round((14+ns2*8+ns2*ns2*1.6)*(n<=4?1.1:1.4)*bm),
     charger:n<2?0:Math.round(ns2*5*bm),
@@ -3663,6 +3672,11 @@ function genWave(n){
     heavy:n<7?0:Math.round((n-6)*1.5*bm),
     redcap:blood?Math.round(4+n*1.5):0,
   };
+  if(GL){/* 古い魔物は出てから頭打ち（cap回ぶんまで増える）、後半は新しい魔物に入れ替わる */const bm2=(blood?1.45:after?0.7:1)*(1+0.03*(n-1));const g=(from,k,cap)=>n<from?0:Math.round(Math.min(n-from+1,cap||8)*k*bm2);
+    const ns=Math.min(n,10),late=n>26?0.35:n>18?0.5:1;
+    Object.assign(cnt,{swarm:Math.round((14+ns*8+ns*ns*1.6)*(n<=4?1.1:1.4)*late*bm2),charger:n<2?0:Math.round(ns*5*late*bm2),harpy:g(3,3,10),troll:g(4,1.1,10),grappler:n<5?0:Math.round((3+Math.min(n-5,10)*2.4)*bm2),spitter:g(5,1.2,10),
+      gobarcher:g(8,2.2,10),heavy:g(9,1.1),wyvern:g(13,0.7),treant:g(15,0.8),shogre:g(22,1.0),maneater:g(23,1.4),vampire:g(30,0.6,6),ghoul:g(30,1.4,6),golem:g(37,0.5,4),
+      werewolf:blood&&n>=21?Math.round(3+(n-20)*0.4):0,redcap:blood?Math.round(4+Math.min(n,20)*1.2):0});}
   if(S&&S.mapId==='s'){cnt.charger=Math.round(cnt.charger*0.5);cnt.wolf=n<3?0:Math.round(ns2*4*bm);cnt.tiger=n<9?0:Math.round((n-8)*0.8*bm);cnt.mammoth=n<13?0:Math.max(1,Math.round((n-12)*0.35*bm));}
   const q=[];
   const weights=sides.map((s,i)=>i===0?1.6:1);const wsum=weights.reduce((a,b)=>a+b,0);
@@ -3682,16 +3696,17 @@ function genWave(n){
       for(let i=0;i<c.grappler;i++)add('grappler',6,6+dur*0.6);
       for(let i=0;i<c.spitter;i++)add('spitter',10,dur);
       for(let i=0;i<(c.gobarcher||0);i++)add('gobarcher',9,dur*0.9);
-      for(let i=0;i<c.heavy;i++)add('heavy',5,9);           // ベアは早めに出るが遅いので、本隊の最後尾と同じころに着く
+      for(let i=0;i<c.heavy;i++)add('heavy',5,9);
+      for(const [ty,a,b2] of [['treant',5,10],['shogre',6,dur*0.5],['maneater',8,dur*0.8],['vampire',10,dur*0.8],['ghoul',8,dur*0.8],['golem',4,8]])for(let i=0;i<(c[ty]||0);i++)add(ty,a,b2);           // ベアは早めに出るが遅いので、本隊の最後尾と同じころに着く
     }
     for(let i=0;i<c.harpy;i++)add('harpy',8,dur);
     for(let i=0;i<c.wyvern;i++)add('wyvern',dur*0.5,dur);
-    for(let i=0;i<c.redcap;i++)add('redcap',6,dur);
-    if(n===finalWave()&&k===FR.length-1)add('king',dur*0.4,dur*0.4+1);
+    for(let i=0;i<c.redcap;i++)add('redcap',6,dur);for(let i=0;i<(c.werewolf||0);i++)add('werewolf',6,dur);
+    if((n===finalWave()||(GL&&n===20))&&k===FR.length-1)add('king',dur*0.4,dur*0.4+1);   // 草原は20回目に中ボス
   });
   q.sort((a,b)=>a.t-b.t);
   const perSide={},sideComp={};for(const e of q){perSide[e.side]=(perSide[e.side]||0)+1;const c=sideComp[e.side]=sideComp[e.side]||{};c[e.type]=(c[e.type]||0)+1;}
-  return{n,q,sides,main:sides[0],tactic,blood,blizzard:S&&S.mapId==='s'&&[8,13,20].includes(n),hpMul:1+Math.max(0,n-10)*0.12,king:n===finalWave(),subs:subs.map((c,i)=>Object.values(c).reduce((a,b)=>a+b,0)+(n===finalWave()&&i===subs.length-1?1:0)),perSide,sideComp,noise0:0.6+Math.random()*0.8,noise1:0.85+Math.random()*0.3};
+  return{n,q,sides,main:sides[0],tactic,blood,blizzard:S&&S.mapId==='s'&&[8,13,20].includes(n),hpMul:1+Math.max(0,n-10)*(GL?0.04:0.12),king:n===finalWave(),subs:subs.map((c,i)=>Object.values(c).reduce((a,b)=>a+b,0)+(n===finalWave()&&i===subs.length-1?1:0)),perSide,sideComp,noise0:0.6+Math.random()*0.8,noise1:0.85+Math.random()*0.3};
 }
 function phaseReset(){try{if(S.buildMode||S.buildPick){S.buildMode=null;S.buildPick=false;renderBuild();}S.aimNaval=false;if(S.sel&&S.sel.kind!=='s')S.sel=null;S.selTile=null;renderInfo(true);renderMode();}catch(e){}}
 // ===== 行軍：街から遠く、まだ見えていない敵は少し速く進む（駐留地からの道のりの待ち時間を少し短くする） =====
@@ -4508,6 +4523,7 @@ function update(dt,sim){
   if(S.waveActive){S._barT=(S._barT||0)-dt;if(S._barT<=0){S._barT=1;const bs=S.blds.filter(b=>b.type==='barrier'&&!(b.bt>0&&!b.upg)&&eff(b)>0);
     for(const o of S.blds)o.shMax=0;for(const b of bs){const r=B.barrier.aura*TU,mx=B.barrier.shield*UP.hp[(b.lv||1)-1];for(const o of S.blds){if(o.type==='barrier'||WALL_TYPES.includes(o.type))continue;if(Math.hypot(bcx(o)-bcx(b),bcy(o)-bcy(b))<=r)o.shMax=Math.max(o.shMax||0,mx);}}}
     for(const o of S.blds){if(!o.shMax){o.shield=0;continue;}if(o.shield==null)o.shield=o.shMax;o.shield=Math.min(o.shield,o.shMax);}}   /* 夜の間は張り直さない（朝の修理でエーテルを使って張り直す） */
+  for(const s of S.squads)if(s.psnT>0){s.psnT-=dt;damageSquad(s,(s.psnD||0)*dt);}   /* マンイーターの毒 */
   // 部隊
   for(const s of S.squads){
     if(s.ut==='guard'&&!sim){const hq=hqOf();if(hq){const [qx,qy]=castleC(hq);
@@ -4651,7 +4667,8 @@ function update(dt,sim){
     }
     let melee=null;
     for(const s of S.squads){if(s.gar||(UT[s.ut].fly&&s.ut!=='mech'))continue;if(Math.hypot(s.x-e.x,s.y-e.y)<d.r+(s.ut==='ship'?18:10)){melee=s;break;}}
-    if(melee){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;damageSquad(melee,d.dmg*(d.vsS||1)*(e.buff?1.3:1));}continue;}
+    if(melee){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;const m0=melee.members,dm=d.dmg*(d.vsS||1)*(e.buff?1.3:1);damageSquad(melee,dm);if(d.poison){melee.psnT=3;melee.psnD=dm/3;}
+      if(d.vampire&&melee.members<m0){for(let i=0;i<m0-Math.max(0,melee.members);i++)S.enemies.push({type:'ghoul',x:melee.x+(Math.random()-.5)*TU,y:melee.y+(Math.random()-.5)*TU,hp:E.ghoul.hp,maxhp:E.ghoul.hp,cd:0,target:null,retarget:0});log('吸血鬼に倒された兵がグールになった','bad');}}continue;}
     let tx,ty;
     if(e.camp&&!hunt){const c=campById(e.camp);if(!c)continue;tx=c.x+(e.hx||0);ty=c.y+(e.hy||0);if(Math.hypot(tx-e.x,ty-e.y)<TU*0.6)continue;}
     else if(e.wp0&&!hunt){tx=e.wp0[0];ty=e.wp0[1];}
@@ -4760,12 +4777,18 @@ function hitEnemy(e,dmg,src,pierce,ap){
   const d=E[e.type];
   if(has('incend'))dmg*=1.15;
   if(ap==null&&src&&src.kind==='b')ap=elevAP(src);
+  if(src){const st=src.kind==='s'?null:src.type,su=src.kind==='s'?src.ut:null;   /* 魔物の弱点・盾（2026-11-13） */
+    if(d.fireWeak&&(st==='dbreath'||st==='magetower'||su==='drake'||su==='mage'))dmg*=2;
+    if(d.magicWeak&&(st==='magetower'||st==='tesla'||st==='mray'||su==='mage'))dmg*=1.5;
+    if(d.silverWeak&&(st==='mray'||(src.kind==='s'&&src.model==='silver')))dmg*=2;
+    if(d.frontShield&&((src.kind==='b'&&isDirect(src))||su==='arch')){const sx=src.kind==='s'?src.x:bcx(src),sy=src.kind==='s'?src.y:bcy(src),tg=e.target&&S.blds.includes(e.target)?e.target:hqOf();if(tg){const fa=Math.atan2(bcy(tg)-e.y,bcx(tg)-e.x),sa=Math.atan2(sy-e.y,sx-e.x);let da=Math.abs(fa-sa);if(da>Math.PI)da=2*Math.PI-da;if(da<Math.PI/2)dmg*=1-d.frontShield;}}}
   const armor=(pierce||has('incend'))?0:(d.armor||0)*(1-Math.min(1,ap||0));
   e.hp-=dmg*(1-armor);
   if(has('poison')&&src&&!pierce&&src.kind!=='s'&&(src.type==='mg'||src.type==='tower')){e.psn=(e.psn||0)+dmg*0.3;e.psnR=Math.max(e.psnR||0,e.psn/3);}
   if(e.hp<=0){
     if(src){const c=cmdOf(src);if(c){c.kills++;gainXp(c,d.xp);}if(src.kind==='s'){const l0=vetLv(src);src.vet=(src.vet||0)+d.xp;const l1=vetLv(src);if(l1>l0){src.maxhp=unitMaxHp(src);log(`${unitLabel(src)} が「${VET[l1].n}」になった`,'good');}}}
     dexMark(e.type,1);
+    for(const g of S.enemies)if(g!==e&&g.hp>0&&E[g.type].eater&&Math.hypot(g.x-e.x,g.y-e.y)<2.5*TU){g.hp=Math.min(g.maxhp,g.hp+300);S.fx.push({x:g.x,y:g.y,r:10,t:0,dur:0.4,c:'#a0c070'});}   /* グールが死体を食べる */
     const m=d.mat*(1+0.5*lvl('refine'));
     S.mat+=Math.floor(m)+(Math.random()<m%1?1:0);
   }
@@ -6849,7 +6872,7 @@ function innerKey(e,root){const c=e.className&&typeof e.className==='string'?e.c
 function findInner(k,root){const [c,i]=k;try{return root.querySelectorAll(/^[A-Z]+$/.test(c)?c:'.'+c)[i]||null;}catch(e){return null;}}
 function closeOverlay(){const was=S&&S.overlay;if(S)S.overlay=null;if(was==='res'&&S.resFromNight){S.resFromNight=false;if(S.phase==='night'&&!S.waveActive)setTimeout(()=>{if(!S.overlay)showNight();},0);}if(was==='report'&&S.phase==='night'&&S.nightPending){S.nightPending=false;setTimeout(showNight,0);}document.getElementById('overlay').style.display='none';document.body.classList.remove('ov');}
 // ===== モンスター図鑑 =====
-const DEX_ORDER=['swarm','charger','gobarcher','spitter','grappler','troll','harpy','heavy','wyvern','wolf','tiger','mammoth','redcap','king'];
+const DEX_ORDER=['swarm','charger','gobarcher','spitter','grappler','troll','harpy','heavy','wyvern','treant','shogre','maneater','vampire','ghoul','golem','wolf','tiger','mammoth','redcap','werewolf','king'];
 function dexFirst(){// このマップで初めて出てくる襲撃（genWave の決まりから）
   const o={},sv=S.open?Object.assign({},S.open):null,sw=S.wave;
   try{S.wave=0;for(let n=1;n<=Math.max(finalWave(),S.wave+1);n++){const w=genWave(n);for(const e of w.q)if(o[e.type]==null)o[e.type]=n;}}finally{if(sv)S.open=sv;S.wave=sw;}
