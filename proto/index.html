@@ -2789,7 +2789,7 @@ function nearestOre(cx,cy){let best=null,bd=1e9;for(let y=0;y<ROWS;y++)for(let x
 function lvl(id){return S.tech[id]||0;}
 function has(id){return lvl(id)>0;}
 const MERGED={mine2:'mine',quarry2:'quarrying',farm2:'farming',fish2:'fishing',autoammo2:'autoammo'};   // 試作：「Ⅱ」の研究は元の研究のⅡ段目にまとめた（効果の計算は元から両方を足しているのでそのまま）
-const HIDDEN_T=new Set(['bonearmor','polearm','firecraft','horsearch','elemental','shells','dragongear',...Object.keys(MERGED)]);   // 装備の種類の研究は武器の材料の段にまとめた
+const HIDDEN_T=new Set(['enchant','bonearmor','polearm','firecraft','horsearch','elemental','shells','dragongear',...Object.keys(MERGED)]);   // 装備の種類の研究は武器の材料の段にまとめた
 for(const t of TECH)if(t&&HIDDEN_T.has(t.id)){t.cat0=t.cat;t.cat='（まとめた）';}
 for(const t of TECH){if(t&&t.max>1&&/Lvごと|／Lv/.test(t.eff||'')){t.lvRank=true;t.eff=t.eff.replace(/[・、]?最大\d+/,'・最大は城のランクまで');}}   // 試作：重ねる研究は城のランクまで
 function techOf(id){return TECH.find(x=>x.id===id);}
@@ -3117,18 +3117,7 @@ function highShot(b){return !!(b.wall||b.type==='tower'||b.type==='magetower'||b
 // 山は誰も撃ち越せない（曲射・高所からも）
 function mtnBlock(b,ex,ey){const sx=bcx(b),sy=bcy(b),n=Math.ceil(Math.hypot(ex-sx,ey-sy)/(T*0.45));const tx=Math.floor(ex/T),ty=Math.floor(ey/T);
   for(let i=1;i<n;i++){const gx=Math.floor((sx+(ex-sx)*i/n)/T),gy=Math.floor((sy+(ey-sy)*i/n)/T);if((S.grid[gy]&&S.grid[gy][gx]===b)||(gx===tx&&gy===ty))continue;if(gx<0||gy<0||gx>=COLS||gy>=ROWS)continue;if(S.ter[gy][gx]===3)return true;}return false;}
-function losFactor(b,ex,ey){
-  const se0=elevAt(b.x,b.y);const sx=bcx(b),sy=bcy(b),n=Math.ceil(Math.hypot(ex-sx,ey-sy)/(T*0.45));let f=1;
-  const tx=Math.floor(ex/T),ty=Math.floor(ey/T);
-  for(let i=1;i<n;i++){const gx=Math.floor((sx+(ex-sx)*i/n)/T),gy=Math.floor((sy+(ey-sy)*i/n)/T);
-    if((S.grid[gy]&&S.grid[gy][gx]===b)||(gx===tx&&gy===ty))continue;if(gx<0||gy<0||gx>=COLS||gy>=ROWS)continue;
-    if(S.ter[gy][gx]===3)return 0;
-    if(!highShot(b)){const o=S.grid[gy][gx];
-      if(o&&!WALL_TYPES.includes(o.type)&&o.type!=='gate'&&!o.wall&&!B[o.type].isMine&&o.type!=='brazier'&&!(GUN_TYPES.includes(o.type)&&Math.max(Math.abs(o.x-b.x),Math.abs(o.y-b.y))<=1))return 0;     // 味方の建物が射線をふさぐ（篝火と、隣り合う兵器はふさがない）
-    }
-    if(!b.wall){const o=S.grid[gy][gx];if(o&&(WALL_TYPES.includes(o.type)||o.wall||B[o.type].towerWall))f=0.75;}}
-  return f;
-}
+function losFactor(b,ex,ey){return mtnBlock(b,ex,ey)?0:1;}   /* 射線をふさぐのは山脈だけ（2026-11-13）。建物・壁ではふさがない */
 function garOf(b){return b.gar?S.squads.find(s=>s.id===b.gar&&s.gar===b.id):null;}
 function garrison(s,b){if(!b||b.gar||!s||s.ut!==B[b.type].garUt)return;s.gar=b.id;b.gar=s.id;s.x=bcx(b);s.y=bcy(b);s.tx=null;log(`${unitLabel(s)} が${B[b.type].name}に配置についた`,'good');if(S.sel===s)S.sel=b;}
 function ungarrison(b,hurt){const s=garOf(b);b.gar=null;if(!s)return;s.gar=null;s.x=bcx(b);s.y=bcy(b)+0.9*TU;s.ax=s.x;s.ay=s.y;if(hurt){s.hp*=0.5;log(`${B[b.type].name}が崩れ、${unitLabel(s)}が投げ出された`,'kia');}}
@@ -6439,7 +6428,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
       else if(o.wlast)h+=`<div class="row"><span class="muted">前回の夜の消費</span><span class="bd">${Object.entries(o.wlast).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;}}
     if(o.res!=null&&o.res!==Infinity)h+=`<div class="row"><span class="muted">残りの埋蔵量</span><span class="${o.dep?'bd':o.res<150?'wn':''}">${o.dep?'枯渇（もう採れない）':Math.floor(o.res)}</span></div>`;}
   if(!isS&&o.type==='ammo'){const sw=o.mode==='sword',ar=o.mode==='armor';h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-wmode="arrow" class="${sw||ar?'':'on'}">${ic('ammo',14)} 矢</button><button data-wmode="sword" class="${sw?'on':''}">${ic('sword',14)} 剣</button><button data-wmode="armor" class="${ar?'on':''}">${ic('armor',14)} 鎧</button></div><div class="muted" style="font-size:11px;margin-top:3px">${ar?'鎧：兵士・重装歩兵・騎兵の鎧の補給に使う（木材 −2・鉄 −6 → 鎧 +4／T 相当）':sw?'剣：兵士・重装歩兵・騎兵の編成と補充に使う':'矢：バリスタ・物見櫓・弓兵が使う'}</div></div>`;}
-  if(!isS&&canEnch(o)&&!(o.bt>0&&!o.upg)){const e=o.ench||0;const what=B[o.type].range?'火力':PROD_BT.includes(o.type)?'生産量':'';
+  if(false&&!isS&&canEnch(o)&&!(o.bt>0&&!o.upg)){   /* 魔核の強化はやめた（2026-11-13） */const e=o.ench||0;const what=B[o.type].range?'火力':PROD_BT.includes(o.type)?'生産量':'';
     h+=`<div class="upg"><b>魔核の強化</b><span><span class="star">${'★'.repeat(e)}${'☆'.repeat(3-e)}</span> ${e}/3</span>`;
     if(!has('enchant'))h+=`<div class="muted" style="font-size:11px">研究「魔核の強化」（魔核タブ）で使えるようになる</div>`;
     else if(e<3){const c=enchCost(o);h+=`<div style="margin-top:3px">${o.upg==='ench'?`<span class="muted">★${e+1}に強化中（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</span>`:`<button onclick="enchUp(S.sel)" ${canAfford(c)&&!S.waveActive&&!(o.bt>0)?'':'disabled'}>★${e+1}に強化（${costText(c)}・${ENCH_T[e]}ターン）</button>`}</div><div class="muted" style="font-size:11px">★ごとに ${what?what+' +15%・':''}耐久 +20%</div>`;}
@@ -6456,7 +6445,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(!isS&&B[o.type].shells){const cur=o.shell||'he';
     h+=`<div class="upg"><b>砲弾</b><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${Object.entries(SHELL).map(([k,v])=>{const ok=!v.req||has(v.req);return `<button data-shell="${k}" class="${cur===k?'on':''}" ${ok?'':'disabled'} title="${ok?'':'研究で解禁'}">${icSvg(k,14)} ${v.n}</button>`;}).join('')}</div>
     <div class="muted" style="font-size:11px;margin-top:3px">${cur==='ap'?'徹甲弾：火力×1.7・装甲無視・射線上の敵を最大4体まで貫く':cur==='can'?'キャニスター：射程×0.65、扇状の範囲の敵すべてに散弾':'榴弾：着弾点の周囲に爆風（群れ向け）'}</div></div>`;}
-  if(!isS&&gunOf(o)&&o.type!=='hq')h+=`<div class="muted" style="font-size:11px;margin-top:4px">${isDirect(o)?(o.wall?'直射砲（城壁の上：壁越しでも威力が落ちない）':'直射砲：岩場の向こうは撃てず、ほかの城壁越しは威力-25%。城壁の上に置くと影響なし'):'曲射砲：壁や岩場の向こうへも威力を落とさず撃てる'}${B[o.type].minRange?`。最低射程${B[o.type].minRange*U}マス`:''}</div>`;
+  if(!isS&&gunOf(o)&&o.type!=='hq')h+=`<div class="muted" style="font-size:11px;margin-top:4px">${isDirect(o)?(o.wall?'直射砲（城壁の上：壁越しでも威力が落ちない）':'直射：山脈の向こうは撃てない（建物や壁は越えて撃てる）'):'曲射砲：壁や岩場の向こうへも威力を落とさず撃てる'}${B[o.type].minRange?`。最低射程${B[o.type].minRange*U}マス`:''}</div>`;
   if(PROD_BT.includes(o.type)&&!['barracks','apart','lab'].includes(o.type)){h+=`<div class="upg"><b>生産</b> <span style="color:${o.off?'var(--red)':'var(--green)'}">${o.off?'停止中':'稼働中'}</span><div class="muted" style="font-size:11px">止めている間は産出も消費もしません（材料を使う施設の節約に）</div><button id="prodOff" style="margin-top:4px">${o.off?'生産を再開する':'生産を止める'}</button></div>`;}
   if(o.type==='hq'){const gq=S.squads.filter(q=>q.ut==='guard');h+=`<div class="upg"><b>近衛兵</b><div class="muted" style="font-size:11px">城で編成できる精鋭（部隊画面 [K]）。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内で火力2倍・被害半分</div>${gq.length?gq.map(q=>`<div class="row" style="align-items:center"><span>${unitLabel(q)} ${q.members}/${UT.guard.members}人・${q.gar?'駐屯中':'出撃中'}</span>${q.gar?`<button data-gdout="${q.id}" style="padding:2px 8px">外に出す</button>`:''}</div>`).join(''):'<div class="muted" style="font-size:11px">まだいません</div>'}</div>`;}
   if(o.type==='hq'){const c=baseUpCost();h+=`<div class="upg"><div class="row"><b>拠点レベル ${S.baseLv}/${BASE_MAX}</b><span class="muted">英雄 ${S.cmds.length}/${maxCmd()}</span></div>
