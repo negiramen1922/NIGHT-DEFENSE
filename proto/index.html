@@ -1499,6 +1499,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .dxi.big{width:300px;height:120px}
 .dxi.big .artpx{width:300px}
 @media (max-width:900px){.dxi.big{width:100%;max-width:300px;height:auto}}
+.kcnext{display:flex;gap:8px;align-items:center;margin:4px 0}.kcnext img{width:32px;height:32px;image-rendering:pixelated;background:#0003;border-radius:4px}
 </style>
 </head>
 <body>
@@ -1738,8 +1739,8 @@ const B={
 const HQGUN={range:4,dmg:9,rate:0.3,ammoUse:0.5};
 Object.assign(B,{
   hq:     {name:'城館',glyph:'館',hp:1800,heat:2,cost:{},pop:0,power:0,spec:'工兵',desc:'街の中心。失うと敗北。周囲を明るく照らす'},
-  miner:  {name:'伐採所',glyph:'伐',hp:160,heat:1,cost:{steel:30},pop:2,power:0,spec:'内政',grp:'prod',desc:'森の上に建設。木材を産出（+10/T、森が深いほど多い：森2で×1.4、森3で×1.8）'},
-  quarry: {name:'石切り場',glyph:'石',hp:200,heat:1,cost:{steel:40},pop:3,power:0,spec:'内政',grp:'prod',desc:'岩場の上か山のふもとに建設。石材を産出（+8/T、岩が多いほど多い：丘2で×1.4、丘3で×1.8）'},
+  miner:  {name:'伐採所',glyph:'伐',hp:160,heat:1,cost:{steel:30},pop:2,power:0,spec:'内政',grp:'prod',desc:'森の上に建設。木材を産出（+10/T、森が深いほど多い：森2で140%、森3で180%）'},
+  quarry: {name:'石切り場',glyph:'石',hp:200,heat:1,cost:{steel:40},pop:3,power:0,spec:'内政',grp:'prod',desc:'岩場の上か山のふもとに建設。石材を産出（+8/T、岩が多いほど多い：丘2で140%、丘3で180%）'},
   fishery:{name:'漁場',glyph:'漁',hp:150,heat:1,cost:{steel:35},pop:2,power:0,spec:'内政',grp:'prod',desc:'川・湖・海から4マス以内に建設。食料を産出（+16/T。農場より多い）'},
   ironmine:{name:'鉱山',glyph:'鉱',hp:220,heat:1,cost:{steel:50,stone:10},pop:3,power:0,spec:'内政',grp:'prod',desc:'鉄鉱脈の上に建設。鉄を産出（+6/T）'},
   farm:   {name:'農場',glyph:'農',hp:150,heat:1,cost:{steel:30},pop:2,power:0,spec:'内政',grp:'prod',desc:'平地に建設。食料を産出（+12/T）。住民は食料を食べる'},
@@ -1967,11 +1968,11 @@ const TECH=[
   {id:'castle',cat:'防衛',tier:2,name:'築城術',t:3,cost:{stone:120,steel:60},key:1,icon:'wall',eff:'「城壁」を建設可能に（上に防衛施設を置ける）',pre:['masonry']},
   {id:'catapult',cat:'防衛',tier:1,name:'投石機',t:2,cost:{steel:60,stone:30},key:1,icon:'how',eff:'「投石機」を建設可能に（石材を撃つ曲射兵器）'},
   {id:'tower',cat:'防衛',tier:1,name:'高い櫓',t:2,cost:{steel:50,stone:20},icon:'tower',eff:'物見櫓の火力 +30%'},
-  {id:'heavymg',cat:'防衛',tier:2,name:'重弩',t:2,cost:{steel:60,iron:40},icon:'mg',eff:'バリスタの火力 ×1.4、射程 +1',pre:['shell']},
+  {id:'heavymg',cat:'防衛',tier:2,name:'重弩',t:2,cost:{steel:60,iron:40},icon:'mg',eff:'バリスタの火力 140%、射程 +1',pre:['shell']},
   {id:'fcs',cat:'防衛',tier:2,name:'照準の目印',t:2,cost:{steel:40,stone:20},eff:'バリスタ・物見櫓の射程 +2、投石機の射程 +4',pre:['shell']},
   {id:'autoload',cat:'防衛',tier:2,name:'巻き上げ機',t:2,cost:{steel:50,iron:30},max:2,eff:'全防衛施設の発射速度 +15%／Lv',pre:['shell']},
   {id:'gunpowder',cat:'防衛',tier:3,name:'火薬',t:3,cost:{iron:80,mat:20,gold:60},key:1,icon:'cannon',eff:'「大砲」を建設可能に（鉄の砲弾で敵を貫く直射砲・装甲無視）',pre:['catapult']},
-  {id:'bighow',cat:'防衛',tier:2,name:'大岩の投擲',t:2,cost:{stone:60,steel:40},icon:'how',eff:'投石機の火力 ×1.25、範囲 ×1.3',pre:['catapult']},
+  {id:'bighow',cat:'防衛',tier:2,name:'大岩の投擲',t:2,cost:{stone:60,steel:40},icon:'how',eff:'投石機の火力 125%、範囲 130%',pre:['catapult']},
   {id:'pitch',cat:'防衛',tier:1,name:'松脂の篝火',t:1,cost:{steel:30,fuel:20},icon:'brazier',eff:'篝火の照らす範囲 +3マス'},
   {id:'wallplus',cat:'防衛',tier:2,name:'壁の補強',t:2,cost:{stone:50},max:2,eff:'城壁の耐久 +40%／Lv',pre:['masonry']},
   {id:'upg_def1',cat:'防衛',tier:2,name:'防衛施設の改築Ⅰ',t:2,cost:{steel:120,stone:60},key:1,eff:'防衛施設を Lv2 に改築可能に',pre:['shell']},
@@ -2042,12 +2043,12 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('kougen',{cat:'防衛',tier:1,name:'鋼弦',max:2,cost:{steel:40,iron:20},t:2,pre:[],icon:'mg',eff:'バリスタの火力 +20%（Lvごと・最大2）'});
  set('goukyu',{cat:'防衛',tier:1,name:'強弓',max:2,cost:{steel:40,ammo:30},t:2,pre:[],icon:'tower',eff:'物見櫓の火力 +20%（Lvごと・最大2）'});
  set('tower',{cat:'防衛',tier:2,name:'高櫓',cost:{steel:60,stone:40},t:2,pre:['goukyu'],eff:'物見櫓の射程 +2・連射 +20%'});
- set('heavymg',{cat:'防衛',tier:2,name:'重弩',pre:['kougen'],eff:'バリスタの火力 ×1.4・射程 +1'});
+ set('heavymg',{cat:'防衛',tier:2,name:'重弩',pre:['kougen'],eff:'バリスタの火力 140%・射程 +1'});
  set('fcs',{cat:'防衛',tier:2,name:'照準術',pre:['kougen'],eff:'バリスタ・物見櫓の射程 +2、投石機の射程 +4'});
  set('autoload',{cat:'防衛',tier:2,name:'巻き上げ機',pre:['kougen'],eff:'全防衛施設の連射 +15%（Lvごと・最大2）'});
  set('hisousha',{cat:'防衛',tier:3,name:'風船爆弾',cost:{iron:60,gold:60},t:3,pre:['gunpowder'],icon:'hisou',eff:'「風船爆弾」を建設できる（風船のついた爆弾が魔物を追いかけて爆発する。空にも地上にも効く範囲攻撃。射程8。火薬を使う）'});
  set('catapult',{cat:'防衛',tier:1,name:'投石機',pre:[],eff:'「投石機」を建設できる（石材を撃つ曲射の範囲攻撃。味方の建物越しに撃てる）'});
- set('bighow',{cat:'防衛',tier:2,name:'大岩弾',pre:['catapult'],eff:'投石機の火力 ×1.25・範囲 ×1.3'});
+ set('bighow',{cat:'防衛',tier:2,name:'大岩弾',pre:['catapult'],eff:'投石機の火力 125%・範囲 130%'});
  set('gunpowder',{cat:'防衛',tier:3,name:'火薬',pre:['bighow'],eff:'「大砲」を建設できる（鉄の砲弾で敵を4体まで貫く）'});
  set('tetsudan',{cat:'防衛',tier:3,name:'鉄弾',cost:{iron:120,gold:60},t:3,pre:['gunpowder'],icon:'cannon',eff:'大砲の火力 +30%'});
  set('masonry',{cat:'防衛',tier:1,name:'石積み',pre:[],eff:'「石の壁」を建設できる。門と物見櫓を石造りにできる'});
@@ -2084,7 +2085,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('bigquiver',{cat:'部隊',tier:1,name:'大矢筒',cost:{steel:30,ammo:30},t:1,pre:[],icon:'archer',eff:'弓兵隊の矢筒 60本→100本'});
  set('scout',{tier:1,pre:[]});set('doctrine',{tier:1,pre:[]});set('nighthunt',{tier:1,pre:[]});
  set('unit_r2',{cat:'部隊',gate:2,tier:2,name:'部隊強化Ⅱ',cost:{gold:60,fuel:60,sword:20},t:2,pre:[],icon:'heavy',eff:'部隊タブのランクⅡの研究を解放（重装歩兵・騎兵・魔術師など）'});
- set('scouting',{cat:'部隊',tier:2,name:'斥候隊',cost:{gold:30,fuel:30},t:1,pre:[],icon:'archer',eff:'兵舎で「斥候」を編成できる。足が速く視界が広い（20マス）。敵の駐留地の正確な場所を見つけられる唯一の部隊。打たれ弱く、受ける被害 ×1.8'});
+ set('scouting',{cat:'部隊',tier:2,name:'斥候隊',cost:{gold:30,fuel:30},t:1,pre:[],icon:'archer',eff:'兵舎で「斥候」を編成できる。足が速く視界が広い（20マス）。敵の駐留地の正確な場所を見つけられる唯一の部隊。打たれ弱く、受ける被害 180%'});
  set('heavyinf',{tier:2,pre:[]});set('cavalry',{tier:2,pre:[]});set('magic',{tier:4,pre:[]});
  set('shieldwall',{cat:'部隊',tier:2,name:'盾陣',cost:{iron:60,steel:40},t:2,pre:['heavyinf'],icon:'heavy',eff:'重装歩兵が受ける被害 −25%。周り4マスの魔物を引きつける'});
  set('charge',{cat:'部隊',tier:2,name:'騎馬突撃',cost:{gold:40,fuel:60},t:2,pre:['cavalry'],icon:'rider',eff:'騎兵の移動 +20%。しばらく戦っていない騎兵の最初の一撃が3倍'});
@@ -3198,6 +3199,13 @@ function costOf(type){return B[type].cost;}
 function maxLvOf(type){const k=KC[type];if(!k)return 1;let m=1;for(let i=1;i<k.st.length;i++){if(has(kcId(k.g,k.st[i][0])))m++;else break;}return m;}
 function kcMax(type){const k=KC[type];return k?k.st.length:1;}
 function upgNeed(type,lv){const k=KC[type];return k&&k.st[lv]?kcId(k.g,k.st[lv][0]):null;}
+function kcImg(type){const im=ICIMG[type]||PXI[type];if(!im)return '';try{return im.toDataURL?im.toDataURL():im.src;}catch(e){return '';}}
+function kcStat(b){const L=[],lv=b.lv||1,d=B[b.type],n=lv+1;   // 改築でどれくらい伸びるか（整数・%）
+  if(d.dmg&&d.grp==='def')L.push(`火力 ${Math.round(d.dmg*(1+LV_DMG_ADD[lv-1]))} → ${Math.round(d.dmg*(1+LV_DMG_ADD[n-1]))}`);
+  if(d.grp==='def'&&d.range){const a=UP.range[lv-1],c=UP.range[n-1];if(c>a)L.push(`射程 +${Math.round((c-a)*U)}マス`);}
+  if(d.grp==='def'){const m0=b.mat||0,m1=MAT_HP[b.type]?Math.min(2,n-1):m0;L.push(`耐久 ${Math.round(hpOf(b.type,lv,m0))} → ${Math.round(hpOf(b.type,n,m1))}`);}
+  if(d.grp==='prod'&&!d.range)L.push(`生産 ${Math.round(UP.prod[lv-1]*100)}% → ${Math.round(UP.prod[n-1]*100)}%`);
+  return L;}
 function stageName(b){const k=KC[b.type];return k&&k.st[(b.lv||1)-1]?k.st[(b.lv||1)-1][1]:B[b.type].name;}
 function upgCost(b){
   const base=B[b.type].cost;const m=b.lv===1?2:4;const c={steel:Math.round((base.steel||20)*m)};
@@ -6309,7 +6317,7 @@ function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
   tiles.push(`<small>狙われやすさ</small><b>${heatName(o)}</b>`);
   if(tiles.length<3&&canHostHero(o))tiles.push(`<small>向いている英雄</small><b>${specOfTarget(o)}</b>`);
   if(tiles.length<3&&o.type==='hq')tiles.push(`<small>城のレベル</small><b>${S.baseLv}<span>/ ${BASE_MAX}</span></b>`);
-  if(tiles.length<3){const pr=prodOf(o);const k=pr&&Object.keys(pr).find(x=>pr[x]>0);if(k)tiles.push(`<small>つくる</small><b>${ic(k,12)}+${pr[k].toFixed(1)}<span>/T</span></b>`);}
+  if(tiles.length<3){const pr=prodOf(o);const k=pr&&Object.keys(pr).find(x=>pr[x]>0);if(k)tiles.push(`<small>つくる</small><b>${ic(k,12)}+${Math.round(pr[k])}<span>/T</span></b>`);}
   h+=`<div class="stats">${tiles.slice(0,3).map(t=>t.startsWith('<div id="iCrew"')?t:`<div>${t}</div>`).join('')}</div>`;
   return h;}
 // .upg の箱を折りたたみ（details）にする。開閉は項目ごとに保存
@@ -6427,12 +6435,13 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   // 改修
   if(!isS&&KC[o.type]&&kcMax(o.type)>1){
     const mx=maxLvOf(o.type),kmx=kcMax(o.type);const pips='◆'.repeat(o.lv)+'◇'.repeat(Math.max(0,kmx-o.lv));
-    h+=`<div class="upg"><div class="row"><b>改築</b><span class="pips">${pips}</span></div><div class="muted" style="font-size:11px">${UPG_EFF[o.type]||''}</div>`;
-    h+=`<div class="muted" style="font-size:11px">${KC[o.type].st.map((x,i)=>i<o.lv?`<b>${x[1]}</b>`:`${x[1]}（ランク${['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'][x[0]]}）`).join(' → ')}</div>`;
+    h+=`<div class="upg"><div class="row"><b>改築</b><span class="pips">${pips}</span></div>`;
     if(o.lv>=kmx)h+=`<div class="muted" style="margin-top:3px">いちばん上まで改築済み</div>`;
-    else if(o.lv>=mx){const nt=TECH.find(t=>t&&t.id===upgNeed(o.type,o.lv));h+=`<div class="muted" style="margin-top:3px">研究<span style="color:var(--amber)">「${nt?nt.name:'？'}」</span>が完了していないため、改築できません</div>`;}
-    else if(o.bt>0)h+=`<div class="muted" style="margin-top:3px">${o.upg==='ench'?'魔核強化中':o.upg==='mat'?'造り替え中':o.upg?'改築中':'建設完了後に改築できます'}（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</div>`;
-    else h+=`<button id="iUpg" class="on wide" ${canAfford(uc)&&!S.waveActive?'':'disabled'} title="${S.waveActive?'襲撃中は改築できません':'[U]'}"><span>${S.waveActive?'襲撃中は改築できません':`「${KC[o.type].st[o.lv][1]}」に改築`}</span><span class="cost">${costText(uc)}<span class="t">${upgTurns(o)}T</span></span></button>`;
+    else{const nx=KC[o.type].st[o.lv][1];
+      h+=`<div class="kcnext"><img src="${kcImg(o.type)}" alt=""><div><b>${nx}</b><div class="muted" style="font-size:11px">${kcStat(o).join('　')}</div></div></div>`;
+      if(o.lv>=mx){const nt=techOf(upgNeed(o.type,o.lv));h+=`<button class="wide" data-kcgo="${nt?nt.id:''}">${nt?`「${nt.name}」の研究で解放`:'研究で解放'}<span class="cost">研究画面へ</span></button>`;}
+      else if(o.bt>0)h+=`<div class="muted" style="margin-top:3px">${o.upg?'改築中':'建設完了後に改築できます'}（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</div>`;
+      else h+=`<button id="iUpg" class="on wide" ${canAfford(uc)&&!S.waveActive?'':'disabled'} title="${S.waveActive?'襲撃中は改築できません':'[U]'}"><span>${S.waveActive?'襲撃中は改築できません':`「${nx}」に改築`}</span><span class="cost">${costText(uc)}<span class="t">${upgTurns(o)}T</span></span></button>`;}
     h+=`</div>`;
   }
   if(UNIT_HOME[o.type]){
@@ -6451,8 +6460,8 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     h+=`</div></div>`;
   }
   if(!isS){const pr=prodOf(o);if(pr){const pos=Object.entries(pr).filter(a=>a[1]>0),neg=Object.entries(pr).filter(a=>a[1]<0);
-    h+=`<div class="row"><span class="muted">つくる（1ターン）</span><span class="gd">${pos.map(([k,v])=>`${ic(k,12)}+${v.toFixed(1)}`).join(' ')||'—'}</span></div>`;
-    if(neg.length)h+=`<div class="row"><span class="muted">使う（1ターン）</span><span class="bd">${neg.map(([k,v])=>`${ic(k,12)}${v.toFixed(1)}`).join(' ')}</span></div>`;}
+    h+=`<div class="row"><span class="muted">つくる（1ターン）</span><span class="gd">${pos.map(([k,v])=>`${ic(k,12)}+${Math.round(v)}`).join(' ')||'—'}</span></div>`;
+    if(neg.length)h+=`<div class="row"><span class="muted">使う（1ターン）</span><span class="bd">${neg.map(([k,v])=>`${ic(k,12)}${Math.round(v)}`).join(' ')}</span></div>`;}
     {const g=gunOf(o)||(B[o.type].range?B[o.type]:null);if(g&&o.type!=='hq'){const ak=g.ammoKey||'ammo',per={[ak]:g.ammoUse||1,...(g.ammo2||{})};const rt=g.rate;
       h+=`<div class="row"><span class="muted">弾の消費</span><span>10秒で${Math.round(10/rt)}発　<span class="muted" style="font-size:11px">1分で約${Object.entries(per).map(([k,v])=>`${ic(k,11)}${Math.round(v*60/rt)}`).join(' ')}</span></span></div>`;   /* 小数を出さない */
       if(o.wuse)h+=`<div class="row"><span class="muted">${S.waveActive?'今夜の消費':'前回の夜の消費'}</span><span class="bd">${Object.entries(o.wuse).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;
@@ -6475,7 +6484,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(isS&&(o.ut==='arch'||o.ut==='mage')&&!o.gar){const tw=S.blds.filter(b=>B[b.type].garUt===o.ut&&!b.gar&&!(b.bt>0));if(tw.length){const nb=tw.sort((a,b2)=>Math.hypot(a.x*T-o.x,a.y*T-o.y)-Math.hypot(b2.x*T-o.x,b2.y*T-o.y))[0];h+=`<div style="margin-top:6px"><button data-gartower="${nb.id}">いちばん近い${B[nb.type].name}に配置する</button></div>`;}}
   if(!isS&&B[o.type].shells){const cur=o.shell||'he';
     h+=`<div class="upg"><b>砲弾</b><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${Object.entries(SHELL).map(([k,v])=>{const ok=!v.req||has(v.req);return `<button data-shell="${k}" class="${cur===k?'on':''}" ${ok?'':'disabled'} title="${ok?'':'研究で解禁'}">${icSvg(k,14)} ${v.n}</button>`;}).join('')}</div>
-    <div class="muted" style="font-size:11px;margin-top:3px">${cur==='ap'?'徹甲弾：火力×1.7・装甲無視・射線上の敵を最大4体まで貫く':cur==='can'?'キャニスター：射程×0.65、扇状の範囲の敵すべてに散弾':'榴弾：着弾点の周囲に爆風（群れ向け）'}</div></div>`;}
+    <div class="muted" style="font-size:11px;margin-top:3px">${cur==='ap'?'徹甲弾：火力170%・装甲無視・射線上の敵を最大4体まで貫く':cur==='can'?'キャニスター：射程65%、扇状の範囲の敵すべてに散弾':'榴弾：着弾点の周囲に爆風（群れ向け）'}</div></div>`;}
   if(!isS&&gunOf(o)&&o.type!=='hq')h+=`<div class="muted" style="font-size:11px;margin-top:4px">${isDirect(o)?(o.wall?'直射砲（城壁の上：壁越しでも威力が落ちない）':'直射：山脈の向こうは撃てない（建物や壁は越えて撃てる）'):'曲射砲：壁や岩場の向こうへも威力を落とさず撃てる'}${B[o.type].minRange?`。最低射程${B[o.type].minRange*U}マス`:''}</div>`;
   if(PROD_BT.includes(o.type)&&!['barracks','apart','lab'].includes(o.type)){h+=`<div class="upg"><b>生産</b> <span style="color:${o.off?'var(--red)':'var(--green)'}">${o.off?'停止中':'稼働中'}</span><div class="muted" style="font-size:11px">止めている間は産出も消費もしません（材料を使う施設の節約に）</div><button id="prodOff" style="margin-top:4px">${o.off?'生産を再開する':'生産を止める'}</button></div>`;}
   if(o.type==='hq'){const gq=S.squads.filter(q=>q.ut==='guard');h+=`<div class="upg"><b>近衛兵</b><div class="muted" style="font-size:11px">城で編成できる精鋭（部隊画面 [K]）。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内で火力2倍・被害半分</div>${gq.length?gq.map(q=>`<div class="row" style="align-items:center"><span>${unitLabel(q)} ${q.members}/${UT.guard.members}人・${q.gar?'駐屯中':'出撃中'}</span>${q.gar?`<button data-gdout="${q.id}" style="padding:2px 8px">外に出す</button>`:''}</div>`).join(''):'<div class="muted" style="font-size:11px">まだいません</div>'}</div>`;}
@@ -6523,6 +6532,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   {const r=document.getElementById('wgRep');if(r)r.onclick=()=>{let n=0;for(const x of wallGroup(o))if(damaged(x)&&repair(x,true))n++;if(n){se('upgrade');log(`つながった壁 ${n}枚をまとめて修理した`,'good');}renderInfo(true);};
    const u=document.getElementById('wgUp');if(u)u.onclick=()=>{const WR=WALL_TYPES,nx=WR[WR.indexOf(o.type)+1];let n=0;const t0=o.type;for(const x of wallGroup(o))if(x.type===t0&&canPlace(nx,x.x,x.y)){placeB(nx,x.x,x.y);n++;}if(n)log(`${B[t0].name} ${n}枚を${B[nx].name}に建て替えた`,'good');S.sel=S.grid[o.y][o.x]||null;renderBuild();renderInfo(true);};}
   const bu=document.getElementById('iUpg');if(bu)bu.onclick=()=>{upgrade(o);renderInfo(true);};
+  document.querySelectorAll('[data-kcgo]').forEach(b=>b.onclick=()=>{if(b.dataset.kcgo)gotoTech(b.dataset.kcgo);else showResearch();});
   el.querySelectorAll('[data-model]').forEach(bt=>bt.onclick=()=>{const t=MTC[bt.dataset.model];if(canAfford(t.cost,t.popEach*t.members)&&unitsOf(o).length+o.queue<capOf(o)){for(const k in t.cost)S[k]-=t.cost[k];S.pop-=t.popEach*t.members;o.queue++;(o.qm=o.qm||[]).push(t.key);renderInfo(true);}});
   const bd=document.getElementById('iDemo');if(bd)bd.onclick=()=>{
     // 確認：1回目はボタンが確認表示に変わり、3秒以内にもう一度押すと解体する
