@@ -2874,7 +2874,8 @@ function tMax(t){return t.lvRank?Math.max(1,S.baseLv||1):(t.max||1);}
 const TECH_MAT={2:{coal:6},3:{coal:4,alloy:4},4:{alloy:6},5:{alloy:4,mmetal:4},6:{mmetal:4,mithril:3},7:{mithril:5}};
 const TECH_MAT_FREE=new Set(['coalt','goldt','smeltt','mitht','kc_work_5','kc_mine_3']);
 function techCost(t){const L=lvl(t.id);const c={};const base=Object.assign({},t.cost);if(t.tier>=2)base.gold=(base.gold||0)+20*(t.tier-1);
-  {const M=TECH_MAT[t.tier||1];if(M&&!TECH_MAT_FREE.has(t.id))for(const k in M)if(!base[k])base[k]=M[k];}for(const k in base)c[k]=Math.round(base[k]*(1+0.7*L));return c;}
+  {const M=TECH_MAT[t.tier||1];if(M&&!TECH_MAT_FREE.has(t.id))for(const k in M)if(!base[k])base[k]=M[k];}
+  if((t.tier||1)>=2){if(base.stone)base.stone=Math.max(5,Math.round(base.stone*0.5/5)*5);if(base.iron)base.iron=Math.max(5,Math.round(base.iron*0.6/5)*5);}   /* 研究の石材・鉄を減らす（建設と壁に回す・2026-11-13） */for(const k in base)c[k]=Math.round(base[k]*(1+0.7*L));return c;}
 function techTurns(t){return t.t+lvl(t.id);}
 const MAP_MAXTIER={f:2,m:3,t:2,s:3};
 function mapMaxTier(){return MAP_MAXTIER[CUR_MAP]||7;}
