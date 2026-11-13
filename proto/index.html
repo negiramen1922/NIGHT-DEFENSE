@@ -1783,7 +1783,37 @@ B.apart={name:'集合住宅',glyph:'集',hp:320,heat:1,cost:{steel:110,stone:50,
 B.hq.hp=3000;B.hq.cap=3;B.hq.name='城';B.hq.desc='街の中心の城（4×4マス）。失うと敗北。周囲を明るく照らす。農兵と近衛兵をここで集める';
 const BUILD_ORDER=['outpost','miner','quarry','ironmine','farm','fishery','well','ammo','powder','barracks','apart','market','tavern','church','lab','furnace','fence','gate','swall','wall','bastion','brazier','spike','pit','bomb','totem','mg','how','cannon','mortar','mabou','hisou','tower','magetower','train','stable','magic','aerie'];
 // アップグレード倍率（Lv1〜3）
-const UP={prod:[1,1.5,2.0],dmg:[1,1.4,1.9],hp:[1,1.5,2.0],wallhp:[1,1.8,2.8],range:[0,0.5,1]};
+const UP={prod:[1,1.5,2.0,2.4,2.8,3.2,3.6],dmg:[1,1.4,1.9,2.4,2.9,3.4,3.9],hp:[1,1.5,2.0,2.5,3.0,3.5,4.0],wallhp:[1,1.8,2.8,2.8,2.8,2.8,2.8],range:[0,0.5,1,1,1.5,1.5,2]};   // 改築の段ごと（2026-11-13 に7段まで）
+const KC_G=[['prod','生産','生産','miner'],['mine','鉱山','生産','ironmine'],['work','工房','生産','ammo'],['town','街','内政','barracks'],['def','防衛施設','防衛','mg'],['magic','魔術','防衛','magetower']];
+function kcId(g,r){return 'kc_'+g+'_'+r;}
+const KC={   // 改築の段：[ランク, 名前]。1つ目は建てたときの姿（2026-11-13）
+ miner:{g:'prod',st:[[1,'伐採所'],[2,'鉄の斧の伐採所'],[3,'製材所']]},
+ quarry:{g:'prod',st:[[1,'石切り場'],[2,'鉄の石切り場'],[3,'発破の石切り場']]},
+ farm:{g:'prod',st:[[1,'農場'],[2,'鉄の鋤の農場'],[3,'大農場']]},
+ fishery:{g:'prod',st:[[1,'漁場'],[4,'大きな網の漁場']]},
+ ironmine:{g:'mine',st:[[1,'鉱山'],[2,'トロッコの鉱山'],[3,'発破の鉱山']]},
+ ammo:{g:'work',st:[[1,'武器工房'],[2,'鋼の武器工房'],[3,'合金の武器工房']]},
+ powder:{g:'work',st:[[3,'火薬工房'],[4,'エーテル火薬工房']]},
+ barracks:{g:'town',st:[[1,'住居'],[2,'石の家'],[4,'集合住宅']]},
+ train:{g:'town',st:[[1,'兵舎'],[2,'石の兵舎'],[4,'大兵舎']]},
+ lab:{g:'town',st:[[1,'研究室'],[2,'書庫'],[4,'研究所'],[6,'魔導研究所']]},
+ market:{g:'town',st:[[1,'交易市場'],[3,'交易所']]},
+ tavern:{g:'town',st:[[2,'酒場'],[4,'宿屋']]},
+ church:{g:'town',st:[[1,'教会'],[6,'聖堂']]},
+ stable:{g:'town',st:[[2,'馬小屋'],[6,'グリフォンの厩舎']]},
+ aerie:{g:'town',st:[[4,'竜舎'],[7,'竜晶の竜舎']]},
+ tower:{g:'def',st:[[1,'木の物見櫓'],[2,'石の物見櫓'],[3,'城塞の物見櫓'],[6,'聖銀の物見櫓']]},
+ mg:{g:'def',st:[[1,'木のバリスタ'],[2,'鉄のバリスタ'],[3,'合金のバリスタ'],[5,'魔金属の大弩'],[6,'ミスリルの大弩']]},
+ how:{g:'def',st:[[1,'投石機'],[2,'鉄の投石機']]},
+ cannon:{g:'def',st:[[3,'大砲'],[5,'魔導砲'],[7,'竜晶砲']]},
+ mortar:{g:'def',st:[[3,'迫撃砲'],[5,'魔金属の迫撃砲']]},
+ hisou:{g:'def',st:[[3,'風船爆弾'],[4,'エーテル風船']]},
+ gate:{g:'def',st:[[1,'木の門'],[2,'石の門'],[4,'鉄の門'],[5,'魔金属の門'],[7,'龍鱗の門']]},
+ bastion:{g:'def',st:[[3,'櫓台'],[5,'魔金属の櫓台']]},
+ magetower:{g:'magic',st:[[4,'メイジの塔'],[5,'魔金属の塔'],[7,'竜晶の塔']]},
+ well:{g:'magic',st:[[4,'エーテル採掘所'],[5,'深いエーテル採掘所']]},
+ magic:{g:'magic',st:[[4,'魔導院'],[6,'大魔導院']]},
+};
 const UPG_EFF={
   miner:'産出 150% → 200%（働き手 +1 → +2）', power:'出力・食料消費 160% → 230%', well:'産出 150% → 200%（働き手 +1 → +2）', elecf:'生産 160% → 230%', tankf:'生産速度 160%、修理速度アップ', ammo:'生産 160% → 230%', barracks:'住める人数 12名 → 20名 → 30名',
   hangar:'生産速度 160%、修理速度アップ', lab:'2段目で研究枠+1、3段目で前倒し確率アップ', reactor:'出力 160% → 230%',
@@ -2122,11 +2152,11 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  for(const t of TECH)if(t.preSum===null)delete t.preSum;
  // ランクⅡ／Ⅲは城のレベルで解放する（関門の研究は廃止）
  {const gone=new Set(TECH.filter(t=>t.gate).map(t=>t.id));for(let i=TECH.length-1;i>=0;i--)if(gone.has(TECH[i].id))TECH.splice(i,1);for(const t of TECH)if(t.pre)t.pre=t.pre.filter(x=>!gone.has(x));}
- /* 改築の研究（2026-11-13）：施設を一段ずつ上げる。前の段の研究が要る */
- TECH.push({id:'upg_prod1',cat:'生産',tier:2,name:'生産施設の改築Ⅰ',t:2,cost:{steel:100,stone:40},pre:[],icon:'barracks',eff:'生産施設を2段目に改築できる（生産量が上がる）'},
-  {id:'upg_prod2',cat:'生産',tier:3,name:'生産施設の改築Ⅱ',t:3,cost:{steel:200,stone:80,gold:80},pre:['upg_prod1'],icon:'barracks',eff:'生産施設を3段目に改築できる'},
-  {id:'upg_def1',cat:'防衛',tier:2,name:'防衛施設の改築Ⅰ',t:2,cost:{steel:100,stone:60},pre:[],icon:'mg',eff:'防衛施設を2段目に改築できる（火力・耐久が上がる）'},
-  {id:'upg_def2',cat:'防衛',tier:3,name:'防衛施設の改築Ⅱ',t:3,cost:{steel:200,stone:120,gold:80},pre:['upg_def1'],icon:'mg',eff:'防衛施設を3段目に改築できる'});
+ /* 改築の研究（2026-11-13）：種類ごと・ランクごと。プレイヤーがどれを上げるか選べる */
+ {const RN=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'];for(const [g,gn,cat,icon] of KC_G){const rs=[...new Set(Object.values(KC).filter(k=>k.g===g).flatMap(k=>k.st.slice(1).map(x=>x[0])))].sort((a,b)=>a-b);let prev=null;
+   for(const r of rs){const ts=Object.entries(KC).filter(([t,k])=>k.g===g&&k.st.slice(1).some(x=>x[0]===r)).map(([t,k])=>k.st.find(x=>x[0]===r)[1]);
+     const cost={steel:40+30*r,stone:20+20*r};if(r>=2)cost.iron=10*r;if(r>=3)cost.gold=20*r;if(r>=4)cost.elec=8*r;if(r>=5)cost.mat=6*r;
+     TECH.push({id:kcId(g,r),cat,tier:r,name:gn+'の改築'+RN[r],t:Math.min(6,r),cost,pre:prev?[prev]:[],icon,eff:'改築できるようになる：'+ts.join('・')});prev=kcId(g,r);}}}
  // 研究で住民は使わない（研究員の仕組みに置き換え）
  for(const t of TECH)if(t.cost)delete t.cost.pop;
 })();
@@ -2848,7 +2878,7 @@ function hpOf(type,lv,mat){
 // 研究による防衛施設ごとの補正
 function defTechMul(b){let r=1+(has('analysis')?0.1:0);if(b.type==='mg')r+=0.2*lvl('kougen');if(b.type==='tower'){r+=0.2*lvl('goukyu')+0.15*lvl('archery');}   /* 弓術は櫓の射手にも効く */if(b.type==='cannon'&&has('tetsudan'))r+=0.3;return r;}
 // 防衛施設の火力：基礎値（種類＋施設Lvの固定値）と、上乗せ％の一覧
-const LV_DMG_ADD=[0,0.42,0.92];
+const LV_DMG_ADD=[0,0.42,0.92,1.4,1.9,2.4,2.9];
 function dmgBaseB(b){const g=gunOf(b)||B[b.type];const d=B[b.type];return (g.dmg||0)*(1+(d.grp==='def'?LV_DMG_ADD[(b.lv||1)-1]:0));}
 function dmgPctB(b){const L=[];const add=(n,v)=>{if(v)L.push([n,v]);};const h=bonus0(b);add('英雄',h.dmg-1);add('魔核★',0.15*(b.ench||0));
   let rs=defTechMul(b)-1+(has('fort')?0.1:0);if(b.type==='mg'){if(has('heavymg'))rs+=0.4;if(has('apmg'))rs+=0.15;}if(HOW_FAM.includes(b.type)){if(has('bighow'))rs+=0.25;if(has('longhow'))rs+=0.2;}add('研究',rs);
@@ -3164,11 +3194,11 @@ function goMarket(keys){const m=marketOf();if(!m){toast('市場がありませ�
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-mkt]');if(!b)return;e.preventDefault();e.stopPropagation();goMarket(b.dataset.mkt.split(','));},true);
 function lackNames(c,pop){const L=[];for(const k in (c||{}))if((c[k]||0)-(S[k]||0)>0.5)L.push(RES_NAME[k]||k);if(pop&&S.pop<pop)L.push('住民');return L.length?L.join('・')+'が足りません':'';}
 function costOf(type){return B[type].cost;}
-/* 改築（2026-11-13）：施設のLvは城のLvではなく研究で開く。一段ずつ上げる（前の段が無いと次へ行けない） */
-const UPG_TECH={prod:['upg_prod1','upg_prod2'],def:['upg_def1','upg_def2']};
-function upgNeed(type,lv){const g=B[type].grp;const L=UPG_TECH[g];return L?L[lv-1]:null;}   // lv→lv+1 に要る研究
-function maxLvOf(type){const g=B[type].grp;if(g!=='prod'&&g!=='def'||WALL_TYPES.includes(type))return 1;   /* 壁は段（重ね置き）で強くするので改築なし */
-  let m=1;for(const id of UPG_TECH[g]){if(has(id))m++;else break;}return Math.min(3,m);}
+/* 改築（2026-11-13）：施設を一段ずつ上げる（前の段が無いと次へ行けない）。段は施設ごとに違い、ランクごとの「〇〇の改築」の研究で開く */
+function maxLvOf(type){const k=KC[type];if(!k)return 1;let m=1;for(let i=1;i<k.st.length;i++){if(has(kcId(k.g,k.st[i][0])))m++;else break;}return m;}
+function kcMax(type){const k=KC[type];return k?k.st.length:1;}
+function upgNeed(type,lv){const k=KC[type];return k&&k.st[lv]?kcId(k.g,k.st[lv][0]):null;}
+function stageName(b){const k=KC[b.type];return k&&k.st[(b.lv||1)-1]?k.st[(b.lv||1)-1][1]:B[b.type].name;}
 function upgCost(b){
   const base=B[b.type].cost;const m=b.lv===1?2:4;const c={steel:Math.round((base.steel||20)*m)};
   c.stone=b.lv===1?10:30;if(b.lv===2)c.elec=6;
@@ -3179,11 +3209,11 @@ function upgCost(b){
 }
 function upgrade(b){
   if(S.waveActive)return;
-  if(b.lv>=3||b.lv>=maxLvOf(b.type)||b.bt>0)return;const c=upgCost(b);if(!canAfford(c))return;
+  if(b.lv>=kcMax(b.type)||b.lv>=maxLvOf(b.type)||b.bt>0)return;const c=upgCost(b);if(!canAfford(c))return;
   if(b.bt>0)return;
   for(const k in c)S[k]-=c[k];se(BSND[b.type]||'upgrade');
   b.upg=true;b.bt=b.btTotal=upgTurns(b)*TURN_SEC;
-  log(`${B[b.type].name} の改築開始（${upgTurns(b)}ターン、改築中は停止）`);
+  log(`${B[b.type].name} の改築開始：${KC[b.type]?KC[b.type].st[b.lv][1]:''}（${upgTurns(b)}ターン、改築中は停止）`);
 }
 function damaged(b){return !(b.bt>0&&!b.upg)&&!b.rep&&(b.hp<b.maxhp-0.5||(b.wall&&b.wall.hp<b.wall.maxhp-0.5));}
 function repairCost(b){
@@ -3241,7 +3271,7 @@ function placeB(type,x,y,free,szo){
   const d=B[type];
   if(!free){const c=costOf(type);for(const k in c)S[k]-=c[k];S.pop-=d.pop;se(BSND[type]||'build');}
   if(d.isMine){const m={x,y,armed:true,kind:d.kind||'mine',sz:newSz(type)};if(m.kind==='spike')m.dur=SPIKE_DUR;S.mines.push(m);return null;}
-  const mat=MAT_HP[type]?bestMat():0;const hp=hpOf(type,1,mat);
+  const mat=0;const hp=hpOf(type,1,mat);   /* 新しく建てると1段目（木）。石・城塞は改築で */
   const b={id:S.nextId++,kind:'b',type,x,y,sz:szo||newSz(type),lv:1,mat,hp,maxhp:hp,cd:0,cmd:null,queue:0,qt:0,xpT:0,absorbed:0,ang:-Math.PI/2+Math.random(),offOre:false,ym:YIELD[type]?yieldFp(type,x,y,szo||newSz(type)):1,res:YIELD[type]?Math.round(reserveOf(type,x,y)*yieldFp(type,x,y,szo||newSz(type))/Math.max(0.01,yieldAt(type,x,y))):null,crew:d.pop,dmgAcc:0};
   const under=S.grid[y][x];
   if(under&&under.type==='bastion'&&MOUNT_T.includes(type)){S.blds=S.blds.filter(o=>o!==under);b.sz=bsz(under);b.onB=1;b.wall={hp:under.hp,maxhp:under.maxhp,lv:under.lv,bastion:true};}
@@ -4254,7 +4284,7 @@ function update(dt,sim){
         b.bt=0;S.fx.push({x:bcx(b),y:bcy(b),r:TU,t:0,dur:0.6,c:'#6fe08a'});
         if(b.upg==='ench'){b.upg=false;b.ench=Math.min(3,(b.ench||0)+1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${d.name} の魔核強化が完了（★${b.ench}）`,'good');if(!S.rep)se('upgrade');}
         else if(b.upg==='mat'){b.upg=false;b.mat=Math.min(2,(b.mat||0)+1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${MAT_NAME[b.type][b.mat]}への造り替えが完了`,'good');if(!S.rep)se('upgrade');}
-        else if(b.upg){b.upg=false;b.lv++;const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${d.name} の改築完了（${b.lv}段目）`,'good');if(!S.rep)se('upgrade');}
+        else if(b.upg){b.upg=false;b.lv++;if(MAT_HP[b.type])b.mat=Math.min(2,b.lv-1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${stageName(b)} への改築が完了`,'good');if(!S.rep)se('upgrade');}
         else if(S.rep){S.doneCnt[d.name]=(S.doneCnt[d.name]||0)+1;}
         else log(`${d.name} 完成`,'good');
       }
@@ -6271,7 +6301,7 @@ function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
     h+=`<div class="stats"><div><small>火力</small><b>${Math.round(unitDmg(o)/t.rate)}<span>/秒</span></b></div><div><small>射程</small><b>${Math.round(unitRange(o)*U)}<span>マス${unitSplash(o)?'・範囲':''}</span></b></div><div><small>熟練度</small><b class="vetb">${vetIc(o,12)}${VET[vetLv(o)].n}</b></div></div>`;
     return h;}
   const d=B[o.type];
-  h+=`<div class="ihead"><span class="iname">${d.name}</span>${d.grp?`<span class="ilv">${'◆'.repeat(o.lv||1)}</span>`:''}<span class="itype">${tag}</span></div>`;
+  h+=`<div class="ihead"><span class="iname">${stageName(o)}</span>${d.grp?`<span class="ilv">${'◆'.repeat(o.lv||1)}</span>`:''}<span class="itype">${tag}</span></div>`;
   h+=`<div class="hpline"><span>耐久</span><span id="iHp">${Math.ceil(o.hp)} / ${Math.ceil(o.maxhp)}</span></div><div class="hpbar${hc}"><i id="iHpBar" style="width:${Math.round(r*100)}%"></i></div>`;
   const tiles=[];
   if(gunOf(o))tiles.push(`<small>射程</small><b>${Math.round(rangeOf(o)*U)}<span>マス</span></b>`);
@@ -6395,13 +6425,14 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   }
   if(!isS&&o.bt>0)h+=`<div style="margin:4px 0;color:${o.upg?'var(--green)':'var(--amber)'}">${o.upg==='ench'?'魔核強化中':o.upg==='mat'?'造り替え中':o.upg?'改築中':'建設中'}　残り <b id="iBt">${Math.ceil(o.bt/TURN_SEC-0.01)}</b> ターン <span class="muted" style="font-size:11px">（戦闘中は10秒＝1ターン）${o.upg?'その間は機能停止':''}</span></div>`;
   // 改修
-  if(!isS&&d.grp&&!WALL_TYPES.includes(o.type)){
-    const mx=maxLvOf(o.type);const pips='◆'.repeat(o.lv)+'◇'.repeat(3-o.lv);
+  if(!isS&&KC[o.type]&&kcMax(o.type)>1){
+    const mx=maxLvOf(o.type),kmx=kcMax(o.type);const pips='◆'.repeat(o.lv)+'◇'.repeat(Math.max(0,kmx-o.lv));
     h+=`<div class="upg"><div class="row"><b>改築</b><span class="pips">${pips}</span></div><div class="muted" style="font-size:11px">${UPG_EFF[o.type]||''}</div>`;
-    if(o.lv>=3)h+=`<div class="muted" style="margin-top:3px">いちばん上まで改築済み</div>`;
+    h+=`<div class="muted" style="font-size:11px">${KC[o.type].st.map((x,i)=>i<o.lv?`<b>${x[1]}</b>`:`${x[1]}（ランク${['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'][x[0]]}）`).join(' → ')}</div>`;
+    if(o.lv>=kmx)h+=`<div class="muted" style="margin-top:3px">いちばん上まで改築済み</div>`;
     else if(o.lv>=mx){const nt=TECH.find(t=>t&&t.id===upgNeed(o.type,o.lv));h+=`<div class="muted" style="margin-top:3px">研究<span style="color:var(--amber)">「${nt?nt.name:'？'}」</span>が完了していないため、改築できません</div>`;}
     else if(o.bt>0)h+=`<div class="muted" style="margin-top:3px">${o.upg==='ench'?'魔核強化中':o.upg==='mat'?'造り替え中':o.upg?'改築中':'建設完了後に改築できます'}（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</div>`;
-    else h+=`<button id="iUpg" class="on wide" ${canAfford(uc)&&!S.waveActive?'':'disabled'} title="${S.waveActive?'襲撃中は改築できません':'[U]'}"><span>${S.waveActive?'襲撃中は改築できません':`改築する（${o.lv+1}段目へ）`}</span><span class="cost">${costText(uc)}<span class="t">${upgTurns(o)}T</span></span></button>`;
+    else h+=`<button id="iUpg" class="on wide" ${canAfford(uc)&&!S.waveActive?'':'disabled'} title="${S.waveActive?'襲撃中は改築できません':'[U]'}"><span>${S.waveActive?'襲撃中は改築できません':`「${KC[o.type].st[o.lv][1]}」に改築`}</span><span class="cost">${costText(uc)}<span class="t">${upgTurns(o)}T</span></span></button>`;
     h+=`</div>`;
   }
   if(UNIT_HOME[o.type]){
@@ -6423,7 +6454,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     h+=`<div class="row"><span class="muted">つくる（1ターン）</span><span class="gd">${pos.map(([k,v])=>`${ic(k,12)}+${v.toFixed(1)}`).join(' ')||'—'}</span></div>`;
     if(neg.length)h+=`<div class="row"><span class="muted">使う（1ターン）</span><span class="bd">${neg.map(([k,v])=>`${ic(k,12)}${v.toFixed(1)}`).join(' ')}</span></div>`;}
     {const g=gunOf(o)||(B[o.type].range?B[o.type]:null);if(g&&o.type!=='hq'){const ak=g.ammoKey||'ammo',per={[ak]:g.ammoUse||1,...(g.ammo2||{})};const rt=g.rate;
-      h+=`<div class="row"><span class="muted">1発ごとに使う</span><span>${Object.entries(per).map(([k,v])=>`${ic(k,12)}${v}`).join(' ')}　<span class="muted" style="font-size:11px">${rt}秒に1発（1分で約${Object.entries(per).map(([k,v])=>`${ic(k,11)}${Math.round(v*60/rt)}`).join(' ')}）</span></span></div>`;
+      h+=`<div class="row"><span class="muted">弾の消費</span><span>10秒で${Math.round(10/rt)}発　<span class="muted" style="font-size:11px">1分で約${Object.entries(per).map(([k,v])=>`${ic(k,11)}${Math.round(v*60/rt)}`).join(' ')}</span></span></div>`;   /* 小数を出さない */
       if(o.wuse)h+=`<div class="row"><span class="muted">${S.waveActive?'今夜の消費':'前回の夜の消費'}</span><span class="bd">${Object.entries(o.wuse).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;
       else if(o.wlast)h+=`<div class="row"><span class="muted">前回の夜の消費</span><span class="bd">${Object.entries(o.wlast).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;}}
     if(o.res!=null&&o.res!==Infinity)h+=`<div class="row"><span class="muted">残りの埋蔵量</span><span class="${o.dep?'bd':o.res<150?'wn':''}">${o.dep?'枯渇（もう採れない）':Math.floor(o.res)}</span></div>`;}
@@ -6434,7 +6465,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     else if(e<3){const c=enchCost(o);h+=`<div style="margin-top:3px">${o.upg==='ench'?`<span class="muted">★${e+1}に強化中（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</span>`:`<button onclick="enchUp(S.sel)" ${canAfford(c)&&!S.waveActive&&!(o.bt>0)?'':'disabled'}>★${e+1}に強化（${costText(c)}・${ENCH_T[e]}ターン）</button>`}</div><div class="muted" style="font-size:11px">★ごとに ${what?what+' +15%・':''}耐久 +20%</div>`;}
     else h+=`<div class="muted" style="font-size:11px">最大まで強化済み</div>`;
     h+='</div>';}
-  if(!isS&&MAT_HP[o.type]){const m=o.mat||0;h+=`<div class="row"><span class="muted">材質</span><span>${MAT_NAME[o.type][m]}</span></div>`;if(m<bestMat()){const c=MAT_COST[o.type][m+1];h+=`<div>${o.upg==='mat'?`<span class="muted">${MAT_NAME[o.type][m+1]}に造り替え中（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</span>`:`<button onclick="matUp(S.sel)" ${canAfford(c)&&!S.waveActive&&!(o.bt>0)?'':'disabled'}>${MAT_NAME[o.type][m+1]}に造り替える（${costText(c)}・${MAT_T[m+1]||1}ターン）</button>`}</div>`;}else if(m<2)h+=`<div class="muted" style="font-size:11px">研究「${m===0?'石積み':'築城術'}」で${MAT_NAME[o.type][m+1]}に造り替えられる</div>`;}
+  if(false&&!isS&&MAT_HP[o.type]){const m=o.mat||0;   /* 造り替えは改築にまとめた（2026-11-13） */h+=`<div class="row"><span class="muted">材質</span><span>${MAT_NAME[o.type][m]}</span></div>`;if(m<bestMat()){const c=MAT_COST[o.type][m+1];h+=`<div>${o.upg==='mat'?`<span class="muted">${MAT_NAME[o.type][m+1]}に造り替え中（残り${Math.ceil(o.bt/TURN_SEC-0.01)}ターン）</span>`:`<button onclick="matUp(S.sel)" ${canAfford(c)&&!S.waveActive&&!(o.bt>0)?'':'disabled'}>${MAT_NAME[o.type][m+1]}に造り替える（${costText(c)}・${MAT_T[m+1]||1}ターン）</button>`}</div>`;}else if(m<2)h+=`<div class="muted" style="font-size:11px">研究「${m===0?'石積み':'築城術'}」で${MAT_NAME[o.type][m+1]}に造り替えられる</div>`;}
   if(!isS&&B[o.type].garrison&&!(o.bt>0)){const gs=garOf(o);
     const gu=B[o.type].garUt,gn=UT[gu].name;
     if(gs)h+=`<div class="upg"><b>配置中：${unitLabel(gs)}</b>（${gs.members}/${UT[gs.ut].members}人）<div class="muted" style="font-size:11px">人数が多いほど火力が上がる。部隊の英雄はここからスキルを使う</div><button id="iUngar" style="margin-top:4px">${gn}を降ろす</button></div>`;
