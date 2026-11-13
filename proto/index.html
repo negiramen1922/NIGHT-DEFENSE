@@ -1853,10 +1853,10 @@ const UPG_EFF={
 const E={
   swarm:  {name:'ゴブリン',desc:'アビスの影響で凶暴化した小鬼。弱いが数が多く、兵士に群がる',hp:30,spd:40,dmg:5,rate:0.6,r:5,color:'#8ac060',xp:2,mat:0.15,vsS:1.6,hunt:4},
   charger:{name:'ゴブリンライダー',desc:'魔狼に乗ったゴブリン。足が速く、群れで真っ先に突っ込んでくる。狼を倒すと乗っていたゴブリンが降りて戦う',hp:80,spd:76,dmg:10,rate:0.6,r:7,color:'#9a9aa8',xp:4,mat:0.5,vsS:1.5,hunt:5,spill:{type:'swarm',n:1}},
-  grove:{name:'蠢く木陰',desc:'草原のラスボス。森の大木そのものが魔物になった怪物。周りに濃い木陰を広げ、その中では明るい明かり（石炭の篝火・蒼い炎）でしか魔物が見えない。10秒ごとに足元から根の触手が突き出る（2秒前に影の円）。燃えている間は装甲がなくなる。体力が半分を切ると、足が増えて波打つように速くなる。火の攻撃で受けるダメージ200%',hp:30000,spd:14,dmg:150,rate:1.4,r:26,color:'#3a4a2a',xp:200,armor:0.4,bldMul:2,mat:120,boss:true,fireWeak:true,shade:7,roots:true},
+  grove:{name:'蠢く木陰',desc:'草原のラスボス。森の大木そのものが魔物になった怪物。周りに濃い木陰を広げ、その中では明るい明かり（石炭の篝火・蒼い炎）でしか魔物が見えない。10秒ごとに足元から根の触手が突き出る（2秒前に影の円）。燃えている間は装甲がなくなる。体力が半分を切ると、足が増えて波打つように速くなる。火の攻撃で受けるダメージ200%',hp:30000,spd:14,dmg:150,rate:1.4,r:26,color:'#3a4a2a',xp:200,armor:0.4,bldMul:2,mat:120,boss:true,fireWeak:true,shade:7,roots:true,drawMul:1.6},
   treant:{name:'トレント',desc:'歩く巨木の魔物。とても硬いが、火に弱い（ドラゴンブレス・竜騎兵・魔術師の火・メイジの塔で受けるダメージ200%。燃えている5秒の間は装甲がなくなる）',hp:1800,spd:24,dmg:45,rate:1.0,r:13,color:'#5a4a2a',xp:20,armor:0.3,bldMul:1.5,mat:6,fireWeak:true,hunt:3},
   shogre:{name:'盾持ちオーガ',desc:'大きな盾を構えたオーガ。正面からの矢・弾を70%防ぐ（横・後ろからと曲射・魔法の範囲はそのまま）',hp:1400,spd:34,dmg:66,rate:1.1,r:12,color:'#6a7a5a',xp:24,armor:0.2,bldMul:1.3,mat:6,vsS:1.3,hunt:4,frontShield:0.7},
-  maneater:{name:'マンイーター',desc:'根で歩いて近づく食人植物。噛みついた兵士を毒にする（3秒かけて、噛んだダメージと同じだけ追加）',hp:700,spd:32,dmg:30,rate:1.0,r:9,color:'#5aa040',xp:12,armor:0.1,mat:4,vsS:1.2,hunt:5,poison:true},
+  maneater:{name:'マンイーター',desc:'根で歩いて近づく食人植物。噛みついた兵士を毒にする（3秒かけて、噛んだダメージと同じだけ追加）',hp:700,spd:32,dmg:30,rate:1.0,r:9,color:'#5aa040',xp:12,armor:0.1,mat:4,vsS:1.2,hunt:5,poison:true,drawMul:1.5},
   vampire:{name:'吸血鬼',desc:'倒した兵士をグールに変える。聖銀の攻撃（銀装兵・ミスリルレイ）で受けるダメージ200%',hp:1600,spd:50,dmg:70,rate:1.0,r:10,color:'#7a2a4a',xp:30,armor:0.2,mat:10,vsS:1.5,hunt:6,vampire:true,silverWeak:true},
   ghoul:{name:'グール',desc:'倒れた魔物の死体を食べて回復する（近くで魔物が倒れると体力+300）',hp:900,spd:40,dmg:45,rate:1.0,r:10,color:'#7a8a6a',xp:14,armor:0.1,mat:4,vsS:1.2,hunt:4,eater:true},
   golem:{name:'ストーンゴーレム',desc:'とても硬い石の巨人。壁を壊しに来る（建物へのダメージ300%）。魔法の攻撃で受けるダメージ150%',hp:5000,spd:18,dmg:110,rate:1.0,r:16,color:'#8a8a80',xp:50,armor:0.5,bldMul:3,mat:16,wallBreak:true,magicWeak:true},
@@ -4715,6 +4715,7 @@ function update(dt,sim){
     let sx=0,sy=0;
     for(const o of S.enemies){if(o===e)continue;const ox=e.x-o.x,oy=e.y-o.y;if(Math.abs(ox)>30||Math.abs(oy)>30)continue;const od=ox*ox+oy*oy;const rr=(d.r+E[o.type].r)*1.1;if(od<rr*rr&&od>0.01){const l=Math.sqrt(od);sx+=ox/l;sy+=oy/l;}}
     const tr=terAt(e.x,e.y);const ev=elevPx(e.x,e.y),fx=Math.floor(e.x/T),fy=Math.floor(e.y/T);const step=(e.spdMul||1)*(e.far||1)*(e.buff?1.25:1)*(e.curse?0.7:1)*(e.fear||e.slowT>0?0.6:1)*d.spd*dt*(fx>=0&&fy>=0&&fx<COLS&&fy<ROWS&&S.ter[fy][fx]===6?0.55:fx>=0&&fy>=0&&fx<COLS&&fy<ROWS&&S.ter[fy][fx]===10?0.5:1)*FOREST_SLOW[forestAt(fx,fy)]*MARSH_SLOW[marshAt(fx,fy)]*[1,0.9,0.8,0.65][ev];
+    if(e.vk==null&&(e.type==='swarm'||e.type==='maneater')){e.vk=Math.floor(Math.random()*(e.type==='swarm'?5:4));if(e.type==='swarm'&&e.vk===2){e.hp*=1.3;e.maxhp*=1.3;}}   /* 見た目違い（服装・花の色）。骨の兜のゴブリンは体力130% */
     if(e.down>0)e.down-=dt;if(e.burnT>0){e.burnT-=dt;if(Math.random()<dt*6)S.fx.push({x:e.x+(Math.random()-.5)*d.r,y:e.y-d.r*0.5,r:4,t:0,dur:0.4,c:'#ff8a3a'});}if(e.harpT>0){e.harpT-=dt;hitEnemy(e,(e.harpD||0)*dt,null);}
     if(e.stun>0){e.stun-=dt;continue;}
     if(d.roots&&e.rage&&!e._spdUp){e._spdUp=true;e.spdMul=(e.spdMul||1)*1.6;log('蠢く木陰の足が増え、波打つように速くなった！','bad');}
@@ -5792,15 +5793,15 @@ function enemyPath(e,d){
 function drawEnemy(e){
   const d=E[e.type],r=d.r;const ratio=Math.max(0,e.hp/e.maxhp);
   if(d.shade){const R0=d.shade*TU,g=ctx.createRadialGradient(e.x,e.y,r,e.x,e.y,R0);g.addColorStop(0,'rgba(6,10,4,.55)');g.addColorStop(1,'rgba(6,10,4,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(e.x,e.y,R0,0,7);ctx.fill();
-    ctx.fillStyle='#e8f0d0';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText(d.name,e.x,e.y-r*1.6);ctx.fillStyle='#200';ctx.fillRect(e.x-40,e.y+r+4,80,5);ctx.fillStyle=e.rage?'#e05a4e':'#8ac060';ctx.fillRect(e.x-40,e.y+r+4,80*ratio,5);}
+    ctx.fillStyle='#e8f0d0';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText(d.name,e.x,e.y-r*2.6);ctx.fillStyle='#200';ctx.fillRect(e.x-40,e.y+r+4,80,5);ctx.fillStyle=e.rage?'#e05a4e':'#8ac060';ctx.fillRect(e.x-40,e.y+r+4,80*ratio,5);}
   if(e.type==='king'&&e.cryT>0){const k=1-e.cryT/2;ctx.strokeStyle=`rgba(240,192,48,${0.3+0.5*k})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,8*TU*k,0,7);ctx.stroke();ctx.lineWidth=1;}
   if(e.type==='king'){const g=ctx.createRadialGradient(e.x,e.y,4,e.x,e.y,r*2.2);g.addColorStop(0,'rgba(255,200,60,.35)');g.addColorStop(1,'rgba(255,200,60,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(e.x,e.y,r*2.2,0,7);ctx.fill();
     ctx.strokeStyle='rgba(255,200,60,.35)';ctx.setLineDash([3,4]);ctx.beginPath();ctx.arc(e.x,e.y,d.aura*TU,0,7);ctx.stroke();ctx.setLineDash([]);
     ctx.fillStyle='#f0c030';ctx.beginPath();ctx.moveTo(e.x-r*0.7,e.y-r*0.9);ctx.lineTo(e.x-r*0.7,e.y-r*1.5);ctx.lineTo(e.x-r*0.35,e.y-r*1.15);ctx.lineTo(e.x,e.y-r*1.7);ctx.lineTo(e.x+r*0.35,e.y-r*1.15);ctx.lineTo(e.x+r*0.7,e.y-r*1.5);ctx.lineTo(e.x+r*0.7,e.y-r*0.9);ctx.closePath();ctx.fill();
     ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText('ゴブリンキング',e.x,e.y-r*1.9);ctx.fillStyle='#300';ctx.fillRect(e.x-30,e.y+r+4,60,4);ctx.fillStyle='#f0c030';ctx.fillRect(e.x-30,e.y+r+4,60*ratio,4);}
-  {let ek='e_'+e.type+(e.rage&&SPR.enemies['e_'+e.type+'_rage']?'_rage':'');if(e.type==='swarm'){if(e.vk==null)e.vk=Math.floor(Math.random()*5);const V=[null,'e_gob_leather','e_gob_bone','e_gob_thief',null][e.vk];if(V&&SPR.enemies[V])ek=V;}if(e.burnT>0&&SPR.enemies[ek+'_burn'])ek+='_burn';const SP=SPR.enemies[ek];   /* 怒った姿・燃えている差分・ゴブリンの見た目違い */const im=SP?(()=>{const atk=(S.waveT-(e.atkT??-99))<0.4&&SP.img.attack,L=atk?SP.img.attack:SP.img.walk;return L[Math.floor(nowS()/(atk?0.2:0.15)+e.x*0.01)%L.length];})():PXI['e_'+e.type];if(im){
+  {let ek='e_'+e.type+(e.rage&&SPR.enemies['e_'+e.type+'_rage']?'_rage':'');if(e.type==='swarm'||e.type==='maneater'){const V=(e.type==='swarm'?[null,'e_gob_leather','e_gob_bone','e_gob_thief','e_gob_shaman']:[null,'e_maneater_purple','e_maneater_blue','e_maneater_yellow'])[e.vk||0];if(V&&SPR.enemies[V])ek=V;}if(e.burnT>0&&SPR.enemies[ek+'_burn'])ek+='_burn';const SP=SPR.enemies[ek];   /* 怒った姿・燃えている差分・ゴブリンの見た目違い */const im=SP?(()=>{const atk=(S.waveT-(e.atkT??-99))<0.4&&SP.img.attack,L=atk?SP.img.attack:SP.img.walk;return L[Math.floor(nowS()/(atk?0.2:0.15)+e.x*0.01)%L.length];})():PXI['e_'+e.type];if(im){
     if(e.lx!=null&&Math.abs(e.x-e.lx)>0.05)e.face=e.x<e.lx?-1:1;e.lx=e.x;
-    const sz=SP?16*Math.max(1,Math.round(r*2.7/16)):Math.round(Math.max(14,r*2.7)),bob=d.fly?Math.sin(nowS()*6+e.x*0.1)*2-4:0;
+    const sz=SP?16*Math.max(1,Math.round(r*2.7*(d.drawMul||1)/16)):Math.round(Math.max(14,r*2.7)),bob=d.fly?Math.sin(nowS()*6+e.x*0.1)*2-4:0;
     if(d.fly){ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(e.x+4,e.y+sz*0.45,sz*0.35,sz*0.12,0,0,7);ctx.fill();}
     if(e.buff){ctx.strokeStyle='rgba(255,200,60,.7)';ctx.beginPath();ctx.ellipse(e.x,e.y+sz*0.4,sz*0.45,sz*0.16,0,0,7);ctx.stroke();}
     ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(e.x,e.y+bob);if((e.face||1)<0)ctx.scale(-1,1);ctx.drawImage(im,-sz/2,-sz/2,sz,sz);ctx.restore();
