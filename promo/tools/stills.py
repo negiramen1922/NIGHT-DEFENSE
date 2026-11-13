@@ -27,14 +27,16 @@ siege=Image.open(P+'shots_siege_attack.png').convert('RGB')
 
 # ===== 1) 16:9 メイン
 W,H=1920,1080
-im=crop_to(clash,W,H,0.5,0.5).convert('RGBA')
+od=crop_to(Image.open(P+'shots_'+LAY+'/open_day.png').convert('RGB'),W,H);on=crop_to(Image.open(P+'shots_'+LAY+'/open_night.png').convert('RGB'),W,H)
+m=Image.new('L',(W,H),0);ImageDraw.Draw(m).polygon([(W*0.66,0),(W,0),(W,H),(W*0.50,H)],fill=255);od.paste(on,(0,0),m);im=od.convert('RGBA')
+ImageDraw.Draw(im).line([(W*0.66,0),(W*0.50,H)],fill=AMBER,width=7)
 im.alpha_composite(grad(W,H,(0,0,0,170),(0,0,0,0)).crop((0,0,W,H//2)),(0,0))
 im.alpha_composite(grad(W,420,(0,0,0,0),(0,0,0,220)),(0,H-420))
 lg=logo(760);im.alpha_composite(lg,(70,50))
 d=ImageDraw.Draw(im)
 T(d,(80,H-215),'昼に築き、夜に守り抜け。',104,AMBER,'lm',7)
 T(d,(84,H-105),'資材を集めて街を育てながら、夜ごと押し寄せる大群を守り抜く',46,WHITE,'lm',5)
-T(d,(W-60,60),'ブラウザで無料プレイ',44,WHITE,'rm',5)
+T(d,(W-60,60),'ただいま開発中',44,WHITE,'rm',5)
 im.convert('RGB').save(OUT+'promo_16x9.png')
 
 # ===== 2) 正方形：昼と夜をななめに分ける
@@ -63,7 +65,7 @@ for i,(src,t1,t2,col,(cx,cy,z)) in enumerate(panels):
 lg=logo(820);im.alpha_composite(lg,((W-lg.width)//2,40))
 d=ImageDraw.Draw(im)
 T(d,(W//2,H-150),'昼に築き、夜に守り抜け。',84,AMBER,st=7)
-T(d,(W//2,H-62),'ブラウザで無料プレイ ／ PC・スマホ対応',40,WHITE,st=5)
+T(d,(W//2,H-62),'ただいま開発中 ／ PC・スマホ対応',40,WHITE,st=5)
 im.convert('RGB').save(OUT+'promo_vertical.png')
 
 # ===== 4) 特徴カード（16:9）：3つの売り

@@ -29,11 +29,9 @@ Playwright・ffmpeg・Python（Pillow・numpy）と DotGothic16 フォントが�
 3. `python3 music.py` … 曲
 4. `python3 compose.py` → `ffmpeg -framerate 30 -i vframes/v%05d.jpg -i music.wav ...` … 字幕を重ねて動画に
 
-## 第2版（v2）：築く・守る・攻める
+## 第2版（v2）：築く・守る・攻める（採用：案A 混ぜて詰める）
 
-- 構成：オープニング → ①築く（街が育つ）→ ②守る（夜の大群と城壁の攻防）→ ③攻める（駐留地への夜襲）→ エンドカード。38.5秒。
-- 街の配置を2案で撮影：
-  - `v2/mixed/` 案A 混ぜて詰める（家・畑・工房を城から順にぎっしり）
-  - `v2/zoned/` 案B まとめる（北東に住宅・南に畑・西に工房）
-- 各フォルダに動画（720p）と画像4枚（16:9・正方形・縦長・特徴カード）。
-- 撮影用スクリプトは `tools/`。`LAYOUT=mixed|zoned node rec.js`、`node recsiege.js`、`python3 compose.py <案>`、`python3 music.py`、`python3 stills.py <案>`。撮影時だけ施設の上限を外しています（ゲーム本体は変更なし）。
+- `v2/mixed/`：動画（38.5秒・720p）と画像4枚（16:9・正方形・縦長・特徴カード）。
+- 構成：オープニング（同じ街の左半分が昼・右半分が夜＋「昼に築き、夜に守り抜け。」）→ ①築く → ②守る → ③攻める（駐留地への夜襲）→ エンドカード（「ただいま開発中 ／ PC・スマホ対応」）。
+- 作り方（`tools/`）：`LAYOUT=mixed node rec.js` → `LAYOUT=mixed node openshot.js`（オープニング用の昼夜2枚）→ `node recsiege.js` → `python3 music.py` → `python3 compose.py mixed` → ffmpeg でつなぐ → `python3 stills.py mixed`。
+- 撮影時だけ施設の上限を外しています（ゲーム本体は変更なし）。案B（種類ごとにまとめる）は `town.js` の `layout:'zoned'` で撮れます。

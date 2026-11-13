@@ -52,17 +52,25 @@ def put(im):frames.append(im)
 def save_all():
     for k,im in enumerate(frames):im.save(OUT+'v%05d.jpg'%k,quality=92)
 
-# ===== 0) オープニング（3.5秒）：キービジュアル
+# ===== 0) オープニング（3.5秒）：同じ街の昼（左）と夜（右）をななめに分ける
 N=int(3.5*FPS)
+OD=Image.open(P+'shots_'+LAY+'/open_day.png').convert('RGB').resize((W,H))
+ON=Image.open(P+'shots_'+LAY+'/open_night.png').convert('RGB').resize((W,H))
 for i in range(N):
-    t=i/(N-1);im=kenburns(KV,t,1.0,1.06,0.5,0.4)
-    im=ImageEnhance.Brightness(im).enhance(0.55+0.45*min(1,t*3))
+    t=i/(N-1);a=kenburns(OD,t,1.05,1.12,0.5,0.5);b=kenburns(ON,t,1.05,1.12,0.5,0.5)
+    k=min(1,i/24);k=1-(1-k)**3            # 境目が右からすべりこむ
+    top=W*(1.15-0.57*k);bot=top-W*0.16
+    m=Image.new('L',(W,H),0);ImageDraw.Draw(m).polygon([(top,0),(W+400,0),(W+400,H),(bot,H)],fill=255)
+    im=a.copy();im.paste(b,(0,0),m)
     im=fade(im,min(1,i/12))
     ov=im.convert('RGBA');d=ImageDraw.Draw(ov)
-    a=max(0,min(1,(i-25)/12))
-    if a>0:
-        band=Image.new('RGBA',(W,170),(6,8,10,int(190*a)));ov.alpha_composite(band,(0,H-230))
-        text_c(d,(W//2,H-145),'昼に築き、夜に守り抜け。',96,AMBER+(int(255*a),),stroke=7)
+    d.line([(top,0),(bot,H)],fill=AMBER+(255,),width=6)
+    ov.alpha_composite(Image.new('RGBA',(W,140),(6,8,10,0)),(0,0))
+    a2=max(0,min(1,(i-22)/12))
+    if a2>0:
+        text_c(d,(W*0.22,150),'昼',110,AMBER+(int(255*a2),),stroke=8);text_c(d,(W*0.80,150),'夜',110,(255,110,90,int(255*a2)),stroke=8)
+        band=Image.new('RGBA',(W,170),(6,8,10,int(190*a2)));ov.alpha_composite(band,(0,H-230));d=ImageDraw.Draw(ov)
+        text_c(d,(W//2,H-145),'昼に築き、夜に守り抜け。',96,AMBER+(int(255*a2),),stroke=7)
     im=ov.convert('RGB')
     if i>N-8:im=fade(im,(N-1-i)/7)
     put(im)
@@ -115,7 +123,7 @@ for i in range(N):
     b=max(0,min(1,(i-12)/12))
     if b>0:
         text_c(d,(W//2,150+lh+70),'シミュレーション型ディフェンスゲーム',52,WHITE+(int(255*b),),stroke=5)
-        text_c(d,(W//2,150+lh+170),'ブラウザで無料プレイ ／ PC・スマホ対応',60,AMBER+(int(255*b),),stroke=6)
+        text_c(d,(W//2,150+lh+170),'ただいま開発中 ／ PC・スマホ対応',60,AMBER+(int(255*b),),stroke=6)
         text_c(d,(W//2,H-110),'negiramen1922.github.io/NIGHT-DEFENSE',46,WHITE+(int(255*b),),stroke=5)
     im=im.convert('RGB')
     if i>N-10:im=fade(im,(N-1-i)/9)

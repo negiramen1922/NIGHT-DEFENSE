@@ -35,6 +35,7 @@ const lerp=(a,b,t)=>a+(b-a)*t;
  await p.screenshot({path:P+SH+'day_town.png'});}
 // 昼の寄り（静止画用）
 await cam(center[0],center[1],1.6);await p.evaluate(()=>{try{draw();}catch(e){}});await p.screenshot({path:P+SH+'day_close.png'});
+await cam(center[0],center[1]-40,1.25);await p.evaluate(()=>{try{draw();}catch(e){}});await p.screenshot({path:P+SH+'open_day.png'});
 // ── 2) 夜になる：敵を出して、闇から迫るのを見せる（4秒）。北へ寄せる
 const nE=await p.evaluate(()=>startRaid({wave:12,depth:30,near:10,scale:0.5}));
 const north=[center[0],center[1]-17*28*0.5];
@@ -57,6 +58,7 @@ const north=[center[0],center[1]-17*28*0.5];
   await cam(center[0]+lerp(0,200,e),center[1]+lerp(0,20,e),lerp(0.95,1.5,e));
   await p.evaluate(()=>{__vt.adv(2/30);stepGame(1/30,2);});await shot();
   if(i===N-1)await p.screenshot({path:P+SH+'east_wall.png'});}}
+await cam(center[0],center[1]-40,1.25);await p.evaluate(()=>{try{draw();}catch(e){}});await p.screenshot({path:P+SH+'open_night.png'});
 const st=await p.evaluate(()=>{const h=hqOf();const c=window.__c||[0,0];let inside=0;if(h){for(const e of S.enemies)if(Math.hypot(e.x-bcx(h),e.y-bcy(h))<15*T)inside++;}return {en:S.enemies.length,kills:S.waveKills,hq:h?Math.round(h.hp)+'/'+Math.round(h.maxhp):'LOST',inside,blds:S.blds.length};});
 fs.writeFileSync(P+'rec_info_'+LAY+'.json',JSON.stringify({frames:fi,nB,nE,...st}));
 console.log('frames',fi,'buildings',nB,'enemies',nE,st,errs.slice(0,5));await b.close();})();

@@ -1,0 +1,21 @@
+// オープニング用：同じ構図の昼と夜（夜は城壁の内側だけ明かりを残して暗く）
+const {chromium}=require('playwright');const fs=require('fs');
+const P='/tmp/claude-0/-home-user-NIGHT-DEFENSE/7aaddc20-a0b4-5b3f-9294-290684e984c4/scratchpad/promo/';
+const LAY=process.env.LAYOUT||'mixed';const SH=P+'shots_'+LAY+'/';
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1920,height:1080}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{let vt=0,real=false;const rn=performance.now.bind(performance);window.__vt={adv:d=>{vt+=d;},on:()=>{real=true;}};performance.now=()=>real?vt:rn();});
+await p.goto('file:///home/user/NIGHT-DEFENSE/index.html');await p.waitForTimeout(2500);
+for(const f of ['town.js','raid.js'])await p.addScriptTag({content:fs.readFileSync(P+f,'utf8')});
+await p.evaluate(()=>{Math.random=(()=>{let s=12345;return()=>{s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;};})();});
+await p.evaluate(l=>buildTown({layout:l}),LAY);
+await p.addStyleTag({content:'#topbar,#intel,#controls,#right,#modeBar,#viewSeg,#guide,#toasts,#reviewBar,.logbox,#pauseMsg,#bpad,#overlay{display:none!important}'});
+await p.evaluate(()=>{toggleFull(true);});await p.waitForTimeout(600);
+await p.evaluate(()=>{window.requestAnimationFrame=()=>0;__vt.on();resizeView();window.mmPos=()=>[-9999,-9999];});
+const Z=+(process.env.Z||1.9),DY=+(process.env.DY||-20);
+const cam=()=>p.evaluate(([z,dy])=>{const h=hqOf();cam.z=z;cam.x=bcx(h)-VW/z/2;cam.y=bcy(h)+dy-VH/z/2;try{draw();}catch(e){}},[Z,DY]);
+await cam();await p.screenshot({path:SH+'open_day.png'});
+await p.evaluate(()=>startRaid({wave:12,depth:30,near:10,scale:0.5}));
+for(let i=0;i<170;i++)await p.evaluate(()=>{__vt.adv(2/30);stepGame(1/30,2);});
+await p.evaluate(()=>{const h=hqOf(),cx=bcx(h),cy=bcy(h);S.lights=(S.lights||[]).filter(l=>Math.hypot(l[0]-cx,l[1]-cy)<15*T).map(l=>[l[0],l[1],l[2]*0.85]);});
+await cam();await p.screenshot({path:SH+'open_night.png'});
+console.log('ok',errs.slice(0,3));await b.close();})();
