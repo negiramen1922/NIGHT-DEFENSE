@@ -2869,7 +2869,11 @@ const RNUM=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ'];
 // 重ねる研究は「伐採技術Ⅰ → Ⅱ → Ⅲ」のように、城のランクごとに一段ずつ（名前に段の数字）
 function tLvName(t,n){return t.lvRank?(RNUM[n]||' Lv'+n):(tMax(t)>1?' Lv'+n:'');}
 function tMax(t){return t.lvRank?Math.max(1,S.baseLv||1):(t.max||1);}
-function techCost(t){const L=lvl(t.id);const c={};const base=Object.assign({},t.cost);if(t.tier>=2)base.gold=(base.gold||0)+40*(t.tier-1);for(const k in base)c[k]=Math.round(base[k]*(1+0.7*L));return c;}
+/* 研究の費用に、そのランクの新しい素材を足す（2026-11-13）。素材を取れるようにする研究には足さない。金貨の上乗せは +40 → +20／ランク */
+const TECH_MAT={2:{coal:6},3:{coal:4,alloy:4},4:{alloy:6},5:{alloy:4,mmetal:4},6:{mmetal:4,mithril:3},7:{mithril:5}};
+const TECH_MAT_FREE=new Set(['coalt','goldt','smeltt','mitht','kc_work_5','kc_mine_3']);
+function techCost(t){const L=lvl(t.id);const c={};const base=Object.assign({},t.cost);if(t.tier>=2)base.gold=(base.gold||0)+20*(t.tier-1);
+  {const M=TECH_MAT[t.tier||1];if(M&&!TECH_MAT_FREE.has(t.id))for(const k in M)if(!base[k])base[k]=M[k];}for(const k in base)c[k]=Math.round(base[k]*(1+0.7*L));return c;}
 function techTurns(t){return t.t+lvl(t.id);}
 const MAP_MAXTIER={f:2,m:3,t:2,s:3};
 function mapMaxTier(){return MAP_MAXTIER[CUR_MAP]||7;}
