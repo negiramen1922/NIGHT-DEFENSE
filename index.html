@@ -7354,7 +7354,7 @@ function gFix(g){if(!g.done){g.done={prod:[],def:[]};for(const tr of ['prod','de
 function gProg(st){const c=st.c?st.c():gCnt(st.b);return Math.min(st.n,Math.floor(c));}
 function gDoneN(tr){return GUIDE[tr].steps.filter((x,i)=>S.guide.done[tr][i]).length;}
 function rwTxt(rw){return Object.keys(rw).map(k=>`${ic(k,12)}+${rw[k]}`).join(' ');}
-function guideTick(){if(!S||S.over||!S.guide)return;if(document.body.classList.contains('ov')&&['title','intro','credit','help'].includes(S.overlay))return;const g=S.guide;gFix(g);
+function guideTick(){if(!S||S.over||!S.guide||S.backdrop)return;if(['title','intro','credit','help','dex'].includes(S.overlay))return;   /* タイトルの後ろのゲーム（S.backdrop）や図鑑を開いている間は数えない */const g=S.guide;gFix(g);
   for(const tr of ['prod','def'])GUIDE[tr].steps.forEach((st,i)=>{if(g.done[tr][i])return;let ok=false;try{ok=gProg(st)>=st.n;}catch(e){}if(!ok)return;
     g.done[tr][i]=true;if(g.hide)return;
     toast(`初心者タスク達成：${st.t}`,'good');log(`初心者タスク達成：${st.t}`);se('research');
@@ -8036,7 +8036,7 @@ function loop(now){
   S.fogT=(S.fogT||0)+dt;if(S.fogT>0.5){S.fogT=0;revealAll();}
   uiT+=dt;if(uiT>0.2){uiT=0;renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
 }
-auUi();newState();renderAll();resizeView();setTimeout(resizeView,300);showTitle();requestAnimationFrame(loop);
+auUi();newState();S.backdrop=true;renderAll();resizeView();setTimeout(resizeView,300);showTitle();requestAnimationFrame(loop);
 </script>
 <script>
 // 本体のスクリプトは、読み込み画面を一度描いてから動かす（大きいので、先に動かすと再読み込みのときなどに読み込み画面が出ないまま固まって見える）
