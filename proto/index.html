@@ -3765,7 +3765,7 @@ function makeCamps(){
       if(campOk(x,y))best=[x,y];}
     if(!best)best=[hx+(ox-hx)*0.7,hy+(oy-hy)*0.7];
     const hr=10*TU,a=Math.random()*6.283,hd=Math.random()*hr*0.6;
-    S.camps.push({id:sd,side:sd,x:best[0],y:best[1],hx:best[0]+Math.cos(a)*hd,hy:best[1]+Math.sin(a)*hd,hr,found:false,state:'idle',killed:0});
+    S.camps.push({id:sd,side:sd,x:best[0],y:best[1],hx:best[0]+Math.cos(a)*hd,hy:best[1]+Math.sin(a)*hd,hr,found:false,state:'idle',killed:0,lay:campLay(S.wave+1)});
   }
 }
 function campSync(){if(S.waveActive||S.mode!=='campaign')return;if(S.campWave!==S.wave+1||!S.camps)makeCamps();
@@ -3833,6 +3833,8 @@ function campWatch(){
     if(c.asked&&!S.squads.some(s=>!s.gar&&Math.hypot(s.x-c.x,s.y-c.y)<CAMP_TRIG*TU*1.6))c.asked=false;}
 }
 // ===== 駐屯地襲撃モード β（2026-11-13）：駐留地に近づくと、別の戦場で夜襲をかける（proto の siege.js・本番は siege.js を読み込む） =====
+// 駐留地の陣の形は、駐留地ができたときに決まる（夜襲で選べない。2026-11-13）。31回目から大要塞、22回目から二重の陣、それまでは丸・四角・横長のどれか
+function campLay(n){return n>30?'fort':n>21?'double':['ring','square','long'][Math.floor(Math.random()*3)];}
 function siegeModeDefault(){try{return localStorage.getItem('nd_siege_mode')!=='0';}catch(e){return true;}}
 function siegeAsk(c){const {u,n}=campUnits(c);if(!n){c.state='gone';return;}
   if(c.raidDay===S.turn){toast(`${campName(c)}には今日もう夜襲をかけました。明日また攻められます`,'warn',4000);return;}

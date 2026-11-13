@@ -104,7 +104,8 @@ const MODEL_SU={pawn:'sword',silver:'sword',guard:'sword',farmer:'sword',advSwor
 function suOf(sq){return MODEL_SU[sq.model]||({inf:'sword',arch:'archer',cav:'cav',drake:'drake',mage:'mage',art:'gun',mil:'sword',guard:'sword',adv:'sword'})[sq.ut]||null;}
 function campSquads(){return (S.squads||[]).filter(q=>q.hp>0&&!q.gar&&suOf(q));}
 function openSiegeCamp(c){const n=S.wave+1,w=S.next||{};
-  G={phase:'setup',camp:c.id,raid:n,layout:'auto',speed:1,paused:false,pool:{},pick:{},fhm:(w.blood?1.25:1)*(w.hpMul||1)};
+  if(!c.lay)c.lay=typeof campLay==='function'?campLay(n):'ring';   /* 1.4までのセーブの駐留地は、初めて夜襲をかけるときに決めて、そのまま残す */
+  G={phase:'setup',camp:c.id,raid:n,layout:c.lay,speed:1,paused:false,pool:{},pick:{},fhm:(w.blood?1.25:1)*(w.hpMul||1)};
   for(const q of campSquads())if(Math.hypot(q.x-c.x,q.y-c.y)<14*TU)G.pick[q.id]=true;   /* 駐留地の近くにいる部隊は最初から選んでおく */
   S.overlay='siege';S.paused=true;
   let root=$('siege');if(!root){root=document.createElement('div');root.id='siege';document.body.appendChild(root);}
@@ -112,11 +113,10 @@ function openSiegeCamp(c){const n=S.wave+1,w=S.next||{};
 function renderCampSetup(){const root=$('siege'),c=campById(G.camp);const st=stationed(G.raid),aw=awakeOf(st);G.st=st;G.aw=aw;const L=campSquads();
   root.innerHTML=`<div class="sgSetup"><h2>駐屯地襲撃 <span style="color:#f2b33d">β</span><small>${campName(c)}への夜襲（第${G.raid}襲撃の前）</small></h2>
     <div class="sgRow"><b>駐留地</b><small class="muted">駐留している魔物 ${total(st)}体（${Object.entries(st).sort((a,b)=>b[1]-a[1]).map(([k,v])=>ename(k)+v).join('・')}）<br>陣の規模：<b>${campTier(G.raid).nm}</b>　起きているのは${Math.round(AWAKE_SHARE*100)}%、ほかはテント・小屋で眠っている</small></div>
-    <div class="sgRow"><b>陣の形</b>${['auto'].concat(Object.keys(LAYOUTS)).map(k=>`<button data-lay="${k}" class="${G.layout===k?'on':''}">${k==='auto'?'おまかせ':LAYOUTS[k].n}</button>`).join('')}</div>
+    <div class="sgRow"><b>陣の形</b><small class="muted"><b>${LAYOUTS[G.layout]?LAYOUTS[G.layout].n:''}</b>（駐留地ができたときに決まっている）</small></div>
     <div class="sgHelp">連れて行く部隊を選びます（駐留地の近くにいた部隊は選んであります）。倒した魔物と、焼いたテントの中の魔物の分だけ、次の襲撃が減ります。部隊が受けた被害・失った兵は本編にそのまま残ります。英雄が率いる部隊は、英雄のスキルも使えます。</div>
     <div class="sgUnits">${L.length?L.map(q=>{const k=suOf(q),d=SU[k],cm=typeof cmdOf==='function'?cmdOf(q):null;return `<label class="sgU" style="cursor:pointer"><input type="checkbox" data-pick="${q.id}" ${G.pick[q.id]?'checked':''}><span class="sgI">${unitIcon(k,32)}</span><span class="sgN"><b>${unitLabel(q)}</b><small class="muted">夜襲では「${d.n}」として戦う　体力 ${Math.round(q.hp/q.maxhp*100)}%　${q.members}${MT(q).unit||'人'}${cm?`　英雄 ${cm.name}`:''}</small></span></label>`;}).join(''):'<div class="muted">連れて行ける部隊がいません（城の守りについている部隊は連れて行けません）</div>'}</div>
     <div class="sgFoot"><button id="sgBack">やめる（街へ戻る）</button><button id="sgGo" class="primary" ${L.some(q=>G.pick[q.id])?'':'disabled'}>出撃（配置へ）</button></div></div>`;
-  root.querySelectorAll('[data-lay]').forEach(b=>b.onclick=()=>{G.layout=b.dataset.lay;sfx('click');renderCampSetup();});
   root.querySelectorAll('[data-pick]').forEach(el=>el.onchange=()=>{G.pick[el.dataset.pick]=el.checked;if(!el.checked)delete G.pick[el.dataset.pick];sfx('click');renderCampSetup();});
   $('sgBack').onclick=closeSiege;
   $('sgGo').onclick=()=>{G.pool={};G.queue={};for(const q of L)if(G.pick[q.id]){const k=suOf(q);G.pool[k]=(G.pool[k]||0)+1;(G.queue[k]=G.queue[k]||[]).push(q.id);}c.raidDay=S.turn;startDeploy();};}
