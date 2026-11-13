@@ -3805,7 +3805,7 @@ function campHunt(e,air){const c=campById(e.camp);if(!c)return null;let best=nul
 // 空の駐留兵：部隊へまっすぐ飛んでいく。いなければ陣の上空へ
 function campFly(e,d,dt){e.cd-=dt*(e.curse?0.75:1);const s=campHunt(e,true),c=campById(e.camp);if(!c)return;
   const tx=s?s.x:c.x+(e.hx||0),ty=s?s.y:c.y+(e.hy||0),dx=tx-e.x,dy=ty-e.y,dd=Math.hypot(dx,dy)||1;
-  if(s&&dd<d.r+12){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;damageSquad(s,d.dmg*(d.vsS||1));}return;}
+  if(s&&dd<d.r+12){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;e.atkX=s.x;damageSquad(s,d.dmg*(d.vsS||1));}return;}
   if(!s&&dd<TU*0.6)return;const st=d.spd*dt;e.x+=dx/dd*st;e.y+=dy/dd*st;}
 function skirmTick(dt){
   const c=campById(S.skirm.id);if(!c){S.skirm=null;return;}S.skirm.t+=dt;
@@ -4689,7 +4689,7 @@ function update(dt,sim){
       if(!e.target||!S.blds.includes(e.target)||e.retarget<=0){let best=null,bs=-1;for(const b of S.blds){if((GUN_TYPES.includes(b.type)&&!d.hitDef)||WALL_TYPES.includes(b.type))continue;const dd=Math.hypot(bcx(b)-e.x,bcy(b)-e.y)/TU;const sc=(1+(b.crew||0)*0.3+(b.type==='barracks'?3:0)+(b.type==='farm'?2:0)+(d.hitDef&&GUN_TYPES.includes(b.type)?3:0))/(dd+4);if(sc>bs){bs=sc;best=b;}}e.target=best;e.retarget=2;}
       if(!e.target)continue;const tx=bcx(e.target),ty=bcy(e.target),dx=tx-e.x,dy=ty-e.y,dd=Math.hypot(dx,dy)||1;
       if(d.drop&&!e.dropped&&dd<TU*1.2){e.dropped=true;spawnAt(d.drop.type,e.x,e.y,d.drop.n,TU*1.6);log(`${d.name}が住居の上からゴブリンを落とした！`,'warn');se('alarm');}
-      if(dd<TU*(d.breath?1.1:0.7)){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;if(d.breath){S.fx.push({x:tx,y:ty,r:d.breath*TU,t:0,dur:0.5,c:'#ff7a2a'});for(const b of S.blds){if(Math.hypot(bcx(b)-tx,bcy(b)-ty)<d.breath*TU)damageB(b,d.dmg,e);}}else damageB(e.target,d.dmg,e);}}
+      if(dd<TU*(d.breath?1.1:0.7)){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;e.atkX=tx;if(d.breath){S.fx.push({x:tx,y:ty,r:d.breath*TU,t:0,dur:0.5,c:'#ff7a2a'});for(const b of S.blds){if(Math.hypot(bcx(b)-tx,bcy(b)-ty)<d.breath*TU)damageB(b,d.dmg,e);}}else damageB(e.target,d.dmg,e);}}
       else{const st=(e.far||1)*d.spd*dt;e.x+=dx/dd*st+Math.sin(S.waveT*3+e.hp)*0.4;e.y+=dy/dd*st;}
       continue;
     }
@@ -4706,7 +4706,7 @@ function update(dt,sim){
       for(const u of S.squads){const r=(d.laser+(u.ut==='mech'?1.5:u.ut==='air'?(has('nap')?2:4):0)+1.5*elevPx(u.x,u.y))*TU,dd=Math.hypot(u.x-e.x,u.y-e.y);if(dd<=r&&dd-r<bs){bs=dd-r;best=u;}}
       for(const b of S.blds){if(!gunOf(b)&&b.type!=='hq')continue;const r=(d.laser+1.5*elevAt(b.x,b.y)+(b.wall?0.5:0))*TU,dd=Math.hypot(bcx(b)-e.x,bcy(b)-e.y);if(dd<=r&&dd-r<bs){bs=dd-r;best=b;}}
       if(best){
-        if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;const bx=best.kind==='s'?best.x:bcx(best),by=best.kind==='s'?best.y:bcy(best);
+        if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;e.atkX=S.blds.includes(best)?bcx(best):best.x;const bx=best.kind==='s'?best.x:bcx(best),by=best.kind==='s'?best.y:bcy(best);
           S.beams.push({x:e.x,y:e.y,tx:bx,ty:by,t:0});if(best.kind==='s')damageSquad(best,d.dmg*(best.ut==='air'?(has('nap')?1.2:2):1));else damageB(best,d.dmg,null);}
         continue;
       }
@@ -4719,14 +4719,14 @@ function update(dt,sim){
       let rt=null,rd=9*TU;for(const b of S.blds){if(!gunOf(b))continue;const dd2=Math.hypot(bcx(b)-e.x,bcy(b)-e.y);if(dd2<rd){rd=dd2;rt=b;}}
       if(!rt)rt=e.target;
       if(rt&&Math.hypot(bcx(rt)-e.x,bcy(rt)-e.y)<=d.ranged*TU){
-        if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;e.flashT=(S.waveT||0)+2.5;S.eshots.push({x:e.x,y:e.y,b:rt,t:0,dur:0.6,dmg:d.dmg});}
+        if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;e.atkX=bcx(rt);e.flashT=(S.waveT||0)+2.5;S.eshots.push({x:e.x,y:e.y,b:rt,t:0,dur:0.6,dmg:d.dmg});}
         continue;
       }
       if(rt)e.target=rt;
     }
     let melee=null;
     for(const s of S.squads){if(s.gar||(UT[s.ut].fly&&s.ut!=='mech'))continue;if(Math.hypot(s.x-e.x,s.y-e.y)<d.r+(s.ut==='ship'?18:10)){melee=s;break;}}
-    if(melee){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;const m0=melee.members,dm=d.dmg*(d.vsS||1)*(e.buff?1.3:1);damageSquad(melee,dm);if(d.poison){melee.psnT=3;melee.psnD=dm/3;}
+    if(melee){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;e.atkX=melee.x;const m0=melee.members,dm=d.dmg*(d.vsS||1)*(e.buff?1.3:1);damageSquad(melee,dm);if(d.poison){melee.psnT=3;melee.psnD=dm/3;}
       if(d.vampire&&melee.members<m0){for(let i=0;i<m0-Math.max(0,melee.members);i++)S.enemies.push({type:'ghoul',x:melee.x+(Math.random()-.5)*TU,y:melee.y+(Math.random()-.5)*TU,hp:E.ghoul.hp,maxhp:E.ghoul.hp,cd:0,target:null,retarget:0});log('吸血鬼に倒された兵がグールになった','bad');}}continue;}
     let tx,ty;
     if(e.camp&&!hunt){const c=campById(e.camp);if(!c)continue;tx=c.x+(e.hx||0);ty=c.y+(e.hy||0);if(Math.hypot(tx-e.x,ty-e.y)<TU*0.6)continue;}
@@ -4768,7 +4768,7 @@ function update(dt,sim){
     // 移動先が施設のマスならそこで止まって攻撃（押し合いで施設の中に入り込まないように）
     const ngx=Math.floor(nx/T),ngy=Math.floor(ny/T),cgx=Math.floor(e.x/T),cgy=Math.floor(e.y/T);
     let nb=(ngx>=0&&ngy>=0&&ngx<COLS&&ngy<ROWS&&(ngx!==cgx||ngy!==cgy))?S.grid[ngy][ngx]:null;
-    if(blk||nb){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;damageB(blk||nb,d.dmg*(d.bldMul||1)*(e.buff?1.3:1),e);}}
+    if(blk||nb){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;e.atkX=bcx(blk||nb);damageB(blk||nb,d.dmg*(d.bldMul||1)*(e.buff?1.3:1),e);}}
     else if(!eBlock(terAt(nx,ny))){e.x=nx;e.y=ny;}
     else if(!eBlock(terAt(nx,e.y)))e.x=nx;
     else if(!eBlock(terAt(e.x,ny)))e.y=ny;
@@ -5843,7 +5843,10 @@ function drawEnemy(e){
     ctx.fillStyle='#f0c030';ctx.beginPath();ctx.moveTo(e.x-r*0.7,e.y-r*0.9);ctx.lineTo(e.x-r*0.7,e.y-r*1.5);ctx.lineTo(e.x-r*0.35,e.y-r*1.15);ctx.lineTo(e.x,e.y-r*1.7);ctx.lineTo(e.x+r*0.35,e.y-r*1.15);ctx.lineTo(e.x+r*0.7,e.y-r*1.5);ctx.lineTo(e.x+r*0.7,e.y-r*0.9);ctx.closePath();ctx.fill();
     ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText('ゴブリンキング',e.x,e.y-r*1.9);ctx.fillStyle='#300';ctx.fillRect(e.x-30,e.y+r+4,60,4);ctx.fillStyle='#f0c030';ctx.fillRect(e.x-30,e.y+r+4,60*ratio,4);}
   {let ek='e_'+e.type+(e.rage&&SPR.enemies['e_'+e.type+'_rage']?'_rage':'');if(e.type==='swarm'||e.type==='maneater'){const V=(e.type==='swarm'?[null,'e_gob_leather','e_gob_bone','e_gob_thief','e_gob_shaman']:[null,'e_maneater_purple','e_maneater_blue','e_maneater_yellow'])[e.vk||0];if(V&&SPR.enemies[V])ek=V;}if(e.burnT>0&&SPR.enemies[ek+'_burn'])ek+='_burn';const SP=SPR.enemies[ek];   /* 怒った姿・燃えている差分・ゴブリンの見た目違い */const im=SP?(()=>{const atk=(S.waveT-(e.atkT??-99))<0.4&&SP.img.attack,L=atk?SP.img.attack:SP.img.walk;return L[Math.floor(nowS()/(atk?0.2:0.15)+e.x*0.01)%L.length];})():PXI['e_'+e.type];if(im){
-    if(e.lx!=null&&Math.abs(e.x-e.lx)>0.05)e.face=e.x<e.lx?-1:1;e.lx=e.x;
+    {const atk=(S.waveT-(e.atkT??-99))<0.8;const tx=atk&&e.atkX!=null?e.atkX:null;   /* 向き：攻撃中は相手のほう。歩くときは横に数px動いてから向きを変える（縦に歩くときに左右へパタパタしない） */
+     if(tx!=null&&Math.abs(tx-e.x)>2){e.face=tx<e.x?-1:1;e.fAcc=0;}
+     else if(e.lx!=null){e.fAcc=Math.max(-4,Math.min(4,(e.fAcc||0)+(e.x-e.lx)));if(e.fAcc>2.5)e.face=1;else if(e.fAcc<-2.5)e.face=-1;}
+     e.lx=e.x;}
     const sz=SP?16*Math.max(1,Math.round(r*2.7*(d.drawMul||1)/16)):Math.round(Math.max(14,r*2.7)),bob=d.fly?Math.sin(nowS()*6+e.x*0.1)*2-4:0;
     if(d.fly){ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(e.x+4,e.y+sz*0.45,sz*0.35,sz*0.12,0,0,7);ctx.fill();}
     if(e.buff){ctx.strokeStyle='rgba(255,200,60,.7)';ctx.beginPath();ctx.ellipse(e.x,e.y+sz*0.4,sz*0.45,sz*0.16,0,0,7);ctx.stroke();}
