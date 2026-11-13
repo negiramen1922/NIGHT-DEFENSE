@@ -1,6 +1,6 @@
 # 宣伝動画の曲（約35秒）：昼は軽いアルペジオ、夜で暗転の一撃、戦闘は太鼓とベース、最後に締めの一撃
 import numpy as np,wave
-SR=44100;DUR=35.0;N=int(SR*DUR)
+SR=44100;DUR=38.5;N=int(SR*DUR)
 L=np.zeros(N);R=np.zeros(N)
 rng=np.random.default_rng(7)
 def add(sig,t0,pan=0.0,g=1.0):
@@ -56,8 +56,8 @@ while t<14.4:
 bpm=140;b=60/bpm;t=14.5;beat=0
 bassline=[45,45,48,45,43,43,47,43, 41,41,45,41,43,43,47,50]
 chords=[[57,60,64],[55,59,62],[53,57,60],[55,59,64]]
-while t<30.45:
-    inten=min(1,0.55+(t-14.5)/16*0.6)
+while t<33.95:
+    inten=min(1,0.55+(t-14.5)/19*0.6)
     if beat%2==0:add(drum(52,0.6,0.35),t,g=0.75*inten)
     if beat%4==2:add(snare(0.25),t,g=0.45*inten)
     if beat%4==3:add(drum(70,0.3,0.2),t+b/2,pan=0.3,g=0.35*inten)
@@ -70,10 +70,12 @@ while t<30.45:
         mel=[69,72,76,74,72,71,69,67,69,72,79,76,74,72,71,72]
         add(tone(note(mel[(beat//2)%len(mel)]),b*0.9,'sq',a=0.003,d=0.3),t,pan=0.2,g=0.07*inten)
     t+=b;beat+=1
-# ── 30.5 秒：締めの一撃と和音
-add(boom(4.0),30.5,g=0.65)
-for k,mm in enumerate([45,57,60,64,69]):add(tone(note(mm),4.4,'saw',a=0.02,d=1.6)*0.5,30.5,pan=(k-2)*0.25,g=0.09)
-for k,m in enumerate([81,84,88]):add(tone(note(m),2.5,'sine',a=0.002,d=0.9),31.0+k*0.15,g=0.12)
+# ── 26.5 秒：攻める（角笛）
+for k,(m,dl) in enumerate([(57,0.0),(64,0.35),(69,0.7),(69,1.3)]):add(tone(note(m),0.9 if k<3 else 1.6,'saw',a=0.03,d=0.8)*0.5,26.4+dl,g=0.16)
+# ── 34 秒：締めの一撃と和音
+add(boom(4.0),34.0,g=0.65)
+for k,mm in enumerate([45,57,60,64,69]):add(tone(note(mm),4.4,'saw',a=0.02,d=1.6)*0.5,34.0,pan=(k-2)*0.25,g=0.09)
+for k,m in enumerate([81,84,88]):add(tone(note(m),2.5,'sine',a=0.002,d=0.9),34.5+k*0.15,g=0.12)
 # まとめ：軽い残響と音量
 def reverb(x):
     y=x.copy()

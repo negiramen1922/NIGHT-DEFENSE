@@ -28,3 +28,12 @@ Playwright・ffmpeg・Python（Pillow・numpy）と DotGothic16 フォントが�
 2. `python3 stills.py` … 静止画
 3. `python3 music.py` … 曲
 4. `python3 compose.py` → `ffmpeg -framerate 30 -i vframes/v%05d.jpg -i music.wav ...` … 字幕を重ねて動画に
+
+## 第2版（v2）：築く・凌ぐ・攻める
+
+- 構成：オープニング → ①築く（街が育つ）→ ②凌ぐ（夜の大群と城壁の攻防）→ ③攻める（駐留地への夜襲）→ エンドカード。38.5秒。
+- 街の配置を2案で撮影：
+  - `v2/mixed/` 案A 混ぜて詰める（家・畑・工房を城から順にぎっしり）
+  - `v2/zoned/` 案B まとめる（北東に住宅・南に畑・西に工房）
+- 各フォルダに動画（720p）と画像4枚（16:9・正方形・縦長・特徴カード）。
+- 撮影用スクリプトは `tools/`。`LAYOUT=mixed|zoned node rec.js`、`node recsiege.js`、`python3 compose.py <案>`、`python3 music.py`、`python3 stills.py <案>`。撮影時だけ施設の上限を外しています（ゲーム本体は変更なし）。

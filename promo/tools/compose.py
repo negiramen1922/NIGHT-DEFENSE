@@ -4,9 +4,10 @@ from PIL import Image,ImageDraw,ImageFont,ImageFilter,ImageEnhance
 P='/tmp/claude-0/-home-user-NIGHT-DEFENSE/7aaddc20-a0b4-5b3f-9294-290684e984c4/scratchpad/promo/'
 FONT=P+'fonts/DotGothic16.ttf'
 W,H=1920,1080;FPS=30
-OUT=P+'vframes/';os.makedirs(OUT,exist_ok=True)
+OUT=P+'vframes_'+(sys.argv[1] if len(sys.argv)>1 else 'mixed')+'/';os.makedirs(OUT,exist_ok=True)
 for f in glob.glob(OUT+'*.jpg'):os.remove(f)
-src=sorted(glob.glob(P+'frames/*.jpg'))
+LAY=sys.argv[1] if len(sys.argv)>1 else 'mixed'
+src=sorted(glob.glob(P+'frames_'+LAY+'/*.jpg'))[:690]+sorted(glob.glob(P+'frames_siege/*.jpg'))[30:255]
 KV=Image.open('/home/user/NIGHT-DEFENSE/keyvisual.jpg').convert('RGB').resize((W,H))
 LOGO=Image.open(P+'logo.png').convert('RGBA')
 def font(sz):return ImageFont.truetype(FONT,sz)
@@ -67,12 +68,19 @@ for i in range(N):
     put(im)
 
 # ===== ゲームのコマ（撮った順）
-seg=[('day',7*FPS),('approach',4*FPS),('clash',6*FPS),('wide',6*FPS),('more',4*FPS)]
-CAP={'day':('資材を集め、街を築く','伐採所・石切り場・農場・工房…街を育てて守りを固める'),
+seg=[('day',7*FPS),('approach',4*FPS),('clash',6*FPS),('wide',6*FPS),('siege',225)]
+CAP={'day':('資材を集め、街を築く','伐採所・石切り場・農場・工房…生産が街を育て、守りを支える'),
      'approach':('日が暮れると――','アビスから魔物の大群が押し寄せる'),
      'clash':('城壁と防衛施設で迎え撃て','バリスタ・大砲・メイジの塔・部隊を配置'),
      'wide':('四方から来る大群を、どう凌ぐか','生産を止めれば守れない。守りを怠れば街が落ちる'),
-     'more':('街づくり×タワーディフェンス','生産と防衛を、同時に回せ')}
+     'siege':('こちらから攻め込む','駐留地に夜襲をかけ、次の襲撃を減らせ')}
+TAG={'day':'① 築く','approach':'② 凌ぐ','clash':'② 凌ぐ','wide':'② 凌ぐ','siege':'③ 攻める'}
+def tag(im,s,a):
+    if a<=0:return im
+    ov=Image.new('RGBA',im.size,(0,0,0,0));d=ImageDraw.Draw(ov)
+    d.rectangle([0,50,470,160],fill=(6,8,10,int(200*a)));d.rectangle([0,50,10,160],fill=AMBER+(int(255*a),))
+    d.text((40,105),s,font=font(78),fill=AMBER+(int(255*a),),anchor='lm',stroke_width=6,stroke_fill=(10,8,6,int(255*a)))
+    im=im.convert('RGBA');im.alpha_composite(ov);return im.convert('RGB')
 k=0
 for name,n in seg:
     for i in range(n):
@@ -83,10 +91,14 @@ for name,n in seg:
             im=caption(im,m,s,env(i,n,8,8))
         else:
             im=caption(im,m,s,env(i,n,10,10))
+        if name in ('day','approach','siege'):im=tag(im,TAG[name],env(i,n if name!='approach' else 99999,10,10))
+        elif name in ('clash','wide'):im=tag(im,TAG[name],1.0 if name=='clash' else env(i,n,1,10))
         if name=='day' and i<10:im=fade(im,i/10)
+        if name=='siege' and i<8:im=fade(im,i/8)
+        if name=='wide' and i>n-8:im=fade(im,(n-1-i)/7)
         if name=='approach' and i<6:  # 夜になる瞬間の暗転
             im=fade(im,0.25+0.75*i/6)
-        if name=='more' and i>n-12:im=fade(im,(n-1-i)/11)
+        if name=='siege' and i>n-12:im=fade(im,(n-1-i)/11)
         put(im)
 print('game frames used',k,'of',len(src))
 
