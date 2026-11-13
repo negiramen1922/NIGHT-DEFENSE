@@ -1776,6 +1776,12 @@ B.magetower={name:'メイジの塔',glyph:'魔',hp:500,heat:1,cost:{steel:60,sto
 B.tower.garUt='arch';B.spike.req='spikes';
 B.furnace={name:'精製炉',glyph:'炉',hp:260,heat:3,cost:{steel:60,stone:40},pop:2,power:0,spec:'内政',grp:'prod',req:'furnace',desc:'魔核のエネルギーを取り出してエーテル結晶を精製する（魔核 −2 → エーテル結晶 +4／T）。魔核が尽きると止まる'};
 B.totem={name:'呪骸の柱',glyph:'呪',hp:420,heat:1,cost:{stone:40,mat:30},pop:0,power:0,spec:'工兵',grp:'def',req:'totem',desc:'魔物の骨で組んだ呪いの柱。周り6マスの魔物の足を30%遅くし、攻撃の間隔を伸ばす（与える被害 −25%）'};
+/* ランクⅣ〜Ⅶの防衛施設（2026-11-13・絵は仮のアイコン。費用・弾は仮） */
+B.barrier={name:'バリアストーン',glyph:'障',hp:400,heat:1,cost:{steel:60,stone:80,elec:30,gold:40},pop:1,power:0,spec:'守備',grp:'def',req:'barrierst',desc:'周り5マスの施設にシールド（ダメージを吸う光の膜・1つにつき200）を張る。割れたシールドはエーテルを使って少しずつ張り直す。自分では攻撃しない',aura:5,shield:200};
+B.tesla={name:'テスラタワー',glyph:'雷',hp:450,heat:1,cost:{steel:80,stone:60,alloy:10,elec:20,gold:60},pop:2,power:0,spec:'守備',grp:'def',req:'teslat',desc:'電気で攻撃する塔。稲妻が魔物から魔物へ跳ねる（4体まで・跳ねるごとに弱くなる）。群れに強く、大きな魔物1体には弱い。空の敵も撃てる。エーテルを使う',range:5,dmg:90,rate:2.5,chain:4,direct:true,antiAir:true,ammoKey:'elec',ammoUse:0.3};
+B.harpoon={name:'ハープーンランチャー',glyph:'銛',hp:500,heat:1,cost:{steel:120,stone:60,iron:60,alloy:15,gold:60},pop:3,power:0,spec:'守備',grp:'def',req:'harpoont',desc:'魔法で軽くした重い銛を撃ち、刺さると重くする。刺さった魔物は動けなくなり（2秒）、刺さっている間少しずつダメージ。空を飛ぶ魔物は地面に引きずり降ろす。ボスには刺さらない（ダメージだけ）。射程6',range:6,dmg:120,rate:3.5,harpoon:true,direct:true,antiAir:true,ammoKey:'iron',ammoUse:1};
+B.mray={name:'ミスリルレイ',glyph:'光',hp:500,heat:1,cost:{steel:100,stone:80,alloy:20,elec:40,gold:80},pop:2,power:0,spec:'守備',grp:'def',req:'mrayt',desc:'聖銀の結晶から光線を出す。同じ相手に当て続けるほど強くなる（最初は1秒に40、5秒たつと1秒に200）。相手を変えると最初から。大きな魔物に強く、群れに弱い。空の敵も撃てる。射程6',range:6,dmg:40,rate:0.2,beam:true,direct:true,antiAir:true,ammoKey:'elec',ammoUse:0.05};
+B.dbreath={name:'ドラゴンブレス',glyph:'竜',hp:600,heat:2,cost:{steel:120,stone:80,alloy:30,mat:40,gold:100},pop:3,power:0,spec:'守備',grp:'def',req:'dbreatht',desc:'竜晶を燃やす火炎放射器。射程は短いが、前の扇形の魔物をまとめて焼き、焼かれた魔物は燃え続ける。射程4',range:4,dmg:45,rate:0.3,cone:true,direct:true,ammoKey:'mat',ammoUse:0.1};
 B.mabou={name:'魔弾砲',glyph:'魔',hp:340,heat:2,cost:{steel:100,iron:60,mat:30,gold:60},pop:4,power:0,spec:'守備',grp:'def',req:'mabou',desc:'エーテル結晶を撃ち出す直射砲。射程内でいちばん硬い敵（トロール・シーカー・キングなど）を狙って大ダメージ。エーテル結晶を1発1つ使う',range:6,dmg:200,rate:2.9,pierce:true,direct:true,ammoKey:'elec',ammoUse:1};
 B.powder={name:'火薬工房',glyph:'薬',hp:220,heat:3,cost:{steel:80,stone:40,gold:30},pop:3,power:0,spec:'内政',grp:'prod',req:'gunpowder',desc:'木材を焼いた木炭と魔物の脂（魔核）から火薬を作る（木材 −6・魔核 −1 → 火薬 +6／T）。大砲・迫撃砲・砲兵隊が使う'};
 B.mortar={name:'迫撃砲',glyph:'迫',hp:280,heat:2,cost:{steel:100,iron:80,stone:40,gold:80},pop:4,power:0,spec:'守備',grp:'def',req:'mortar',desc:'投石機の上位。火薬で石の砲弾を高く打ち上げる曲射砲。射程がとても長く、着弾点を大きく吹き飛ばす。壁や味方の建物越しに撃てる（山は越えられない）。最低射程4マス。1発ごとに石材1・火薬1',range:9.5,minRange:2,dmg:120,rate:3.4,splash:1.9,ammoKey:'stone',ammoUse:1,ammo2:{powder:1}};
@@ -1812,6 +1818,10 @@ const KC={   // 改築の段：[ランク, 名前]。1つ目は建てたとき�
  gate:{g:'def',st:[[1,'木の門'],[2,'石の門'],[4,'鉄の門'],[5,'魔金属の門'],[7,'龍鱗の門']]},
  bastion:{g:'def',st:[[3,'櫓台'],[5,'魔金属の櫓台']]},
  magetower:{g:'magic',st:[[4,'メイジの塔'],[5,'魔金属の塔'],[7,'竜晶の塔']]},
+ barrier:{g:'magic',st:[[4,'バリアストーン'],[6,'聖銀のバリアストーン']]},
+ tesla:{g:'magic',st:[[5,'テスラタワー'],[7,'竜晶のテスラタワー']]},
+ harpoon:{g:'def',st:[[5,'ハープーンランチャー'],[6,'聖銀の銛のランチャー']]},
+ mray:{g:'magic',st:[[6,'ミスリルレイ'],[7,'竜晶のレイ']]},
  well:{g:'magic',st:[[4,'エーテル採掘所'],[5,'深いエーテル採掘所']]},
  magic:{g:'magic',st:[[4,'魔導院'],[6,'大魔導院']]},
 };
@@ -1929,6 +1939,7 @@ for(const k of ['fence','swall','wall']){const c=B[k].cost;for(const r in c)c[r]
 const GUN_TYPES=['mg','how','cannon','mabou','hisou','tower','magetower','field','mortar','hvy','mlrs','rail'];
 /* 壁の上位（2026-11-12）：城壁の上に重ねて置くと置き換わる。城壁と同じく上に防衛施設を置ける */
 const WALL_UP=[['wall3','魔金属の壁',1500,'mwall','#a774ec',{stone:30,alloy:8,mat:6,gold:20}],['wall5','龍鱗の壁',2100,'dragwall','#5a8a6a',{stone:40,alloy:10,mat:12,gold:30}]];   /* 壁の段：Ⅰ木の柵・Ⅱ石の壁・Ⅲ城壁・Ⅴ魔金属の壁・Ⅶ龍鱗の壁（2026-11-13） */
+for(const [k,t] of [['barrier',4],['tesla',5],['harpoon',5],['mray',6],['dbreath',7]])if(B[k])B[k].tier=t;
 for(const [k,n,hp,rq,col,cost] of WALL_UP)B[k]=Object.assign({},B.wall,{name:n,hp,req:rq,cost,wcol:col,tier:{wall3:5,wall5:7}[k],desc:n+'。城壁（と下の段の壁）の上に重ねて置くと置き換わる。上に防衛施設を置ける'});
 const CWALL=new Set(['wall',...WALL_UP.map(w=>w[0])]);
 const WALL_TYPES=['fence','swall','wall',...WALL_UP.map(w=>w[0])];
@@ -2093,6 +2104,11 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館か所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
  set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
+ set('barrierst',{cat:'防衛',tier:4,name:'バリアストーン',cost:{stone:120,elec:60,gold:80},t:4,pre:[],icon:'barrier',eff:'「バリアストーン」を建設できる（周りの施設にシールドを張る）'});
+ set('teslat',{cat:'防衛',tier:5,name:'テスラタワー',cost:{steel:150,alloy:30,elec:60,gold:100},t:5,pre:[],icon:'tesla',eff:'「テスラタワー」を建設できる（稲妻が魔物から魔物へ跳ねる）'});
+ set('harpoont',{cat:'防衛',tier:5,name:'ハープーンランチャー',cost:{steel:150,iron:80,alloy:30,gold:100},t:5,pre:[],icon:'harpoon',eff:'「ハープーンランチャー」を建設できる（刺さると動けなくする銛。空の魔物は地面に落とす）'});
+ set('mrayt',{cat:'防衛',tier:6,name:'ミスリルレイ',cost:{steel:180,alloy:40,elec:80,gold:120},t:5,pre:[],icon:'mray',eff:'「ミスリルレイ」を建設できる（当て続けるほど強くなる光線）'});
+ set('dbreatht',{cat:'防衛',tier:7,name:'ドラゴンブレス',cost:{steel:200,alloy:50,mat:60,gold:150},t:6,pre:[],icon:'dbreath',eff:'「ドラゴンブレス」を建設できる（扇形に焼く火炎放射器）'});
  set('masonry',{tier:2});set('castle',{tier:3});   /* 壁の段：石の壁はⅡ、城壁はⅢ（2026-11-13） */
  set('mwall',{cat:'防衛',tier:5,name:'魔金属の壁',cost:{stone:100,alloy:30,mat:20,gold:60},t:4,pre:['castle'],icon:'wall3',eff:'「魔金属の壁」を建設できる（耐久1500。城壁の上に重ねて置くと置き換わる。上に防衛施設を置ける）'});
  set('dragwall',{cat:'防衛',tier:7,name:'龍鱗の壁',cost:{stone:150,alloy:50,mat:40,gold:100},t:6,pre:['mwall'],icon:'wall5',eff:'「龍鱗の壁」を建設できる（耐久2100。いちばん硬い）'});
@@ -2998,6 +3014,12 @@ Object.assign(WICON,{
   advSword:cbAdvSword(),advBow:cbAdvBow(),advMage:cbAdvMage(),
 });
 
+Object.assign(WICON,{
+ barrier:`<rect x="8" y="5" width="8" height="17" fill="#6a7088" stroke="#1c1824"/><path d="M10 9 H14 M10 13 H14 M10 17 H14" stroke="#62c6d9"/><circle cx="12" cy="12" r="10" fill="none" stroke="#62c6d9" stroke-opacity=".5"/>`,
+ tesla:`<rect x="9" y="9" width="6" height="14" fill="#8c86a6" stroke="#1c1824"/><path d="M8 9 H16 M8 7 H16 M9 5 H15" stroke="#c8884a" stroke-width="1.5"/><circle cx="12" cy="3.5" r="2.5" fill="#e8d0ff"/><path d="M15 4 L19 7 L17 8 L21 11" stroke="#d8b8ff" fill="none"/>`,
+ harpoon:`<rect x="4" y="13" width="16" height="7" fill="#6a4a2a" stroke="#1c1824"/><path d="M3 12 L21 8" stroke="#c0c8d4" stroke-width="2.5"/><path d="M21 8 L17 6 L18 10Z" fill="#e8eef6"/><path d="M5 12 Q3 16 6 19" stroke="#8a8a90" fill="none"/>`,
+ mray:`<rect x="9" y="10" width="6" height="13" fill="#d8dce8" stroke="#1c1824"/><path d="M12 2 L16 8 L12 11 L8 8Z" fill="#f6faff" stroke="#9ab0d0"/><circle cx="12" cy="7" r="6" fill="#f6faff" fill-opacity=".25"/>`,
+ dbreath:`<rect x="4" y="12" width="12" height="10" fill="#5a3a3a" stroke="#1c1824"/><path d="M14 9 L22 12 L14 15 Z" fill="#7a2a2a" stroke="#1c1824"/><circle cx="10" cy="15" r="2" fill="#e05a4e"/><path d="M22 12 L24 10 M22 12 L24 14" stroke="#ffb040"/>`});
 const ICIMG={};for(const k in WICON){const im=new Image();im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">${WICON[k]}</svg>`);ICIMG[k]=im;}
 
 // ===== 建物アイコン（マップ・建設ボタン・詳細の絵で共通） =====
@@ -3406,7 +3428,7 @@ function heroSkills(c){const L=SKILLS[c.spec]||[];if(!L.length)return [];if(!c.s
 // 配属先 o の英雄が、適任でスキル id を覚えているか
 function heroSk(o,id){const c=cmdOf(o);if(!c||match(c,o)<1)return false;return heroSkills(c).some(k=>k.id===id);}
 function posOfObj(o){if(o.kind==='s'){if(o.gar){const t=S.blds.find(b=>b.id===o.gar);if(t)return [bcx(t),bcy(t)];}return [o.x,o.y];}return [bcx(o),bcy(o)];}
-function enemiesIn(x,y,r,ground){const o=[];for(const e of S.enemies){if(e.hp<=0)continue;if(ground&&E[e.type].fly)continue;if(Math.hypot(e.x-x,e.y-y)<=r)o.push(e);}return o;}
+function enemiesIn(x,y,r,ground){const o=[];for(const e of S.enemies){if(e.hp<=0)continue;if(ground&&isFly(e))continue;if(Math.hypot(e.x-x,e.y-y)<=r)o.push(e);}return o;}
 function densest(x,y,r,rad){let best=null,bn=0;const cs=enemiesIn(x,y,r).filter(seenE);for(const e of cs){let n=0;for(const o of cs)if(Math.hypot(o.x-e.x,o.y-e.y)<rad)n++;if(n>bn){bn=n;best=e;}}return best;}
 // スキルの効果範囲（旧タイル単位）。self＝英雄の周り、reach＝狙える距離、hit＝着弾点の広さ
 function skillArea(k,o){const rg=o&&o.kind==='s'?unitRange(o):null;switch(k.id){
@@ -3449,7 +3471,7 @@ function skillTick(dt){
       else if(k.id==='sogeki'){const rg=(o.kind==='s'?unitRange(o):6)*1.5*TU;let tg=null;for(const e of enemiesIn(x,y,rg))if(seenE(e)&&(!tg||e.hp>tg.hp))tg=e;if(tg){hitEnemy(tg,300*pm,o,true);S.shots.push({x,y,tx:tg.x,ty:tg.y,t:0,dur:0.25,arrow:true,big:true});S.fx.push({x:tg.x,y:tg.y,r:10,t:0,dur:0.3,c:'#ffffff'});used=true;}}
       else if(k.id==='totsu'&&o.kind==='s'){let tg=null,bd=5*TU;for(const e of enemiesIn(x,y,5*TU,true))if(seenE(e)){const d=Math.hypot(e.x-x,e.y-y);if(d<bd){bd=d;tg=e;}}
         if(tg){const a=Math.atan2(tg.y-y,tg.x-x),L=Math.min(3*TU,bd+TU*0.5);let ex=x,ey=y;for(let st=0;st<12;st++){const nx=x+Math.cos(a)*L*(st+1)/12,ny=y+Math.sin(a)*L*(st+1)/12;if(allyBlockAt(Math.floor(nx/T),Math.floor(ny/T)))break;ex=nx;ey=ny;}
-          for(const e of S.enemies)if(e.hp>0&&!E[e.type].fly&&segDist(e.x,e.y,x,y,ex,ey)<0.8*TU)hitEnemy(e,sd*2*pm,o);o.x=ex;o.y=ey;S.shots.push({x,y,tx:ex,ty:ey,t:0,dur:0.25,c:col,w:3});used=true;}}
+          for(const e of S.enemies)if(e.hp>0&&!isFly(e)&&segDist(e.x,e.y,x,y,ex,ey)<0.8*TU)hitEnemy(e,sd*2*pm,o);o.x=ex;o.y=ey;S.shots.push({x,y,tx:ex,ty:ey,t:0,dur:0.25,c:col,w:3});used=true;}}
       else if(k.id==='kaen'){const tg=densest(x,y,((o.kind==='s'?unitRange(o):5)+1)*TU,1.2*TU);if(tg){for(const e of enemiesIn(tg.x,tg.y,1.2*TU))hitEnemy(e,80*pm,o);S.fx.push({x:tg.x,y:tg.y,r:1.2*TU,t:0,dur:0.4,c:'#ff8a3a'});S.shots.push({x,y,tx:tg.x,ty:tg.y,t:0,dur:0.2,c:'#ffb04a',w:3});used=true;}}
       else if(k.id==='rai'){const rg=((o.kind==='s'?unitRange(o):5)+1)*TU;let cur=[x,y];const hit=new Set();for(let i=0;i<5;i++){let tg=null,bd=i?3*TU:rg;for(const e of S.enemies){if(e.hp<=0||hit.has(e)||!seenE(e))continue;const d=Math.hypot(e.x-cur[0],e.y-cur[1]);if(d<bd){bd=d;tg=e;}}if(!tg)break;hit.add(tg);hitEnemy(tg,60*pm,o);S.shots.push({x:cur[0],y:cur[1],tx:tg.x,ty:tg.y,t:0,dur:0.25,c:'#c8e8ff',w:2});cur=[tg.x,tg.y];}used=hit.size>0;}
       else if(k.id==='inseki'){const tg=densest(x,y,8*TU,2.5*TU);if(tg){for(const e of enemiesIn(tg.x,tg.y,2.5*TU)){hitEnemy(e,300*pm,o,true);if(!E[e.type].boss)e.stun=Math.max(e.stun||0,2);}S.fx.push({x:tg.x,y:tg.y,r:2.5*TU,t:0,dur:0.7,c:'#ff6a3a'});se('boom');used=true;}}
@@ -3757,7 +3779,7 @@ function drawTents(c,an,burnt){
     const g=ctx.createRadialGradient(fx,fy,2,fx,fy,TU*1.6);g.addColorStop(0,'rgba(255,150,60,.25)');g.addColorStop(1,'rgba(255,150,60,0)');ctx.fillStyle=g;ctx.fillRect(fx-TU*1.6,fy-TU*1.6,TU*3.2,TU*3.2);}
   ctx.restore();
 }
-function startWave(){phaseReset();S.barrier=(S.baseLv||1)>=5?barrierMax():0;
+function startWave(){phaseReset();S._barT=0;for(const b of S.blds||[])b.shield=null;S.barrier=(S.baseLv||1)>=5?barrierMax():0;
   S.wave++;if(S.mapId==='s'&&S.wave>=8&&!S.frozen)freezeRivers();S.waveActive=true;S.waveKills=0;S.subShown=-1;S.wled={};for(const b of S.blds){b.wlast=b.wuse;b.wuse=null;}
   S.cur=S.next;S.qi=0;S.waveT=0;S._mmT=null;S.navalLeft=0;S.waveStart={kia:S.kia,mat:S.mat,fallen:S.fallen.length,bld:S.bldLost};
   log(`第${S.wave}襲撃 接近！${S.wave===finalWave()?' — 最後の夜':''}`,'warn');
@@ -4214,7 +4236,7 @@ function cavCharge(s,dt){const c=s.chg;
   if(allyBlockAt(gx,gy)&&!(gx===Math.floor(s.x/T)&&gy===Math.floor(s.y/T)))return chgEnd(s,'壁');
   (S.dust=S.dust||[]).push({x:s.x,y:s.y,t:0});
   const mul=[has('charge')?4:3,2];const moutotsu=heroSk(s,'moutotsu');
-  for(const e of S.enemies){if(e.hp<=0||E[e.type].fly||c.hit.has(e))continue;if(segDist(e.x,e.y,s.x,s.y,nx,ny)>0.7*TU)continue;
+  for(const e of S.enemies){if(e.hp<=0||isFly(e)||c.hit.has(e))continue;if(segDist(e.x,e.y,s.x,s.y,nx,ny)>0.7*TU)continue;
     c.hit.add(e);const m=mul[c.n]||1;c.n++;hitEnemy(e,unitDmg(s)*m,s);if(moutotsu&&!E[e.type].boss)e.stun=Math.max(e.stun||0,1);
     if(CHG_BIG.has(e.type)){damageSquad(s,s.maxhp*0.05);S.fx.push({x:e.x,y:e.y,r:0.8*TU,t:0,dur:0.35,c:'#ffd070'});s.x=nx;s.y=ny;return chgEnd(s,'大物');}
     // 小さな魔物は横へはじき飛ばす
@@ -4240,7 +4262,7 @@ function squadAI(s,dt,firing){
   }
   if(s.tx!=null){if(stepTo(s,s.tx,s.ty,dt,firing))s.tx=null;return;}
   if(s.mode==='guard'){
-    let tg=null,bd=6*TU;const ats=MT(s).antiSub,aa=MT(s).antiAir||eqHas(s,'aa');for(const e of S.enemies){if(e.sub&&!ats)continue;if(E[e.type].fly&&!aa)continue;if(!seenE(e))continue;const d=Math.hypot(e.x-s.ax,e.y-s.ay);if(d<bd){bd=d;tg=e;}}
+    let tg=null,bd=6*TU;const ats=MT(s).antiSub,aa=MT(s).antiAir||eqHas(s,'aa');for(const e of S.enemies){if(e.sub&&!ats)continue;if(isFly(e)&&!aa)continue;if(!seenE(e))continue;const d=Math.hypot(e.x-s.ax,e.y-s.ay);if(d<bd){bd=d;tg=e;}}
     // 迎撃：柵や壁の向こうの敵には回り込んで斬りかかる（壁越しに突くのは固守のとき）
     if(tg){if(firing&&!s._ow){}else if(Math.hypot(tg.x-s.x,tg.y-s.y)>unitRange(s)*TU*0.8||s._ow)stepTo(s,tg.x,tg.y,dt,false);}
     else if(Math.hypot(s.ax-s.x,s.ay-s.y)>4)stepTo(s,s.ax,s.ay,dt,false);
@@ -4248,8 +4270,8 @@ function squadAI(s,dt,firing){
   // 固守：近接部隊は、待機地点から3マス以内の柵・壁の向こうに敵が来たら、柵ぎわまで寄って突く。いなくなれば待機地点へ戻る
   if(s.mode==='hold'&&unitRange0(s)<2&&!eqHas(s,'arrow')){
     let wf=null,bd=(3+2.6)*TU;
-    if(!firing||s._ow)for(const e of S.enemies){if(E[e.type].fly||!seenE(e)||e.hp<=0)continue;const dd=Math.hypot(e.x-s.ax,e.y-s.ay);if(dd>=bd)continue;const f=wallFront({x:s.ax,y:s.ay},e);if(f&&Math.hypot(f[0]-s.ax,f[1]-s.ay)<=3*TU){bd=dd;wf=f;}}
-    if(wf){s.holdWF=wf;s.holdT=2.5;}else if(firing||S.enemies.some(e=>!E[e.type].fly&&e.hp>0&&Math.hypot(e.x-s.ax,e.y-s.ay)<(3+2.6)*TU))s.holdT=Math.max(s.holdT||0,0.5);
+    if(!firing||s._ow)for(const e of S.enemies){if(isFly(e)||!seenE(e)||e.hp<=0)continue;const dd=Math.hypot(e.x-s.ax,e.y-s.ay);if(dd>=bd)continue;const f=wallFront({x:s.ax,y:s.ay},e);if(f&&Math.hypot(f[0]-s.ax,f[1]-s.ay)<=3*TU){bd=dd;wf=f;}}
+    if(wf){s.holdWF=wf;s.holdT=2.5;}else if(firing||S.enemies.some(e=>!isFly(e)&&e.hp>0&&Math.hypot(e.x-s.ax,e.y-s.ay)<(3+2.6)*TU))s.holdT=Math.max(s.holdT||0,0.5);
     s.holdT=(s.holdT||0)-dt;if(s.holdT<=0)s.holdWF=null;
     const hw=s.holdWF;
     if(hw){if(Math.hypot(hw[0]-s.x,hw[1]-s.y)>TU*0.25&&!(firing&&s._ow))stepTo(s,hw[0],hw[1],dt,false);}
@@ -4337,13 +4359,14 @@ function update(dt,sim){
     const g=gunOf(b);
     if(g&&!sim){
       const ef=eff(b);if(ef<=0)continue;
+      if(g.beam){beamTick(b,g,dt,ef);continue;}
       const gm=gunMods(b);
       b.cd-=dt*(bn.rate+gm.rate-1+0.15*lvl('autoload')+(b.boostT>0?(b.boostR||0.5):0))*(0.3+0.7*pr)*ef;
       if(b.cd<=0){
         const cx=bcx(b),cy=bcy(b);let tg=null,td=rangeOf(b)*TU,los=1;
         const minR=(g.minRange||0)*TU,dir=isDirect(b);
         // 射程内の候補を近い順（電磁投射砲は硬い順）に並べ、直射砲は射線が通るものを選ぶ
-        const cand=[];for(const e of S.enemies){if(e.sub)continue;if(E[e.type].fly&&!g.antiAir)continue;if(g.airOnly&&!E[e.type].fly)continue;if(!seenE(e))continue;const dd=Math.hypot(e.x-cx,e.y-cy);if(dd<td&&dd>=minR)cand.push([g.pierce?-e.hp:dd,e]);}
+        const cand=[];for(const e of S.enemies){if(e.sub)continue;if(isFly(e)&&!g.antiAir)continue;if(g.airOnly&&!isFly(e))continue;if(!seenE(e))continue;const dd=Math.hypot(e.x-cx,e.y-cy);if(dd<td&&dd>=minR)cand.push([g.pierce?-e.hp:dd,e]);}
         if(cand.length){cand.sort((a,b2)=>a[0]-b2[0]);
           if(!dir){for(let k=0;k<cand.length&&k<8;k++)if(!mtnBlock(b,cand[k][1].x,cand[k][1].y)){tg=cand[k][1];break;}}else for(let k=0;k<cand.length&&k<8;k++){const f=losFactor(b,cand[k][1].x,cand[k][1].y);if(f>0){tg=cand[k][1];los=f;break;}}}
         const sh=g.shells?SHELL[b.shell&&(!SHELL[b.shell].req||has(SHELL[b.shell].req))?b.shell:'he']:null;
@@ -4370,24 +4393,34 @@ function update(dt,sim){
           }
           else if(g.salvo){for(let i=0;i<g.salvo;i++){const a=Math.random()*7,rr=TU*Math.random()*1.8;S.navShells.push({x:tg.x+Math.cos(a)*rr,y:tg.y+Math.sin(a)*rr,t:0,delay:0.35+i*0.12,dmg:dm,splash:g.splash*TU,src:b});}
             S.shots.push({x:cx,y:cy,tx:tg.x,ty:tg.y,t:0,dur:0.35,c:'#ffb14e',w:2});}
+          else if(g.chain){/* テスラタワー：稲妻が4体まで跳ねる */let cur=tg,prev={x:cx,y:cy-10};const hit=new Set();
+            for(let k=0;k<g.chain&&cur;k++){hitEnemy(cur,dm*[1,0.8,0.6,0.45][k],b);hit.add(cur);S.shots.push({x:prev.x,y:prev.y,tx:cur.x,ty:cur.y,t:0,dur:0.18,c:'#e0c8ff',w:2,zig:true});prev=cur;let nx=null,nd=2.5*TU;
+              for(const e of S.enemies){if(hit.has(e)||e.hp<=0)continue;const d2=Math.hypot(e.x-cur.x,e.y-cur.y);if(d2<nd){nd=d2;nx=e;}}cur=nx;}se('rail');}
+          else if(g.harpoon){/* ハープーン：刺さるとダメージ＋スタン＋持続ダメージ・空を落とす（ボスはダメージだけ） */hitEnemy(tg,dm,b);
+            if(!E[tg.type].boss){tg.stun=Math.max(tg.stun||0,2);tg.harpT=2;tg.harpD=dm*0.15;if(E[tg.type].fly)tg.down=4;}
+            S.shots.push({x:cx,y:cy,tx:tg.x,ty:tg.y,t:0,dur:0.25,c:'#c0c8d4',w:3});se('mg');}
+          else if(g.cone){/* ドラゴンブレス：前の扇形をまとめて焼く・燃え続ける */const a0=Math.atan2(tg.y-cy,tg.x-cx),L=rangeOf(b)*TU;
+            for(const e of S.enemies){if(e.hp<=0||isFly(e))continue;const dx=e.x-cx,dy=e.y-cy,d2=Math.hypot(dx,dy);if(d2>L)continue;let da=Math.abs(Math.atan2(dy,dx)-a0);if(da>Math.PI)da=2*Math.PI-da;if(da>0.55)continue;
+              hitEnemy(e,dm,b);e.psn=(e.psn||0)+dm*0.5;e.psnR=Math.max(e.psnR||0,e.psn/3);}
+            for(let k=0;k<4;k++){const aa=a0+(Math.random()-.5)*1.0,rr=L*(0.4+0.6*Math.random());S.fx.push({x:cx+Math.cos(aa)*rr,y:cy+Math.sin(aa)*rr,r:TU*0.5,t:0,dur:0.3,c:'#ff8a3a'});}}
           else if(g.balloon){S.shots.push({balloon:true,bx:cx,by:cy-10,x:cx,y:cy,tx:tg.x,ty:tg.y,tg,t:0,dur:1,dmg:dm,splash:g.splash*gm.splash*TU,src:b});se('how');}
           else if(g.splash)S.shots.push({x:cx,y:cy,tx:tg.x,ty:tg.y,t:0,dur:g.flat?0.25:0.7,flat:!!g.flat,shell:true,dmg:dm*(sh&&has('heplus')?1.2:1),splash:g.splash*gm.splash*TU*(g.shells?2*(has('heplus')?1.4:1):1),src:b,cluster:gm.cluster});
           else if(g.airOnly){
             // 飛槍車：槍を一斉に打ち上げ、狙った敵の周り1.5マスの空の敵にまとめて当てる
-            for(const e of S.enemies)if(E[e.type].fly&&e.hp>0&&Math.hypot(e.x-tg.x,e.y-tg.y)<1.5*TU)hitEnemy(e,dm,b);
+            for(const e of S.enemies)if(isFly(e)&&e.hp>0&&Math.hypot(e.x-tg.x,e.y-tg.y)<1.5*TU)hitEnemy(e,dm,b);
             for(let k=0;k<8;k++){const a=Math.random()*7,r=Math.random()*1.4*TU;S.shots.push({x:cx+(k-4)*2,y:cy-6,tx:tg.x+Math.cos(a)*r,ty:tg.y+Math.sin(a)*r,t:0,dur:0.3,arrow:true});}se('mg');
           }
           else if(g.bolt){
             // 重い矢：狙った敵を射抜き、その後ろ2マス以内の敵1体まで貫く
             const a=Math.atan2(tg.y-cy,tg.x-cx),ex=tg.x+Math.cos(a)*2*TU,ey=tg.y+Math.sin(a)*2*TU;
-            hitEnemy(tg,dm,b);let back=null,bd=1e9;for(const e of S.enemies){if(e===tg||e.hp<=0||E[e.type].fly!==E[tg.type].fly)continue;if(segDist(e.x,e.y,tg.x,tg.y,ex,ey)<E[e.type].r+5){const d=Math.hypot(e.x-tg.x,e.y-tg.y);if(d<bd){bd=d;back=e;}}}
+            hitEnemy(tg,dm,b);let back=null,bd=1e9;for(const e of S.enemies){if(e===tg||e.hp<=0||isFly(e)!==E[tg.type].fly)continue;if(segDist(e.x,e.y,tg.x,tg.y,ex,ey)<E[e.type].r+5){const d=Math.hypot(e.x-tg.x,e.y-tg.y);if(d<bd){bd=d;back=e;}}}
             if(back)hitEnemy(back,dm*0.7,b);
             S.shots.push({x:cx,y:cy,tx:(back||tg).x,ty:(back||tg).y,t:0,dur:0.22,arrow:true,big:true});se('mg');
           }
           else if(g.cannon){
             // 砲弾：射線上の敵を最大4体まで貫く（奥ほど威力減。装甲無視はやめた・2026-11-12）
             const a=Math.atan2(tg.y-cy,tg.x-cx),L=rangeOf(b)*TU,ex=cx+Math.cos(a)*L,ey=cy+Math.sin(a)*L;
-            const hit=S.enemies.filter(e=>!E[e.type].fly&&segDist(e.x,e.y,cx,cy,ex,ey)<E[e.type].r+6).sort((p,q)=>Math.hypot(p.x-cx,p.y-cy)-Math.hypot(q.x-cx,q.y-cy)).slice(0,4);
+            const hit=S.enemies.filter(e=>!isFly(e)&&segDist(e.x,e.y,cx,cy,ex,ey)<E[e.type].r+6).sort((p,q)=>Math.hypot(p.x-cx,p.y-cy)-Math.hypot(q.x-cx,q.y-cy)).slice(0,4);
             hit.forEach((e,i)=>hitEnemy(e,dm*[1,0.75,0.55,0.4][i],b,false));
             const last=hit.length?hit[hit.length-1]:tg;
             S.shots.push({x:cx,y:cy,tx:last.x,ty:last.y,t:0,dur:0.2,c:'#2a2a2a',w:4});
@@ -4406,10 +4439,14 @@ function update(dt,sim){
       }
     }
   }
+  // バリアストーン：周りの施設にシールド。割れたらエーテルを使って張り直す
+  if(S.waveActive){S._barT=(S._barT||0)-dt;if(S._barT<=0){S._barT=1;const bs=S.blds.filter(b=>b.type==='barrier'&&!(b.bt>0&&!b.upg)&&eff(b)>0);
+    for(const o of S.blds)o.shMax=0;for(const b of bs){const r=B.barrier.aura*TU,mx=B.barrier.shield*UP.hp[(b.lv||1)-1];for(const o of S.blds){if(o.type==='barrier'||WALL_TYPES.includes(o.type))continue;if(Math.hypot(bcx(o)-bcx(b),bcy(o)-bcy(b))<=r)o.shMax=Math.max(o.shMax||0,mx);}}}
+    for(const o of S.blds){if(!o.shMax){o.shield=0;continue;}if(o.shield==null)o.shield=o.shMax;if((o.shield||0)<o.shMax&&(S.elec||0)>0){const add=Math.min(o.shMax-(o.shield||0),20*dt);o.shield=(o.shield||0)+add;S.elec-=add*0.01;}}}
   // 部隊
   for(const s of S.squads){
     if(s.ut==='guard'&&!sim){const hq=hqOf();if(hq){const [qx,qy]=castleC(hq);
-      const threat=S.waveActive&&S.enemies.some(e=>!E[e.type].fly&&e.hp>0&&Math.hypot(e.x-qx,e.y-qy)<6*TU);
+      const threat=S.waveActive&&S.enemies.some(e=>!isFly(e)&&e.hp>0&&Math.hypot(e.x-qx,e.y-qy)<6*TU);
       if(s.gar===hq.id){s.hp=Math.min(s.maxhp,s.hp+30*dt);if(threat&&!s.stayIn){s.gar=null;s.x=qx;s.y=qy+1.4*TU;s.mode='guard';s.ax=qx;s.ay=qy+1.4*TU;s.tx=null;}}
       else if(!s.gar&&!s.stayOut&&!threat&&Math.hypot(s.x-qx,s.y-qy)<2.8*TU){s.inT=(s.inT||0)+dt;if(s.inT>2.5){s.inT=0;s.gar=hq.id;}}
       else if(!s.gar){s.inT=0;if(!s.stayOut&&!threat&&s.tx==null&&s.mode!=='return'&&Math.hypot(s.x-qx,s.y-qy)>=2.8*TU){s.ax=qx;s.ay=qy+1.4*TU;}}}}
@@ -4420,11 +4457,11 @@ function update(dt,sim){
     const t=MT(s);
     let tg=null,td=unitRange(s)*TU;
     const sAA=t.antiAir||eqHas(s,'aa');
-    if(t.hard||eqHas(s,'hard')){let bh=-1;for(const e of S.enemies){if(e.sub&&!t.antiSub)continue;if(E[e.type].fly&&!sAA)continue;if(!seenE(e))continue;const dd=Math.hypot(e.x-s.x,e.y-s.y);if(dd<td&&e.hp>bh){bh=e.hp;tg=e;}}}
-    else for(const e of S.enemies){if(e.sub&&!t.antiSub)continue;if(E[e.type].fly&&!sAA)continue;if(!seenE(e))continue;const dd=Math.hypot(e.x-s.x,e.y-s.y);if(dd<td){td=dd;tg=e;}}
+    if(t.hard||eqHas(s,'hard')){let bh=-1;for(const e of S.enemies){if(e.sub&&!t.antiSub)continue;if(isFly(e)&&!sAA)continue;if(!seenE(e))continue;const dd=Math.hypot(e.x-s.x,e.y-s.y);if(dd<td&&e.hp>bh){bh=e.hp;tg=e;}}}
+    else for(const e of S.enemies){if(e.sub&&!t.antiSub)continue;if(isFly(e)&&!sAA)continue;if(!seenE(e))continue;const dd=Math.hypot(e.x-s.x,e.y-s.y);if(dd<td){td=dd;tg=e;}}
     // 近接部隊は、壁をはさんだ向こうの敵にも槍で突ける（射程+1マス・威力60%）
     let overWall=false;
-    if(!tg&&unitRange0(s)<2&&!eqHas(s,'arrow')){let bd=(unitRange(s)+1.1)*TU;for(const e of S.enemies){if(E[e.type].fly||!seenE(e))continue;const dd=Math.hypot(e.x-s.x,e.y-s.y);if(dd>=bd)continue;const mx=Math.floor((s.x+e.x)/2/T),my=Math.floor((s.y+e.y)/2/T);const wb=S.grid[my]&&S.grid[my][mx];if(wb&&(WALL_TYPES.includes(wb.type)||wb.type==='gate')){bd=dd;tg=e;overWall=true;}}}
+    if(!tg&&unitRange0(s)<2&&!eqHas(s,'arrow')){let bd=(unitRange(s)+1.1)*TU;for(const e of S.enemies){if(isFly(e)||!seenE(e))continue;const dd=Math.hypot(e.x-s.x,e.y-s.y);if(dd>=bd)continue;const mx=Math.floor((s.x+e.x)/2/T),my=Math.floor((s.y+e.y)/2/T);const wb=S.grid[my]&&S.grid[my][mx];if(wb&&(WALL_TYPES.includes(wb.type)||wb.type==='gate')){bd=dd;tg=e;overWall=true;}}}
     s.cd-=dt*bn.rate;
     if(s.gar)continue;
     const sau=t.shootAmmo!=null?t.shootAmmo:1,sak=t.ammoKey||'ammo';const ssp=supOf(s);
@@ -4443,7 +4480,7 @@ function update(dt,sim){
     }
     s.idleT=(s.idleT||0)+dt;
     if(S.waveActive&&has('fieldsup')){const sp2=supOf(s);if(sp2&&s.sup<sp2.max){const home=S.blds.find(b=>(b.type==='hq'||b.type===UT[s.ut].home)&&Math.hypot(bcx(b)-s.x,bcy(b)-s.y)<=4*TU);if(home){const add=Math.min(sp2.max-s.sup,sp2.max*0.04*dt,supAvail(sp2));if(add>0){s.sup+=add;supPay(sp2,add,UT[s.ut].name+'（補給）');}}}}
-    if(has('shieldwall')&&s.model==='heavy'){for(const e of S.enemies){if(E[e.type].fly||e.taunt&&e.taunt!==s&&S.squads.includes(e.taunt))continue;if(Math.hypot(e.x-s.x,e.y-s.y)<2*TU){e.taunt=s;e.tauntT=Math.max(e.tauntT||0,1);}}}
+    if(has('shieldwall')&&s.model==='heavy'){for(const e of S.enemies){if(isFly(e)||e.taunt&&e.taunt!==s&&S.squads.includes(e.taunt))continue;if(Math.hypot(e.x-s.x,e.y-s.y)<2*TU){e.taunt=s;e.tauntT=Math.max(e.tauntT||0,1);}}}
     s._ow=overWall;squadAI(s,dt,!!tg);
   }
   if(sim)return;
@@ -4520,7 +4557,7 @@ function update(dt,sim){
     if(!e.target||!S.blds.includes(e.target)||e.retarget<=0){e.target=chooseTarget(e);e.retarget=1.2;}
     e.cd-=dt*(e.curse?0.75:1);
     // 近くの部隊を追う（喰付型・格闘型）
-    let hunt=(e.tauntT>0&&S.squads.includes(e.taunt)&&!E[e.type].fly)?e.taunt:null;
+    let hunt=(e.tauntT>0&&S.squads.includes(e.taunt)&&!isFly(e))?e.taunt:null;
     if(e.camp&&!hunt)hunt=campHunt(e,false);
     if(!hunt&&!e.camp){let hd=(d.hunt||(d.laser||d.ranged?0:4))*TU;for(const s of S.squads){if(s.gar||s.ut==='ship'||(UT[s.ut].fly&&s.ut!=='mech'))continue;const dd=Math.hypot(s.x-e.x,s.y-e.y);if(dd<hd){hd=dd;hunt=s;}}}
     if(d.laser&&!e.sub&&!e.wp0){
@@ -4578,6 +4615,7 @@ function update(dt,sim){
     let sx=0,sy=0;
     for(const o of S.enemies){if(o===e)continue;const ox=e.x-o.x,oy=e.y-o.y;if(Math.abs(ox)>30||Math.abs(oy)>30)continue;const od=ox*ox+oy*oy;const rr=(d.r+E[o.type].r)*1.1;if(od<rr*rr&&od>0.01){const l=Math.sqrt(od);sx+=ox/l;sy+=oy/l;}}
     const tr=terAt(e.x,e.y);const ev=elevPx(e.x,e.y),fx=Math.floor(e.x/T),fy=Math.floor(e.y/T);const step=(e.far||1)*(e.buff?1.25:1)*(e.curse?0.7:1)*(e.fear||e.slowT>0?0.6:1)*d.spd*dt*(fx>=0&&fy>=0&&fx<COLS&&fy<ROWS&&S.ter[fy][fx]===6?0.55:fx>=0&&fy>=0&&fx<COLS&&fy<ROWS&&S.ter[fy][fx]===10?0.5:1)*FOREST_SLOW[forestAt(fx,fy)]*MARSH_SLOW[marshAt(fx,fy)]*[1,0.9,0.8,0.65][ev];
+    if(e.down>0)e.down-=dt;if(e.harpT>0){e.harpT-=dt;hitEnemy(e,(e.harpD||0)*dt,null);}
     if(e.stun>0){e.stun-=dt;continue;}
     if(e.slowT>0)e.slowT-=dt;
     const nx=e.x+(dx+sx*0.6)*step*(e.slowT>0?0.45:1),ny=e.y+(dy+sy*0.6)*step*(e.slowT>0?0.45:1);
@@ -4594,11 +4632,11 @@ function update(dt,sim){
   }
   // 地雷
   for(const m of S.mines){if(!m.armed)continue;const mx=bcx(m),my=bcy(m),hb=(m.sz||U)*T*0.55;   // hb：踏んだとみなす範囲（半分の幅）
-    if(m.kind==='spike'){if(m.dur==null)m.dur=SPIKE_DUR;for(const e of S.enemies){if(E[e.type].fly||Math.abs(e.x-mx)>hb||Math.abs(e.y-my)>hb)continue;hitEnemy(e,SPIKE_DPS*dt*(has('shell')?1.2:1),null);e.slowT=1;m.dur-=dt;}
+    if(m.kind==='spike'){if(m.dur==null)m.dur=SPIKE_DUR;for(const e of S.enemies){if(isFly(e)||Math.abs(e.x-mx)>hb||Math.abs(e.y-my)>hb)continue;hitEnemy(e,SPIKE_DPS*dt*(has('shell')?1.2:1),null);e.slowT=1;m.dur-=dt;}
       if(m.dur<=0){m.armed=false;m.dur=0;log('トゲ床が踏み壊された（一括修理で直せる）','warn');}continue;}
-    if(m.kind==='bomb'){const hit=S.enemies.find(e=>!E[e.type].fly&&e.hp>0&&Math.abs(e.x-mx)<hb&&Math.abs(e.y-my)<hb);if(hit){m.armed=false;m.used=true;se('boom');S.fx.push({x:mx,y:my,r:TU*2.2,t:0,dur:0.6,c:'#ff9a3a'});S.fx.push({x:mx,y:my,r:TU*1.2,t:0,dur:0.35,c:'#fff0a0'});
+    if(m.kind==='bomb'){const hit=S.enemies.find(e=>!isFly(e)&&e.hp>0&&Math.abs(e.x-mx)<hb&&Math.abs(e.y-my)<hb);if(hit){m.armed=false;m.used=true;se('boom');S.fx.push({x:mx,y:my,r:TU*2.2,t:0,dur:0.6,c:'#ff9a3a'});S.fx.push({x:mx,y:my,r:TU*1.2,t:0,dur:0.35,c:'#fff0a0'});
       for(const o of S.enemies){if(E[o.type].fly)continue;const dd=Math.hypot(o.x-mx,o.y-my);if(dd<TU*2.1)hitEnemy(o,(dd<TU?380:240)*(has('tetsudan')?1.2:1),null,true);}}continue;}
-    if(m.kind==='pit'){if(m.uses==null)m.uses=has('resetpit')?5:3;let fell=0;for(const e of S.enemies){if(E[e.type].fly||e.hp<=0||Math.abs(e.x-mx)>hb*1.1||Math.abs(e.y-my)>hb*1.1)continue;fell++;hitEnemy(e,(e.type==='charger'?1000:420)*(has('yariana')?2:1),null,true);e.stun=4;}
+    if(m.kind==='pit'){if(m.uses==null)m.uses=has('resetpit')?5:3;let fell=0;for(const e of S.enemies){if(isFly(e)||e.hp<=0||Math.abs(e.x-mx)>hb*1.1||Math.abs(e.y-my)>hb*1.1)continue;fell++;hitEnemy(e,(e.type==='charger'?1000:420)*(has('yariana')?2:1),null,true);e.stun=4;}
       if(fell){m.uses--;se('boom');S.fx.push({x:mx,y:my,r:TU,t:0,dur:0.45,c:'#8a6a40'});if(m.uses<=0){m.armed=false;m.used=true;}}continue;}
     for(const e of S.enemies){if(Math.abs(e.x-mx)<hb*1.1&&Math.abs(e.y-my)<hb*1.1){
       m.armed=false;m.used=true;se('boom');S.fx.push({x:mx,y:my,r:TU*1.4,t:0,dur:0.45,c:'#ffb14e'});
@@ -4662,8 +4700,16 @@ function hitEnemy(e,dmg,src,pierce,ap){
 }
 const FEAR_E=new Set(['swarm','charger','redcap','spitter','gobarcher']);
 function barrierMax(){return 1500;}
+function isFly(e){return E[e.type].fly&&!(e.down>0);}   // ハープーンで落とされている間は地上の魔物
+function beamTick(b,g,dt,ef){   // ミスリルレイ：同じ相手に当て続けるほど強く（1秒に40 → 5秒で200）
+  const cx=bcx(b),cy=bcy(b),R0=rangeOf(b)*TU;let tg=b.beamT&&b.beamT.hp>0&&S.enemies.includes(b.beamT)&&Math.hypot(b.beamT.x-cx,b.beamT.y-cy)<R0&&seenE(b.beamT)?b.beamT:null;
+  if(!tg){b.ramp=0;let bd=R0;for(const e of S.enemies){if(e.hp<=0||!seenE(e)||(isFly(e)&&!g.antiAir))continue;const d=Math.hypot(e.x-cx,e.y-cy);if(d<bd&&!mtnBlock(b,e.x,e.y)){bd=d;tg=e;}}b.beamT=tg;}
+  if(!tg)return;const au=(g.ammoUse||0)*dt*10;if((S[g.ammoKey]||0)<au){b.noAmmo=true;return;}S[g.ammoKey]-=au;b.noAmmo=false;
+  b.ramp=Math.min(5,(b.ramp||0)+dt);const dps=dmgB(b)*(1+0.8*b.ramp)*ef;hitEnemy(tg,dps*dt,b);b.ang=Math.atan2(tg.y-cy,tg.x-cx);
+  S.shots.push({x:cx,y:cy-10,tx:tg.x,ty:tg.y,t:0,dur:dt*1.5,c:b.ramp>3?'#ffffff':'#d8ecff',w:1+Math.round(b.ramp)});}
 function damageB(b,dmg,attacker){
   const bn=bonus(b);dmg*=(1-bn.red)*(1-0.1*forestAt(b.x,b.y));
+  if((b.shield||0)>0){const a=Math.min(b.shield,dmg);b.shield-=a;dmg-=a;if(dmg<=0)return;}   /* バリアストーンのシールド */
   if(b.type==='hq'&&(S.baseLv||1)>=5&&(S.barrier||0)>0){const a=Math.min(S.barrier,dmg);S.barrier-=a;dmg-=a;if(S.barrier<=0)log('城の結界が破られた！','warn');if(dmg<=0)return;}
   // 城壁の上の防衛施設：まず土台の城壁が被害を受ける（この間は人員に被害なし）
   if(b.wall){
@@ -5014,7 +5060,7 @@ function econWarnings(e,f){
 let econKey='';
 // 住民の内訳：施設の要員は仕事の名前で、部隊は兵種で数える
 const JOB={miner:'木こり',quarry:'石工',ironmine:'鉱夫',farm:'農夫',fishery:'漁師',well:'エーテル掘り',ammo:'武器鍛冶',powder:'火薬職人',furnace:'精製職人',market:'商人',tavern:'酒場の店員',barracks:'',apart:'',lab:'研究員',
-  mg:'バリスタ兵',how:'投石兵',cannon:'砲手',mortar:'砲手',mabou:'魔弾砲手',tower:'櫓の射手',magetower:'塔の魔術師',hisou:'風船兵',outpost:'砦の守備兵',train:'兵舎の番兵',stable:'馬丁',magic:'魔導院の番人',aerie:'竜の世話係'};
+  mg:'バリスタ兵',how:'投石兵',cannon:'砲手',mortar:'砲手',mabou:'魔弾砲手',barrier:'石の番人',tesla:'雷の技師',harpoon:'銛撃ち',mray:'光の術者',dbreath:'炎の番人',tower:'櫓の射手',magetower:'塔の魔術師',hisou:'風船兵',outpost:'砦の守備兵',train:'兵舎の番兵',stable:'馬丁',magic:'魔導院の番人',aerie:'竜の世話係'};
 function popBreakdown(){const work={},army={};let research=0,train=0;
   for(const b of S.blds){const n=b.crew||0;if(n){const j=JOB[b.type]||B[b.type].name+'の要員';work[j]=(work[j]||0)+n;}if(b.qm)for(const m of b.qm){const u=MTC[m];train+=u.popEach*u.members;}}
   for(const q of S.squads){const n=q.members*MT(q).popEach;if(!n)continue;const j=MT(q).name;army[j]=(army[j]||0)+n;}
@@ -5200,7 +5246,9 @@ function draw(){
   // 弾・矢（ドット絵 v2）
   const P=SPR.projectiles;ctx.imageSmoothingEnabled=false;
   const pdraw=(sp,anim,x,y,dir)=>{if(!sp)return false;const L=sp.img[anim]||sp.img.dirs||sp.img.anim;const im=anim==='dirs'?L[dir]:L[Math.floor(nowS()/0.12)%L.length];ctx.drawImage(im,Math.round(x-im.width/2),Math.round(y-im.height/2));return true;};
+  if(S.waveActive)for(const o of S.blds){if(!(o.shield>0))continue;const n=bsz(o);ctx.strokeStyle=`rgba(98,198,217,${0.25+0.45*o.shield/(o.shMax||1)})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(bcx(o),bcy(o),n*T*0.75,0,7);ctx.stroke();}   /* バリアストーンのシールド */
   for(const s of S.shots){
+    if(s.zig){const k=1-s.t/s.dur;ctx.strokeStyle=s.c;ctx.globalAlpha=k;ctx.lineWidth=s.w||2;ctx.beginPath();ctx.moveTo(s.x,s.y);const n=5;for(let i=1;i<n;i++){const f=i/n;ctx.lineTo(s.x+(s.tx-s.x)*f+(Math.random()-.5)*8,s.y+(s.ty-s.y)*f+(Math.random()-.5)*8);}ctx.lineTo(s.tx,s.ty);ctx.stroke();ctx.globalAlpha=1;continue;}
     if(s.balloon){if(s.done)continue;const bob=Math.sin(s.t*6)*2;ctx.strokeStyle='#d8c8a8';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(s.bx,s.by+bob);ctx.lineTo(s.bx,s.by+bob+7);ctx.stroke();
       ctx.fillStyle='#c84a3a';ctx.beginPath();ctx.arc(s.bx,s.by+bob-3,5,0,7);ctx.fill();ctx.fillStyle='#ff9a80';ctx.fillRect(s.bx-3,s.by+bob-6,2,2);
       ctx.fillStyle='#2a2438';ctx.beginPath();ctx.arc(s.bx,s.by+bob+9,3,0,7);ctx.fill();ctx.fillStyle='#ffd060';ctx.fillRect(s.bx+2,s.by+bob+5,1,2);continue;}
@@ -6141,7 +6189,7 @@ document.getElementById('vSe').oninput=e=>auSetSe(+e.target.value);
 // ===== UI（ボタンは作り直さず中身だけ更新） =====
 function setText(el,v){if(el&&el.textContent!==v)el.textContent=v;}
 // 建設は「防衛」「生産」の2グループ。防衛は数字キー、生産はShift＋数字
-const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','wall3','wall5','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','spike','pit','bomb','brazier','totem','outpost']},
+const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','wall3','wall5','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','barrier','tesla','harpoon','mray','dbreath','spike','pit','bomb','brazier','totem','outpost']},
   {id:'prod',name:'生産・街',keys:'⇧',list:['miner','quarry','ironmine','farm','fishery','well','ammo','powder','furnace','barracks','apart','market','tavern','church','lab']},
   {id:'unit',name:'部隊',keys:'-',list:['train','stable','magic','aerie']}];
 // 建設の分類タブ（防衛・生産・街・部隊）。押すとその見出しまで一覧をスクロールする
