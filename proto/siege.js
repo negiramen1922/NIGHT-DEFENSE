@@ -18,7 +18,7 @@ const SU={
   archer:{n:'弓兵',  spr:'archer', m:5,hp:24, dmg:6, rate:1.1,rng:130,spd:38,bld:0.5,role:'ranged',d:'いちばん近い相手を撃つ。柵の向こうにも届く。空の魔物を撃てる'},
   mage:  {n:'魔術師',spr:'wizard', m:3,hp:30, dmg:20,rate:1.6,rng:140,spd:30,bld:0.6,role:'ranged',magic:true,splash:30,d:'いちばん近い相手に火の玉（まわりにも当たる）。空の魔物も撃てる。打たれ弱い'},
   cav:   {n:'騎兵',  spr:'rider',  m:3,hp:70, dmg:11,rate:0.9,rng:16, spd:72,bld:0.8,role:'cav',   d:'足が速い。いちばん近い相手を狙う'},
-  eng:   {n:'工兵',  spr:'farmer', m:4,hp:34, dmg:6, rate:0.9,rng:16, spd:38,bld:5,  role:'eng',   d:'物見櫓・岩投げオーガを狙うのが得意。物見櫓や道をふさぐ柵・門は爆薬で吹き飛ばす（14秒ごと）。破城槌・投石機を修理する。近くの罠を外す'},
+  eng:   {n:'工兵',  spr:'engineer_b', m:4,hp:34, dmg:6, rate:0.9,rng:16, spd:38,bld:5,  role:'eng',   d:'物見櫓・岩投げオーガを狙うのが得意。物見櫓や道をふさぐ柵・門は爆薬で吹き飛ばす（14秒ごと）。破城槌・投石機を修理する。近くの罠を外す'},
   drake: {n:'竜騎兵',spr:'dragon', m:2,hp:120,dmg:14,rate:1.3,rng:70, spd:62,bld:1.5,role:'drake',fly:true,splash:22,tentMul:2.5,d:'空を飛んで柵を越える。テント・小屋・巣を狙うのが得意（テントへのダメージ 250%）。火で範囲攻撃。空の魔物とも戦える'},
   gun:   {n:'砲兵',  spr:'cannoneer',m:3,hp:30,dmg:20,rate:2.4,rng:200,minR:40,spd:30,bld:2,role:'gun',splash:26,d:'大砲で遠くから撃つ（範囲）。物見櫓・岩投げオーガを狙うのが得意。近づかれると弱い'},
   ram:   {n:'破城槌',draw:'ram',   m:1,hp:900,dmg:70,rate:1.6,rng:20, spd:44,bld:3,  role:'ram',isBld:true,carry:2,d:'大将のテントへまっすぐ進む。途中の柵・門・建物は打ち破る。壊れるか大将のテントに着くと兵士2部隊が出る（建物に強い魔物に弱い）'},
@@ -617,7 +617,16 @@ let HEAVY=null;function heavyFrame(w){if(HEAVY===null){HEAVY=[];try{const sp=NDS
     let last=-1;fr.forEach((r,i)=>{if(/[bcdef]/.test(r.slice(0,10)))last=i;});const c=document.createElement('canvas');c.width=c.height=sp.size;const g=c.getContext('2d');
     fr.forEach((r,y)=>{for(let x=0;x<r.length;x++){const ch=r[x];if(ch==='.'||(y<=last&&x<10))continue;g.fillStyle=sp.pal[ch];g.fillRect(x,y,1,1);}});HEAVY.push(c);}}catch(e){HEAVY=[];}}
   return HEAVY.length?HEAVY[Math.floor(w)%HEAVY.length]:sprFrame('enemies','e_heavy',w,null);}
-function sprFrame(cat,k,an,atk){const sp=typeof SPR!=='undefined'&&SPR[cat]&&SPR[cat][k];if(!sp)return null;if(atk!=null&&sp.img.attack){const L=sp.img.attack;return L[Math.min(L.length-1,Math.floor(atk/0.1))];}const L=sp.img.walk||sp.img[Object.keys(sp.img)[0]];return L[Math.floor(an)%L.length];}
+function sprFrame(cat,k,an,atk){const sp=typeof SPR!=='undefined'&&SPR[cat]&&SPR[cat][k];if(!sp)return null;const AT=sp.img.attack||sp.img.drum||sp.img.throw||sp.img.bark||sp.img.hit||sp.img.fire;if(atk!=null&&AT){const L=AT;return L[Math.min(L.length-1,Math.floor(atk/0.1))];}const L=sp.img.walk||sp.img.move||sp.img.fly||sp.img[Object.keys(sp.img)[0]];return L[Math.floor(an)%L.length];}
+/* 陣の建物：Claude Design の絵（2026-11-13）。無ければ前のコードの絵 */
+function campDraw(g,b,tt){if(typeof SPR==='undefined')return false;const M={tent:['camp','camp_tent','idle',40],hut:['camp','camp_hut','idle',50],nest:['camp','camp_nest','idle',50],chief:['camp','camp_boss','idle',76],tower:['camp','camp_gtower','idle',50],gate:['camp','camp_gate','closed',40],abatis:['camp','camp_abatis','idle',22],post:['walls','camp_stake','tiles',18]}[b.kind];
+  if(!M)return false;const sp=SPR[M[0]]&&SPR[M[0]][M[1]];if(!sp||!sp.img[M[2]])return false;let im;
+  if(M[2]==='tiles'){let h=0,v=0;for(const o of G.blds)if(o!==b&&o.kind==='post'&&o.hp>0){const dx=o.x-b.x,dy=o.y-b.y;if(Math.hypot(dx,dy)<26){if(Math.abs(dx)>Math.abs(dy))h++;else v++;}}im=sp.img.tiles[h>=v?10:5];}
+  else{const L=sp.img[M[2]];im=L[Math.floor(tt*5+(b.id||0))%L.length];}
+  const z=M[3];g.save();g.imageSmoothingEnabled=false;g.drawImage(im,Math.round(b.x-z/2),Math.round(b.y-z*0.7),z,z);g.restore();
+  if((b.kind==='tent'||b.kind==='hut'||b.kind==='nest')&&!G.alarm){g.fillStyle='rgba(220,230,255,.7)';g.font='9px sans-serif';g.fillText('z',b.x+z*0.3,b.y-z*0.6-((tt*8+b.id)%10));}
+  return true;}
+function foeKey(f){return f.def==='drum'?'drummer':f.def==='rock'?'ogre_rock':f.def==='wolf'?'e_wolf_guard':f.k==='heavy'?'e_seeker_bare':'e_'+f.k;}
 function campPath(g,bd,pad){if(bd.t==='circle'){g.arc(CX,CY,bd.r+pad,0,Math.PI*2);}else{g.rect(CX-bd.a-pad,CY-bd.b-pad,(bd.a+pad)*2,(bd.b+pad)*2);}}
 function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,0);g.fillStyle='#070a08';g.fillRect(0,0,cv.width,cv.height);(cam(),g.setTransform(G.k,0,0,G.k,G.ox,G.oy));g.imageSmoothingEnabled=false;
   if(!G.ground){const c=document.createElement('canvas');c.width=W;c.height=H;const q=c.getContext('2d');q.fillStyle='#2f4a26';q.fillRect(0,0,W,H);
@@ -637,7 +646,8 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
   for(const t of G.traps){if(t.hp<=0)continue;g.fillStyle='#3a3228';g.fillRect(t.x-6,t.y-6,12,12);g.fillStyle='#c8c8c0';for(let i=0;i<2;i++)for(let j=0;j<2;j++){g.beginPath();g.moveTo(t.x-4+i*6,t.y-1+j*5);g.lineTo(t.x-3+i*6,t.y-5+j*5);g.lineTo(t.x-2+i*6,t.y-1+j*5);g.fill();}}
   // 建物
   for(const b of G.blds){if(b.hp<=0){if(b.kind!=='post'){g.fillStyle='rgba(30,22,16,.85)';g.beginPath();g.ellipse(b.x,b.y+4,b.r,b.r*0.5,0,0,7);g.fill();}continue;}
-    if(b.kind==='post'){g.fillStyle='#4a3018';g.fillRect(b.x-4,b.y-11,8,15);g.fillStyle='#7a5430';g.fillRect(b.x-3,b.y-11,3,14);g.fillStyle='#a07848';g.beginPath();g.moveTo(b.x-4,b.y-11);g.lineTo(b.x,b.y-16);g.lineTo(b.x+4,b.y-11);g.fill();}
+    if(campDraw(g,b,tt)){}
+    else if(b.kind==='post'){g.fillStyle='#4a3018';g.fillRect(b.x-4,b.y-11,8,15);g.fillStyle='#7a5430';g.fillRect(b.x-3,b.y-11,3,14);g.fillStyle='#a07848';g.beginPath();g.moveTo(b.x-4,b.y-11);g.lineTo(b.x,b.y-16);g.lineTo(b.x+4,b.y-11);g.fill();}
     else if(b.kind==='gate'){const hz=Math.abs(b.nx)>0.7;g.fillStyle='#3a2410';if(hz)g.fillRect(b.x-6,b.y-18,12,32);else g.fillRect(b.x-18,b.y-12,36,18);g.fillStyle='#6a4422';if(hz)for(let i=-14;i<12;i+=6)g.fillRect(b.x-5,b.y+i,10,3);else for(let i=-16;i<16;i+=6)g.fillRect(b.x+i,b.y-11,3,16);
       g.fillStyle='#5a5a62';if(hz){g.fillRect(b.x-7,b.y-19,14,3);g.fillRect(b.x-7,b.y+12,14,3);}else{g.fillRect(b.x-19,b.y-13,3,20);g.fillRect(b.x+16,b.y-13,3,20);}}
     else if(b.kind==='tower'){g.fillStyle='#3a2410';g.fillRect(b.x-11,b.y-22,3,30);g.fillRect(b.x+8,b.y-22,3,30);g.strokeStyle='#5a3a1c';g.lineWidth=2;g.beginPath();g.moveTo(b.x-9,b.y+4);g.lineTo(b.x+9,b.y-18);g.moveTo(b.x+9,b.y+4);g.lineTo(b.x-9,b.y-18);g.stroke();g.lineWidth=1;   // 物見櫓：丸太を組んだ台の上にゴブリンアーチャー
@@ -662,7 +672,7 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
   // 焼けたテントの火
   for(const f of (G.fires||[])){for(let i=0;i<3;i++){const h=8+((tt*30+i*7)%10);g.fillStyle=['#ff5a1e','#ffb040','#ffe080'][i];g.fillRect(f.x-6+i*4,f.y-h,4,h);}}
   // 魔物
-  for(const f of G.foes){if(!alive(f))continue;const ae=f.atkT!=null&&G.t-f.atkT<0.4?G.t-f.atkT:null;const im=f.k==='heavy'?heavyFrame(f.walk||0):sprFrame('enemies','e_'+f.k,f.walk||0,ae);const sz=Math.max(24,Math.round((E[f.k].r||6)*3));   // 大きな魔物は大きく（シーカー51・マンモス48）
+  for(const f of G.foes){if(!alive(f))continue;const ae=f.atkT!=null&&G.t-f.atkT<0.4?G.t-f.atkT:null;const im=sprFrame('enemies',foeKey(f),f.walk||0,ae)||(f.k==='heavy'?heavyFrame(f.walk||0):sprFrame('enemies','e_'+f.k,f.walk||0,ae));const sz=Math.max(24,Math.round((E[f.k].r||6)*3));   // 大きな魔物は大きく（シーカー51・マンモス48）
     const fl=flyF(f)&&(f.awake||G.alarm)?12+Math.sin(tt*4+f.id)*2:0;if(fl){g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(f.x,f.y+3,sz/4,sz/10,0,0,7);g.fill();}
     g.save();g.translate(f.x,f.y-fl);if(f.face>0)g.scale(-1,1);if(!f.awake&&!f.sentry)g.globalAlpha=0.75;if(im)g.drawImage(im,-sz/2,-sz+4,sz,sz);else{g.fillStyle=E[f.k].color||'#8ac060';g.fillRect(-5,-10,10,10);}g.restore();
     if(f.sentry&&!G.alarm){g.strokeStyle='rgba(255,220,120,.25)';g.beginPath();g.arc(f.x,f.y,120,0,7);g.stroke();}
@@ -670,7 +680,7 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
   // こちらの部隊
   for(const u of G.units){if(!alive(u))continue;const d=SU[u.t],n=mem(u),sel=G.sel.has(u.id);
     if(sel){g.strokeStyle='#62c6d9';g.lineWidth=1.5;g.beginPath();g.ellipse(u.x,u.y+4,d.isBld?20:16,d.isBld?9:7,0,0,7);g.stroke();}
-    if(d.draw){(d.draw==='ram'?drawRam:drawCat)(g,u.x,u.y,1.4,u.face);}
+    if(d.draw){const au=u.atkT!=null&&G.t-u.atkT<0.4?G.t-u.atkT:null;const im=sprFrame('siege',d.draw==='ram'?'ram':'mcat',u.walk||0,au);if(im){g.save();g.imageSmoothingEnabled=false;g.translate(u.x,u.y);if(u.face<0)g.scale(-1,1);g.drawImage(im,-24,-34,48,48);g.restore();}else (d.draw==='ram'?drawRam:drawCat)(g,u.x,u.y,1.4,u.face);}
     else{const au=u.atkT!=null&&G.t-u.atkT<0.4?G.t-u.atkT:null;const im=sprFrame('units',d.spr,u.walk,au);const off=[[0,0],[-9,4],[9,4],[-5,-6],[6,-6],[0,8]];const z=d.fly?30:20;for(let i=n-1;i>=0;i--){const [ox,oy]=off[i%off.length];g.save();g.translate(u.x+ox*(d.fly?1.6:1),u.y+oy-(d.fly?10+Math.sin(tt*4+u.id)*2:0));if(u.face<0)g.scale(-1,1);if(im)g.drawImage(im,-z/2,-z+2,z,z);g.restore();}
       if(d.fly){g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(u.x,u.y+6,14,4,0,0,7);g.fill();}}
     const r=u.hp/u.maxhp;g.fillStyle='#000';g.fillRect(u.x-12,u.y+(d.isBld?14:9),24,3);g.fillStyle=r<0.3?'#ff5a4e':r<0.6?'#f2b33d':'#6fe08a';g.fillRect(u.x-12,u.y+(d.isBld?14:9),24*r,3);
