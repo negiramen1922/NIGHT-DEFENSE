@@ -1616,7 +1616,7 @@ let COLS=48, ROWS=32, W=COLS*T, H=ROWS*T;
 let VW=32*TU, VH=20*TU;   // 表示範囲（スマホ縦画面では高さを伸ばす）
 let HQX=24, HQY=16;
 // マップの種類：campaign=作戦マップ（固定・広域）／random=演習（ランダム）
-const FINAL_BY_MAP={m:15,t:6,s:20,'7':40};   // 草原（グレイヴェル）は40回目まで（2026-11-13）
+const FINAL_BY_MAP={m:15,t:6,s:20,'7':40,f:40};   // 草原（グレイヴェル）は40回目まで（2026-11-13）
 function finalWave(){return (S&&S.mapId&&FINAL_BY_MAP[S.mapId])||FINAL_WAVE_BASE;}
 function setDims(mode){if(mode==='campaign'&&CUR_MAP==='s'){COLS=96;ROWS=64;HQX=46;HQY=34;}else if(mode==='campaign'&&(CUR_MAP==='f'||CUR_MAP==='t')){COLS=96;ROWS=64;HQX=44;HQY=40;}else if(mode==='campaign'&&CUR_MAP==='m'){COLS=96;ROWS=64;HQX=48;HQY=30;}else if(mode==='campaign'&&CUR_MAP==='c'){COLS=150;ROWS=96;HQX=50;HQY=58;}else if(mode==='campaign'){COLS=96;ROWS=64;HQX=28;HQY=34;}else{COLS=48;ROWS=32;HQX=24;HQY=16;}W=COLS*T;H=ROWS*T;}
 // 地形は旧タイルの解像度で作り、1タイルを U×U マスに割る（城の左上は旧城館の中心に合わせる）
@@ -1639,7 +1639,7 @@ cv.width=VW; cv.height=VH;
 const FOOD_PER=0.03;
 function foodMul(){return S&&S.mapId==='s'?1.3:1;}
 const BLOOD_NIGHTS=[5,10];   // ブラッドムーンの襲撃（山のマップは第15襲撃も）
-function bloodNights(){if(S&&S.mapId==='t')return [6];if(S&&S.mapId==='7')return [5,10,15,21,25,30,35];if(S&&S.mapId==='s')return [5,10,15,20];return (typeof finalWave==='function'&&finalWave()>=15)?[5,10,15]:BLOOD_NIGHTS;}
+function bloodNights(){if(S&&S.mapId==='t')return [6];if(S&&(S.mapId==='7'||S.mapId==='f'))return [5,10,15,21,25,30,35];if(S&&S.mapId==='s')return [5,10,15,20];return (typeof finalWave==='function'&&finalWave()>=15)?[5,10,15]:BLOOD_NIGHTS;}
 let BLOOD_MODE=false;
 // 税：なし／低／普通／高（住民1人あたり毎ターンの金貨）と幸福度への影響
 const TAX=[{n:'なし',g:0,h:15},{n:'低い',g:0.17,h:6},{n:'普通',g:0.35,h:0},{n:'高い',g:0.59,h:-18}];
@@ -3203,7 +3203,7 @@ for(const k in PXS)if(!k.startsWith('e_')&&k!=='gunbase')WICON[k]=pxSvg(k);
 for(const k of ['spike','pit','bomb','bastion','hq','miner','quarry','ironmine','farm','fishery','well','ammo','barracks','lab','outpost','train','fence','swall','wall','tower','market','tavern','stable','aerie','magic','rider','dragon','wizard']){const im=new Image();im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">${WICON[k]}</svg>`);ICIMG[k]=im;}
 for(const k in PXS)ICIMG[k]=pxCanvas(k);
 const PXI={};for(const k in PXS)PXI[k]=ICIMG[k];
-for(const [a,b] of [['e_shogre','ogre_shield'],['e_golem','e_golem'],['e_mole','mole'],['e_bat','bat'],['e_treant','e_troll'],['e_maneater','e_spitter'],['e_werewolf','e_wolf'],['e_eltreant','e_elder_treant'],['e_eltreant_burn','e_elder_treant_burn'],['e_grove','boss_shade'],['e_grove_rage','boss_shade2'],['e_grove_burn','boss_shade_burn'],['e_grove_rage_burn','boss_shade2_burn'],['e_grove','e_troll'],['e_grove_rage','e_grove']])if(SPR.enemies&&!SPR.enemies[a]&&SPR.enemies[b])SPR.enemies[a]=SPR.enemies[b];   /* トレント・マンイーター・ワーウルフは絵ができるまで代わり */
+for(const [a,b] of [['e_shogre','ogre_shield'],['e_golem','e_golem'],['e_mole','mole'],['e_bat','bat'],['e_treant','e_troll'],['e_maneater','e_spitter'],['e_werewolf','e_wolf'],['e_eltreant','e_elder_treant'],['e_eltreant_burn','e_elder_treant_burn'],['e_grove','boss_shade'],['e_grove_rage','boss_shade2'],['e_grove_burn','boss_shade_burn'],['e_grove_rage_burn','boss_shade2_burn'],['e_grove','e_troll'],['e_grove_rage','e_grove']]){if(SPR.enemies&&!SPR.enemies[a]&&SPR.enemies[b])SPR.enemies[a]=SPR.enemies[b];if(!ICIMG[a]&&ICIMG[b])ICIMG[a]=ICIMG[b];}   /* トレント・マンイーター・ワーウルフは絵ができるまで代わり */
 for(const [k,,,,col] of WALL_UP){const src=ICIMG.wall;const c=document.createElement('canvas');c.width=src.width||48;c.height=src.height||48;const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(src,0,0,c.width,c.height);g.globalCompositeOperation='source-atop';g.globalAlpha=0.5;g.fillStyle=col;g.fillRect(0,0,c.width,c.height);ICIMG[k]=c;PXI[k]=c;
   if(WICON.wall)WICON[k]=WICON.wall.split('#a09a90').join(col);}   /* 壁の上位：城壁の絵に材料の色を重ねた仮の絵 */
 if(SPR.walls&&SPR.walls.wall)for(const [k,,,,col] of WALL_UP){const W=SPR.walls.wall;const tint=c0=>{const c=document.createElement('canvas');c.width=c0.width;c.height=c0.height;const g=c.getContext('2d');g.drawImage(c0,0,0);g.globalCompositeOperation='source-atop';g.globalAlpha=0.45;g.fillStyle=col;g.fillRect(0,0,c.width,c.height);return c;};
@@ -3477,7 +3477,7 @@ const DEF_BT=['hq','outpost','fence','gate','swall','wall','brazier','spike','pi
 const PROD_BT=['coalmine','goldmine','mithmine','smelter','miner','quarry','ironmine','farm','fishery','well','ammo','market','tavern','powder','barracks','apart','furnace','lab'];
 function specOfTarget(o){if(o.kind==='s')return SPEC_OF_UT[o.ut]||'歩兵';if(DEF_BT.includes(o.type))return '守備';if(PROD_BT.includes(o.type))return '内政';return {train:'歩兵',stable:'騎兵',aerie:'竜騎',magic:'魔導'}[o.type]||'内政';}
 const SKILLS={
-  '歩兵':[{id:'nagi',name:'薙払',cd:8,desc:'8秒ごと、周り3.2マスの敵をまとめて斬る（部隊の火力×3）'},
+  '歩兵':[{id:'nagi',name:'薙払',cd:8,desc:'8秒ごと、周り3マスの敵をまとめて斬る（部隊の火力×3）'},
           {id:'kobu',name:'鼓舞',cd:16,dur:6,desc:'16秒ごと、6秒間 6マス以内の味方部隊の火力+30%・体力10%回復'},
           {id:'fukutsu',name:'不屈',cd:18,dur:6,desc:'18秒ごと、6秒間 受ける被害−50%・周り6マスの敵を引きつける'}],
   '弓兵':[{id:'ame',name:'矢雨',cd:10,desc:'10秒ごと、射程内でいちばん敵が密集した所に矢の雨（半径4マスに40）'},
@@ -3485,7 +3485,7 @@ const SKILLS={
           {id:'shoumei',name:'照明矢',cd:15,dur:8,desc:'15秒ごと、8秒間 敵の群れの周り8マスを照らす（照らした敵はみんなで狙える）'}],
   '騎兵':[{id:'moutotsu',name:'猛突',desc:'突撃の勢いが2秒でたまる（ふつうは4秒）。突撃で当たった敵を1秒スタン'},
           {id:'yuugeki',name:'遊撃',cd:15,dur:5,desc:'15秒ごと、5秒間 移動の速さ+60%・受ける被害−30%'}],
-  '魔導':[{id:'kaen',name:'火球',cd:8,desc:'8秒ごと、敵の群れに火球（半径2.4マスに80）'},
+  '魔導':[{id:'kaen',name:'火球',cd:8,desc:'8秒ごと、敵の群れに火球（半径2マスに80）'},
           {id:'rai',name:'雷撃',cd:12,desc:'12秒ごと、射程内の敵5体に連鎖する雷（各60）'},
           {id:'inseki',name:'隕石',cd:25,desc:'25秒ごと、16マス以内の最大の群れに隕石（半径5マスに300・2秒スタン）'}],
   '竜騎':[{id:'ibuki',name:'火炎',cd:10,desc:'10秒ごと、周り5マスの敵を焼く（60）'},
@@ -3664,7 +3664,7 @@ function genWave(n){
   const tactic=n<=2?'swarm':n<=4?'mixed':n<=7?'vanguard':'combined';
   const tutM=S&&S.mapId==='t'?0.55:1;const BN=bloodNights(),blood=!!(S.bloodMode||BN.includes(n)),after=!S.bloodMode&&BN.includes(n-1),bm=(blood?1.45:after?0.7:1)*(1+Math.max(0,Math.min(n,10)-3)*0.04+Math.max(0,n-10)*0.04)*tutM;
   // 第10襲撃より後は数の増え方をゆるめ、そのぶん魔物を硬くする（重くなりすぎないように）
-  const GL=S&&S.mapId==='7';   /* 草原：40回目までの出方（2026-11-13・docs/ENEMIES.md） */
+  const GL=S&&(S.mapId==='7'||S.mapId==='f');   /* 草原：40回目までの出方（2026-11-13・docs/ENEMIES.md） */
   const ns2=Math.min(n,10)+Math.max(0,n-10)*(GL?0.2:0.35);
   const cnt={
     swarm:Math.round((14+ns2*8+ns2*ns2*1.6)*(n<=4?1.1:1.4)*bm),
@@ -4953,21 +4953,21 @@ const EQ={
  torch:{n:'松明',ut:'inf',slot:'sub',req:'firecraft',light:4.5,fear:true,d:'自分の周り9マスを照らし、4マス以内の小さな魔物を怯ませる（足−40%）。盾の守りはなくなる'},
  sbow:{n:'短弓',ut:'arch',slot:'main',d:'平均的な弓'},
  lbow:{n:'長弓',ut:'arch',slot:'main',req:'polearm',range:2,rate:1.1,d:'短弓の上位：射程+4（連射の間隔+10%）'},
- xbow:{n:'クロスボウ',ut:'arch',slot:'main',req:'heavyarms',dmg:1.9,rate:1.5,ap:0.5,range:2,d:'長弓の上位：射程+4・威力1.9倍・装甲を半分無視（連射の間隔+50%）'},
+ xbow:{n:'クロスボウ',ut:'arch',slot:'main',req:'heavyarms',dmg:1.9,rate:1.5,ap:0.5,range:2,d:'長弓の上位：射程+4・威力190%・装甲を半分無視（連射の間隔+50%）'},
  arrow:{n:'普通の矢',ut:'arch',slot:'ammo',d:'平均的な矢'},
  farrow:{n:'火矢',ut:'arch',slot:'ammo',req:'firecraft',burn:0.4,needFire:true,d:'灯った篝火の8マス以内にいる間、当たった魔物を燃やす（3秒で与えた被害の40%）。離れると普通の矢'},
  parrow:{n:'毒矢',ut:'arch',slot:'ammo',req:'poison',burn:0.3,d:'当たった魔物を毒にする（3秒で与えた被害の30%・装甲無視）'},
  lance:{n:'騎槍',ut:'cav',slot:'main',charge:true,d:'長い槍。突撃で群れを突き抜ける（騎兵はどの武器でも突撃する）'},
  hlance:{n:'鋼の騎槍',ut:'cav',slot:'main',req:'heavyarms',dmg:1.3,charge:true,d:'騎槍の上位：火力+30%。突撃で群れを突き抜ける'},
  rlance:{n:'騎射の騎槍',ut:'cav',slot:'main',req:['heavyarms','horsearch'],dmg:1.3,charge:true,aa:true,d:'鋼の騎槍＋鞍の弓：火力+30%。空の敵も射落とせる'},
- saber:{n:'サーベル',ut:'cav',slot:'main',req:'heavyarms',dmg:0.75,rate:0.65,splash:0.5,d:'攻撃の間隔−35%、周りの敵もまとめて切り払う（範囲0.5）。火力−25%、突撃の一撃なし'},
- hbow:{n:'騎射弓',ut:'cav',slot:'main',req:'horsearch',range:2,dmg:0.7,aa:true,arrow:true,d:'射程6.8で走りながら射る。空の敵も撃てる。火力−30%、突撃の一撃なし'},
+ saber:{n:'サーベル',ut:'cav',slot:'main',req:'heavyarms',dmg:0.75,rate:0.65,splash:0.5,d:'攻撃の間隔−35%、周りの敵もまとめて切り払う（範囲は半マス）。火力−25%、突撃の一撃なし'},
+ hbow:{n:'騎射弓',ut:'cav',slot:'main',req:'horsearch',range:2,dmg:0.7,aa:true,arrow:true,d:'射程7で走りながら射る。空の敵も撃てる。火力−30%、突撃の一撃なし'},
  fstaff:{n:'炎の杖',ut:'mage',slot:'main',d:'範囲攻撃（標準）'},
  tstaff:{n:'雷の杖',ut:'mage',slot:'main',req:'elemental',nosplash:true,chain:2,d:'範囲の代わりに、近くの敵2体へ雷が連鎖する（連鎖先は60%）'},
- estaff:{n:'属性の杖',ut:'mage',slot:'main',req:'elemental',chain:2,slow:2.5,d:'炎の杖の上位：範囲攻撃に加えて、近くの敵2体へ雷が連鎖し、当たった魔物を2.5秒間遅くする'},
- istaff:{n:'氷の杖',ut:'mage',slot:'main',req:'elemental',dmg:0.8,slow:2.5,d:'範囲内の魔物を2.5秒間40%遅くする。火力−20%'},
+ estaff:{n:'属性の杖',ut:'mage',slot:'main',req:'elemental',chain:2,slow:2.5,d:'炎の杖の上位：範囲攻撃に加えて、近くの敵2体へ雷が連鎖し、当たった魔物を3秒近く遅くする'},
+ istaff:{n:'氷の杖',ut:'mage',slot:'main',req:'elemental',dmg:0.8,slow:2.5,d:'範囲内の魔物を3秒近く40%遅くする。火力−20%'},
  he:{n:'炸裂弾',ut:'art',slot:'ammo',d:'範囲攻撃（標準）'},
- ap:{n:'徹甲弾',ut:'art',slot:'ammo',req:'shells',nosplash:true,dmg:2.2,pierce:true,hard:true,d:'範囲なし。射程内でいちばん硬い敵を狙い、装甲を無視して2.2倍'},
+ ap:{n:'徹甲弾',ut:'art',slot:'ammo',req:'shells',nosplash:true,dmg:2.2,pierce:true,hard:true,d:'範囲なし。射程内でいちばん硬い敵を狙い、装甲を無視して220%'},
  he2:{n:'特殊砲弾',ut:'art',slot:'ammo',req:'shells',dmg:1.4,burn:0.5,d:'炸裂弾の上位：火力+40%・着弾した範囲の魔物を燃やす（3秒で与えた被害の50%）'},
  inc:{n:'焼夷弾',ut:'art',slot:'ammo',req:'shells',dmg:0.7,burn:0.8,d:'着弾した範囲の魔物を燃やす（3秒で与えた被害の80%）。直撃の威力−30%'},
  dnone:{n:'なし',ut:'drake',slot:'gear',d:'火炎の息だけで戦う'},
@@ -6791,7 +6791,7 @@ function curDev(){const def=S.blds.filter(b=>b.type!=='hq'&&B[b.type].range&&!(b
   return {pop:popTotal(),def:Math.round(def*10)/10,sq:S.squads.filter(q=>q.ut!=='ship').length};}
 function recHTML(w){const r=recOf(w),c=curDev();const col=(v,t)=>v>=t?'var(--green)':v>=t*0.7?'var(--amber)':'var(--red)';
   const it=(lab,v,t,tip)=>`<span title="${tip}">${lab} <b style="color:${col(v,t)}">${v}</b><span class="muted">/${t}</span></span>`;
-  return `<span class="recRow"><span class="lbl" style="background:#3a4a2a">推奨</span>${it('人口',c.pop,r.pop,'住民と兵の合計')}${it('防衛施設',c.def,r.def,'バリスタ・投石機などの数（Lv2は1.6基、Lv3は2.3基として数える）')}${it('部隊',c.sq,r.sq,'編成した部隊の数')}</span>`;}
+  return `<span class="recRow"><span class="lbl" style="background:#3a4a2a">推奨</span>${it('人口',c.pop,r.pop,'住民と兵の合計')}${it('防衛施設',c.def,r.def,'バリスタ・投石機などの数（Lv2は160%、Lv3は230%として数える）')}${it('部隊',c.sq,r.sq,'編成した部隊の数')}</span>`;}
 const DIR_ARROW={北:'↑',南:'↓',東:'→',西:'←',北東:'↗',北西:'↖',南東:'↘',南西:'↙'};
 function sideSrc(sd){const nm=sideName(sd);const m=nm.match(/^(.*?)（(.+?)）$/);if(m&&DIR_ARROW[m[2]])return `${m[1]} <span class="dir">${DIR_ARROW[m[2]]}${m[2]}</span>`;const m2=nm.match(/^(東|西|南|北)方面$/);if(m2)return `<span class="dir">${DIR_ARROW[m2[1]]}${m2[1]}</span>`;return nm;}
 const SPR_URL={};
@@ -6810,7 +6810,7 @@ function gotoTech(id){const tj=techOf(id);if(!tj)return;S.resTab=tj.cat;S.resSel
 function pipsHTML(n,max,cls){let h='';for(let i=0;i<max;i++)h+=`<i class="${i<n?'on':''}"></i>`;return `<span class="${cls}">${h}</span>`;}
 function recMeters(w){const r=recOf(w),c=curDev();
   const m=(lab,v,t,tip)=>`<div class="rec${v<t?' short':''}" title="${tip}"><div class="rt"><span>${lab}</span><b>${v} <small>/ ${t}</small></b></div><div class="ebar"><i style="width:${Math.round(Math.min(1,v/Math.max(1,t))*100)}%"></i></div></div>`;
-  return `<span class="rtag">推奨</span>${m('人口',c.pop,r.pop,'住民と兵の合計')}${m('防衛施設',c.def,r.def,'バリスタ・投石機などの数（Lv2は1.6基、Lv3は2.3基として数える）')}${m('部隊',c.sq,r.sq,'編成した部隊の数')}`;}
+  return `<span class="rtag">推奨</span>${m('人口',c.pop,r.pop,'住民と兵の合計')}${m('防衛施設',c.def,r.def,'バリスタ・投石機などの数（Lv2は160%、Lv3は230%として数える）')}${m('部隊',c.sq,r.sq,'編成した部隊の数')}`;}
 // 敵情の帯をたたむ（PC）。たたんだときは「第◯襲撃・規模・あと◯日」だけの1行
 function intelMin(){try{return localStorage.getItem('nd_intel_min')==='1';}catch(e){return false;}}
 function setIntelMin(v){try{localStorage.setItem('nd_intel_min',v?'1':'0');}catch(e){}document.body.classList.toggle('intelMin',!!v);}
@@ -6908,7 +6908,7 @@ function innerKey(e,root){const c=e.className&&typeof e.className==='string'?e.c
 function findInner(k,root){const [c,i]=k;try{return root.querySelectorAll(/^[A-Z]+$/.test(c)?c:'.'+c)[i]||null;}catch(e){return null;}}
 function closeOverlay(){const was=S&&S.overlay;if(S)S.overlay=null;if(was==='res'&&S.resFromNight){S.resFromNight=false;if(S.phase==='night'&&!S.waveActive)setTimeout(()=>{if(!S.overlay)showNight();},0);}if(was==='report'&&S.phase==='night'&&S.nightPending){S.nightPending=false;setTimeout(showNight,0);}document.getElementById('overlay').style.display='none';document.body.classList.remove('ov');}
 // ===== モンスター図鑑 =====
-const DEX_ORDER=['swarm','charger','gobarcher','spitter','grappler','troll','harpy','heavy','wyvern','treant','eltreant','shogre','maneater','vampire','ghoul','golem','wolf','tiger','mammoth','redcap','werewolf','king'];
+const DEX_ORDER=['swarm','charger','gobarcher','spitter','grappler','troll','harpy','heavy','wyvern','treant','eltreant','shogre','maneater','vampire','ghoul','golem','wolf','tiger','mammoth','redcap','werewolf','king','grove'];
 function dexFirst(){// このマップで初めて出てくる襲撃（genWave の決まりから）
   const o={},sv=S.open?Object.assign({},S.open):null,sw=S.wave;
   try{S.wave=0;for(let n=1;n<=Math.max(finalWave(),S.wave+1);n++){const w=genWave(n);for(const e of w.q)if(o[e.type]==null)o[e.type]=n;}}finally{if(sv)S.open=sv;S.wave=sw;}
@@ -6956,9 +6956,9 @@ function showDex(){if(!S.dexSel)S.dexSel=DEX_ORDER[0];const D=S.dex||{},F=dexFir
   const sp=v=>Math.round(v/TU*10)/10*U;
   h+=`</div><div class="dxd"><div class="dxh"><div class="dxi${NDART['e_'+k]?' big':''}">${NDART['e_'+k]?artPx('e_'+k):eSpr(k,96)}</div><div><div class="dxn">${d.name}</div><div class="dxs">撃破 ${D[k].kills}${F[k]!=null?`　／　このマップでは第${F[k]}襲撃から`:''}${k==='redcap'?'（ブラッドムーンの夜だけ）':''}</div></div></div>
     <div class="dxt">${d.desc}</div>
-    <div class="statgrid dxg"><div>体力<b>${d.hp}</b></div><div>攻撃<b>${d.dmg}<small>／${d.rate}秒</small></b></div><div>速さ<b>${sp(d.spd)}<small>マス/秒</small></b></div><div>落とす魔核<b style="color:var(--mat)">${d.mat}</b></div></div>
+    <div class="statgrid dxg"><div>体力<b>${d.hp}</b></div><div>攻撃<b>${d.dmg}<small>　1分に${Math.round(60/d.rate)}回</small></b></div><div>速さ<b>${Math.round(d.spd/TU*10*U)}<small>マス/10秒</small></b></div><div>落とす魔核<b style="color:var(--mat)">${d.mat<1?Math.round(d.mat*100)+'<small>%で1個</small>':Math.round(d.mat)}</b></div></div>
     <div class="dxtr">${dexTraits(d).map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join('')||'<div class="muted">特別な能力はない</div>'}</div>
-    <div class="muted" style="font-size:11px;margin-top:8px">体力は基本の値です。ブラッドムーンの夜は1.25倍、第10襲撃より後は1回ごとに+12%されます。</div></div></div>`;
+    <div class="muted" style="font-size:11px;margin-top:8px">体力は基本の値です。ブラッドムーンの夜は125%、第10襲撃より後は1回ごとに+12%されます。</div></div></div>`;
   const card=openOverlay('dex',h,true);document.getElementById('ovClose').onclick=closeOverlay;
   card.querySelectorAll('[data-dx]').forEach(b=>b.onclick=()=>{S.dexSel=b.dataset.dx;const sc=card.querySelector('.dxl').scrollTop;showDex();card.querySelector('.dxl').scrollTop=sc;});}
 // ===== 研究：スキルツリー =====
@@ -7148,7 +7148,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=NEXT_PREP;S.prepTotal=NEXT_PREP;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.2 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.3 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over;}
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7223,13 +7223,19 @@ function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.a
   document.getElementById('tCredit').onclick=()=>openOverlay('title',`<h2>クレジット</h2><div style="line-height:1.9">${GAME_TITLE} — ${GAME_SUB}　ver ${GAME_VER}<br>企画・ゲームデザイン：ねぎらーめん<br>プログラム・ドット絵・効果音・音楽：Claude と共同制作<br><span class="muted">すべてのドット絵と音はこのゲームのために作られたものです</span></div><div style="margin-top:12px"><button id="crBack">タイトルへ</button></div>`)&&(document.getElementById('crBack').onclick=showTitle);}
 function confirmNew(){return true;}
 function showIntro(){
-  const MAPL=[['t','廃村エルム','はじめての防衛','#8ad08a','入門','焼け落ちた村の跡。壊れた柵やバリスタが残っていて、半額ですぐに建て直せる。初心者タスクに沿って準備し、<b>6回の襲撃</b>を守り抜く。魔物は少なめ'],
-    ['f','辺境の街グレイヴェル','ゴブリン軍の侵攻','#e8c070','1マップ目','森と岩場に囲まれた辺境の街。北のアビスから始まり、やがて3方向から魔物が押し寄せる。最後の夜にはゴブリンキングが現れる。<b>10回の襲撃</b>'],
-    ['m','山上の砦ハルデン','ゴブリン軍の侵攻','#ff8a6a','2マップ目・むずかしめ','山に囲まれた高い盆地の砦。畑にできる平地と森がわずかで、食料と木材が乏しい（石と鉄は豊富）。魔物は3つの谷を登ってくる。<b>15回の襲撃</b>'],
-    ['s','雪原の関所ヴィンター','白い牙','#9ad0ff','3マップ目・むずかしい','北と南を川が守る雪原の関所。<b>第8襲撃から川が凍り</b>、吹雪の夜は明かりが届きにくい。魔狼・タイガーライダー・マンモスが現れる。<b>20回の襲撃</b>']];
-  openOverlay('intro',`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>マップを選ぶ</h2><button id="inBack">タイトルへ</button></div>${saveInfo()?'<div class="wn" style="font-size:12px;margin-bottom:6px">新しく始めると、今のセーブデータは上書きされます</div>':''}
-  <div id="inTasks" class="tskRow"><span><b>初心者タスク</b><small>生産・防衛の目標と、やり方のヒントをマップに表示します（どのマップでも使えます）</small></span><span class="tskSw"><button data-tsk="1">ON</button><button data-tsk="0">OFF</button></span></div>
-  <div style="display:flex;flex-direction:column;gap:8px;margin:4px 0 6px">`+MAPL.map(([id,nm,sub,col,diff,desc])=>`<button data-map="${id}" style="display:flex;gap:12px;align-items:center;text-align:left;padding:8px 10px">
+  /* ステージ（2026-11-13）：いま遊べるのはチュートリアルと草原だけ。ほかは Coming Soon で入れない */
+  const MAPL=[['t','ステージ0　廃村エルム','チュートリアル','#8ad08a','入門','焼け落ちた村の跡。壊れた柵やバリスタが残っていて、半額ですぐに建て直せる。初心者タスクに沿って準備し、<b>6回の襲撃</b>を守り抜く。魔物は少なめ'],
+    ['f','ステージ1　辺境の街グレイヴェル','草原','#e8c070','ふつう','森と岩場に囲まれた草原の街。北のアビスから始まり、やがて3方向から魔物が押し寄せる。20回目にゴブリンキング、最後の夜には森の化け物「蠢く木陰」が現れる。<b>40回の襲撃</b>'],
+    ['swamp','ステージ2','沼地','#7a9a6a','Coming Soon',''],
+    ['m','ステージ3','山脈','#ff8a6a','Coming Soon',''],
+    ['s','ステージ4','雪原','#9ad0ff','Coming Soon',''],
+    ['waste','ステージ5','荒野','#d0a060','Coming Soon','']];
+  const soonImg=id=>(id==='m'||id==='s')?mapIcon(id):'';
+  openOverlay('intro',`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>ステージを選ぶ</h2><button id="inBack">タイトルへ</button></div>${saveInfo()?'<div class="wn" style="font-size:12px;margin-bottom:6px">新しく始めると、今のセーブデータは上書きされます</div>':''}
+  <div id="inTasks" class="tskRow"><span><b>初心者タスク</b><small>生産・防衛の目標と、やり方のヒントをマップに表示します（どのステージでも使えます）</small></span><span class="tskSw"><button data-tsk="1">ON</button><button data-tsk="0">OFF</button></span></div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin:4px 0 6px">`+MAPL.map(([id,nm,sub,col,diff,desc])=>diff==='Coming Soon'?`<button disabled style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px;opacity:.55;cursor:default">
+    <span style="position:relative;width:144px;height:84px;flex-shrink:0;border:1px solid var(--line);background:#14161a;display:flex;align-items:center;justify-content:center">${soonImg(id)?`<img src="${soonImg(id)}" width="144" height="84" style="image-rendering:pixelated;position:absolute;inset:0;filter:grayscale(1) brightness(.45)" alt="">`:''}<b style="position:relative;color:#e8dcc0;font-size:13px;letter-spacing:1px">COMING SOON</b></span>
+    <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">Coming Soon</small><br><small style="color:var(--dim)">準備中です</small></span></button>`:`<button data-map="${id}" style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px">
     <img src="${mapIcon(id)}" width="144" height="84" style="image-rendering:pixelated;border:1px solid var(--line);flex-shrink:0" alt="">
     <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">${diff}</small><br><small style="color:var(--dim);line-height:1.6">${desc}</small></span></button>`).join('')+`</div>`,true);
   const go=(mid)=>{closeOverlay();withLoading('マップを作っています…',()=>{CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');renderAll();resizeView();});};
