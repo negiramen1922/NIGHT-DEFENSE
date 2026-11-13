@@ -1676,7 +1676,7 @@ const BASE_MAX=7;
 // 大きさ（マス）：基本は2×2、大きい施設は3×3、城は4×4
 const BIG_SZ=3;
 // 柵・石の壁・城壁は1×1（門は2×2）
-const BSIZE={hq:4,fence:1,swall:1,wall:1,wall2:1,wall3:1,wall4:1,wall5:1,brazier:1};for(const k of ['bastion','outpost','how','cannon','mortar','mabou','field','hvy','rail','mlrs','market','lab','magic','aerie','hangar','tankf','airfield','furnace','apart','reactor','elecf','power'])BSIZE[k]=BIG_SZ;BSIZE.church=BIG_SZ;for(const k of ['spike','pit','bomb','landmine'])BSIZE[k]=1;   // 罠は1×1（たくさん並べて使う）   // 馬小屋・酒場・兵舎・火薬工房は2×2（ドット絵v2）
+const BSIZE={hq:4,fence:1,swall:1,wall:1,wall3:1,wall5:1,brazier:1};for(const k of ['bastion','outpost','how','cannon','mortar','mabou','field','hvy','rail','mlrs','market','lab','magic','aerie','hangar','tankf','airfield','furnace','apart','reactor','elecf','power'])BSIZE[k]=BIG_SZ;BSIZE.church=BIG_SZ;for(const k of ['spike','pit','bomb','landmine'])BSIZE[k]=1;   // 罠は1×1（たくさん並べて使う）   // 馬小屋・酒場・兵舎・火薬工房は2×2（ドット絵v2）
 function newSz(t){return BSIZE[t]||U;}
 function bsz(b){return (b&&b.sz)||(b&&b.type?newSz(b.type):U);}
 function bcx(b){return (b.x+bsz(b)/2)*T;}
@@ -1686,7 +1686,7 @@ function bcyT(b){return b.y+(bsz(b)-1)/2;}
 function bCells(x,y,n){const a=[];for(let dy=0;dy<n;dy++)for(let dx=0;dx<n;dx++)a.push([x+dx,y+dy]);return a;}
 function gridSet(b,v){for(const [cx,cy] of bCells(b.x,b.y,bsz(b)))if(cy>=0&&cy<ROWS&&cx>=0&&cx<COLS&&(v||S.grid[cy][cx]===b))S.grid[cy][cx]=v?b:null;}
 // 施設の上限：柵・壁・門・罠・篝火・城・前哨砦は数えない
-const FAC_FREE=new Set(['hq','outpost','brazier','fence','swall','wall','wall2','wall3','wall4','wall5','gate','landmine','spike','pit','bomb']);
+const FAC_FREE=new Set(['hq','outpost','brazier','fence','swall','wall','wall3','wall5','gate','landmine','spike','pit','bomb']);
 function facCounted(t){return !FAC_FREE.has(t)&&!(B[t]&&B[t].isMine);}
 function facCount(){return S.blds.filter(b=>facCounted(b.type)).length;}
 function outpostN(){return S.blds.filter(b=>b.type==='outpost').length;}
@@ -1897,8 +1897,8 @@ function ready(b){return !(b.bt>0);}
 for(const k of ['fence','swall','wall']){const c=B[k].cost;for(const r in c)c[r]=Math.ceil(c[r]/2);}   // 壁は1×1になったので、同じ長さで前と同じ費用になるよう半額
 const GUN_TYPES=['mg','how','cannon','mabou','hisou','tower','magetower','field','mortar','hvy','mlrs','rail'];
 /* 壁の上位（2026-11-12）：城壁の上に重ねて置くと置き換わる。城壁と同じく上に防衛施設を置ける */
-const WALL_UP=[['wall2','合金の城壁',1200,'alloywall','#3a3d4a',{stone:30,alloy:6,gold:15}],['wall3','魔金属の城壁',1500,'mwall','#a774ec',{stone:30,alloy:8,mat:6,gold:20}],['wall4','ミスリルの城壁',1800,'mithwall','#f0f6ff',{stone:35,alloy:8,elec:8,gold:25}],['wall5','竜晶の城壁',2100,'dragwall','#e05a4e',{stone:40,alloy:10,mat:12,gold:30}]];
-for(const [k,n,hp,rq,col,cost] of WALL_UP)B[k]=Object.assign({},B.wall,{name:n,hp,req:rq,cost,wcol:col,tier:{wall2:3,wall3:5,wall4:6,wall5:7}[k],desc:n+'。城壁（と下の段の壁）の上に重ねて置くと置き換わる。上に防衛施設を置ける'+(k==='wall4'?'。触れている魔物に少しずつダメージを与える（聖銀）':'')});
+const WALL_UP=[['wall3','魔金属の壁',1500,'mwall','#a774ec',{stone:30,alloy:8,mat:6,gold:20}],['wall5','龍鱗の壁',2100,'dragwall','#5a8a6a',{stone:40,alloy:10,mat:12,gold:30}]];   /* 壁の段：Ⅰ木の柵・Ⅱ石の壁・Ⅲ城壁・Ⅴ魔金属の壁・Ⅶ龍鱗の壁（2026-11-13） */
+for(const [k,n,hp,rq,col,cost] of WALL_UP)B[k]=Object.assign({},B.wall,{name:n,hp,req:rq,cost,wcol:col,tier:{wall3:5,wall5:7}[k],desc:n+'。城壁（と下の段の壁）の上に重ねて置くと置き換わる。上に防衛施設を置ける'});
 const CWALL=new Set(['wall',...WALL_UP.map(w=>w[0])]);
 const WALL_TYPES=['fence','swall','wall',...WALL_UP.map(w=>w[0])];
 const HOW_FAM=['how','hvy'];
@@ -2062,10 +2062,9 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館か所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
  set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
- set('alloywall',{cat:'防衛',tier:3,name:'合金の城壁',cost:{stone:80,alloy:20,gold:40},t:3,pre:['castle'],icon:'wall2',eff:'「合金の城壁」を建設できる（耐久1200。城壁の上に重ねて置くと置き換わる）'});
- set('mwall',{cat:'防衛',tier:5,name:'魔金属の城壁',cost:{stone:100,alloy:30,mat:20,gold:60},t:4,pre:['alloywall'],icon:'wall3',eff:'「魔金属の城壁」を建設できる（耐久1500）'});
- set('mithwall',{cat:'防衛',tier:6,name:'ミスリルの城壁',cost:{stone:120,alloy:40,elec:30,gold:80},t:5,pre:['mwall'],icon:'wall4',eff:'「ミスリルの城壁」を建設できる（耐久1800。触れている魔物に少しずつダメージ）'});
- set('dragwall',{cat:'防衛',tier:7,name:'竜晶の城壁',cost:{stone:150,alloy:50,mat:40,gold:100},t:6,pre:['mithwall'],icon:'wall5',eff:'「竜晶の城壁」を建設できる（耐久2100。いちばん硬い）'});
+ set('masonry',{tier:2});set('castle',{tier:3});   /* 壁の段：石の壁はⅡ、城壁はⅢ（2026-11-13） */
+ set('mwall',{cat:'防衛',tier:5,name:'魔金属の壁',cost:{stone:100,alloy:30,mat:20,gold:60},t:4,pre:['castle'],icon:'wall3',eff:'「魔金属の壁」を建設できる（耐久1500。城壁の上に重ねて置くと置き換わる。上に防衛施設を置ける）'});
+ set('dragwall',{cat:'防衛',tier:7,name:'龍鱗の壁',cost:{stone:150,alloy:50,mat:40,gold:100},t:6,pre:['mwall'],icon:'wall5',eff:'「龍鱗の壁」を建設できる（耐久2100。いちばん硬い）'});
  set('steelarmor',{cat:'部隊',tier:2,name:'鋼の鎧',cost:{iron:45,steel:30},t:2,pre:['ironarmor'],icon:'heavy',eff:'鎧が「鋼の鎧」になる：体力 +20%（補給で鎧と鉄を使う）'});
  set('alloyarmor',{cat:'部隊',tier:3,name:'合金の鎧',cost:{iron:80,gold:50},t:3,pre:['steelarmor'],icon:'heavy',eff:'鎧が「合金の鎧」になる：体力 +30%。補給で「合金」を使う'});
  set('chainmail',{cat:'部隊',tier:2,name:'鎖帷子',cost:{iron:30,steel:20},t:2,pre:[],icon:'archer',eff:'弓兵・砲兵・魔術師のローブが「皮のローブ」から「鎖帷子」になる：体力 +15%（補給で鎧を使う）'});
@@ -3427,7 +3426,7 @@ function skillTick(dt){
 }
 
 function cmdOf(o){return o.cmd?S.cmds.find(c=>c.id===o.cmd&&c.alive):null;}
-const NO_HERO=['fence','swall','wall','wall2','wall3','wall4','wall5','gate','bastion','brazier','market'];   // 市場は英雄の配属なし（詳細は売り買いの情報に使う）
+const NO_HERO=['fence','swall','wall','wall3','wall5','gate','bastion','brazier','market'];   // 市場は英雄の配属なし（詳細は売り買いの情報に使う）
 function canHostHero(o){return !o||o.kind==='s'||(!NO_HERO.includes(o.type)&&!(B[o.type]&&B[o.type].isMine));}
 function assign(c,target){
   if(target&&!canHostHero(target)){toast('壁・門・柵・篝火には英雄を置けません','warn');return;}
@@ -4369,9 +4368,6 @@ function update(dt,sim){
       }
     }
   }
-  // ミスリルの城壁：触れている魔物に少しずつダメージ（1秒に15）
-  if(S.waveActive&&S.blds.some(b=>b.type==='wall4'))for(const e of S.enemies){if(e.hp<=0||E[e.type].fly)continue;const gx=Math.floor(e.x/T),gy=Math.floor(e.y/T);let hit=false;
-    for(let dy=-1;dy<=1&&!hit;dy++)for(let dx=-1;dx<=1;dx++){const o=S.grid[gy+dy]&&S.grid[gy+dy][gx+dx];if(o&&o.type==='wall4'){hit=true;break;}}if(hit)hitEnemy(e,15*dt,null);}
   // 部隊
   for(const s of S.squads){
     if(s.ut==='guard'&&!sim){const hq=hqOf();if(hq){const [qx,qy]=castleC(hq);
@@ -5942,7 +5938,7 @@ function placeOK(type,gx,gy){
   if(MOUNT_T.includes(type)){const ex=bastionAt(gx,gy);if(ex){if(ex.x!==gx||ex.y!==gy||!ready(ex))return false;if(B[type].req&&!has(B[type].req))return false;if(capBlock(type))return false;return true;}}
   if(B[type].req&&!has(B[type].req))return false;
   if(capBlock(type))return false;
-  const NS=newSz(type),mine=!!B[type].isMine,WR={fence:1,swall:2,wall:3,wall2:4,wall3:5,wall4:6,wall5:7};
+  const NS=newSz(type),mine=!!B[type].isMine,WR={fence:1,swall:2,wall:3,wall3:5,wall5:7};
   const occ=new Set();
   for(const [cx,cy] of bCells(gx,gy,NS)){
     if(cx<0||cy<0||cx>=COLS||cy>=ROWS)return false;
@@ -6105,7 +6101,7 @@ document.getElementById('vSe').oninput=e=>auSetSe(+e.target.value);
 // ===== UI（ボタンは作り直さず中身だけ更新） =====
 function setText(el,v){if(el&&el.textContent!==v)el.textContent=v;}
 // 建設は「防衛」「生産」の2グループ。防衛は数字キー、生産はShift＋数字
-const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','wall2','wall3','wall4','wall5','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','spike','pit','bomb','brazier','totem','outpost']},
+const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','wall3','wall5','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','spike','pit','bomb','brazier','totem','outpost']},
   {id:'prod',name:'生産・街',keys:'⇧',list:['miner','quarry','ironmine','farm','fishery','well','ammo','powder','furnace','barracks','apart','market','tavern','church','lab']},
   {id:'unit',name:'部隊',keys:'-',list:['train','stable','magic','aerie']}];
 // 建設の分類タブ（防衛・生産・街・部隊）。押すとその見出しまで一覧をスクロールする
@@ -6938,6 +6934,7 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   log(`${MAPS[CUR_MAP]?MAPS[CUR_MAP].name:''}：セーブから再開（${S.turn}日目・第${S.wave+1}襲撃の前）`,'good');
   renderAll();resizeView();auMusicFor&&auMusicFor();
   if(S.phase==='night'&&!S.waveActive&&!S.over){calcLights();setTimeout(()=>{if(!S.overlay)showNight();},0);}   // 夜にセーブしたものを再開したら、夜の画面を出し直す（暗い地図のままにしない）
+  for(const b of S.blds||[]){if(b.type==='wall2'){b.type='wall';}if(b.type==='wall4'){b.type='wall3';}if(b.wall&&b.wall.wt==='wall2')b.wall.wt='wall';if(b.wall&&b.wall.wt==='wall4')b.wall.wt='wall3';}   /* 合金・ミスリルの城壁はやめた */
   for(const b of S.blds||[])if((b.type==='tower'||b.type==='magetower')&&b.gar){const q=S.squads.find(x=>x.id===b.gar);b.gar=null;if(q){q.gar=null;q.x=bcx(b);q.y=bcy(b)+0.9*TU;}}   /* 櫓・塔は人員で撃つようになった（2026-11-12） */
   return true;}
 function delSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
