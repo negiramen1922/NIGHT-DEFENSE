@@ -3723,7 +3723,7 @@ function drawCamps(an,under){
   for(const c of S.camps){
     if(!!under!==(c.state==='fight'))continue;   // 交戦中のテントは部隊・魔物の下に、それ以外は霧の上に描く
     if(c.state==='gone'){if(!c.found)continue;ctx.globalAlpha=0.5;drawTents(c,an,true);ctx.globalAlpha=1;continue;}
-    if(!c.found){continue;   /* 見つけていない駐留地は、うっすらとも出さない（2026-11-13） */
+    if(!c.found){if(lvl('scout')<1)continue;
       ctx.save();ctx.setLineDash([6,6]);ctx.strokeStyle='rgba(255,120,90,.55)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(c.hx,c.hy,c.hr,0,7);ctx.stroke();ctx.restore();
       ctx.fillStyle='rgba(255,90,70,.06)';ctx.beginPath();ctx.arc(c.hx,c.hy,c.hr,0,7);ctx.fill();
       ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillStyle='rgba(0,0,0,.6)';const lb=`${campName(c)}？ このあたり`;const w=ctx.measureText(lb).width+8;ctx.fillRect(c.hx-w/2,c.hy-8,w,16);ctx.fillStyle='#ffb0a0';ctx.fillText(lb,c.hx,c.hy+1);continue;}
