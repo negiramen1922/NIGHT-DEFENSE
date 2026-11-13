@@ -1801,6 +1801,7 @@ B.hq.hp=3000;B.hq.cap=3;B.hq.name='城';B.hq.desc='街の中心の城（4×4マ�
 const BUILD_ORDER=['outpost','miner','quarry','ironmine','farm','fishery','well','ammo','powder','barracks','apart','market','tavern','church','lab','furnace','fence','gate','swall','wall','bastion','brazier','spike','pit','bomb','totem','mg','how','cannon','mortar','mabou','hisou','tower','magetower','train','stable','magic','aerie'];
 // アップグレード倍率（Lv1〜3）
 const UP={prod:[1,1.5,2.0,2.4,2.8,3.2,3.6],dmg:[1,1.4,1.9,2.4,2.9,3.4,3.9],hp:[1,1.5,2.0,2.5,3.0,3.5,4.0],wallhp:[1,1.8,2.8,2.8,2.8,2.8,2.8],range:[0,0.5,1,1,1.5,1.5,2]};   // 改築の段ごと（2026-11-13 に7段まで）
+const BRAZ_FUEL=[['steel',2],['coal',3],['elec',2]];   // 篝火の段ごとの夜の燃料
 const KC_G=[['prod','生産','生産','miner'],['mine','鉱山','生産','ironmine'],['work','工房','生産','ammo'],['town','街','内政','barracks'],['def','防衛施設','防衛','mg'],['magic','魔術','防衛','magetower']];
 function kcId(g,r){return 'kc_'+g+'_'+r;}
 const KC={   // 改築の段：[ランク, 名前]。1つ目は建てたときの姿（2026-11-13）
@@ -1831,6 +1832,7 @@ const KC={   // 改築の段：[ランク, 名前]。1つ目は建てたとき�
  hisou:{g:'def',st:[[3,'風船爆弾'],[4,'エーテル風船']]},
  gate:{g:'def',st:[[1,'木の門'],[2,'石の門'],[4,'鉄の門'],[5,'魔金属の門'],[7,'龍鱗の門']]},
  bastion:{g:'def',st:[[3,'櫓台'],[5,'魔金属の櫓台']]},
+ brazier:{g:'def',st:[[1,'篝火'],[2,'石炭の篝火'],[4,'蒼い炎']]},
  magetower:{g:'magic',st:[[4,'メイジの塔'],[5,'魔金属の塔'],[7,'竜晶の塔']]},
  barrier:{g:'magic',st:[[4,'バリアストーン'],[6,'聖銀のバリアストーン']]},
  tesla:{g:'magic',st:[[5,'テスラタワー'],[7,'竜晶のテスラタワー']]},
@@ -2871,7 +2873,7 @@ const RNUM=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ'];
 function tLvName(t,n){return t.lvRank?(RNUM[n]||' Lv'+n):(tMax(t)>1?' Lv'+n:'');}
 function tMax(t){return t.lvRank?Math.max(1,S.baseLv||1):(t.max||1);}
 /* 研究の費用に、そのランクの新しい素材を足す（2026-11-13）。素材を取れるようにする研究には足さない。金貨の上乗せは +40 → +20／ランク */
-const TECH_MAT={2:{coal:6},3:{coal:4,alloy:4},4:{alloy:6},5:{alloy:4,mmetal:4},6:{mmetal:4,mithril:3},7:{mithril:5}};
+const TECH_MAT={2:{coal:10},3:{coal:8,goldore:6,alloy:6},4:{coal:8,alloy:8},5:{coal:6,alloy:6,mmetal:6},6:{coal:6,mmetal:6,mithril:4},7:{coal:6,mmetal:4,mithril:8}};   /* 研究に足す素材（2026-11-13 増やした） */
 const TECH_MAT_FREE=new Set(['coalt','goldt','smeltt','mitht','kc_work_5','kc_mine_3']);
 function techCost(t){const L=lvl(t.id);const c={};const base=Object.assign({},t.cost);if(t.tier>=2)base.gold=(base.gold||0)+20*(t.tier-1);
   {const M=TECH_MAT[t.tier||1];if(M&&!TECH_MAT_FREE.has(t.id))for(const k in M)if(!base[k])base[k]=M[k];}
@@ -3173,7 +3175,7 @@ if(SPR.walls&&SPR.walls.wall)for(const [k,,,,col] of WALL_UP){const W=SPR.walls.
   const o={size:W.size,pal:W.pal,img:{}};for(const a in W.img)o.img[a]=W.img[a].map(tint);SPR.walls[k]=o;}
 function drawIcon(k,x,y,sz,ang){const im=ICIMG[k];if(!im||!im.complete)return false;ctx.save();ctx.translate(x,y);if(ang)ctx.rotate(ang);ctx.drawImage(im,-sz/2,-sz/2,sz,sz);ctx.restore();return true;}
 // 明かり：夜（襲撃中）は明かりの範囲の敵しか見えず、狙えない
-function lightOf(b){if(b.bt>0&&!b.upg)return 0;if(b.type==='cannon'&&b.flashT&&performance.now()-b.flashT<350)return 5;return b.type==='hq'?8:b.type==='brazier'?(b.unlit?0:6+(has('pitch')?4:0)+(has('abysslamp')?4:0)):b.type==='outpost'?6:b.type==='tower'?3.5+(has('abysslamp')?1.5:0):GUN_TYPES.includes(b.type)?2.5:WALL_TYPES.includes(b.type)?0:1.5;}
+function lightOf(b){if(b.bt>0&&!b.upg)return 0;if(b.type==='cannon'&&b.flashT&&performance.now()-b.flashT<350)return 5;return b.type==='hq'?8:b.type==='brazier'?(b.unlit?0:6+3*((b.lv||1)-1)+(has('pitch')?4:0)+(has('abysslamp')?4:0)):b.type==='outpost'?6:b.type==='tower'?3.5+(has('abysslamp')?1.5:0):GUN_TYPES.includes(b.type)?2.5:WALL_TYPES.includes(b.type)?0:1.5;}
 function calcLights(){const L=[];for(const b of S.blds){const r=lightOf(b);if(r)L.push([bcx(b),bcy(b),r*TU]);}for(const u of S.squads)if(!u.gar)L.push([u.x,u.y,(eqS(u,'light')||2.4)*TU]);if(S.waveActive&&S.cur&&S.cur.blizzard)for(const l of L)l[2]*=0.6;S.lights=L;}
 function litAt(x,y){if(!S.waveActive)return true;for(const l of S.lights||[]){const dx=x-l[0],dy=y-l[1];if(dx*dx+dy*dy<l[2]*l[2])return true;}return false;}
 let nightCv=null;
@@ -3268,7 +3270,7 @@ function kcStat(b){const L=[],lv=b.lv||1,d=B[b.type],n=lv+1;   // 改築でど�
   return L;}
 function stageName(b){const k=KC[b.type];return k&&k.st[(b.lv||1)-1]?k.st[(b.lv||1)-1][1]:B[b.type].name;}
 /* 改築の費用（2026-11-13）：建設費 × 段（2段目100%・3段目150%・4段目200%…）＋その段のランクの素材。金貨は半分 */
-const UPG_MAT={2:{iron:10,coal:5},3:{alloy:6},4:{elec:10},5:{mmetal:6},6:{mithril:5},7:{mithril:8,mat:10}};
+const UPG_MAT={2:{iron:15,coal:10},3:{alloy:12,coal:6},4:{elec:15,coal:6},5:{mmetal:10,coal:6},6:{mithril:8,coal:6},7:{mithril:12,mat:10}};   /* その素材の段に改築するとき（2026-11-13 増やした） */
 function upgCost(b){
   const base=B[b.type].cost,m=[0,1,1.5,2,2.5,3,3.5][b.lv]||3;const c={};
   for(const k in base){if(k==='gold')continue;c[k]=Math.max(5,Math.round(base[k]*m/5)*5);}
@@ -3821,8 +3823,8 @@ function startWave(){phaseReset();S._barT=0;S.barrier=(S.baseLv||1)>=5?barrierMa
   S.wave++;if(S.mapId==='s'&&S.wave>=8&&!S.frozen)freezeRivers();S.waveActive=true;S.waveKills=0;S.subShown=-1;S.wled={};for(const b of S.blds){b.wlast=b.wuse;b.wuse=null;}
   S.cur=S.next;S.qi=0;S.waveT=0;S._mmT=null;S.navalLeft=0;S.waveStart={kia:S.kia,mat:S.mat,fallen:S.fallen.length,bld:S.bldLost};
   log(`第${S.wave}襲撃 接近！${S.wave===finalWave()?' — 最後の夜':''}`,'warn');
-  {const bz=S.blds.filter(b=>b.type==='brazier'&&!(b.bt>0));let lit=0,un=0;for(const b of bz){if(S.steel>=2){useRes('篝火の燃料','steel',2,b);b.unlit=false;lit++;}else{b.unlit=true;un++;}}
-   if(lit)log(`篝火 ${lit}基に火を入れた（木材−${lit*2}）`);if(un)log(`木材が足りず、篝火 ${un}基が灯らない`,'bad');}
+  {const bz=S.blds.filter(b=>b.type==='brazier'&&!(b.bt>0));let lit=0,un=0;const used={};for(const b of bz){const [k,n]=BRAZ_FUEL[(b.lv||1)-1]||BRAZ_FUEL[0];if((S[k]||0)>=n){useRes('篝火の燃料',k,n,b);used[k]=(used[k]||0)+n;b.unlit=false;lit++;}else{b.unlit=true;un++;}}   /* 篝火の燃料：木材2 → 石炭の篝火は石炭3 → 蒼い炎はエーテル2（2026-11-13） */
+   if(lit)log(`篝火 ${lit}基に火を入れた（${Object.entries(used).map(([k,v])=>RES_NAME[k]+'−'+v).join('・')}）`);if(un)log(`燃料が足りず、篝火 ${un}基が灯らない`,'bad');}
   S.paused=false;S.porters=[];closeOverlay();se('alarm');auMusicFor();
 }
 function spawnAt(type,x,y,n,spread){dexMark(type);for(let i=0;i<n;i++){const a=Math.random()*7,r=Math.random()*(spread||TU);const d=E[type];S.enemies.push({type,x:x+Math.cos(a)*r,y:y+Math.sin(a)*r,hp:d.hp,maxhp:d.hp,cd:0.5,target:null,retarget:0});}}
