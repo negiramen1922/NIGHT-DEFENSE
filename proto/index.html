@@ -1677,7 +1677,7 @@ const BASE_MAX=7;
 // 大きさ（マス）：基本は2×2、大きい施設は3×3、城は4×4
 const BIG_SZ=3;
 // 柵・石の壁・城壁は1×1（門は2×2）
-const BSIZE={hq:4,fence:1,swall:1,wall:1,wall3:1,wall5:1,brazier:1};for(const k of ['bastion','outpost','how','cannon','mortar','mabou','field','hvy','rail','mlrs','market','lab','magic','aerie','hangar','tankf','airfield','furnace','apart','reactor','elecf','power'])BSIZE[k]=BIG_SZ;BSIZE.church=BIG_SZ;for(const k of ['spike','pit','bomb','landmine'])BSIZE[k]=1;   // 罠は1×1（たくさん並べて使う）   // 馬小屋・酒場・兵舎・火薬工房は2×2（ドット絵v2）
+const BSIZE={hq:4,fence:1,swall:1,wall:1,wall3:1,wall5:1,brazier:1,aebomb:1,gravity:1,stake:1,meteor:1};for(const k of ['bastion','outpost','how','cannon','mortar','mabou','field','hvy','rail','mlrs','market','lab','magic','aerie','hangar','tankf','airfield','furnace','apart','reactor','elecf','power'])BSIZE[k]=BIG_SZ;BSIZE.church=BIG_SZ;for(const k of ['spike','pit','bomb','landmine'])BSIZE[k]=1;   // 罠は1×1（たくさん並べて使う）   // 馬小屋・酒場・兵舎・火薬工房は2×2（ドット絵v2）
 function newSz(t){return BSIZE[t]||U;}
 function bsz(b){return (b&&b.sz)||(b&&b.type?newSz(b.type):U);}
 function bcx(b){return (b.x+bsz(b)/2)*T;}
@@ -1687,7 +1687,7 @@ function bcyT(b){return b.y+(bsz(b)-1)/2;}
 function bCells(x,y,n){const a=[];for(let dy=0;dy<n;dy++)for(let dx=0;dx<n;dx++)a.push([x+dx,y+dy]);return a;}
 function gridSet(b,v){for(const [cx,cy] of bCells(b.x,b.y,bsz(b)))if(cy>=0&&cy<ROWS&&cx>=0&&cx<COLS&&(v||S.grid[cy][cx]===b))S.grid[cy][cx]=v?b:null;}
 // 施設の上限：柵・壁・門・罠・篝火・城・前哨砦は数えない
-const FAC_FREE=new Set(['hq','outpost','brazier','fence','swall','wall','wall3','wall5','gate','landmine','spike','pit','bomb']);
+const FAC_FREE=new Set(['hq','outpost','brazier','fence','swall','wall','wall3','wall5','aebomb','gravity','stake','meteor','gate','landmine','spike','pit','bomb']);
 function facCounted(t){return !FAC_FREE.has(t)&&!(B[t]&&B[t].isMine);}
 function facCount(){return S.blds.filter(b=>facCounted(b.type)).length;}
 function outpostN(){return S.blds.filter(b=>b.type==='outpost').length;}
@@ -1777,6 +1777,11 @@ B.tower.garUt='arch';B.spike.req='spikes';
 B.furnace={name:'精製炉',glyph:'炉',hp:260,heat:3,cost:{steel:60,stone:40},pop:2,power:0,spec:'内政',grp:'prod',req:'furnace',desc:'魔核のエネルギーを取り出してエーテル結晶を精製する（魔核 −2 → エーテル結晶 +4／T）。魔核が尽きると止まる'};
 B.totem={name:'呪骸の柱',glyph:'呪',hp:420,heat:1,cost:{stone:40,mat:30},pop:0,power:0,spec:'工兵',grp:'def',req:'totem',desc:'魔物の骨で組んだ呪いの柱。周り6マスの魔物の足を30%遅くし、攻撃の間隔を伸ばす（与える被害 −25%）'};
 /* ランクⅣ〜Ⅶの防衛施設（2026-11-13・絵は仮のアイコン。費用・弾は仮） */
+/* ランクⅣ〜Ⅶの罠（2026-11-13・絵と費用は仮） */
+B.aebomb={name:'エーテル爆弾',glyph:'',hp:1,heat:0,cost:{steel:15,elec:12},pop:0,power:0,spec:'工兵',isMine:true,kind:'aebomb',req:'aebombt',desc:'爆弾罠の上位。踏んだ魔物の周り6マスをエーテルの爆発で吹き飛ばす（使い切り・空の敵には効かない）'};
+B.gravity={name:'重力の罠',glyph:'',hp:1,heat:0,cost:{steel:20,elec:20,mat:10},pop:0,power:0,spec:'工兵',isMine:true,kind:'gravity',req:'gravityt',desc:'近づいた魔物（空を飛ぶ魔物も）を、周り5マスまとめて地面に押さえつける（4秒動けない・空の魔物は地面に落ちる）。ボスは遅くなるだけ。一晩に2回、8秒おき'};
+B.stake={name:'聖銀の杭',glyph:'',hp:1,heat:0,cost:{steel:20,alloy:6,gold:10},pop:0,power:0,spec:'工兵',isMine:true,kind:'stake',req:'staket',desc:'踏んだ魔物に聖銀の杭が刺さり、6秒かけて少しずつダメージ（合計300）。20体に刺さると折れる（一括修理で直す）'};
+B.meteor={name:'メテオコール',glyph:'',hp:1,heat:0,cost:{steel:30,mat:40,gold:30},pop:0,power:0,spec:'工兵',isMine:true,kind:'meteor',req:'meteort',desc:'踏まれると、少しして空から隕石が落ちて周り8マスを吹き飛ばす（中心1500・まわり900）。使い切りの切り札'};
 B.barrier={name:'バリアストーン',glyph:'障',hp:400,heat:1,cost:{steel:60,stone:80,elec:30,gold:40},pop:1,power:0,spec:'守備',grp:'def',req:'barrierst',desc:'周り5マスの施設にシールド（ダメージを吸う光の膜・1つにつき200）を張る。割れたシールドはエーテルを使って少しずつ張り直す。自分では攻撃しない',aura:5,shield:200};
 B.tesla={name:'テスラタワー',glyph:'雷',hp:450,heat:1,cost:{steel:80,stone:60,alloy:10,elec:20,gold:60},pop:2,power:0,spec:'守備',grp:'def',req:'teslat',desc:'電気で攻撃する塔。稲妻が魔物から魔物へ跳ねる（4体まで・跳ねるごとに弱くなる）。群れに強く、大きな魔物1体には弱い。空の敵も撃てる。エーテルを使う',range:5,dmg:90,rate:2.5,chain:4,direct:true,antiAir:true,ammoKey:'elec',ammoUse:0.3};
 B.harpoon={name:'ハープーンランチャー',glyph:'銛',hp:500,heat:1,cost:{steel:120,stone:60,iron:60,alloy:15,gold:60},pop:3,power:0,spec:'守備',grp:'def',req:'harpoont',desc:'魔法で軽くした重い銛を撃ち、刺さると重くする。刺さった魔物は動けなくなり（2秒）、刺さっている間少しずつダメージ。空を飛ぶ魔物は地面に引きずり降ろす。ボスには刺さらない（ダメージだけ）。射程6',range:6,dmg:120,rate:3.5,harpoon:true,direct:true,antiAir:true,ammoKey:'iron',ammoUse:1};
@@ -1939,7 +1944,7 @@ for(const k of ['fence','swall','wall']){const c=B[k].cost;for(const r in c)c[r]
 const GUN_TYPES=['mg','how','cannon','mabou','hisou','tower','magetower','field','mortar','hvy','mlrs','rail'];
 /* 壁の上位（2026-11-12）：城壁の上に重ねて置くと置き換わる。城壁と同じく上に防衛施設を置ける */
 const WALL_UP=[['wall3','魔金属の壁',1500,'mwall','#a774ec',{stone:30,alloy:8,mat:6,gold:20}],['wall5','龍鱗の壁',2100,'dragwall','#5a8a6a',{stone:40,alloy:10,mat:12,gold:30}]];   /* 壁の段：Ⅰ木の柵・Ⅱ石の壁・Ⅲ城壁・Ⅴ魔金属の壁・Ⅶ龍鱗の壁（2026-11-13） */
-for(const [k,t] of [['barrier',4],['tesla',5],['harpoon',5],['mray',6],['dbreath',7]])if(B[k])B[k].tier=t;
+for(const [k,t] of [['aebomb',4],['gravity',5],['stake',6],['meteor',7],['barrier',4],['tesla',5],['harpoon',5],['mray',6],['dbreath',7]])if(B[k])B[k].tier=t;
 for(const [k,n,hp,rq,col,cost] of WALL_UP)B[k]=Object.assign({},B.wall,{name:n,hp,req:rq,cost,wcol:col,tier:{wall3:5,wall5:7}[k],desc:n+'。城壁（と下の段の壁）の上に重ねて置くと置き換わる。上に防衛施設を置ける'});
 const CWALL=new Set(['wall',...WALL_UP.map(w=>w[0])]);
 const WALL_TYPES=['fence','swall','wall',...WALL_UP.map(w=>w[0])];
@@ -2104,6 +2109,10 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館か所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
  set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
+ set('aebombt',{cat:'防衛',tier:4,name:'エーテル爆弾',cost:{steel:80,elec:40,gold:60},t:3,pre:[],icon:'aebomb',eff:'罠「エーテル爆弾」を置ける（爆弾罠の上位）'});
+ set('gravityt',{cat:'防衛',tier:5,name:'重力の罠',cost:{steel:100,elec:60,mat:30,gold:80},t:4,pre:[],icon:'gravity',eff:'罠「重力の罠」を置ける（空の魔物も地面に押さえつける）'});
+ set('staket',{cat:'防衛',tier:6,name:'聖銀の杭',cost:{steel:120,alloy:30,gold:100},t:5,pre:[],icon:'stake',eff:'罠「聖銀の杭」を置ける（刺さって少しずつダメージ）'});
+ set('meteort',{cat:'防衛',tier:7,name:'メテオコール',cost:{steel:150,mat:60,gold:150},t:6,pre:[],icon:'meteor',eff:'罠「メテオコール」を置ける（空から隕石を落とす切り札）'});
  set('barrierst',{cat:'防衛',tier:4,name:'バリアストーン',cost:{stone:120,elec:60,gold:80},t:4,pre:[],icon:'barrier',eff:'「バリアストーン」を建設できる（周りの施設にシールドを張る）'});
  set('teslat',{cat:'防衛',tier:5,name:'テスラタワー',cost:{steel:150,alloy:30,elec:60,gold:100},t:5,pre:[],icon:'tesla',eff:'「テスラタワー」を建設できる（稲妻が魔物から魔物へ跳ねる）'});
  set('harpoont',{cat:'防衛',tier:5,name:'ハープーンランチャー',cost:{steel:150,iron:80,alloy:30,gold:100},t:5,pre:[],icon:'harpoon',eff:'「ハープーンランチャー」を建設できる（刺さると動けなくする銛。空の魔物は地面に落とす）'});
@@ -3015,6 +3024,10 @@ Object.assign(WICON,{
 });
 
 Object.assign(WICON,{
+ aebomb:`<ellipse cx="12" cy="19" rx="9" ry="3.5" fill="#2a2a3a"/><path d="M12 4 L17 12 L12 19 L7 12Z" fill="#62c6d9" stroke="#1c1824"/><path d="M12 7 L14 12 L12 16" stroke="#c8f4fb" fill="none"/>`,
+ gravity:`<circle cx="12" cy="12" r="9" fill="none" stroke="#a774ec" stroke-width="2"/><circle cx="12" cy="12" r="5" fill="none" stroke="#a774ec"/><path d="M12 3 V21 M3 12 H21" stroke="#a774ec" stroke-opacity=".6"/>`,
+ stake:`<ellipse cx="12" cy="19" rx="8" ry="3" fill="#2a2a20"/><path d="M8 19 L9 9 L10 19Z M11 19 L12 6 L13 19Z M14 19 L15 10 L16 19Z" fill="#f6faff" stroke="#9ab0d0" stroke-width=".5"/>`,
+ meteor:`<circle cx="12" cy="13" r="8" fill="none" stroke="#7a6a5a" stroke-width="2"/><path d="M12 8 L15 13 L12 17 L9 13Z" fill="#e05a4e" stroke="#1c1824"/>`,
  barrier:`<rect x="8" y="5" width="8" height="17" fill="#6a7088" stroke="#1c1824"/><path d="M10 9 H14 M10 13 H14 M10 17 H14" stroke="#62c6d9"/><circle cx="12" cy="12" r="10" fill="none" stroke="#62c6d9" stroke-opacity=".5"/>`,
  tesla:`<rect x="9" y="9" width="6" height="14" fill="#8c86a6" stroke="#1c1824"/><path d="M8 9 H16 M8 7 H16 M9 5 H15" stroke="#c8884a" stroke-width="1.5"/><circle cx="12" cy="3.5" r="2.5" fill="#e8d0ff"/><path d="M15 4 L19 7 L17 8 L21 11" stroke="#d8b8ff" fill="none"/>`,
  harpoon:`<rect x="4" y="13" width="16" height="7" fill="#6a4a2a" stroke="#1c1824"/><path d="M3 12 L21 8" stroke="#c0c8d4" stroke-width="2.5"/><path d="M21 8 L17 6 L18 10Z" fill="#e8eef6"/><path d="M5 12 Q3 16 6 19" stroke="#8a8a90" fill="none"/>`,
@@ -4502,7 +4515,7 @@ function update(dt,sim){
       S.steel+=rew;
       S.next=genWave(S.wave+1);genCands();
       log(`昼・準備に移行（補給 木材+${rew}）。第${S.wave+1}襲撃まで ${NEXT_PREP}ターン。雇用候補が更新されました`,'warn');
-      const pitN=digPits();for(const m of S.mines)if(m.kind==='pit'&&m.armed)m.uses=null;if(pitN)log(`落とし穴 ${pitN}個を掘り直した（木材−${pitN*PIT_DIG}）`);   // 襲撃が終わったらすぐ掘り直す（前はターン終わりまで埋まったままだった）
+      const pitN=digPits();for(const m of S.mines){if(m.kind==='pit'&&m.armed)m.uses=null;if(m.kind==='gravity'){m.uses=null;m.cd=0;}if(m.kind==='stake'){m.dur=20;m.armed=true;}}if(pitN)log(`落とし穴 ${pitN}個を掘り直した（木材−${pitN*PIT_DIG}）`);   // 襲撃が終わったらすぐ掘り直す（前はターン終わりまで埋まったままだった）
       const lostC=S.fallen.slice(ws.fallen||0);
       const newSide=S.next.sides.find(sd=>!S.cur.sides.includes(sd));
       S.recentLoss=(S.bldLost-(ws.bld||0))+Math.round((S.kia-(ws.kia||0))/3);
@@ -4636,6 +4649,13 @@ function update(dt,sim){
       if(m.dur<=0){m.armed=false;m.dur=0;log('トゲ床が踏み壊された（一括修理で直せる）','warn');}continue;}
     if(m.kind==='bomb'){const hit=S.enemies.find(e=>!isFly(e)&&e.hp>0&&Math.abs(e.x-mx)<hb&&Math.abs(e.y-my)<hb);if(hit){m.armed=false;m.used=true;se('boom');S.fx.push({x:mx,y:my,r:TU*2.2,t:0,dur:0.6,c:'#ff9a3a'});S.fx.push({x:mx,y:my,r:TU*1.2,t:0,dur:0.35,c:'#fff0a0'});
       for(const o of S.enemies){if(E[o.type].fly)continue;const dd=Math.hypot(o.x-mx,o.y-my);if(dd<TU*2.1)hitEnemy(o,(dd<TU?380:240)*(has('tetsudan')?1.2:1),null,true);}}continue;}
+    if(m.kind==='aebomb'||m.kind==='meteor'){const hit=S.enemies.find(e=>!isFly(e)&&e.hp>0&&Math.abs(e.x-mx)<hb&&Math.abs(e.y-my)<hb);if(hit){m.armed=false;m.used=true;
+        if(m.kind==='aebomb'){se('boom');S.fx.push({x:mx,y:my,r:TU*3.2,t:0,dur:0.6,c:'#62c6d9'});S.fx.push({x:mx,y:my,r:TU*1.6,t:0,dur:0.35,c:'#e8fcff'});for(const o of S.enemies){if(E[o.type].fly)continue;const dd=Math.hypot(o.x-mx,o.y-my);if(dd<TU*3)hitEnemy(o,dd<TU*1.4?600:400,null);}}
+        else{S.navShells.push({x:mx,y:my,t:0,delay:1.2,dmg:900,splash:TU*4});S.navShells.push({x:mx,y:my,t:0,delay:1.25,dmg:600,splash:TU*1.6});log('メテオコール：空から隕石が落ちてくる！','warn');}}continue;}
+    if(m.kind==='gravity'){if(m.uses==null)m.uses=2;m.cd=Math.max(0,(m.cd||0)-dt);if(m.cd>0||m.uses<=0)continue;const R0=TU*2.5;if(S.enemies.some(e=>e.hp>0&&Math.hypot(e.x-mx,e.y-my)<TU*0.9)){m.uses--;m.cd=8;se('boom');S.fx.push({x:mx,y:my,r:R0,t:0,dur:0.8,c:'#a774ec'});
+        for(const e of S.enemies){if(e.hp<=0||Math.hypot(e.x-mx,e.y-my)>R0)continue;if(E[e.type].boss){e.slowT=3;continue;}e.stun=Math.max(e.stun||0,4);if(E[e.type].fly)e.down=Math.max(e.down||0,5);}}continue;}
+    if(m.kind==='stake'){if(m.dur==null)m.dur=20;if(m.dur<=0){m.armed=false;continue;}for(const e of S.enemies){if(e.hp<=0||isFly(e)||e.staked||Math.abs(e.x-mx)>hb||Math.abs(e.y-my)>hb)continue;e.staked=true;e.harpT=Math.max(e.harpT||0,6);e.harpD=50;m.dur--;S.fx.push({x:e.x,y:e.y,r:8,t:0,dur:0.3,c:'#f6faff'});}
+      if(m.dur<=0){m.armed=false;log('聖銀の杭が折れた（一括修理で直せる）','warn');}continue;}
     if(m.kind==='pit'){if(m.uses==null)m.uses=has('resetpit')?5:3;let fell=0;for(const e of S.enemies){if(isFly(e)||e.hp<=0||Math.abs(e.x-mx)>hb*1.1||Math.abs(e.y-my)>hb*1.1)continue;fell++;hitEnemy(e,(e.type==='charger'?1000:420)*(has('yariana')?2:1),null,true);e.stun=4;}
       if(fell){m.uses--;se('boom');S.fx.push({x:mx,y:my,r:TU,t:0,dur:0.45,c:'#8a6a40'});if(m.uses<=0){m.armed=false;m.used=true;}}continue;}
     for(const e of S.enemies){if(Math.abs(e.x-mx)<hb*1.1&&Math.abs(e.y-my)<hb*1.1){
@@ -4643,7 +4663,7 @@ function update(dt,sim){
       const base=150*(has('atmine')?1.5:1),rad=TU*1.3*(has('claymine')?1.4:1);
       for(const o of S.enemies){if(Math.hypot(o.x-mx,o.y-my)<rad)hitEnemy(o,base*(has('atmine')&&E[o.type].r>=10?1.6:1),null,has('atmine'));}
       break;}}}
-  S.mines=S.mines.filter(m=>!(m.used&&m.kind==='bomb'));if(!has('rearm'))S.mines=S.mines.filter(m=>!m.used||m.kind==='pit'||m.kind==='spike');
+  S.mines=S.mines.filter(m=>!(m.used&&(m.kind==='bomb'||m.kind==='aebomb'||m.kind==='meteor')));if(!has('rearm'))S.mines=S.mines.filter(m=>!m.used||m.kind==='pit'||m.kind==='spike');
   // 艦砲射撃の着弾
   for(const n of S.navShells){n.t+=dt;if(n.t>=n.delay&&!n.done){n.done=true;se('boom');S.fx.push({x:n.x,y:n.y,r:n.splash,t:0,dur:0.5,c:'#ffe38a'});
     for(const e of S.enemies){if(Math.hypot(e.x-n.x,e.y-n.y)<n.splash)hitEnemy(e,n.dmg,n.src&&S.blds.includes(n.src)?n.src:null);}}}
@@ -5232,6 +5252,7 @@ function draw(){
     if((m.kind==='spike'||m.kind==='pit')&&SPR.buildings[m.kind]){const L=SPR.buildings[m.kind].img.idle,im=L[(Math.floor(an/0.2)+m.x)%L.length],S2=U*T;ctx.imageSmoothingEnabled=false;ctx.globalAlpha=m.kind==='pit'&&!m.armed?0.45:1;ctx.drawImage(im,m.x*T,m.y*T,S2,S2);ctx.globalAlpha=1;ctx.imageSmoothingEnabled=true;return;}
     if(m.kind==='spike'){ctx.fillStyle='#3a3228';ctx.fillRect(m.x*T+3,m.y*T+3,TU-6,TU-6);ctx.fillStyle='#c8c8c0';for(let i=0;i<3;i++)for(let j=0;j<3;j++){const px=m.x*T+7+i*7,py=m.y*T+8+j*7;ctx.beginPath();ctx.moveTo(px-2,py+2);ctx.lineTo(px,py-3);ctx.lineTo(px+2,py+2);ctx.fill();}return;}
     if(m.kind==='bomb'){if(!m.armed)return;ctx.fillStyle='rgba(60,40,20,.6)';ctx.beginPath();ctx.ellipse(mx,my+5,9,3.5,0,0,7);ctx.fill();ctx.fillStyle='#1c1c24';ctx.beginPath();ctx.arc(mx-1,my,6.5,0,7);ctx.fill();ctx.fillStyle='#4a4a5a';ctx.fillRect(mx-4,my-4,3,3);ctx.strokeStyle='#c8a070';ctx.beginPath();ctx.moveTo(mx+3,my-5);ctx.quadraticCurveTo(mx+5,my-9,mx+7,my-8);ctx.stroke();if(Math.sin(an*8+m.x)>0)  {ctx.fillStyle='#ffd060';ctx.fillRect(mx+6,my-10,3,3);}return;}
+    if(m.kind==='aebomb'||m.kind==='gravity'||m.kind==='stake'||m.kind==='meteor'){const im=ICIMG[m.kind];ctx.globalAlpha=m.armed?(m.kind==='gravity'&&(m.cd>0||m.uses===0)?0.4:1):0.35;if(im&&(im.complete||im.getContext))ctx.drawImage(im,mx-TU/2,my-TU/2,TU,TU);ctx.globalAlpha=1;return;}
     if(m.kind==='pit'){ctx.fillStyle=m.armed?'rgba(110,80,40,.75)':'#120c06';ctx.beginPath();ctx.ellipse(mx,my,TU*0.4,TU*0.32,0,0,7);ctx.fill();if(m.armed){ctx.strokeStyle='rgba(160,120,60,.8)';for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(mx-9,my+i*3);ctx.lineTo(mx+9,my+i*3+1);ctx.stroke();}}return;}
     ctx.fillStyle=m.armed?'#3a3020':'#222';ctx.beginPath();ctx.arc(mx,my,5,0,7);ctx.fill();ctx.strokeStyle=m.armed?'#8a7040':'#444';ctx.stroke();
     if(m.armed&&Math.sin(an*3+m.x)>0.6){ctx.fillStyle='#ff5a4e';ctx.beginPath();ctx.arc(mx,my,1.6,0,7);ctx.fill();}}}
@@ -6189,7 +6210,7 @@ document.getElementById('vSe').oninput=e=>auSetSe(+e.target.value);
 // ===== UI（ボタンは作り直さず中身だけ更新） =====
 function setText(el,v){if(el&&el.textContent!==v)el.textContent=v;}
 // 建設は「防衛」「生産」の2グループ。防衛は数字キー、生産はShift＋数字
-const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','wall3','wall5','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','barrier','tesla','harpoon','mray','dbreath','spike','pit','bomb','brazier','totem','outpost']},
+const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','wall3','wall5','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','barrier','tesla','harpoon','mray','dbreath','spike','pit','bomb','aebomb','gravity','stake','meteor','brazier','totem','outpost']},
   {id:'prod',name:'生産・街',keys:'⇧',list:['miner','quarry','ironmine','farm','fishery','well','ammo','powder','furnace','barracks','apart','market','tavern','church','lab']},
   {id:'unit',name:'部隊',keys:'-',list:['train','stable','magic','aerie']}];
 // 建設の分類タブ（防衛・生産・街・部隊）。押すとその見出しまで一覧をスクロールする
@@ -6245,7 +6266,7 @@ function tileDesc(x,y){
   {const ys=Object.keys(YIELD).map(k=>[k,yieldAt(k,x,y)]).filter(a=>a[1]>0);
    if(ys.length)L.push(`<div style="font-size:11px;color:#9fe39a">この土地で採れる：${ys.map(([k,v])=>`${ic(YIELD[k],12)}${YNAME[k]}${v!==1?` ×${v}`:''}`).join('　')}</div>`);
    else if(S.ter[y][x]!==6&&S.ter[y][x]!==3)L.push(`<div class="muted" style="font-size:11px">この土地で採れる資源はありません</div>`);}
-  {const m=mineAt(x,y);if(m){const nm={spike:'トゲ床',pit:'落とし穴',bomb:'爆弾罠'}[m.kind]||'地雷';const st=m.kind==='spike'?(m.armed?`耐久 ${Math.ceil(m.dur==null?SPIKE_DUR:m.dur)} / ${SPIKE_DUR}`:'壊れている（一括修理 木材'+SPIKE_FIX+'）'):m.kind==='pit'?(m.armed?'使える':'埋まっている（一括修理 木材'+PIT_DIG+'・襲撃後に自動）'):(m.armed?'敷設済み':'使用済み');L.push(`<div style="font-size:11px;color:#ffb14e">${nm}：${st}</div>`);}}
+  {const m=mineAt(x,y);if(m){const nm={spike:'トゲ床',pit:'落とし穴',bomb:'爆弾罠',aebomb:'エーテル爆弾',gravity:'重力の罠',stake:'聖銀の杭',meteor:'メテオコール'}[m.kind]||'地雷';const st=m.kind==='spike'?(m.armed?`耐久 ${Math.ceil(m.dur==null?SPIKE_DUR:m.dur)} / ${SPIKE_DUR}`:'壊れている（一括修理 木材'+SPIKE_FIX+'）'):m.kind==='pit'?(m.armed?'使える':'埋まっている（一括修理 木材'+PIT_DIG+'・襲撃後に自動）'):(m.armed?'敷設済み':'使用済み');L.push(`<div style="font-size:11px;color:#ffb14e">${nm}：${st}</div>`);}}
   
   
   return L.join('');
