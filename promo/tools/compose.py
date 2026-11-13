@@ -54,10 +54,11 @@ def save_all():
 
 # ===== 0) オープニング（3.5秒）：同じ街の昼（左）と夜（右）をななめに分ける
 N=int(3.5*FPS)
-OD=Image.open(P+'shots_'+LAY+'/open_day.png').convert('RGB').resize((W,H))
-ON=Image.open(P+'shots_'+LAY+'/open_night.png').convert('RGB').resize((W,H))
+FDs=sorted(glob.glob(P+'frames_open_day/*.jpg'));FNs=sorted(glob.glob(P+'frames_open_night/*.jpg'))
+def icon(n,sz):return Image.open(P+'icon_'+n+'.png').convert('RGBA').resize((sz,sz),Image.NEAREST)
+SUN=icon('sun',132);MOON=icon('moon',132)
 for i in range(N):
-    t=i/(N-1);a=kenburns(OD,t,1.05,1.12,0.5,0.5);b=kenburns(ON,t,1.05,1.12,0.5,0.5)
+    t=i/(N-1);a=kenburns(Image.open(FDs[min(i,len(FDs)-1)]).convert('RGB'),t,1.05,1.10,0.5,0.5);b=kenburns(Image.open(FNs[min(i,len(FNs)-1)]).convert('RGB'),t,1.05,1.10,0.5,0.5)
     k=min(1,i/24);k=1-(1-k)**3            # 境目が右からすべりこむ
     top=W*(1.15-0.57*k);bot=top-W*0.16
     m=Image.new('L',(W,H),0);ImageDraw.Draw(m).polygon([(top,0),(W+400,0),(W+400,H),(bot,H)],fill=255)
@@ -68,7 +69,11 @@ for i in range(N):
     ov.alpha_composite(Image.new('RGBA',(W,140),(6,8,10,0)),(0,0))
     a2=max(0,min(1,(i-22)/12))
     if a2>0:
-        text_c(d,(W*0.22,150),'昼',110,AMBER+(int(255*a2),),stroke=8);text_c(d,(W*0.80,150),'夜',110,(255,110,90,int(255*a2)),stroke=8)
+        for ic,x in ((SUN,int(W*0.06)),(MOON,int(W*0.70))):
+            c=ic.copy();c.putalpha(c.split()[3].point(lambda v:int(v*a2)));sh=Image.new('RGBA',c.size,(0,0,0,0));sh.putalpha(c.split()[3].point(lambda v:int(v*0.7)))
+            ov.alpha_composite(sh,(x+6,86));ov.alpha_composite(c,(x,80))
+        d=ImageDraw.Draw(ov)
+        text_c(d,(int(W*0.06)+150,146),'昼は築く',90,AMBER+(int(255*a2),),'lm',stroke=8);text_c(d,(int(W*0.70)+150,146),'夜は守る',90,(200,215,255,int(255*a2)),'lm',stroke=8)
         band=Image.new('RGBA',(W,170),(6,8,10,int(190*a2)));ov.alpha_composite(band,(0,H-230));d=ImageDraw.Draw(ov)
         text_c(d,(W//2,H-145),'昼に築き、夜に守り抜け。',96,AMBER+(int(255*a2),),stroke=7)
     im=ov.convert('RGB')
