@@ -1871,7 +1871,7 @@ const E={
   gobarcher:{name:'ゴブリンアーチャー',desc:'本隊の後ろから弓で部隊や防衛施設を撃ってくるゴブリン。打たれ弱いが、放っておくと前線がじわじわ削られる',hp:50,spd:30,dmg:4,rate:0.8,r:6,color:'#9ab060',xp:3,mat:0.3,hunt:3,archers:{range:5,dmg:7,rate:1.3}},
   harpy:  {name:'ハーピー',desc:'空から壁を飛び越え、街の奥の住居や生産施設を襲う。空を撃てる兵器でしか倒せない',hp:70,spd:62,dmg:9,rate:0.8,r:7,color:'#c080ff',xp:4,mat:0.4,fly:true},
   wyvern: {name:'ドラゴン',desc:'ゴブリンを乗せた竜。城壁や施設を飛び越えて住居の密集地を目指し、着くとゴブリンを落としてから炎で焼き払う。空を撃てる兵器でしか倒せない',hp:950,spd:46,dmg:34,rate:1.4,r:14,color:'#a83a2a',xp:30,mat:8,fly:true,armor:0.25,drop:{type:'swarm',n:8},breath:1.6},
-  king:   {name:'ゴブリンキング',desc:'ゴブリン軍の王（草原では20回目の中ボス）。周りのゴブリンを奮い立たせ、手下を呼び続ける。15秒ごとに「王の号令」（2秒前に金の輪）で、周り8マスの魔物を6秒勢いづかせる。体力が75%・50%・25%になるたびに援軍（ゴブリンライダー6・オーガ2）を呼ぶ',hp:10000,spd:24,dmg:130,rate:1.6,r:22,color:'#d8a020',xp:120,mat:60,armor:0.45,bldMul:1.5,aura:6,summon:{type:'swarm',n:4,every:7},boss:true},
+  king:   {name:'ゴブリンキング',desc:'ゴブリン軍の王（草原では20回目の中ボス）。15秒ごとに「王の号令」（2秒前に金の輪）で、周り8マスの魔物を6秒勢いづかせる。体力が75%・50%・25%になるたびに援軍（ゴブリンライダー6・オーガ2）を呼ぶ',hp:10000,spd:24,dmg:130,rate:1.6,r:22,color:'#d8a020',xp:120,mat:60,armor:0.45,bldMul:1.5,aura:8,boss:true},
   redcap: {name:'レッドキャップ',desc:'ブラッドムーンの夜にだけ現れる殺戮者。人を狙い、兵士や施設の人員を次々に手にかける',hp:160,spd:60,dmg:14,rate:0.4,r:7,color:'#d02020',xp:12,mat:3,vsS:4,hunt:8,crewKill:true},
   biter:{name:'（未使用）',desc:'',hp:30,spd:34,dmg:5,rate:0.5,r:5,color:'#999',xp:2,mat:0.1},
   laser:{name:'（未使用）',desc:'',hp:170,spd:24,dmg:20,rate:1.8,r:8,color:'#ffe14e',xp:10,mat:2.5,laser:6},
@@ -4628,7 +4628,7 @@ function update(dt,sim){
     {const fx=Math.floor(e.x/T),fy=Math.floor(e.y/T);e.sub=!!(S.deep&&fx>=0&&fy>=0&&fx<COLS&&fy<ROWS&&S.deep[fy*COLS+fx]);}
     if(e.wp0&&Math.hypot(e.wp0[0]-e.x,e.wp0[1]-e.y)<TU*2.5)e.wp0=null;
     if(d.regen&&e.hp<e.maxhp)e.hp=Math.min(e.maxhp,e.hp+d.regen*dt);
-    e.buff=false;if(S._kings&&S._kings.length&&(e.type==='swarm'||e.type==='charger'||e.type==='spitter'))for(const k of S._kings)if(Math.hypot(k.x-e.x,k.y-e.y)<E.king.aura*TU){e.buff=true;break;}
+    e.buff=false;   /* 王のオーラ（いつも）はやめた。勢いづくのは王の号令のときだけ（2026-11-13） */
     if(e.rallyT>0){e.rallyT-=dt;e.buff=true;}   /* 王の号令 */
     if(e.type==='king'){/* 中ボス：王の号令（15秒ごと・2秒前に金の輪）と、体力75%・50%・25%で援軍 */
       e.cryCd=(e.cryCd==null?6:e.cryCd)-dt;if(e.cryCd<=0&&!e.cryT){e.cryT=2;}
@@ -6911,7 +6911,7 @@ function dexTraits(d){const L=[];
   if(d.spill)L.push(['中から出てくる',`倒すと${E[d.spill.type].name}が${d.spill.n}体出る`]);
   if(d.drop)L.push(['落とす',`${E[d.drop.type].name}を${d.drop.n}体落とす`]);
   if(d.summon)L.push(['手下を呼ぶ',`${d.summon.every}秒ごとに${E[d.summon.type].name}を${d.summon.n}体`]);
-  if(d.aura)L.push(['鼓舞',`周り${d.aura*U}マスのゴブリンを強くする`]);
+  if(d.aura)L.push(['王の号令',`15秒ごとに、周り${d.aura}マスの魔物を6秒勢いづかせる（2秒前に金の輪）`]);if(d.boss&&d.aura)L.push(['援軍','体力が75%・50%・25%になるたびに、ゴブリンライダー6・オーガ2を呼ぶ']);
   if(d.boss)L.push(['ボス','最後の夜の最後の波に現れる']);
   if(d.vsS&&d.vsS>=1.5)L.push([`対部隊 ×${d.vsS}`,'部隊にとくに強い']);
   if(d.bldMul&&d.bldMul>1)L.push([`対施設 ×${d.bldMul}`,'施設にとくに強い']);
