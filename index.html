@@ -7244,7 +7244,7 @@ function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn()
   requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();}finally{b.classList.add('off');}}));}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.4','2026-11-13',['<b>駐屯地襲撃モード β</b>：ステージ選択で ON にすると、見つけた駐留地へ攻め込むとき、別の戦場で夜襲をかけて戦う。手持ちの部隊で戦い、倒した魔物の分だけ次の襲撃が減る（部隊の損耗も残る）','ステージ1の名前を<b>グレイヴェル平原</b>に','<b>モンスター図鑑</b>をタイトルへ。セーブをまたいで記録が残る。立ち絵が少し動くように','<b>アップデート情報</b>をゲームの中で見られるように','上の資源の表示：新しい資材が増えても入りきるように詰めて表示。石炭・合金のアイコンを見やすく']],
+ ['1.4','2026-11-13',['<b>駐屯地襲撃モード β</b>：ステージ選択で ON にすると、見つけた駐留地へ攻め込むとき、別の戦場で夜襲をかけて戦う。手持ちの部隊で戦い、倒した魔物の分だけ次の襲撃が減る（部隊の損耗も残る）','ステージ1の名前を<b>グレイヴェル平原</b>に','<b>モンスター図鑑</b>をタイトルへ。セーブをまたいで記録が残る。立ち絵が少し動くように','<b>アップデート情報</b>をゲームの中で見られるように','上の資源の表示：新しい資材が増えても入りきるように詰めて表示。石炭・合金のアイコンを見やすく','襲撃の曲を40回の襲撃に合わせて、ランクが上がるごとに盛り上がるように']],
  ['1.3','2026-11-13',['<b>ステージ1（草原）を40回の襲撃まで</b>：20回目に中ボス「ゴブリンキング」、40回目にラスボス「蠢く木陰」','ステージ選択：沼地・山脈・雪原・荒野は Coming Soon','新しい魔物：トレント・エルダートレント・盾持ちオーガ・マンイーター・吸血鬼・グール・ストーンゴーレム・ワーウルフ','ランクⅠ〜Ⅶ（城Lv7まで）、新しい素材、施設の改築','新しい防衛施設・罠：風船爆弾・メイジの塔・バリアストーン・テスラタワー・ハープーンランチャー・ミスリルレイ・ドラゴンブレス ほか','新しい部隊：エーテルゴーレム・狙撃兵・銀装兵・グリフォン騎兵','図鑑の特徴に名前、数字は小数なしで表示']],
  ['1.2','2026-11-10',['夜の過ごし方（休む・宴・祈り・夜警・夜なべ）と夜の出来事','教会・熟練度・罠の見直し・市場の売り買い','部隊の範囲選択、オートセーブ、読み込み画面']],
  ['1.1','',['スマホ横持ちに対応、ホーム画面に追加してアプリとして遊べるように','タブを 建設・研究・軍事・街 に整理','城の強化・造り替えにターンがかかるように']],
@@ -7694,12 +7694,17 @@ const PREP_CH=[[50,53,57],[46,50,53],[43,46,50],[45,49,52]];
 const BAT_ROOT=[38,38,34,36,38,38,41,40];
 const BAT_CH=[[62,65,69],[62,65,69],[58,62,65],[60,64,67],[62,65,69],[62,65,69],[65,69,72],[64,67,71]];
 const MELO=[74,null,72,74,77,null,76,74, 72,null,70,69,70,null,72,null, 74,null,72,74,77,null,79,77, 76,null,74,72,73,null,null,null];
+// 襲撃の曲の盛り上がり（2026-11-13・40回の襲撃に合わせる）。40回のステージはランクの区切りで変える：
+// Ⅰ〜Ⅲ（1〜11回）＝0：太鼓とベース／Ⅳ〜Ⅵ（12〜34回）＝1：旋律が入る／Ⅶ（35〜40回）＝2：刻みが細かくなる。テンポはランクごとに少しずつ速く（144→168）
+function battleRank(){const n=S.wave||1;return n<=3?1:n<=7?2:n<=11?3:n<=18?4:n<=26?5:n<=34?6:7;}
+function battleLv(){if(finalWave()>=40){const r=battleRank();return r>=7?2:r>=4?1:0;}return S.wave>=finalWave()?2:S.wave>=4?1:0;}
+function battleBpm(){if(!S||!S.waveActive||finalWave()<40)return 150;return 140+battleRank()*4;}
 function auMusicFor(){
   if(!AU.ctx||!S)return;
   // 場面ごとの曲：ホーム（タイトル）・昼・静かな夜・祭りの夜・敵の襲撃・ボス襲来（攻城戦は siege.js が上書きする）
   const boss=(S.waveActive||S.skirm)&&S.enemies&&S.enemies.some(e=>e.hp>0&&E[e.type]&&E[e.type].boss);
   const want=(S.overlay==='title'||S.overlay==='intro')?'home':S.over?null:(S.waveActive||S.skirm)?(boss?'boss':'battle'):S.night?(S.night.plan==='fest'?'fest':'night'):'prep';
-  AU.intensity=S.waveActive?(S.wave>=finalWave()?2:S.wave>=4?1:0):0;
+  AU.intensity=S.waveActive?battleLv():0;
   AU.map=AU.mapForce||S.mapId||'f';
   if(want!==AU.track){
     const t=AU.ctx.currentTime;
@@ -7755,7 +7760,7 @@ function playBattle(st,t){
 // ---- 追加の曲（2026-11-11）----
 const TRACK={
   prep:{bpm:72,f:(s,t)=>playPrep(s,t)},
-  battle:{bpm:150,f:(s,t)=>playBattle(s,t)},
+  battle:{bpm:()=>battleBpm(),f:(s,t)=>playBattle(s,t)},
   home:{bpm:66,f:(s,t)=>playHome(s,t)},
   night:{bpm:56,f:(s,t)=>playNight(s,t)},
   fest:{bpm:128,f:(s,t)=>playFest(s,t)},
