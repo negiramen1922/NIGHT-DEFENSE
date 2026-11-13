@@ -1781,7 +1781,7 @@ B.totem={name:'呪骸の柱',glyph:'呪',hp:420,heat:1,cost:{stone:40,mat:30},po
 B.coalmine={name:'炭鉱',glyph:'炭',hp:220,heat:1,cost:{steel:50,stone:20,gold:10},pop:3,power:0,spec:'内政',grp:'prod',req:'coalt',desc:'鉱脈の上に建設。石炭を産出（+6/T）。石炭は篝火・鋼・合金に使う'};
 B.goldmine={name:'金鉱',glyph:'金',hp:220,heat:1,cost:{steel:60,stone:30,gold:20},pop:3,power:0,spec:'内政',grp:'prod',req:'goldt',desc:'鉱脈の上に建設。素材の金を産出（+4/T）。金貨ではない。合金の材料'};
 B.mithmine={name:'聖銀鉱',glyph:'銀',hp:260,heat:1,cost:{steel:100,stone:60,alloy:10,gold:40},pop:4,power:0,spec:'内政',grp:'prod',req:'mitht',desc:'鉱脈の上に建設。聖銀（ミスリル）を産出（+2/T）'};
-B.smelter={name:'精錬所',glyph:'錬',hp:300,heat:2,cost:{steel:80,stone:60,iron:20,gold:30},pop:3,power:0,spec:'内政',grp:'prod',req:'smeltt',desc:'鉄3・金2・石炭1から合金3を作る（1ターン）。ランクⅤの改築で魔金属も作れる（合金2・エーテル2・魔核1から魔金属2）'};
+B.smelter={name:'精錬所',glyph:'錬',hp:300,heat:2,cost:{steel:80,stone:60,iron:20,gold:30},pop:3,power:0,spec:'内政',grp:'prod',req:'smeltt',desc:'鉄4・金3・石炭2から合金5を作る（1ターン）。ランクⅤの改築で魔金属も作れる（合金2・エーテル2・魔核1から魔金属3）'};
 /* ランクⅣ〜Ⅶの罠（2026-11-13・絵と費用は仮） */
 B.aebomb={name:'エーテル爆弾',glyph:'',hp:1,heat:0,cost:{steel:15,elec:12},pop:0,power:0,spec:'工兵',isMine:true,kind:'aebomb',req:'aebombt',desc:'爆弾罠の上位。踏んだ魔物の周り6マスをエーテルの爆発で吹き飛ばす（使い切り・空の敵には効かない）'};
 B.gravity={name:'重力の罠',glyph:'',hp:1,heat:0,cost:{steel:20,elec:20,mat:10},pop:0,power:0,spec:'工兵',isMine:true,kind:'gravity',req:'gravityt',desc:'近づいた魔物（空を飛ぶ魔物も）を、周り5マスまとめて地面に押さえつける（4秒動けない・空の魔物は地面に落ちる）。ボスは遅くなるだけ。一晩に2回、8秒おき'};
@@ -4375,13 +4375,13 @@ function update(dt,sim){
     else if(b.type==='tavern'){S.fuel=Math.max(0,S.fuel-0.2*dt);}
     else if(b.type==='ironmine'){const v=0.6*um*RICH[richAt(b.x,b.y)]*(techMul('ironmine')+bn.prod-1)*dt;S.iron+=v;depleteTick(b,v);tickProdXp(b,dt);}
     else if(b.type==='coalmine'||b.type==='goldmine'||b.type==='mithmine'){const r=YIELD[b.type],v={coalmine:0.6,goldmine:0.4,mithmine:0.2}[b.type]*um*RICH[richAt(b.x,b.y)]*bn.prod*dt;S[r]=(S[r]||0)+v;depleteTick(b,v);tickProdXp(b,dt);}
-    else if(b.type==='smelter'){const m=um*bn.prod*dt/10;if(b.mode==='mmetal'&&b.lv>=2){if(S.alloy>=2*m&&S.elec>=2*m&&S.mat>=m){S.alloy-=2*m;S.elec-=2*m;S.mat-=m;S.mmetal=(S.mmetal||0)+2*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
-      else{if(S.iron>=3*m&&(S.goldore||0)>=2*m&&(S.coal||0)>=m){S.iron-=3*m;S.goldore-=2*m;S.coal-=m;S.alloy=(S.alloy||0)+3*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}}
+    else if(b.type==='smelter'){const m=um*bn.prod*dt/10;if(b.mode==='mmetal'&&b.lv>=2){if(S.alloy>=2*m&&S.elec>=2*m&&S.mat>=m){S.alloy-=2*m;S.elec-=2*m;S.mat-=m;S.mmetal=(S.mmetal||0)+3*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
+      else{if(S.iron>=4*m&&(S.goldore||0)>=3*m&&(S.coal||0)>=2*m){S.iron-=4*m;S.goldore-=3*m;S.coal-=2*m;S.alloy=(S.alloy||0)+5*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}}
     else if(b.type==='farm'){S.fuel+=0.8*um*(techMul('farm')+bn.prod-1)*dt;tickProdXp(b,dt);}
     else if(b.type==='ammo'){const m=um*(techMul('ammo')+bn.prod-1)*dt;const sw=b.mode==='sword',ar=b.mode==='armor';const kf=heroSk(b,'kenyaku')?0.6:1;const ns=(sw||ar?0.2:0.4)*m*kf,ni=(ar?0.6:sw?0.4:0.2)*m*kf;if(S.steel>=ns&&S.iron>=ni){S.steel-=ns;S.iron-=ni;if(ar)S.armor=(S.armor||0)+0.4*m;else if(sw)S.sword+=0.5*m;else S.ammo+=3.0*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
     else if(b.type==='powder'){const m=um*bn.prod*dt;const nw=0.6*m,nm=0.1*m;if(S.steel>=nw&&S.mat>=nm){S.steel-=nw;S.mat-=nm;S.powder=(S.powder||0)+0.6*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
     else if(b.type==='furnace'){b.fa=(b.fa||0)+0.2*um*bn.prod*dt;b.starved=S.mat<1;while(b.fa>=1&&S.mat>=1){b.fa-=1;S.mat-=1;S.elec+=2;}if(S.mat<1)b.fa=Math.min(b.fa,1);tickProdXp(b,dt);}
-    else if(b.type==='well'){const v=0.3*um*RICH[richAt(b.x,b.y)]*bn.prod*dt;S.elec+=v;depleteTick(b,v);tickProdXp(b,dt);}
+    else if(b.type==='well'){const v=0.5*um*RICH[richAt(b.x,b.y)]*bn.prod*dt;S.elec+=v;depleteTick(b,v);tickProdXp(b,dt);}
     else if(b.type==='power'){const need=0.25*um*dt;if(S.fuel>=need){S.fuel-=need;b.noFuel=false;}else b.noFuel=true;tickProdXp(b,dt);}
     else if(b.type==='elecf'){const m=um*bn.prod*pr*dt;const ns=0.5*m;if(S.steel>=ns){S.steel-=ns;S.elec+=0.3*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
     else if(b.type==='barracks'||b.type==='reactor'||b.type==='lab'){if(b.type!=='barracks'||S.pop<S.popCap)tickProdXp(b,dt);}
@@ -6058,10 +6058,10 @@ function reserveOf(type,x,y){const v=yieldAt(type,x,y);return type==='miner'?Mat
 function prodOf(b){const k=TURN_SEC,bn=bonus(b),um=UP.prod[b.lv-1]*eff(b)*happyMul();if(b.bt>0||b.dep||b.off)return null;
   switch(b.type){case 'miner':return {steel:1.0*um*(b.ym||1)*(techMul('miner')+bn.prod-1)*k};case 'quarry':return {stone:0.6*um*(b.ym||1)*(techMul('quarry')+bn.prod-1)*k};
   case 'ironmine':return {iron:0.6*um*RICH[richAt(b.x,b.y)]*(techMul('ironmine')+bn.prod-1)*k};case 'farm':return {fuel:0.8*um*(techMul('farm')+bn.prod-1)*k};
-  case 'fishery':return {fuel:1.0*um*(techMul('fishery')+bn.prod-1)*k};case 'well':return {elec:0.3*um*RICH[richAt(b.x,b.y)]*bn.prod*k};case 'market':return {gold:0.6*um*bn.prod*k};
+  case 'fishery':return {fuel:1.0*um*(techMul('fishery')+bn.prod-1)*k};case 'well':return {elec:0.5*um*RICH[richAt(b.x,b.y)]*bn.prod*k};   /* エーテル 3→5/T（2026-11-13・ランクⅣで足りなかった） */case 'market':return {gold:0.6*um*bn.prod*k};
   case 'ammo':{const m=um*(techMul('ammo')+bn.prod-1)*k;const kf=heroSk(b,'kenyaku')?0.6:1;return b.mode==='armor'?{armor:0.4*m,steel:-0.2*m*kf,iron:-0.6*m*kf}:b.mode==='sword'?{sword:0.5*m,steel:-0.2*m*kf,iron:-0.4*m*kf}:{ammo:3.0*m,steel:-0.4*m*kf,iron:-0.2*m*kf};}
   case 'coalmine':return {coal:0.6*um*RICH[richAt(b.x,b.y)]*bn.prod*k};case 'goldmine':return {goldore:0.4*um*RICH[richAt(b.x,b.y)]*bn.prod*k};case 'mithmine':return {mithril:0.2*um*RICH[richAt(b.x,b.y)]*bn.prod*k};
-  case 'smelter':{const m=um*bn.prod;return b.mode==='mmetal'&&b.lv>=2?{mmetal:2*m,alloy:-2*m,elec:-2*m,mat:-m}:{alloy:3*m,iron:-3*m,goldore:-2*m,coal:-m};}
+  case 'smelter':{const m=um*bn.prod;return b.mode==='mmetal'&&b.lv>=2?{mmetal:3*m,alloy:-2*m,elec:-2*m,mat:-m}:{alloy:5*m,iron:-4*m,goldore:-3*m,coal:-2*m};}
   case 'barracks':return {pop:S.happy>=35?bn.prod*3:0};case 'apart':return {pop:S.happy>=35?bn.prod*5:0};case 'tavern':return {fuel:-0.2*k};
   case 'furnace':{const m=0.2*um*bn.prod*k;return {elec:2*m,mat:-m};}case 'powder':{const m=um*bn.prod*k;return {powder:0.6*m,steel:-0.6*m,mat:-0.1*m};}}return null;}
 function depleteTick(b,amt){if(b.res==null||b.res===Infinity)return;b.res-=amt;if(b.res<=0){b.res=0;b.dep=true;log(`${B[b.type].name}の資源が尽きた（新しい場所を探そう）`,'warn');
