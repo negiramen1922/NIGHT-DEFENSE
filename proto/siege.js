@@ -1,5 +1,5 @@
 // ===== 攻城戦（試作）：駐留地への夜襲を、別の戦場で戦う =====
-// 試作版だけで読み込む（tools/mkproto.py が proto/index.html に <script src="siege.js"> を足す）。本番の index.html には入らない。
+// 本番・試作版の両方で読み込む（2026-11-13 から本番も。駐屯地襲撃モード β）。単独の攻城戦（タイトルのボタン）は試作版だけ。本番の index.html には入らない。
 // 流れ：編成（何回目の襲撃の駐留地か・陣の形・部隊を自由に選ぶ）→ 配置（陣のまわりに置く）→ 戦闘（夜明けまで・リアルタイム）→ 結果
 // 夜襲なので、陣の魔物は「その駐留地にいる数の3割」。ほかはテントで眠っている。見張りに見つかるまで陣は寝ている。
 // 結果は「勝ち負け」ではなく、敵へのダメージ（倒した魔物と、焼いたテントの割合）で決まる。
@@ -39,7 +39,12 @@ const LAYOUTS={
   square:{n:'四角い陣', b:[{t:'rect',a:200,b:150,gates:['l','r','b']}],towers:'corners',tents:{grid:true,n:6}},
   double:{n:'二重の陣', b:[{t:'circle',r:225,gates:[180,0,90,270]},{t:'circle',r:110,gates:[135,315]}],towers:[{r:178,n:6},{r:70,n:3}],tents:{r:160,n:7}},
   long:  {n:'横長の陣', b:[{t:'rect',a:270,b:115,gates:['l','r','t']}],towers:'corners',tents:{row:true,n:7}},
+  fort:  {n:'大要塞',   b:[{t:'circle',r:250,gates:[180,0,90,270]},{t:'circle',r:172,gates:[45,225]},{t:'circle',r:92,gates:[135,315]}],towers:[{r:212,n:8},{r:138,n:5},{r:58,n:3}],tents:{r:124,n:8}},
 };
+// 陣の規模：襲撃が進むほど陣が大きくなる（40回目まで。2026-11-13）。sc：大きさ、extra：テントを足す数
+function campTier(n){return n<=7?{nm:'小さな陣',sc:1,extra:0}:n<=14?{nm:'中くらいの陣',sc:1.1,extra:2}:n<=21?{nm:'大きな陣',sc:1.2,extra:3}:n<=30?{nm:'砦',sc:1.3,extra:4}:{nm:'大要塞',sc:1,extra:5};}
+function scaledLayout(lk,n){const L=JSON.parse(JSON.stringify(LAYOUTS[lk])),t=campTier(n),k=lk==='fort'?1:t.sc;
+  for(const bd of L.b)for(const q of ['r','a','b'])if(bd[q])bd[q]=Math.round(bd[q]*k);if(Array.isArray(L.towers))for(const tw of L.towers)tw.r=Math.round(tw.r*k);if(L.tents.r)L.tents.r=Math.round(L.tents.r*k);L.extra=t.extra;return L;}
 for(const L of Object.values(LAYOUTS)){for(const bd of L.b)for(const k of ['r','a','b'])if(bd[k])bd[k]=Math.round(bd[k]*CAMP_SC);if(Array.isArray(L.towers))for(const t of L.towers)t.r=Math.round(t.r*CAMP_SC);if(L.tents.r)L.tents.r=Math.round(L.tents.r*CAMP_SC);}
 let G=null,cv=null,cx=null,raf=0,last=0,nid=1;
 const $=id=>document.getElementById(id);
@@ -57,6 +62,7 @@ const ename=k=>(typeof E!=='undefined'&&E[k]?E[k].name:k);
 
 // ---------- 駐留している魔物：第N襲撃のうち、いちばん多い方角のぶん ----------
 function stationed(n){let q=[];
+  if(G&&G.camp&&typeof campById==='function'){const c=campById(G.camp);const c2={};if(c){const {u}=campUnits(c);for(const k in u)if(E[k]&&!E[k].boss)c2[k]=u[k];}return c2;}
   try{if(typeof genWave==='function'&&typeof S!=='undefined'&&S&&S.sideOrder){const sv={open:S.open&&Object.assign({},S.open),wave:S.wave};const w=genWave(n);S.open=sv.open;q=w.q||[];}}catch(e){q=[];}
   const by={};for(const e of q){(by[e.side]=by[e.side]||[]).push(e);}const side=Object.keys(by).sort((a,b)=>by[b].length-by[a].length)[0];
   const c={};for(const e of (side?by[side]:[]))if(E[e.type]&&!E[e.type].boss)c[e.type]=(c[e.type]||0)+1;
@@ -79,9 +85,10 @@ function heroList(){if(G.heroL)return G.heroL;let L=[];const ok=c=>c&&c.alive&&c
 function hSkill(c){try{return typeof heroSkills==='function'?heroSkills(c)[0]:null;}catch(e){return null;}}
 function hColor(c){return typeof SPECS!=='undefined'&&SPECS[c.spec]?SPECS[c.spec].color:'#f2b33d';}
 function heroIcon(c,sz){const sp=typeof SPR!=='undefined'&&SPR.units&&SPR.units[HSPR[c.spec]];if(!sp||!sp.img||!sp.img.walk)return '';const cv0=document.createElement('canvas');cv0.width=cv0.height=sz;const g=cv0.getContext('2d');g.imageSmoothingEnabled=false;const im=sp.img.walk[0]||sp.img.walk;try{g.drawImage(im,0,0,sz,sz);}catch(e){}return `<img src="${cv0.toDataURL()}" width="${sz}" height="${sz}" style="image-rendering:pixelated;vertical-align:middle">`;}
-function attachHero(u){const c=heroList().find(h=>G.hsel&&G.hsel[h.id]===u.t&&!(G.hUsed||(G.hUsed=new Set())).has(h.id));if(!c)return;G.hUsed.add(c.id);
+function attachHero(u){const c=heroList().find(h=>G.hsel&&G.hsel[h.id]===u.t&&!(G.hUsed||(G.hUsed=new Set())).has(h.id));if(!c)return;G.hUsed.add(c.id);applyHero(u,c);}
+function applyHero(u,c){
   const m=(HFIT[c.spec]||[]).includes(u.t)?1:0.3,L=(typeof HERO_CORE!=='undefined'?HERO_CORE[Math.min(typeof HERO_MAX!=='undefined'?HERO_MAX:5,c.lv||1)-1]:0.5);
-  u.hero=c;u.hm=m;u.dmul=1+m*(L*0.8+(c.atk||0)*0.01);u.hpMul=1+m*(L*0.5+(c.def||0)*0.01);u.red=Math.min(0.4,m*(0.1+(c.def||0)*0.01));u.hp*=u.hpMul;u.maxhp*=u.hpMul;
+  u.hero=c;u.hm=m;u.dmul=(u.dmul||1)*(1+m*(L*0.8+(c.atk||0)*0.01));const hm=1+m*(L*0.5+(c.def||0)*0.01);u.hpMul=(u.hpMul||1)*hm;u.red=Math.min(0.4,m*(0.1+(c.def||0)*0.01));u.hp*=hm;u.maxhp*=hm;
   u.sk=hSkill(c);u.skT=u.sk&&u.sk.cd?u.sk.cd*0.4:0;u.skN=0;}
 
 // ---------- 画面（編成） ----------
@@ -92,10 +99,41 @@ function openSiege(){
   let root=$('siege');if(!root){root=document.createElement('div');root.id='siege';document.body.appendChild(root);}
   root.style.display='flex';document.body.classList.add('siegeOn');renderSetup();
 }
+// ---------- 本編とつなぐ：駐屯地襲撃モード β（2026-11-13）。本編の駐留地に近づくと、本編から openSiegeCamp(c) を呼ぶ ----------
+const MODEL_SU={pawn:'sword',silver:'sword',guard:'sword',farmer:'sword',advSword:'sword',heavy:'heavy',aether_golem:'heavy',archer:'archer',sniper:'archer',scout:'archer',advBow:'archer',rider:'cav',griffon:'cav',dragon:'drake',wizard:'mage',advMage:'mage',cannoneer:'gun'};
+function suOf(sq){return MODEL_SU[sq.model]||({inf:'sword',arch:'archer',cav:'cav',drake:'drake',mage:'mage',art:'gun',mil:'sword',guard:'sword',adv:'sword'})[sq.ut]||null;}
+function campSquads(){return (S.squads||[]).filter(q=>q.hp>0&&!q.gar&&suOf(q));}
+function openSiegeCamp(c){const n=S.wave+1,w=S.next||{};
+  G={phase:'setup',camp:c.id,raid:n,layout:'auto',speed:1,paused:false,pool:{},pick:{},fhm:(w.blood?1.25:1)*(w.hpMul||1)};
+  for(const q of campSquads())if(Math.hypot(q.x-c.x,q.y-c.y)<14*TU)G.pick[q.id]=true;   /* 駐留地の近くにいる部隊は最初から選んでおく */
+  S.overlay='siege';S.paused=true;
+  let root=$('siege');if(!root){root=document.createElement('div');root.id='siege';document.body.appendChild(root);}
+  root.style.display='flex';document.body.classList.add('siegeOn');renderCampSetup();}
+function renderCampSetup(){const root=$('siege'),c=campById(G.camp);const st=stationed(G.raid),aw=awakeOf(st);G.st=st;G.aw=aw;const L=campSquads();
+  root.innerHTML=`<div class="sgSetup"><h2>駐屯地襲撃 <span style="color:#f2b33d">β</span><small>${campName(c)}への夜襲（第${G.raid}襲撃の前）</small></h2>
+    <div class="sgRow"><b>駐留地</b><small class="muted">駐留している魔物 ${total(st)}体（${Object.entries(st).sort((a,b)=>b[1]-a[1]).map(([k,v])=>ename(k)+v).join('・')}）<br>陣の規模：<b>${campTier(G.raid).nm}</b>　起きているのは${Math.round(AWAKE_SHARE*100)}%、ほかはテント・小屋で眠っている</small></div>
+    <div class="sgRow"><b>陣の形</b>${['auto'].concat(Object.keys(LAYOUTS)).map(k=>`<button data-lay="${k}" class="${G.layout===k?'on':''}">${k==='auto'?'おまかせ':LAYOUTS[k].n}</button>`).join('')}</div>
+    <div class="sgHelp">連れて行く部隊を選びます（駐留地の近くにいた部隊は選んであります）。倒した魔物と、焼いたテントの中の魔物の分だけ、次の襲撃が減ります。部隊が受けた被害・失った兵は本編にそのまま残ります。英雄が率いる部隊は、英雄のスキルも使えます。</div>
+    <div class="sgUnits">${L.length?L.map(q=>{const k=suOf(q),d=SU[k],cm=typeof cmdOf==='function'?cmdOf(q):null;return `<label class="sgU" style="cursor:pointer"><input type="checkbox" data-pick="${q.id}" ${G.pick[q.id]?'checked':''}><span class="sgI">${unitIcon(k,32)}</span><span class="sgN"><b>${unitLabel(q)}</b><small class="muted">夜襲では「${d.n}」として戦う　体力 ${Math.round(q.hp/q.maxhp*100)}%　${q.members}${MT(q).unit||'人'}${cm?`　英雄 ${cm.name}`:''}</small></span></label>`;}).join(''):'<div class="muted">連れて行ける部隊がいません（城の守りについている部隊は連れて行けません）</div>'}</div>
+    <div class="sgFoot"><button id="sgBack">やめる（街へ戻る）</button><button id="sgGo" class="primary" ${L.some(q=>G.pick[q.id])?'':'disabled'}>出撃（配置へ）</button></div></div>`;
+  root.querySelectorAll('[data-lay]').forEach(b=>b.onclick=()=>{G.layout=b.dataset.lay;sfx('click');renderCampSetup();});
+  root.querySelectorAll('[data-pick]').forEach(el=>el.onchange=()=>{G.pick[el.dataset.pick]=el.checked;if(!el.checked)delete G.pick[el.dataset.pick];sfx('click');renderCampSetup();});
+  $('sgBack').onclick=closeSiege;
+  $('sgGo').onclick=()=>{G.pool={};G.queue={};for(const q of L)if(G.pick[q.id]){const k=suOf(q);G.pool[k]=(G.pool[k]||0)+1;(G.queue[k]=G.queue[k]||[]).push(q.id);}c.raidDay=S.turn;startDeploy();};}
+// 夜襲の結果を本編へ：倒した魔物の分だけ次の襲撃を減らし、部隊の被害を戻す
+function killsByType(){const kd={};for(const f of G.foes)if(!f.def&&!alive(f))kd[f.k]=(kd[f.k]||0)+1;for(const b of G.blds)if(b.burnBy)for(const k in b.burnBy)kd[k]=(kd[k]||0)+b.burnBy[k];return kd;}
+function campApply(why){const c=campById(G.camp);if(!c||G.applied)return null;G.applied=true;const kd=killsByType();let n=0;
+  for(const k in kd)for(let i=0;i<kd[k];i++){const before=S.next&&S.next.q.length;campLoss({camp:c.id,type:k});if(S.next&&S.next.q.length<before){n++;try{dexMark(k,true);}catch(e){}}}
+  for(const k in G.st)try{dexMark(k);}catch(e){}
+  let lost=0;for(const u of G.units){if(!u.sq)continue;const sq=S.squads.find(q=>q.id===u.sq);if(!sq)continue;const end=u.out?(u.keepHp||0):(alive(u)&&!G.retreat?u.hp:0);const r=u.hp0>0?end/u.hp0:1;if(r<=0)lost++;sqLoss(sq,r);}
+  const left=campUnits(c).n;let gone=false;
+  if(left<=0||why==='complete'){c.state='gone';gone=true;const rew=30+S.wave*10;S.gold+=rew;log(`駐屯地襲撃：${campName(c)}を壊滅させた（${n}体）。この方面の襲撃はなくなった。略奪品 金貨+${rew}`,'good');}
+  else{c.state='idle';log(`駐屯地襲撃：${campName(c)}の魔物を${n}体減らした（残り約${left}体）${lost?`。${lost}部隊が戻らなかった`:''}`,n>0?'good':'warn');}
+  return {n,left,gone,lost};}
 function saveSetup(){try{localStorage.setItem('nd_siege',JSON.stringify({pool:G.start||G.pool,raid:G.raid,layout:G.layout,hsel:G.hsel||{}}));}catch(e){}}
 function renderSetup(){const root=$('siege');saveSetup();const st=stationed(G.raid),aw=awakeOf(st);G.st=st;G.aw=aw;
   root.innerHTML=`<div class="sgSetup"><h2>攻城戦（試作）<small>駐留地への夜襲</small></h2>
-    <div class="sgRow"><b>どの駐留地</b><span class="sgRaid"><button data-raid="-1">−</button><b>第${G.raid}襲撃</b><button data-raid="1">＋</button></span>
+    <div class="sgRow"><b>どの駐留地</b><span class="sgRaid"><button data-raid="-1">−</button><b>第${G.raid}襲撃</b><button data-raid="1">＋</button></span><small class="muted" style="margin-left:6px">陣の規模：<b>${campTier(G.raid).nm}</b></small>
       <small class="muted">駐留している魔物 ${total(st)}体（${Object.entries(st).map(([k,v])=>ename(k)+v).join('・')}）<br>陣の守り：${['物見櫓','見張りオオカミ'].concat(G.raid>=DEF_FROM.drum?['戦太鼓のゴブリン']:[]).concat(G.raid>=DEF_FROM.rock?['岩投げオーガ']:[]).join('・')}<br>夜襲なので、起きて出てくるのは3割の <b style="color:#ff8a6a">${total(aw)}体</b>。残りはテントで眠っている</small></div>
     <div class="sgRow"><b>陣の形</b>${['auto'].concat(Object.keys(LAYOUTS)).map(k=>`<button data-lay="${k}" class="${G.layout===k?'on':''}">${k==='auto'?'おまかせ':LAYOUTS[k].n}</button>`).join('')}</div>
     <div class="sgHelp">部隊を自由に選べます（試作なので費用なし）。陣のまわりのどこからでも攻められます。部隊はいちばん近い相手を狙います（得意な相手は優先）。夜明け（${NIGHT_SEC/60}分）まで戦えます。<br>敵へのダメージ＝倒した魔物（起きていた3割）＋焼いたテント（眠っている7割）。</div>
@@ -106,7 +144,7 @@ function renderSetup(){const root=$('siege');saveSetup();const st=stationed(G.ra
     ${(()=>{let L=[];try{L=JSON.parse(localStorage.getItem('nd_siege_log')||'[]');}catch(e){}if(!L.length)return '';const W2={dawn:'夜明け',complete:'壊滅',lose:'全滅',retreat:'撤退'};
       return `<details class="sgLog"><summary>これまでの記録（${L.length}回）</summary><table class="sgLoss"><tr><th>日時</th><th>駐留地</th><th>結果</th><th>ダメージ</th><th>部隊ごとの損耗（兵の残り／出発）</th></tr>${L.map(o=>`<tr><td>${new Date(o.d).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</td><td>第${o.raid}襲撃・${LAYOUTS[o.lay]?LAYOUTS[o.lay].n:''}</td><td>${W2[o.why]||o.why} ${Math.floor(o.t/60)}:${String(o.t%60).padStart(2,'0')}</td><td>${o.dmg}%</td><td style="text-align:left">${ORDER.filter(k=>o.loss&&o.loss[k]).map(k=>{const q=o.loss[k];return `${SU[k].n} ${q.m1}/${q.m0}`;}).join('・')}${o.heroes&&o.heroes.length?'<br><small>英雄：'+o.heroes.map(h=>`${h.n}（${SU[h.t]?SU[h.t].n:''}・${h.sk}${h.c}回・残り${h.men}/${h.m0}）`).join('、')+'</small>':''}</td></tr>`).join('')}</table><button id="sgLogClr" class="ghost">記録を消す</button></details>`;})()}
     <div class="sgFoot"><button id="sgBack">やめる（タイトルへ）</button><button id="sgGo" class="primary" ${ORDER.some(k=>G.pool[k]>0)?'':'disabled'}>出撃（配置へ）</button></div></div>`;
-  root.querySelectorAll('[data-raid]').forEach(b=>b.onclick=()=>{G.raid=Math.max(1,Math.min(20,G.raid+(+b.dataset.raid)));sfx('click');renderSetup();});
+  root.querySelectorAll('[data-raid]').forEach(b=>b.onclick=()=>{G.raid=Math.max(1,Math.min(40,G.raid+(+b.dataset.raid)));sfx('click');renderSetup();});
   root.querySelectorAll('[data-lay]').forEach(b=>b.onclick=()=>{G.layout=b.dataset.lay;sfx('click');renderSetup();});
   root.querySelectorAll('[data-inc]').forEach(b=>b.onclick=()=>{G.pool[b.dataset.inc]=Math.min(30,(G.pool[b.dataset.inc]||0)+1);sfx('click');renderSetup();});
   root.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>{G.pool[b.dataset.dec]=Math.max(0,(G.pool[b.dataset.dec]||0)-1);sfx('click');renderSetup();});
@@ -114,7 +152,7 @@ function renderSetup(){const root=$('siege');saveSetup();const st=stationed(G.ra
   {const c=$('sgLogClr');if(c)c.onclick=()=>{try{localStorage.removeItem('nd_siege_log');}catch(e){}renderSetup();};}
   $('sgBack').onclick=closeSiege;$('sgGo').onclick=startDeploy;
 }
-function closeSiege(){setTimeout(()=>{try{if(typeof AU!=='undefined'&&AU.ctx)auMusicFor();}catch(e){}},50);cancelAnimationFrame(raf);raf=0;const root=$('siege');if(root){root.style.display='none';root.innerHTML='';}document.body.classList.remove('siegeOn');G=null;if(typeof showTitle==='function')showTitle();}
+function closeSiege(){setTimeout(()=>{try{if(typeof AU!=='undefined'&&AU.ctx)auMusicFor();}catch(e){}},50);cancelAnimationFrame(raf);raf=0;const root=$('siege');if(root){root.style.display='none';root.innerHTML='';}document.body.classList.remove('siegeOn');const wasCamp=G&&G.camp;G=null;if(wasCamp){if(S.overlay==='siege')S.overlay=null;try{renderAll();}catch(e){}return;}if(typeof showTitle==='function')showTitle();}
 function unitIcon(k,sz){const d=SU[k];if(d.draw){const c=document.createElement('canvas');c.width=c.height=32;const g=c.getContext('2d');g.translate(16,18);(d.draw==='ram'?drawRam:drawCat)(g,0,0,1,0);return `<img src="${c.toDataURL()}" width="${sz}" height="${sz}" style="image-rendering:pixelated">`;}
   const sp=typeof SPR!=='undefined'&&SPR.units&&SPR.units[d.spr];if(!sp)return '';return `<img src="${sp.img.walk[0].toDataURL()}" width="${sz}" height="${sz}" style="image-rendering:pixelated">`;}
 
@@ -122,7 +160,8 @@ function unitIcon(k,sz){const d=SU[k];if(d.draw){const c=document.createElement(
 // 水・山は通れない（地上の部隊は回り込む）。森は足が遅くなり、見張りに見つかりにくい。陣のまわりは切り開いてある
 function pickTerrain(){G.mo=null;try{if(typeof terCv==='undefined'||!terCv||typeof S==='undefined'||!S||!S.ter)return;
   let cx0=null,cy0=null;
-  if(S.camps&&S.camps.length){const c=S.camps[Math.floor(Math.random()*S.camps.length)];cx0=c.x;cy0=c.y;}
+  if(G.camp&&typeof campById==='function'&&campById(G.camp)){const c=campById(G.camp);cx0=c.x;cy0=c.y;}
+  else if(S.camps&&S.camps.length){const c=S.camps[Math.floor(Math.random()*S.camps.length)];cx0=c.x;cy0=c.y;}
   else if(S.hives&&S.sideOrder){const sd=S.sideOrder[Math.floor(Math.random()*S.sideOrder.length)],h=S.hives[sd],hq=S.blds.find(b=>b.type==='hq');if(h&&hq&&typeof bcx==='function'){const k=0.45;cx0=bcx(h)+(bcx(hq)-bcx(h))*k;cy0=bcy(h)+(bcy(hq)-bcy(h))*k;}}
   if(cx0==null){cx0=terCv.width/2;cy0=terCv.height/2;}
   const ox=Math.max(0,Math.min(terCv.width-W,Math.round(cx0-CX))),oy=Math.max(0,Math.min(terCv.height-H,Math.round(cy0-CY)));
@@ -141,7 +180,7 @@ function farFromCamp(x,y,m){const bd=G.bounds[0],dx=Math.abs(x-CX),dy=Math.abs(y
 // ---------- 戦場をつくる ----------
 function buildField(){
   pickTerrain();G.blk=null;G.blkM=null;
-  let lk=G.layout;if(lk==='auto'){const n=total(G.aw);lk=n>70?'double':['ring','square','long'][Math.floor(Math.random()*3)];}G.lay=lk;const L=LAYOUTS[lk];
+  let lk=G.layout;if(lk==='auto'){const n=total(G.aw);lk=G.raid>30?'fort':(n>70||G.raid>21)?'double':['ring','square','long'][Math.floor(Math.random()*3)];}G.lay=lk;const L=scaledLayout(lk,G.raid);
   G.units=[];G.foes=[];G.blds=[];G.shots=[];G.fx=[];G.traps=[];G.sel=new Set();G.t=0;G.alarm=false;G.card=ORDER.find(k=>G.pool[k]>0)||null;G.bounds=[];
   const B=(kind,x,y,r,hp,ex)=>{const b=Object.assign({id:nid++,kind,x,y,r,hp,maxhp:hp,cd:Math.random()},ex||{});G.blds.push(b);return b;};
   // 柵と門
@@ -157,7 +196,7 @@ function buildField(){
   const towers=[];if(L.towers==='corners'){const bd=G.bounds[0];for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]])towers.push([CX+sx*(bd.a-30),CY+sy*(bd.b-30),0]);}
   else L.towers.forEach((t,li)=>{for(let i=0;i<t.n;i++){const a=(i+0.5)/t.n*Math.PI*2;towers.push([CX+Math.cos(a)*t.r,CY+Math.sin(a)*t.r,li]);}});
   // 襲撃が進むほど物見櫓を足す（外側の柵の内側に）
-  {const extra=Math.floor(G.raid/3),bd=G.bounds[0];for(let i=0;i<extra;i++){const a=(i+0.25)/Math.max(1,extra)*Math.PI*2+0.6;const r=(bd.t==='circle'?bd.r:Math.min(bd.a,bd.b))-34;towers.push([CX+Math.cos(a)*r*(bd.t==='rect'?bd.a/Math.min(bd.a,bd.b):1)*0.95,CY+Math.sin(a)*r,0]);}}
+  {const extra=Math.max(0,Math.min(Math.floor(G.raid/3),16-towers.length)),bd=G.bounds[0];   /* 物見櫓は16まで */for(let i=0;i<extra;i++){const a=(i+0.25)/Math.max(1,extra)*Math.PI*2+0.6;const r=(bd.t==='circle'?bd.r:Math.min(bd.a,bd.b))-34;towers.push([CX+Math.cos(a)*r*(bd.t==='rect'?bd.a/Math.min(bd.a,bd.b):1)*0.95,CY+Math.sin(a)*r,0]);}}
   for(const [x,y,li] of towers)B('tower',x,y,15,li?520:420,{rng:150,dmg:li?10:8,rate:li?1.0:1.1});
   // 守りの魔物（駐留している魔物とは別。ダメージの計算には入れない）
   // 岩投げオーガ：門の内側に陣取って大きな岩を投げる。破城槌・投石機に強い（襲撃が進むほど増える）
@@ -174,6 +213,9 @@ function buildField(){
   if(T.grid){const bd=G.bounds[0];for(let i=0;i<T.n;i++){tp.push([CX+((i%3)-1)*(bd.a*0.55),CY+(i<3?-1:1)*bd.b*0.45]);}}
   else if(T.row){const bd=G.bounds[0];for(let i=0;i<T.n;i++){const k=i<4?i:i-4;const xs=i<4?[-0.75,-0.4,0.4,0.75][k]:[-0.55,0,0.55][k];tp.push([CX+xs*bd.a,CY+(i<4?-0.45:0.5)*bd.b]);}}
   else for(let i=0;i<T.n;i++){const a=i/T.n*Math.PI*2+0.3;tp.push([CX+Math.cos(a)*T.r,CY+Math.sin(a)*T.r]);}
+  // 大きな陣はテントを足す（いちばん内側の柵と中心のあいだ、または外の柵の内側に輪で）
+  if(L.extra){const bd=G.bounds[0],ib=G.bounds[G.bounds.length-1];for(let i=0;i<L.extra;i++){const a=i/L.extra*Math.PI*2+1.1;
+    const rx=bd.t==='circle'?(G.bounds.length>1?(G.bounds[0].r+G.bounds[1].r)/2:bd.r*0.62):bd.a*0.62,ry=bd.t==='circle'?rx:bd.b*0.62;tp.push([CX+Math.cos(a)*rx,CY+Math.sin(a)*ry]);}}
   // 眠っている魔物（7割）を建物に分ける：ゴブリンたちはテント、大きな魔物・獣は小屋、空を飛ぶ魔物は竜の巣。大将のテントは2つ分
   {const sl={};for(const k in G.st){const v=G.st[k]-(G.aw[k]||0);if(v>0)sl[k]=v;}
     const ks=Object.keys(sl),cnt=keys=>keys.reduce((a,k)=>a+sl[k],0);
@@ -200,14 +242,21 @@ function buildField(){
   G.sleeping=total(G.st)-total(G.aw);
   G.ground=null;
 }
-function mkFoe(k,x,y,ex){const d=E[k];return Object.assign({id:nid++,k,x,y,px:x,py:y,hp:d.hp,maxhp:d.hp,cd:Math.random(),face:-1,tg:null,walk:Math.random()*4},ex||{});}
+function mkFoe(k,x,y,ex){const d=E[k],hm=(G&&G.fhm)||1;return Object.assign({id:nid++,k,x,y,px:x,py:y,hp:Math.round(d.hp*hm),maxhp:Math.round(d.hp*hm),cd:Math.random(),face:-1,tg:null,walk:Math.random()*4},ex||{});}
 function startDeploy(){if(!ORDER.some(k=>G.pool[k]>0))return;G.hUsed=new Set();if(!G.start)G.start=Object.assign({},G.pool);G.phase='deploy';buildField();renderField();loopStart();
   msg('夜襲です。陣は寝静まっている。見張りや物見櫓に見つかると、陣の魔物が起きてくる（ホイール・ピンチ・＋－で拡大、右ドラッグ・2本指で移動）');}
-function spawnSquad(k,x,y,noHero){const d=SU[k];const u={id:nid++,t:k,x,y,hp:d.hp*d.m,maxhp:d.hp*d.m,cd:Math.random()*d.rate,face:x<CX?1:-1,tg:null,tx:null,ty:null,hold:false,walk:Math.random()*4,spawned:false};G.units.push(u);if(!noHero)attachHero(u);return u;}
+function spawnSquad(k,x,y,noHero){const d=SU[k];const u={id:nid++,t:k,x,y,hp:d.hp*d.m,maxhp:d.hp*d.m,cd:Math.random()*d.rate,face:x<CX?1:-1,tg:null,tx:null,ty:null,hold:false,walk:Math.random()*4,spawned:false};G.units.push(u);
+  if(G.camp&&!noHero&&G.queue&&G.queue[k]&&G.queue[k].length){const id=G.queue[k].shift(),sq=S.squads.find(q=>q.id===id);if(sq){linkSquad(u,sq);u.hp0=u.hp;return u;}}
+  if(!noHero)attachHero(u);u.hp0=u.hp;return u;}
+// 本編の部隊を夜襲の部隊にする：装備の段（1人の体力）で強さ、今の体力の割合で兵の数、率いる英雄のスキル
+function linkSquad(u,sq){const d=SU[u.t];u.sq=sq.id;u.name=typeof unitLabel==='function'?unitLabel(sq):'';
+  let rk=1;try{rk=Math.max(1,memberHp(sq)/MT(sq).hpEach);}catch(e){}u.hpMul=rk;u.dmul=rk;
+  const fr=Math.max(0.05,Math.min(1,sq.hp/sq.maxhp));u.maxhp=d.hp*d.m*rk;u.hp=u.maxhp*fr;
+  const c=typeof cmdOf==='function'?cmdOf(sq):null;if(c&&c.spec!=='内政')applyHero(u,c);}
 
 // ---------- 戦場の画面 ----------
 function renderField(){const root=$('siege');
-  root.innerHTML=`<div class="sgTop"><b>夜襲（試作）</b><span class="sgProg" title="敵へのダメージ（倒した魔物＋焼いたテント）"><small>敵へのダメージ</small><i><b id="sgPB"></b></i><em id="sgPT">0%</em></span><span id="sgStat"></span><span class="grow"></span>
+  root.innerHTML=`<div class="sgTop"><b>夜襲${G.camp?'（β）':'（試作）'}</b><span class="sgProg" title="敵へのダメージ（倒した魔物＋焼いたテント）"><small>敵へのダメージ</small><i><b id="sgPB"></b></i><em id="sgPT">0%</em></span><span id="sgStat"></span><span class="grow"></span>
       <button id="sgZo" title="縮小">－</button><button id="sgZi" title="拡大（ホイール・ピンチでも）">＋</button><button id="sgSpd">速度 ×${G.speed}</button><button id="sgPause">${G.paused?'再開':'一時停止'}</button><button id="sgQuit">撤退</button></div>
     <canvas id="sgCv"></canvas>
     <div class="sgMsg" id="sgMsg"></div>
@@ -575,14 +624,14 @@ function menLeft(u){if(u.out)return mem(Object.assign({},u,{hp:u.keepHp}));if(al
 function lossTable(){const T={};for(const u of G.units){const k=u.t,d=SU[k];const o=T[k]=T[k]||{sq:0,m0:0,m1:0,wiped:0,out:0};o.sq++;o.m0+=d.m;const m=menLeft(u);o.m1+=m;if(!m)o.wiped++;if(u.out)o.out++;}return T;}
 function saveLog(r,why){try{const L=JSON.parse(localStorage.getItem('nd_siege_log')||'[]');L.unshift({d:Date.now(),raid:G.raid,lay:G.lay,dmg:r.dmgPct,why,t:Math.round(G.t),loss:lossTable(),heroes:G.units.filter(u=>u.hero).map(u=>({n:u.hero.name,t:u.t,sk:u.sk?u.sk.name:'',c:u.skN||0,men:menLeft(u),m0:SU[u.t].m}))});localStorage.setItem('nd_siege_log',JSON.stringify(L.slice(0,20)));}catch(e){}}
 function lossHtml(T){return `<table class="sgLoss"><tr><th>部隊</th><th>出した部隊</th><th>兵（出発→残り）</th><th>損耗率</th><th>全滅した部隊</th>${G&&G.retreat?'<th>逃げ切った部隊</th>':''}</tr>${ORDER.filter(k=>T[k]).map(k=>{const o=T[k],lp=o.m0?Math.round((1-o.m1/o.m0)*100):0;return `<tr><td>${SU[k].n}</td><td>${o.sq}部隊</td><td>${o.m0}人 → ${o.m1}人</td><td style="color:${lp>=70?'#ff5a4e':lp>=40?'#f2b33d':'#6fe08a'}">${lp}%</td><td>${o.wiped}</td>${G&&G.retreat?`<td>${o.out}</td>`:''}</tr>`;}).join('')}</table>`;}
-function endBattle(why){if(!G||G.phase==='end')return;G.phase='end';const r=result(),lostSq=G.units.filter(u=>!u.out&&(!alive(u)||G.retreat)).length,outSq=G.units.filter(u=>u.out).length;
+function endBattle(why){if(!G||G.phase==='end')return;G.phase='end';const CA=G.camp?campApply(why):null;const r=result(),lostSq=G.units.filter(u=>!u.out&&(!alive(u)||G.retreat)).length,outSq=G.units.filter(u=>u.out).length;
   const men0=G.units.reduce((a,u)=>a+(SU[u.t].m>1?SU[u.t].m:0),0),men=G.units.filter(u=>u.out||(alive(u)&&!G.retreat)).reduce((a,u)=>a+(SU[u.t].m>1?mem(u.out?Object.assign({},u,{hp:u.keepHp}):u):0),0);
   sfx(r.dmgPct>=50?'clear':'turn');
   const t={dawn:'夜が明けた',complete:'陣を壊滅させた！',lose:'夜襲の部隊が全滅した',retreat:G.burnedAll?'テントを焼き払って引き上げた':'撤退した'}[why];
   const killW=r.all?r.kill/r.all*100:0,burnW=r.all?r.sleepKill/r.all*100:0,grade=r.dmgPct>=90?['大戦果','#ffd060']:r.dmgPct>=60?['戦果あり','#ffb040']:r.dmgPct>=30?['小さな戦果','#c8c8a0']:['戦果わずか','#8aa48d'];
   const bar=(v,m,c)=>`<i class="sgMini"><b style="width:${m?Math.round(v/m*100):0}%;background:${c}"></b></i>`;
   const box=document.createElement('div');box.className='sgEnd';box.innerHTML=`<div class="sgEH"><span>${t}</span><em style="color:${grade[1]}">${grade[0]}</em></div>
-    <div class="sgBig"><div><small>敵へのダメージ</small><b>${r.dmgPct}%</b></div><div class="sgSum">駐留していた魔物 <b>${r.all}</b> 体のうち、<b style="color:#ffb040">${r.dmgN}</b> 体ぶんを減らした<br><small>本番なら（案）：この駐留地から来る次の襲撃が ${r.dmgPct}% 減る</small></div></div>
+    <div class="sgBig"><div><small>敵へのダメージ</small><b>${r.dmgPct}%</b></div><div class="sgSum">駐留していた魔物 <b>${r.all}</b> 体のうち、<b style="color:#ffb040">${r.dmgN}</b> 体ぶんを減らした<br>${CA?`<small>次の襲撃から <b>${CA.n}</b> 体減った${CA.gone?'（駐留地は壊滅）':`（この駐留地の残り 約${CA.left}体）`}${CA.lost?`　戻らなかった部隊 ${CA.lost}`:''}</small>`:`<small>本番なら（案）：この駐留地から来る次の襲撃が ${r.dmgPct}% 減る</small>`}</div></div>
     ${(()=>{const BN={tent:'テント',hut:'小屋',nest:'竜の巣',chief:'大将のテント',tower:'物見櫓',gate:'門',abatis:'逆茂木',post:'柵の杭'};
       const BK=['chief','tent','hut','nest','tower','gate','abatis'],bt=k=>G.blds.filter(b=>b.kind===k);let bA=0,bD=0;
       const bRows=BK.filter(k=>bt(k).length).map(k=>{const a=bt(k).length,dd=bt(k).filter(b=>b.hp<=0).length;bA+=a;bD+=dd;return `<div class="sgL"><span>${BN[k]}</span><b>${dd} / ${a}</b>${bar(dd,a,'#ff9a2a')}</div>`;}).join('');
@@ -597,10 +646,11 @@ function endBattle(why){if(!G||G.phase==='end')return;G.phase='end';const r=resu
       <div class="sgCard"><h4>生き残った兵 <b style="color:#6fe08a">${sp}%</b></h4><div class="sgL"><span>出した兵</span><b>${sm[0]}人</b></div><div class="sgL"><span>生き残った兵</span><b>${sm[1]}人</b>${bar(sm[1],sm[0],'#6fe08a')}</div><div class="sgL"><span>失った兵</span><b style="color:#ff8a6a">${sm[0]-sm[1]}人</b></div>${G.retreat?`<div class="sgL"><span>逃げ切った兵</span><b>${G.units.filter(u=>u.out).reduce((a,u)=>a+menLeft(u),0)}人</b></div>`:''}<div class="sgL tot"><span>かかった時間</span><b>${Math.floor(G.t/60)}:${String(Math.round(G.t)%60).padStart(2,'0')}</b></div><small class="muted">破城槌・投石機は1台＝1人として数える</small></div>
     </div>`;})()}
     ${G.units.some(u=>u.hero)?`<div class="sgHeroes">${G.units.filter(u=>u.hero).map(u=>`<span style="color:${hColor(u.hero)}">${u.hero.name}（${SU[u.t].n}）スキル「${u.sk?u.sk.name:'-'}」${u.skN||0}回${alive(u)||u.out?'':'・部隊は倒れた'}</span>`).join('')}</div>`:''}
-    <div class="sgFoot"><button id="sgAgain">同じ編成でもう一度</button><button id="sgEdit">編成を変える</button><button id="sgClose">タイトルへ</button></div>`;
+    <div class="sgFoot">${G.camp?'<button id="sgClose" class="primary">街へ戻る</button>':'<button id="sgAgain">同じ編成でもう一度</button><button id="sgEdit">編成を変える</button><button id="sgClose">タイトルへ</button>'}</div>`;
   {const T=lossTable();const sm=Object.values(T).reduce((a,o)=>[a[0]+o.m0,a[1]+o.m1],[0,0]);const el=document.createElement('details');el.className='sgLossBox';el.open=true;el.innerHTML=`<summary>部隊ごとの損耗（兵 ${sm[0]}人 → ${sm[1]}人、損耗 ${sm[0]?Math.round((1-sm[1]/sm[0])*100):0}%）</summary>${lossHtml(T)}`;box.querySelector('.sgFoot').before(el);saveLog(r,why);}
   $('siege').appendChild(box);
   const keep=G.start,raid=G.raid,lay=G.layout;
+  if(G.camp){$('sgClose').onclick=closeSiege;return;}
   $('sgAgain').onclick=()=>{G={phase:'setup',pool:Object.assign({},keep),raid,layout:lay,speed:G.speed,paused:false,start:keep};G.st=stationed(raid);G.aw=awakeOf(G.st);startDeploy();};
   $('sgEdit').onclick=()=>{cancelAnimationFrame(raf);G={phase:'setup',pool:Object.assign({},keep),raid,layout:lay,speed:1,paused:false};renderSetup();};
   $('sgClose').onclick=closeSiege;}
@@ -715,7 +765,7 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
 }
 let hudT=0;function hud(){const now=performance.now();if(now-hudT<200)return;hudT=now;const el=$('sgStat');if(!el||!G||!G.blds)return;const r=result(),left=Math.max(0,Math.ceil(NIGHT_SEC-G.t));
   {const pb=$('sgPB');if(pb)pb.style.width=r.dmgPct+'%';const pt=$('sgPT');if(pt)pt.textContent=r.dmgPct+'%';}
-  el.innerHTML=`第${G.raid}襲撃の駐留地（${LAYOUTS[G.lay].n}）　夜明けまで <b>${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}</b>　焼いた建物 ${r.tentPct}%　魔物 ${G.foes.filter(alive).length}/${G.foes.length}　味方 ${G.units.filter(alive).length}部隊　${G.retreat?`<b style="color:#ff5a4e">撤退中</b> 逃げ切った ${G.units.filter(u=>u.out).length}部隊`:G.phase==='deploy'?'<b style="color:#62c6d9">配置中</b>':G.alarm?'<b style="color:#ff5a4e">見つかった！</b>':G.phase==='battle'?'<b style="color:#9ab0ff">寝静まっている</b>':''}`;
+  el.innerHTML=`第${G.raid}襲撃の駐留地（${campTier(G.raid).nm}・${LAYOUTS[G.lay].n}）　夜明けまで <b>${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}</b>　焼いた建物 ${r.tentPct}%　魔物 ${G.foes.filter(alive).length}/${G.foes.length}　味方 ${G.units.filter(alive).length}部隊　${G.retreat?`<b style="color:#ff5a4e">撤退中</b> 逃げ切った ${G.units.filter(u=>u.out).length}部隊`:G.phase==='deploy'?'<b style="color:#62c6d9">配置中</b>':G.alarm?'<b style="color:#ff5a4e">見つかった！</b>':G.phase==='battle'?'<b style="color:#9ab0ff">寝静まっている</b>':''}`;
   if(G.phase==='battle'&&G.units.some(u=>!alive(u)&&G.sel.has(u.id)))renderCmd();}
 
 // ---------- 見た目 ----------
@@ -822,9 +872,9 @@ function renderMusic(){const r=document.getElementById('sgMusic');if(!r)return;c
   document.getElementById('sgMStop').onclick=()=>{MUS=null;if(typeof AU!=='undefined'&&AU.ctx){AU.track=null;}renderMusic();};   // 止める（閉じると元の曲に戻る）
   document.getElementById('sgMClose').onclick=closeMusic;}
 function hook(){if(typeof showTitle!=='function'||typeof E==='undefined'||typeof SPR==='undefined'){setTimeout(hook,200);return;}
-  const orig=showTitle;window.showTitle=showTitle=function(){const r=orig.apply(this,arguments);try{const nb=document.getElementById('tNew');if(nb&&!document.getElementById('tSiege')){const b=document.createElement('button');b.id='tSiege';b.textContent='攻城戦（試作）';b.style.padding='8px';b.onclick=openSiege;nb.insertAdjacentElement('afterend',b);}if(nb&&!document.getElementById('tMusic')){const m=document.createElement('button');m.id='tMusic';m.textContent='♪ 音楽室・音量';m.style.padding='8px';m.onclick=openMusic;(document.getElementById('tSiege')||nb).insertAdjacentElement('afterend',m);}}catch(e){}return r;};
+  const orig=showTitle;window.showTitle=showTitle=function(){const r=orig.apply(this,arguments);if(!String(typeof GAME_VER!=='undefined'?GAME_VER:'').includes('試作'))return r;   /* 単独の攻城戦・音楽室は試作版だけ */try{const nb=document.getElementById('tNew');if(nb&&!document.getElementById('tSiege')){const b=document.createElement('button');b.id='tSiege';b.textContent='攻城戦（試作）';b.style.padding='8px';b.onclick=openSiege;nb.insertAdjacentElement('afterend',b);}if(nb&&!document.getElementById('tMusic')){const m=document.createElement('button');m.id='tMusic';m.textContent='♪ 音楽室・音量';m.style.padding='8px';m.onclick=openMusic;(document.getElementById('tSiege')||nb).insertAdjacentElement('afterend',m);}}catch(e){}return r;};
   if(typeof S!=='undefined'&&S&&S.overlay==='title')showTitle();
   musicHook();
-  window.openSiege=openSiege;window.__siege=()=>G;window.__siegeUpd=dt=>update(dt);window.__tb=tBlock;window.__fp=findPath;window.__reach=reachable;}
+  window.openSiege=openSiege;window.openSiegeCamp=openSiegeCamp;window.__siege=()=>G;window.__sgSpawn=(k,x,y)=>{spawnSquad(k,x,y);G.pool[k]--;};window.__siegeUpd=dt=>update(dt);window.__tb=tBlock;window.__fp=findPath;window.__reach=reachable;}
 hook();
 })();

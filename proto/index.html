@@ -465,6 +465,8 @@ button.danger{background:#2a1210;color:#ff8a80;box-shadow:0 0 0 1px var(--red-li
 .res .dl{font-size:10px}
 .res .dl.up{color:var(--green)}.res .dl.up::before{content:'▲'}
 .res .dl.dn{color:var(--red)}.res .dl.dn::before{content:'▼'}
+#resbar.tight .rgp>.rgi{gap:5px}#resbar.tight .rgp{padding:4px 6px}#resbar.tight .dl.zero{display:none}
+
 .res .dl.zero{color:var(--off)}
 #wave{display:flex;align-items:center;gap:12px;padding:0 14px;background:var(--head);color:var(--amber);flex-shrink:0}
 .daypips{display:flex;gap:2px}.daypips i{width:6px;height:4px;background:#3a3220}.daypips i.on{background:var(--amber)}   /* 【追加】襲撃までの日数 */
@@ -1258,6 +1260,7 @@ body.land #build .bchips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}b
 /* 上の資源の数字：桁が増えても横の資源が動かない */
 #resbar .res>b{display:inline-block;min-width:3.3em;text-align:left}
 @media (min-width:1301px){#resbar .res>.dl{display:inline-block;min-width:2.8em}}
+#resbar.tight .res>b{min-width:2.2em}#resbar.tight .res>.dl{min-width:0!important}#resbar.tight2 .res>.dl{display:none!important}#resbar.tight2 .res .ic{width:20px;height:20px}#resbar.tight2 .rgp>.rgi{gap:6px}#resbar.tight2 .res>b{min-width:0}
 @media (max-width:900px){body.resMin:not(.land) #wrap #resbar .res>b{min-width:1.9em}
 body.resMin:not(.land) #wrap #resbar .res.key{grid-template-columns:auto 2.4em}}
 body.land #wrap #resbar .res .dl{display:inline-block!important;min-width:3em}
@@ -1498,6 +1501,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 #info .banner .tag{z-index:1}
 .dxi.big{width:300px;height:120px}
 .dxi.big .artpx{width:300px}
+.dxi.big .dxcv{width:300px;height:120px;image-rendering:pixelated;display:block}
 @media (max-width:900px){.dxi.big{width:100%;max-width:300px;height:auto}}
 .kcnext{display:flex;gap:8px;align-items:center;margin:4px 0}.kcnext img{width:32px;height:32px;image-rendering:pixelated;background:#0003;border-radius:4px}
 </style>
@@ -1564,9 +1568,9 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
       <span class="sep"></span>
       <div class="speed"><button id="bPauseSeg" class="dOnly" title="一時停止 [Space]"></button><button data-spd="1">×1</button><button data-spd="2">×2</button><button data-spd="3">×3</button></div>
       <span class="grow"></span>
-      <button id="bDex" class="dOnly">図鑑<kbd>E</kbd></button><button id="bHist" class="dOnly">記録</button>
+      <button id="bHist" class="dOnly">記録</button>
       <details id="more" class="more"><summary title="表示・設定"><span class="mic"></span><span class="mtx">表示・設定</span></summary><div class="moreBody">
-      <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mSup">一括補給</button><button id="mHist">襲撃の記録</button><button id="mDex">モンスター図鑑</button><button id="mLog">通信ログ</button></div>
+      <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mSup">一括補給</button><button id="mHist">襲撃の記録</button><button id="mLog">通信ログ</button></div>
       <div class="mOnly mspeed"><span class="help">速度</span><div class="speed"><button data-spd="1">×1</button><button data-spd="2">×2</button><button data-spd="3">×3</button></div></div>
       <button id="bOrient" style="display:none">画面の向き：横で固定</button>
       <button id="bInstall2" style="display:none">ホーム画面に追加（アプリにする）</button>
@@ -2536,7 +2540,7 @@ const MAPS={
   'm':{name:'山上の砦ハルデン',diff:'むずかしめ',desc:'山々に囲まれた高い盆地の砦。畑にできる平地と森が少なく、食料と木材が乏しい。石と鉄は豊富'},
   's':{name:'雪原の関所ヴィンター',diff:'むずかしい',desc:'凍てつく雪原の関所。川が天然の堀だが、冬が深まると凍りつく。吹雪の夜は明かりが届かない'},
   't':{name:'廃村エルム',diff:'入門',desc:'昔ゴブリンに焼かれた村。壊れた柵やバリスタが残っていて、半額ですぐに建て直せる。襲撃は6回で、魔物も少なめ'},
-  'f':{name:'辺境の街グレイヴェル',diff:'試作',desc:'森と丘に囲まれた辺境の街。北のアビスから魔物が来る'},
+  'f':{name:'グレイヴェル平原',diff:'ふつう',desc:'森と丘に囲まれた辺境の街。北のアビスから魔物が来る'},
   'c':{name:'日本海沿岸 第1防衛区域',diff:'入門',desc:'海の向こうの島にアビス。魔物は海底を渡り、3つの浜から上陸してくる'},
   '7':{name:'辺境の街グレイヴェル',diff:'やさしめ',desc:'城館の近くに豊かな鉱脈・油田があり、遠くにも豊かな資源が眠る。まずはここから'},
   '2':{name:'第2防衛区域',diff:'むずかしめ',desc:'城館の近くは資源が乏しく、豊かな資源は遠方だけ。前哨砦を押し出して資源を確保する必要がある'},
@@ -2545,7 +2549,7 @@ const MAPS={
 function mapName(){return S&&S.mode==='campaign'?MAPS[S.mapId||'7'].name:'演習';}
 function newCampaign(){
   const G=upGen(CUR_MAP==='s'?genSnow():CUR_MAP==='f'||CUR_MAP==='t'?genFantasy():CUR_MAP==='m'?genMountain():CUR_MAP==='c'?genCoast():genCampaign(CUR_MAP));
-  S=baseState(G.ore,G.t,G.oil);S.mode='campaign';S.mapId=CUR_MAP;S.hives=G.hives;
+  S=baseState(G.ore,G.t,G.oil);S.mode='campaign';S.mapId=CUR_MAP;S.hives=G.hives;S.siegeMode=siegeModeDefault();
   if(G.island){S.island=G.island;S.seaWalk=true;}
   // α（最寄り）→β→γ の順に襲撃元が増える
   S.sideOrder=['A','B','C'];S.lanes={A:.5,B:.5,C:.5};
@@ -3429,7 +3433,7 @@ function piSz(sz){return sz<=18?12:sz<=36?24:48;}
 // 操作アイコン（1色）：name=sun/moon/research/army/hire/menu/lock/check/pause/play/gear/close/log
 function ui(name,col,sz){sz=piSz(sz||12);return `<img class="pi" src="${piURL(name,col)}" width="${sz}" height="${sz}" alt="" style="width:${sz}px;height:${sz}px">`;}
 // 試作：新しい資源（鎧・金・合金）のアイコン（仮の絵）
-function icNew(k,sz){{const RK={coal:'res_coal',alloy:'res_alloy',goldore:'res_gold',armor:'res_armor',mmetal:'res_magic',mithril:'res_holy'}[k];const u=RK&&typeof SPR!=='undefined'&&sprIconURL(RK);if(u)return `<img class="ic pi" src="${u}" width="${sz}" height="${sz}" title="${RES_NAME[k]}" style="width:${sz}px;height:${sz}px;image-rendering:pixelated;vertical-align:-3px">`;}const C={armor:['#9aa0a6','a'],goldore:['#f2c84a','n'],alloy:['#3a3d4a','i'],coal:['#2a2a32','n'],mmetal:['#a774ec','i'],mithril:['#f0f6ff','i']}[k];if(!C)return null;const [c,t]=C,d='#1c1824';
+function icNew(k,sz){{const RK={coal:'res_coal',alloy:'res_alloy',goldore:'res_gold',armor:'res_armor',mmetal:'res_magic',mithril:'res_holy'}[k];const u=RK&&typeof SPR!=='undefined'&&sprIconURL(RK);if(u)return `<img class="ic pi" src="${u}" width="${sz}" height="${sz}" title="${RES_NAME[k]}" style="width:${sz}px;height:${sz}px;image-rendering:pixelated;vertical-align:-3px${k==='coal'||k==='alloy'?';filter:drop-shadow(0 0 1px #c8c0d8) drop-shadow(0 0 1px #c8c0d8)':''}">`;}const C={armor:['#9aa0a6','a'],goldore:['#f2c84a','n'],alloy:['#3a3d4a','i'],coal:['#2a2a32','n'],mmetal:['#a774ec','i'],mithril:['#f0f6ff','i']}[k];if(!C)return null;const [c,t]=C,d='#1c1824';
   const body=t==='a'?`<path d="M4 2h8l3 3-2 2v7H3V7L1 5z" fill="${c}" stroke="${d}"/>`:t==='n'?`<path d="M3 9l3-5h5l3 4-2 5H5z" fill="${c}" stroke="${d}"/><rect x="6" y="6" width="2" height="2" fill="#fff8c0"/>`:`<path d="M2 11l3-5h9l-3 5z" fill="${c}" stroke="${d}"/><path d="M2 11h9v3H2z" fill="#b89a50" stroke="${d}"/><path d="M11 11l3-5v3l-3 5z" fill="#c9b070" stroke="${d}"/>`;
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" class="ic" style="vertical-align:-3px" shape-rendering="crispEdges"><title>${RES_NAME[k]}</title>${body}</svg>`;}
 function ic(k,sz){sz=sz||14;{const n=icNew(k,sz);if(n)return n;}const p=PI_RES[k];if(p&&PXICON.items[p]){const z=piSz(sz);return `<img class="ic pi" src="${piURL(p)}" width="${z}" height="${z}" alt="${RES_NAME[k]||k}" title="${RES_NAME[k]||k}" style="width:${z}px;height:${z}px">`;}
@@ -3822,8 +3826,26 @@ function campWatch(){
       if(!c.found&&MT(s).scoutEye&&d<=((MT(s).vision||6)+lvl('scout'))*T){c.found=true;S.campFoundN=(S.campFoundN||0)+1;s.tx=null;s.ax=s.x;s.ay=s.y;
         const {u,n}=campUnits(c);se('upgrade');toast(`${unitLabel(s)}が${campName(c)}を発見！（約${n}体）`,'good',4500);
         log(`${unitLabel(s)}が${campName(c)}を発見：${Object.keys(u).map(k=>E[k].name+'×'+u[k]).join('・')}。${CAMP_TRIG*U}マス以内に近づくと戦闘になる`,'good');}
-      if(S.phase!=='night'&&!S.skirm&&d<CAMP_TRIG*TU){startSkirm(c);return;}}}
+      if(S.phase!=='night'&&!S.skirm&&d<CAMP_TRIG*TU){
+        if(S.siegeMode===false){if(!c.offMsg){c.offMsg=1;toast('駐屯地襲撃モードが OFF なので、駐留地には攻め込めません','warn',3500);}continue;}
+        if(S.siegeMode&&typeof openSiegeCamp==='function'){if(!c.found){c.found=true;S.campFoundN=(S.campFoundN||0)+1;}if(!c.asked){c.asked=true;siegeAsk(c);return;}continue;}
+        startSkirm(c);return;}}
+    if(c.asked&&!S.squads.some(s=>!s.gar&&Math.hypot(s.x-c.x,s.y-c.y)<CAMP_TRIG*TU*1.6))c.asked=false;}
 }
+// ===== 駐屯地襲撃モード β（2026-11-13）：駐留地に近づくと、別の戦場で夜襲をかける（proto の siege.js・本番は siege.js を読み込む） =====
+function siegeModeDefault(){try{return localStorage.getItem('nd_siege_mode')!=='0';}catch(e){return true;}}
+function siegeAsk(c){const {u,n}=campUnits(c);if(!n){c.state='gone';return;}
+  if(c.raidDay===S.turn){toast(`${campName(c)}には今日もう夜襲をかけました。明日また攻められます`,'warn',4000);return;}
+  S.paused=true;try{renderPauseUI();}catch(e){}
+  openOverlay('siegeAsk',`<h2>${campName(c)}に夜襲をかける？</h2><div class="help" style="line-height:1.8">駐留している魔物 <b>${n}</b> 体（${Object.keys(u).sort((a,b)=>u[b]-u[a]).slice(0,5).map(k=>E[k].name+u[k]).join('・')}）。<br>
+    別の戦場で夜襲をかけます。連れて行く部隊を選び、陣のまわりに置いて戦います。倒した魔物の分だけ<b>次の襲撃が減り</b>、部隊が受けた被害はそのまま残ります。駐留地への夜襲は1日1回です。</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button id="saNo">やめる</button><button id="saGo" class="on">部隊を選ぶ</button></div>`,true);
+  document.getElementById('saNo').onclick=()=>{closeOverlay();};
+  document.getElementById('saGo').onclick=()=>{closeOverlay();openSiegeCamp(c);};}
+// 夜襲の結果を本編の部隊に戻す：残った体力の割合 r（0〜1）
+function sqLoss(sq,r){if(!sq||!(sq.hp>0))return;const t=MT(sq),nh=Math.round(sq.hp*Math.max(0,Math.min(1,r)));
+  if(nh<=0){sq.hp=0;S.squads=S.squads.filter(x=>x!==sq);S.kia+=sq.members*(t.popEach||(sq.ut==='adv'?1:0));coClean();log(`${unitLabel(sq)} 夜襲で全滅`,'kia');killCmd(sq,`${unitLabel(sq)}を率いて戦死`);if(S.sel===sq)S.sel=null;return;}
+  sq.hp=nh;const m=Math.max(1,Math.ceil(sq.hp/(memberHp(sq)*bonus(sq).hp)-1e-6));if(m<sq.members){const lost=sq.members-m;sq.members=m;S.kia+=lost*(t.popEach||(sq.ut==='adv'?1:0));log(`${unitLabel(sq)} 夜襲で${lost}${t.unit}を失った（残り${m}${t.unit}）`,'kia');}}
 // 描画：見つけた駐留地はテントと見張りの魔物。見つけていない駐留地は、研究「斥候」Lv1からだいたいの範囲だけ
 function drawCamps(an,under){
   if(!S.camps||S.waveActive)return;
@@ -3871,7 +3893,15 @@ function startWave(){phaseReset();S._barT=0;S.barrier=(S.baseLv||1)>=5?barrierMa
   S.paused=false;S.porters=[];closeOverlay();se('alarm');auMusicFor();
 }
 function spawnAt(type,x,y,n,spread){dexMark(type);for(let i=0;i<n;i++){const a=Math.random()*7,r=Math.random()*(spread||TU);const d=E[type];S.enemies.push({type,x:x+Math.cos(a)*r,y:y+Math.sin(a)*r,hp:d.hp,maxhp:d.hp,cd:0.5,target:null,retarget:0});}}
-function dexMark(t,kill){const D=S.dex||(S.dex={});const o=D[t]||(D[t]={seen:0,kills:0});o.seen=1;if(kill)o.kills++;}
+function dexMark(t,kill){const D=S.dex||(S.dex={});const o=D[t]||(D[t]={seen:0,kills:0});o.seen=1;if(kill)o.kills++;gdexMark(t,kill);}
+// 図鑑はセーブをまたいで記録する（タイトルの「モンスター図鑑」で見る。2026-11-13）。セーブの図鑑とは種類ごとに多い方をとる
+let GDEX=null,GDEX_DIRTY=false;
+function gdexKey(){return SAVE_KEY+'_dex';}
+function gdex(){if(!GDEX){try{GDEX=JSON.parse(localStorage.getItem(gdexKey())||'{}')||{};}catch(e){GDEX={};}try{const r=localStorage.getItem(SAVE_KEY);if(r){const d=JSON.parse(r);if(d&&d.S&&d.S.dex)gdexMerge(d.S.dex);}}catch(e){}}return GDEX;}
+function gdexMerge(D){const G=GDEX||gdex();for(const k in D){const a=D[k]||{},o=G[k]||(G[k]={seen:0,kills:0});o.seen=Math.max(o.seen||0,a.seen||0);o.kills=Math.max(o.kills||0,a.kills||0);}GDEX_DIRTY=true;}
+function gdexMark(t,kill){const G=gdex();const o=G[t]||(G[t]={seen:0,kills:0});o.seen=1;if(kill)o.kills++;GDEX_DIRTY=true;}
+function gdexFlush(){if(!GDEX_DIRTY)return;GDEX_DIRTY=false;try{localStorage.setItem(gdexKey(),JSON.stringify(GDEX));}catch(e){}}
+setInterval(gdexFlush,4000);addEventListener('pagehide',gdexFlush);
 function spawnEnemy(ent){dexMark(ent.type);
   const d=Object.assign({},E[ent.type]);if(S.cur&&S.cur.blood)d.hp=Math.round(d.hp*1.25);if(S.cur&&S.cur.hpMul)d.hp=Math.round(d.hp*S.cur.hpMul);let x,y;const j=(Math.random()-.5)*0.35;
   if(S.island&&S.hives[ent.side]){const h=S.island,bch=S.hives[ent.side],a=Math.random()*Math.PI*2,r=Math.random()*1.8*TU;
@@ -6190,13 +6220,13 @@ function placeOK(type,gx,gy){
   return true;
 }
 document.addEventListener('keydown',ev=>{
+  if(document.body.classList.contains('siegeOn'))return;   // 駐屯地襲撃の画面では本編のキーを使わない
   if(ev.target.tagName==='SELECT')return;
   const kl=ev.key.toLowerCase();if(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown'].includes(kl)){keysDown.add(kl);if(kl.startsWith('arrow'))ev.preventDefault();}
-  if(ev.key==='Escape'){if(['res','hire','army','retry','legend','dex'].includes(S.overlay)){closeOverlay();return;}if(S.buildMode||S.buildPick){exitBuild();return;}S.multi=[];S.sel=null;S.selTile=null;renderBuild();renderInfo(true);}
+  if(ev.key==='Escape'){if(S.overlay==='dex'){dexStop();if(DEX_FROM_TITLE)showTitle();else closeOverlay();return;}if(['res','hire','army','retry','legend'].includes(S.overlay)){closeOverlay();return;}if(S.buildMode||S.buildPick){exitBuild();return;}S.multi=[];S.sel=null;S.selTile=null;renderBuild();renderInfo(true);}
   if(ev.key==='Tab'&&!S.overlay){ev.preventDefault();if(S.buildMode||S.buildPick)exitBuild();else enterBuild(S.lastBuild||null);return;}
   if(ev.key==='r'||ev.key==='R'){if(S.overlay==='res')closeOverlay();else if(!S.overlay)showResearch();return;}
   if(ev.key==='k'||ev.key==='K'){if(!S.overlay)openArmyTab(null,true);return;}
-  if(ev.key==='e'||ev.key==='E'){if(S.overlay==='dex')closeOverlay();else if(!S.overlay)showDex();return;}
   if(ev.key==='j'||ev.key==='J'){if(!S.overlay)openArmyTab('hero');return;}
   if(S.overlay==='report'&&(ev.key==='Enter'||ev.key==='Escape'||ev.code==='Space')){ev.preventDefault();closeOverlay();return;}
   if(S.overlay==='confirm'&&ev.key==='Escape'){closeOverlay();return;}
@@ -6237,7 +6267,7 @@ document.getElementById('bPause').onclick=togglePause;document.getElementById('b
 document.getElementById('bSave').onclick=()=>{if(!saveGame()){toast(S.waveActive?'襲撃中はセーブできません（朝に自動保存されます）':'今はセーブできません','warn');}};
 document.querySelector('#more .moreBody').addEventListener('click',e=>{if(e.target.closest('button'))document.getElementById('more').open=false;});
 document.getElementById('bTitle').onclick=()=>{if(canSave())saveGame(true);showTitle();};
-document.getElementById('bDex').onclick=()=>{if(S.overlay==='dex')closeOverlay();else showDex();};
+
 document.getElementById('bHist').onclick=()=>{if(S.overlay==='hist')closeOverlay();else showHist();};
 function toggleLv(){setView(S.showLv?'n':'lv');}
 document.getElementById('bLegend').onclick=()=>showLegend();
@@ -6869,7 +6899,8 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   }h+='</div></div>';}
   h+=`<div class="rgp" data-label="人"><div class="rgi"><div class="res key" title="待機中の人員 ／ 総員（配置・部隊・研究中を含む）／ 住居の上限">${ic('pop',24)}<b>${S.pop}</b><span class="sub">住 ${popTotal()}/${S.popCap}</span>${dl(n.pop)}</div>`;
   h+=`<div class="res" title="戦死">${ic('kia',24)}<b style="color:var(--red)">${S.kia}</b></div></div></div>`;
-  setHTML(document.getElementById('resbar'),h);
+  {const r=document.getElementById('resbar');setHTML(r,h);   /* 新しい資材が増えて入りきらないときは、詰めて表示（±0を隠す→増減を隠して小さく） */
+   if(r._fitH!==h||r._fitW!==innerWidth){r._fitH=h;r._fitW=innerWidth;r.classList.remove('tight','tight2');if(r.scrollWidth>r.clientWidth+2){r.classList.add('tight');if(r.scrollWidth>r.clientWidth+2)r.classList.add('tight2');}}}
   // 右端：日付と襲撃までの日数
   let wv='';
   document.body.classList.toggle('night',!!S.waveActive);
@@ -6942,25 +6973,35 @@ function dexTraits(d){const L=[];
   if(d.bldMul&&d.bldMul>1)L.push([`対施設 ${Math.round(d.bldMul*100)}%`,'施設にとくに強い']);
   if(['swarm','charger','redcap','spitter','gobarcher'].includes(Object.keys(E).find(k=>E[k]===d)))L.push(['火が苦手','篝火の近くでは足が遅くなる']);
   return L;}
-function showDex(){if(!S.dexSel)S.dexSel=DEX_ORDER[0];const D=S.dex||{},F=dexFirst();
+let DEX_SEL=null,DEX_FROM_TITLE=false;
+function showDex(fromTitle){if(fromTitle!=null)DEX_FROM_TITLE=!!fromTitle;if(S&&S.dex)gdexMerge(S.dex);const D=gdex();let F={};{const sm=S.mapId,smo=S.mode;try{S.mapId='f';S.mode='campaign';F=dexFirst();}catch(e){F={};}finally{S.mapId=sm;S.mode=smo;}}
+  if(!DEX_SEL)DEX_SEL=DEX_ORDER[0];S.dexSel=DEX_SEL;
   const list=DEX_ORDER.filter(k=>E[k]&&(F[k]!=null||(D[k]&&D[k].seen)));
-  if(!list.includes(S.dexSel))S.dexSel=list[0];
+  if(!list.includes(S.dexSel))S.dexSel=list[0];DEX_SEL=S.dexSel;
   // 図鑑は、その魔物を初めて倒した時に開放される
   const got=k=>!!(D[k]&&D[k].kills>0);const gotN=list.filter(got).length;
-  let h=`<h2>モンスター図鑑<span class="dxc">開放 ${gotN} / ${list.length}</span><button id="ovClose" style="float:right">閉じる<kbd>E</kbd></button></h2><div class="dex"><div class="dxl">`;
+  let h=`<h2>モンスター図鑑<span class="dxc">開放 ${gotN} / ${list.length}</span><button id="ovClose" style="float:right">${DEX_FROM_TITLE?'タイトルへ':'閉じる'}</button></h2><div class="dex"><div class="dxl">`;
   for(const k of list){const g=got(k);h+=`<button data-dx="${k}" class="${k===S.dexSel?'on':''}${g?'':' unseen'}">${eSpr(k,36)}<span><b>${g?E[k].name:'？？？'}</b><small>${g?`撃破 ${D[k].kills}`:D[k]&&D[k].seen?'遭遇済み・未撃破':'未遭遇'}</small></span></button>`;}
   const k=S.dexSel,d=E[k],sn=got(k);
   if(!sn){h+=`</div><div class="dxd"><div class="dxh"><div class="dxi unseen">${eSpr(k,96)}</div><div><div class="dxn" style="color:var(--dim)">？？？</div><div class="dxs">${D[k]&&D[k].seen?'遭遇済み・まだ倒していない':'まだ遭遇していない'}</div></div></div><div class="dxt muted">この魔物を1体倒すと、図鑑に記録されます。</div></div></div>`;
-    const card=openOverlay('dex',h,true);document.getElementById('ovClose').onclick=closeOverlay;
-    card.querySelectorAll('[data-dx]').forEach(b=>b.onclick=()=>{S.dexSel=b.dataset.dx;const sc=card.querySelector('.dxl').scrollTop;showDex();card.querySelector('.dxl').scrollTop=sc;});return;}
+    dexOpen(h);return;}
   const sp=v=>Math.round(v/TU*10)/10*U;
-  h+=`</div><div class="dxd"><div class="dxh"><div class="dxi${NDART['e_'+k]?' big':''}">${NDART['e_'+k]?artPx('e_'+k):eSpr(k,96)}</div><div><div class="dxn">${d.name}</div><div class="dxs">撃破 ${D[k].kills}${F[k]!=null?`　／　このマップでは第${F[k]}襲撃から`:''}${k==='redcap'?'（ブラッドムーンの夜だけ）':''}</div></div></div>
+  h+=`</div><div class="dxd"><div class="dxh"><div class="dxi${NDART['e_'+k]?' big':''}">${NDART['e_'+k]?artPx('e_'+k):eSpr(k,96)}</div><div><div class="dxn">${d.name}</div><div class="dxs">撃破 ${D[k].kills}${F[k]!=null?`　／　グレイヴェル平原では第${F[k]}襲撃から`:''}${k==='redcap'?'（ブラッドムーンの夜だけ）':''}</div></div></div>
     <div class="dxt">${d.desc}</div>
     <div class="statgrid dxg"><div>体力<b>${d.hp}</b></div><div>攻撃<b>${d.dmg}<small>　1分に${Math.round(60/d.rate)}回</small></b></div><div>速さ<b>${Math.round(d.spd/TU*10*U)}<small>マス/10秒</small></b></div><div>落とす魔核<b style="color:var(--mat)">${d.mat<1?Math.round(d.mat*100)+'<small>%で1個</small>':Math.round(d.mat)}</b></div></div>
     <div class="dxtr">${dexTraits(d).map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join('')||'<div class="muted">特別な能力はない</div>'}</div>
     <div class="muted" style="font-size:11px;margin-top:8px">体力は基本の値です。ブラッドムーンの夜は125%、第10襲撃より後は1回ごとに+12%されます。</div></div></div>`;
-  const card=openOverlay('dex',h,true);document.getElementById('ovClose').onclick=closeOverlay;
-  card.querySelectorAll('[data-dx]').forEach(b=>b.onclick=()=>{S.dexSel=b.dataset.dx;const sc=card.querySelector('.dxl').scrollTop;showDex();card.querySelector('.dxl').scrollTop=sc;});}
+  dexOpen(h,'e_'+k);}
+function dexOpen(h,ak){const card=openOverlay('dex',h,true);document.getElementById('ovClose').onclick=()=>{dexStop();if(DEX_FROM_TITLE)showTitle();else closeOverlay();};
+  card.querySelectorAll('[data-dx]').forEach(b=>b.onclick=()=>{DEX_SEL=b.dataset.dx;se('click');const sc=card.querySelector('.dxl').scrollTop;showDex();const c2=document.querySelector('.dxl');if(c2)c2.scrollTop=sc;});
+  dexStop();if(ak&&NDART[ak]){const box=card.querySelector('.dxi.big');if(box)dexAnim(box,ak);}}
+// 図鑑の立ち絵を少し動かす：4コマを回しながら、足元は止めて上ほど左右にゆらす（息づかい）
+let DEX_RAF=0;function dexStop(){if(DEX_RAF)cancelAnimationFrame(DEX_RAF);DEX_RAF=0;}
+function dexAnim(box,ak){const [url,n]=NDART[ak];const im=new Image();im.onload=()=>{const fw=Math.floor(im.width/(n||1)),fh=im.height,K=Math.max(1,Math.floor(300/fw)),cv=document.createElement('canvas');cv.width=fw*K;cv.height=fh*K;cv.className='dxcv';
+  box.innerHTML='';box.appendChild(cv);const g=cv.getContext('2d');g.imageSmoothingEnabled=false;const t0=performance.now();
+  const step=()=>{if(!cv.isConnected){DEX_RAF=0;return;}const t=(performance.now()-t0)/1000,f=Math.floor(t*4)%(n||1),sx=f*fw;g.clearRect(0,0,cv.width,cv.height);g.drawImage(im,sx,0,fw,fh,0,0,cv.width,cv.height);
+    const gnd=Math.floor(fh*0.82);for(let y=0;y<gnd;y++){const a=(1-y/gnd);const dx=Math.round(Math.sin(t*2.2+y*0.07)*a*1.6);const dy=Math.round((Math.sin(t*2.2)*0.5+0.5)*a*1.2);if(!dx&&!dy)continue;g.drawImage(im,sx,Math.min(fh-1,y+dy),fw,1,dx*K,y*K,cv.width,K);}
+    DEX_RAF=requestAnimationFrame(step);};step();};im.src=url;}
 // ===== 研究：スキルツリー =====
 const NW=178,NH=72,GX=46,GY=14;
 function treeLayout(cat){
@@ -7148,7 +7189,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=NEXT_PREP;S.prepTotal=NEXT_PREP;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.3 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.4 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over;}
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7200,6 +7241,19 @@ function pixelLogo(){const lines=['NIGHT','DEFENSE'],P=7,GAP=1,LG=3;const px=[];
 // 重い処理の前に読み込み画面を出す（画面が描かれてから処理する）
 function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn();return;}document.getElementById('bootMsg').textContent=msg||'読み込み中…';b.classList.remove('off');
   requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();}finally{b.classList.add('off');}}));}
+// ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
+const UPDATES=[
+ ['1.4','2026-11-13',['<b>駐屯地襲撃モード β</b>：ステージ選択で ON にすると、見つけた駐留地へ攻め込むとき、別の戦場で夜襲をかけて戦う。手持ちの部隊で戦い、倒した魔物の分だけ次の襲撃が減る（部隊の損耗も残る）','ステージ1の名前を<b>グレイヴェル平原</b>に','<b>モンスター図鑑</b>をタイトルへ。セーブをまたいで記録が残る。立ち絵が少し動くように','<b>アップデート情報</b>をゲームの中で見られるように','上の資源の表示：新しい資材が増えても入りきるように詰めて表示。石炭・合金のアイコンを見やすく']],
+ ['1.3','2026-11-13',['<b>ステージ1（草原）を40回の襲撃まで</b>：20回目に中ボス「ゴブリンキング」、40回目にラスボス「蠢く木陰」','ステージ選択：沼地・山脈・雪原・荒野は Coming Soon','新しい魔物：トレント・エルダートレント・盾持ちオーガ・マンイーター・吸血鬼・グール・ストーンゴーレム・ワーウルフ','ランクⅠ〜Ⅶ（城Lv7まで）、新しい素材、施設の改築','新しい防衛施設・罠：風船爆弾・メイジの塔・バリアストーン・テスラタワー・ハープーンランチャー・ミスリルレイ・ドラゴンブレス ほか','新しい部隊：エーテルゴーレム・狙撃兵・銀装兵・グリフォン騎兵','図鑑の特徴に名前、数字は小数なしで表示']],
+ ['1.2','2026-11-10',['夜の過ごし方（休む・宴・祈り・夜警・夜なべ）と夜の出来事','教会・熟練度・罠の見直し・市場の売り買い','部隊の範囲選択、オートセーブ、読み込み画面']],
+ ['1.1','',['スマホ横持ちに対応、ホーム画面に追加してアプリとして遊べるように','タブを 建設・研究・軍事・街 に整理','城の強化・造り替えにターンがかかるように']],
+ ['1.0','',['画面デザインとドット絵を一新','敵の駐留地・斥候・モンスター図鑑']],
+];
+function updSeen(){try{return localStorage.getItem('nd_upd_seen')===UPDATES[0][0];}catch(e){return true;}}
+function showUpdates(){try{localStorage.setItem('nd_upd_seen',UPDATES[0][0]);}catch(e){}
+  openOverlay('title',`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>アップデート情報</h2><button id="upBack">タイトルへ</button></div>
+  <div style="max-height:62vh;overflow:auto;line-height:1.8">${UPDATES.map(([v,d,L],i)=>`<div style="margin:0 0 12px"><h3 style="margin:0 0 4px;color:${i?'var(--dim)':'#f2b33d'}">ver ${v}${d?`<small class="muted" style="margin-left:8px">${d}</small>`:''}</h3><ul style="margin:0;padding-left:18px">${L.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('')}</div>`,true);
+  document.getElementById('upBack').onclick=showTitle;}
 function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.add('off');}const sv=saveInfo();
   const dt=sv?new Date(sv.date):null;const when=dt?`${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`:'';
   openOverlay('title',`<div style="text-align:center;padding:10px 6px 4px">
@@ -7210,6 +7264,8 @@ function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.a
       ${sv?`<button id="tContinue" class="on" style="padding:10px;font-size:15px"><b>つづきから</b></button>`:''}
       <button id="tNew" ${sv?'':'class="on"'} style="padding:10px;font-size:15px"><b>はじめから</b></button>
       <button id="tHelp" style="padding:8px">遊び方</button>
+      <button id="tDex" style="padding:8px">モンスター図鑑</button>
+      <button id="tUpd" style="padding:8px">アップデート情報${updSeen()?'':' <b style="color:#f2b33d">NEW</b>'}</button>
       <button id="tCredit" style="padding:8px">クレジット</button>
       ${isAppMode()?'':'<button id="tInstall" style="padding:8px">ホーム画面に追加（アプリにする）</button>'}
       <button id="tOld" style="padding:6px;font-size:12px" class="ghost">旧版（ver 0.9）で遊ぶ</button>
@@ -7218,6 +7274,8 @@ function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.a
   const c=document.getElementById('tContinue');if(c)c.onclick=()=>{closeOverlay();withLoading('セーブを読み込んでいます…',()=>{if(!loadGame())toast('セーブデータを読み込めませんでした','bad');});};
   document.getElementById('tNew').onclick=()=>{if(sv&&!confirmNew())return;showIntro();};
   document.getElementById('tHelp').onclick=()=>showHelp(true);
+  document.getElementById('tDex').onclick=()=>{se('click');showDex(true);};
+  document.getElementById('tUpd').onclick=()=>{se('click');showUpdates();};
   document.getElementById('tOld').onclick=()=>{location.href='../v0.9/index.html';};
   {const ti=document.getElementById('tInstall');if(ti)ti.onclick=()=>doInstall(true);}
   document.getElementById('tCredit').onclick=()=>openOverlay('title',`<h2>クレジット</h2><div style="line-height:1.9">${GAME_TITLE} — ${GAME_SUB}　ver ${GAME_VER}<br>企画・ゲームデザイン：ねぎらーめん<br>プログラム・ドット絵・効果音・音楽：Claude と共同制作<br><span class="muted">すべてのドット絵と音はこのゲームのために作られたものです</span></div><div style="margin-top:12px"><button id="crBack">タイトルへ</button></div>`)&&(document.getElementById('crBack').onclick=showTitle);}
@@ -7225,13 +7283,14 @@ function confirmNew(){return true;}
 function showIntro(){
   /* ステージ（2026-11-13）：いま遊べるのはチュートリアルと草原だけ。ほかは Coming Soon で入れない */
   const MAPL=[['t','ステージ0　廃村エルム','チュートリアル','#8ad08a','入門','焼け落ちた村の跡。壊れた柵やバリスタが残っていて、半額ですぐに建て直せる。初心者タスクに沿って準備し、<b>6回の襲撃</b>を守り抜く。魔物は少なめ'],
-    ['f','ステージ1　辺境の街グレイヴェル','草原','#e8c070','ふつう','森と岩場に囲まれた草原の街。北のアビスから始まり、やがて3方向から魔物が押し寄せる。20回目にゴブリンキング、最後の夜には森の化け物「蠢く木陰」が現れる。<b>40回の襲撃</b>'],
+    ['f','ステージ1　グレイヴェル平原','草原','#e8c070','ふつう','森と岩場に囲まれた草原の辺境の街。北のアビスから始まり、やがて3方向から魔物が押し寄せる。20回目にゴブリンキング、最後の夜には森の化け物「蠢く木陰」が現れる。<b>40回の襲撃</b>'],
     ['swamp','ステージ2','沼地','#7a9a6a','Coming Soon',''],
     ['m','ステージ3','山脈','#ff8a6a','Coming Soon',''],
     ['s','ステージ4','雪原','#9ad0ff','Coming Soon',''],
     ['waste','ステージ5','荒野','#d0a060','Coming Soon','']];
   const soonImg=id=>(id==='m'||id==='s')?mapIcon(id):'';
   openOverlay('intro',`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>ステージを選ぶ</h2><button id="inBack">タイトルへ</button></div>${saveInfo()?'<div class="wn" style="font-size:12px;margin-bottom:6px">新しく始めると、今のセーブデータは上書きされます</div>':''}
+  <div class="tskRow"><span><b>駐屯地襲撃モード <span style="color:#f2b33d">β</span></b><small>ON：見つけた駐留地に近づくと、別の戦場で夜襲をかけて戦う（倒した分だけ次の襲撃が減る）。OFF：駐留地には攻め込めない</small></span><span class="tskSw"><button data-sgm="1">ON</button><button data-sgm="0">OFF</button></span></div>
   <div id="inTasks" class="tskRow"><span><b>初心者タスク</b><small>生産・防衛の目標と、やり方のヒントをマップに表示します（どのステージでも使えます）</small></span><span class="tskSw"><button data-tsk="1">ON</button><button data-tsk="0">OFF</button></span></div>
   <div style="display:flex;flex-direction:column;gap:8px;margin:4px 0 6px">`+MAPL.map(([id,nm,sub,col,diff,desc])=>diff==='Coming Soon'?`<button disabled style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px;opacity:.55;cursor:default">
     <span style="position:relative;width:144px;height:84px;flex-shrink:0;border:1px solid var(--line);background:#14161a;display:flex;align-items:center;justify-content:center">${soonImg(id)?`<img src="${soonImg(id)}" width="144" height="84" style="image-rendering:pixelated;position:absolute;inset:0;filter:grayscale(1) brightness(.45)" alt="">`:''}<b style="position:relative;color:#e8dcc0;font-size:13px;letter-spacing:1px">COMING SOON</b></span>
@@ -7243,6 +7302,8 @@ function showIntro(){
   document.getElementById('inBack').onclick=showTitle;
   const upd=()=>document.querySelectorAll('[data-tsk]').forEach(b=>b.classList.toggle('on',(b.dataset.tsk==='1')===tasksOn()));upd();
   document.querySelectorAll('[data-tsk]').forEach(b=>b.onclick=()=>{setTasksOn(b.dataset.tsk==='1');upd();se('click');});
+  const upd2=()=>document.querySelectorAll('[data-sgm]').forEach(b=>b.classList.toggle('on',(b.dataset.sgm==='1')===siegeModeDefault()));upd2();
+  document.querySelectorAll('[data-sgm]').forEach(b=>b.onclick=()=>{try{localStorage.setItem('nd_siege_mode',b.dataset.sgm);}catch(e){}upd2();se('click');});
 }
 // ===== 初心者タスク（生産・防衛の目標）と画面の説明 =====
 (function(){const tg=document.getElementById('resTg');const ap=v=>{document.body.classList.toggle('resMin',v);tg.textContent=v?'全13 ▾':'▴ たたむ';};let v=true;try{const q=localStorage.getItem('nd_resmin');if(q!=null)v=q==='1';}catch(e){}ap(v);tg.onclick=()=>{v=!document.body.classList.contains('resMin');ap(v);setTimeout(()=>{try{resizeView();}catch(e){}},0);try{localStorage.setItem('nd_resmin',v?'1':'0');}catch(e){}setTimeout(()=>{try{resizeView();}catch(e){}},0);};})();
@@ -7981,6 +8042,6 @@ auUi();newState();renderAll();resizeView();setTimeout(resizeView,300);showTitle(
 (function(){var done=0;function go(){if(done)return;done=1;try{performance.mark('ndMainStart');}catch(e){}var s=document.createElement('script');s.textContent=document.getElementById('ndMain').textContent;document.body.appendChild(s);}
  requestAnimationFrame(function(){setTimeout(go,0);});setTimeout(go,400);})();
 </script>
-<script src="siege.js"></script>   <!-- 試作版だけ：攻城戦（proto/siege.js） -->
+<script src="siege.js"></script>   <!-- 駐屯地襲撃モード β（本番も）。単独の攻城戦・音楽室は試作版だけ -->
 </body>
 </html>

@@ -1,7 +1,7 @@
 // ナイトディフェンス：オフラインでも遊べるようにするサービスワーカー
 // いつもはネットから最新を取り、つながらないときだけ保存しておいたものを使う（更新がすぐ届くように）
 const CACHE = 'nd-v1';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './siege.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
 });
