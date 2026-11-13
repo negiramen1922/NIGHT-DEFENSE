@@ -2083,7 +2083,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('formation',{tier:1,pre:[],cost:{fuel:40,sword:10},icon:'heavy',eff:'小隊（部隊）3つまでを「中隊」にまとめられる。一緒に動き、近くにいる間は火力 +15%・耐久 +10%'});
  set('armcare',{cat:'部隊',tier:1,name:'武具の手入れ',cost:{steel:30,iron:15},t:1,pre:[],icon:'pawn',eff:'近接部隊・竜騎兵の武具の傷み −40%'});
  set('bigquiver',{cat:'部隊',tier:1,name:'大矢筒',cost:{steel:30,ammo:30},t:1,pre:[],icon:'archer',eff:'弓兵隊の矢筒 60本→100本'});
- set('scout',{tier:1,pre:[]});set('doctrine',{tier:1,pre:[]});set('nighthunt',{tier:1,pre:[]});
+ set('scout',{tier:1,pre:[],eff:'敵の偵察。Lv0：襲撃が来る方向だけ分かる。Lv1：駐留地のおおよその場所が分かる（マップとミニマップに円）・次の襲撃の概数と魔物の種類　Lv2：正確な数　Lv3：方面別の構成'});set('doctrine',{tier:1,pre:[]});set('nighthunt',{tier:1,pre:[]});
  set('unit_r2',{cat:'部隊',gate:2,tier:2,name:'部隊強化Ⅱ',cost:{gold:60,fuel:60,sword:20},t:2,pre:[],icon:'heavy',eff:'部隊タブのランクⅡの研究を解放（重装歩兵・騎兵・魔術師など）'});
  set('scouting',{cat:'部隊',tier:2,name:'斥候隊',cost:{gold:30,fuel:30},t:1,pre:[],icon:'archer',eff:'兵舎で「斥候」を編成できる。足が速く視界が広い（20マス）。敵の駐留地の正確な場所を見つけられる唯一の部隊。打たれ弱く、受ける被害 180%'});
  set('heavyinf',{tier:2,pre:[]});set('cavalry',{tier:2,pre:[]});set('magic',{tier:4,pre:[]});
@@ -2743,7 +2743,7 @@ function pxTile(c,X,Y,v,lv,x,y,oil,ore,rich){
   if(ore){const n=[0,1,2,3][rich||1];const P=[[1,7],[6,2],[7,8]];for(let i=0;i<n;i++){pxStamp(c,ox+P[i][0],oy+P[i][1],BOULDER,{o:O,s:'#6a5a4a',S:'#4a3e32'});c.fillStyle='#e0843a';c.fillRect(ox+P[i][0]+3,oy+P[i][1]+2,1,1);c.fillRect(ox+P[i][0]+5,oy+P[i][1]+3,1,1);}}
 }
 
-function abyssHid(x,y){return S.ter[y][x]===7&&S.mode==='campaign'&&S.seen&&!S.seen[y*COLS+x];}
+function abyssHid(x,y){return S.ter[y][x]===7&&S.mode==='campaign'&&!S.island;}   /* 巣（アビスの裂け目）はマップに描かない（2026-11-13） */
 function renderTerrain(){
   lblCv=null;
   terCv=document.createElement('canvas');terCv.width=W;terCv.height=H;const c=terCv.getContext('2d');
@@ -2792,7 +2792,7 @@ function isSeen(x,y){return x>=0&&y>=0&&x<COLS&&y<ROWS&&(!S.seen||S.seen[y*COLS+
 function reveal(cx,cy,r){
   if(!fogCv)return;r*=U;const c=fogCv.getContext('2d'),m=miniFog.getContext('2d'),sx=MM.w/COLS,sy=MM.h/ROWS;let ch=false;
   for(let y=Math.max(0,Math.floor(cy-r));y<=Math.min(ROWS-1,Math.ceil(cy+r));y++)for(let x=Math.max(0,Math.floor(cx-r));x<=Math.min(COLS-1,Math.ceil(cx+r));x++){
-    const i=y*COLS+x;if(S.seen[i])continue;if(Math.hypot(x-cx,y-cy)>r)continue;S.seen[i]=1;ch=true;if(S.ter[y][x]===7)S._abyssNew=true;c.clearRect(x,y,1,1);m.clearRect(x*sx,y*sy,Math.ceil(sx),Math.ceil(sy));}
+    const i=y*COLS+x;if(S.seen[i])continue;if(Math.hypot(x-cx,y-cy)>r)continue;S.seen[i]=1;ch=true;c.clearRect(x,y,1,1);m.clearRect(x*sx,y*sy,Math.ceil(sx),Math.ceil(sy));}
   if(S._abyssNew&&terCv){S._abyssNew=false;renderTerrain();}   /* アビスの裂け目が見えたら地形を描き直す */
   return ch;
 }
@@ -5092,7 +5092,7 @@ function draw(){
     const a=0.10+0.06*Math.sin(an*3);
     for(const sd of shown){
       const ln=w.q.find(e=>e.side===sd);const lane=ln?ln.lane:0.5;let g;
-      if(S.hives){const [hx,hy]=sidePos(sd);g=ctx.createRadialGradient(hx,hy,TU,hx,hy,TU*6);g.addColorStop(0,`rgba(255,60,50,${a*2.5})`);g.addColorStop(1,'rgba(255,60,50,0)');ctx.fillStyle=g;ctx.fillRect(hx-TU*6,hy-TU*6,TU*12,TU*12);continue;}
+      if(S.hives){continue;const [hx,hy]=sidePos(sd);g=ctx.createRadialGradient(hx,hy,TU,hx,hy,TU*6);g.addColorStop(0,`rgba(255,60,50,${a*2.5})`);g.addColorStop(1,'rgba(255,60,50,0)');ctx.fillStyle=g;ctx.fillRect(hx-TU*6,hy-TU*6,TU*12,TU*12);continue;}
       if(sd==='E'){g=ctx.createLinearGradient(W-3*TU,0,W,0);g.addColorStop(0,'rgba(255,60,50,0)');g.addColorStop(1,`rgba(255,60,50,${a})`);ctx.fillStyle=g;ctx.fillRect(W-3*TU,lane*H-H*0.3,3*TU,H*0.6);}
       if(sd==='W'){g=ctx.createLinearGradient(3*TU,0,0,0);g.addColorStop(0,'rgba(255,60,50,0)');g.addColorStop(1,`rgba(255,60,50,${a})`);ctx.fillStyle=g;ctx.fillRect(0,lane*H-H*0.3,3*TU,H*0.6);}
       if(sd==='N'){g=ctx.createLinearGradient(0,3*TU,0,0);g.addColorStop(0,'rgba(255,60,50,0)');g.addColorStop(1,`rgba(255,60,50,${a})`);ctx.fillStyle=g;ctx.fillRect(lane*W-W*0.2,0,W*0.4,3*TU);}
@@ -5111,7 +5111,7 @@ function draw(){
     ctx.fillStyle='rgba(255,150,120,.8)';ctx.beginPath();ctx.moveTo(cx+TU*1.4,cy);ctx.lineTo(cx+TU*0.6,cy-TU*0.5);ctx.lineTo(cx+TU*0.6,cy+TU*0.5);ctx.closePath();ctx.fill();
     ctx.fillStyle='#ffc0a8';ctx.font=`bold ${Math.round(11/Math.min(1,cam.z))}px sans-serif`;ctx.fillText(h.name+' 上陸地点',cx,cy-TU*2.6);}
   drawCamps(an,true);
-  for(const h of hiveSpots()){const cx=bcx(h),cy=bcy(h),p=0.5+0.5*Math.sin(an*1.5+h.x);
+  for(const h of (S.island?hiveSpots():[])){const cx=bcx(h),cy=bcy(h),p=0.5+0.5*Math.sin(an*1.5+h.x);   /* 巣（敵の本拠点）は描かない（2026-11-13）。島マップだけ */
     const g=ctx.createRadialGradient(cx,cy,4,cx,cy,TU*2.6);g.addColorStop(0,'#000');g.addColorStop(.35,'#3a0a5a');g.addColorStop(.7,'#7a2ab0');g.addColorStop(1,'rgba(40,5,60,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,TU*2.4,0,7);ctx.fill();
     ctx.fillStyle=`rgba(200,120,255,${0.3+0.4*p})`;for(let i=0;i<5;i++){const a=i*1.26+an*0.2;ctx.beginPath();ctx.arc(cx+Math.cos(a)*TU*1.1,cy+Math.sin(a)*TU*0.9,4+2*p,0,7);ctx.fill();}
 }
@@ -5287,7 +5287,7 @@ function draw(){
   }
   if(fogCv){ctx.imageSmoothingEnabled=true;ctx.drawImage(fogCv,0,0,W,H);}
   drawCamps(an);   // 見つけた駐留地は霧の上にも出す
-  for(const h of hiveSpots()){ctx.fillStyle='#ffb0c8';ctx.font=`bold ${Math.round(11/Math.min(1,cam.z))}px sans-serif`;ctx.fillText(h.name,bcx(h),bcy(h)-TU*2.6);}
+  for(const h of (S.island?hiveSpots():[])){ctx.fillStyle='#ffb0c8';ctx.font=`bold ${Math.round(11/Math.min(1,cam.z))}px sans-serif`;ctx.fillText(h.name,bcx(h),bcy(h)-TU*2.6);}
   // 地図の端
   ctx.strokeStyle='rgba(255,90,78,.25)';ctx.lineWidth=2;ctx.strokeRect(0,0,W,H);ctx.lineWidth=1;
   // ===== 画面座標での表示 =====
@@ -5305,9 +5305,10 @@ function draw(){
       const [wx,wy]=sidePos(sd,lane);
       let sx=(wx-cam.x)*cam.z,sy=(wy-cam.y)*cam.z;const m=26;
       const onScreen=sx>=0&&sx<=VW&&sy>=0&&sy<=VH;
+      let hAng=null;if(S.hives){const hq=hqOf();hAng=hq?Math.atan2(wy-bcy(hq),wx-bcx(hq)):0;const dx=Math.cos(hAng),dy=Math.sin(hAng),k=Math.min((VW/2-m)/Math.max(0.01,Math.abs(dx)),(VH/2-m-14)/Math.max(0.01,Math.abs(dy)));sx=VW/2+dx*k;sy=VH/2+dy*k;}   /* 巣の場所は出さず、城から見た方向だけ（画面の端に矢印） */
       sx=Math.max(m,Math.min(VW-m,sx));sy=Math.max(m+14,Math.min(VH-m-(sd==='S'?0:0),sy));
       if(!S.hives){if(sd==='E'&&!onScreen)sx=VW-m;if(sd==='W'&&!onScreen)sx=m;if(sd==='N'&&!onScreen)sy=m+14;if(sd==='S'&&!onScreen)sy=VH-m;}
-      const ang=S.hives?Math.atan2(wy-(cam.y+VH/cam.z/2),wx-(cam.x+VW/cam.z/2)):{E:0,W:Math.PI,N:-Math.PI/2,S:Math.PI/2}[sd];
+      const ang=S.hives?hAng:{E:0,W:Math.PI,N:-Math.PI/2,S:Math.PI/2}[sd];
       ctx.save();ctx.translate(sx,sy);
       ctx.fillStyle=`rgba(255,60,50,${0.25*pulse})`;ctx.beginPath();ctx.arc(0,0,20,0,7);ctx.fill();
       ctx.rotate(ang);ctx.fillStyle=`rgba(255,90,78,${0.6+0.4*pulse})`;ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(2,-11);ctx.lineTo(2,11);ctx.closePath();ctx.fill();
@@ -5330,7 +5331,8 @@ function draw(){
   // ミニマップ
   const [mx,my]=mmPos(),ks=MM.w/W;
   ctx.globalAlpha=0.92;ctx.fillStyle='#000';ctx.fillRect(mx-2,my-2,MM.w+4,MM.h+4);if(miniCv)ctx.drawImage(miniCv,mx,my);if(miniFog)ctx.drawImage(miniFog,mx,my);ctx.globalAlpha=1;
-  for(const h of hiveSpots()){ctx.fillStyle='#ff5a8a';ctx.beginPath();ctx.arc(mx+bcx(h)*(MM.w/W),my+bcy(h)*(MM.h/H),3.5,0,7);ctx.fill();}
+  for(const h of (S.island?hiveSpots():[])){ctx.fillStyle='#ff5a8a';ctx.beginPath();ctx.arc(mx+bcx(h)*(MM.w/W),my+bcy(h)*(MM.h/H),3.5,0,7);ctx.fill();}
+  if(S.camps&&!S.waveActive&&lvl('scout')>=1)for(const c of S.camps){if(c.found||c.state!=='idle')continue;ctx.save();ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(255,120,90,.8)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(mx+c.hx*ks,my+c.hy*ks,Math.max(4,c.hr*ks),0,7);ctx.stroke();ctx.restore();}   /* 斥候Lv1から：駐留地のおおよその場所（ミニマップにも） */
   if(S.camps&&!S.waveActive)for(const c of S.camps){if(!c.found||c.state==='gone')continue;const x=mx+c.x*ks,y=my+c.y*ks;ctx.fillStyle='#ff9a3a';ctx.beginPath();ctx.moveTo(x,y-4);ctx.lineTo(x+4,y+3);ctx.lineTo(x-4,y+3);ctx.closePath();ctx.fill();}
   for(const b of S.blds){ctx.fillStyle=b.type==='hq'?'#f2b33d':gunOf(b)?'#9fe0a0':CWALL.has(b.type)?'#8a9a8c':'#4f9a62';ctx.fillRect(mx+b.x*T*ks,my+b.y*T*ks,3,3);}
   ctx.fillStyle='#62c6d9';for(const q of S.squads)ctx.fillRect(mx+q.x*ks-1.5,my+q.y*ks-1.5,3,3);
