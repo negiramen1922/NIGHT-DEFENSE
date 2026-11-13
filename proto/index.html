@@ -1782,7 +1782,7 @@ B.aebomb={name:'エーテル爆弾',glyph:'',hp:1,heat:0,cost:{steel:15,elec:12}
 B.gravity={name:'重力の罠',glyph:'',hp:1,heat:0,cost:{steel:20,elec:20,mat:10},pop:0,power:0,spec:'工兵',isMine:true,kind:'gravity',req:'gravityt',desc:'近づいた魔物（空を飛ぶ魔物も）を、周り5マスまとめて地面に押さえつける（4秒動けない・空の魔物は地面に落ちる）。ボスは遅くなるだけ。一晩に2回、8秒おき'};
 B.stake={name:'聖銀の杭',glyph:'',hp:1,heat:0,cost:{steel:20,alloy:6,gold:10},pop:0,power:0,spec:'工兵',isMine:true,kind:'stake',req:'staket',desc:'踏んだ魔物に聖銀の杭が刺さり、6秒かけて少しずつダメージ（合計300）。20体に刺さると折れる（一括修理で直す）'};
 B.meteor={name:'メテオコール',glyph:'',hp:1,heat:0,cost:{steel:30,mat:40,gold:30},pop:0,power:0,spec:'工兵',isMine:true,kind:'meteor',req:'meteort',desc:'踏まれると、少しして空から隕石が落ちて周り8マスを吹き飛ばす（中心1500・まわり900）。使い切りの切り札'};
-B.barrier={name:'バリアストーン',glyph:'障',hp:400,heat:1,cost:{steel:60,stone:80,elec:30,gold:40},pop:1,power:0,spec:'守備',grp:'def',req:'barrierst',desc:'周り5マスの施設にシールド（ダメージを吸う光の膜・1つにつき200）を張る。割れたシールドはエーテルを使って少しずつ張り直す。自分では攻撃しない',aura:5,shield:200};
+B.barrier={name:'バリアストーン',glyph:'障',hp:400,heat:1,cost:{steel:60,stone:80,elec:30,gold:40},pop:1,power:0,spec:'守備',grp:'def',req:'barrierst',desc:'周り5マスの施設にシールド（ダメージを吸う光の膜・1つにつき200）を張る。夜の間は張り直さない。割れたシールドは、朝の修理（一括修理）でエーテルを使って張り直す（10ごとにエーテル1）。自分では攻撃しない',aura:5,shield:200};
 B.tesla={name:'テスラタワー',glyph:'雷',hp:450,heat:1,cost:{steel:80,stone:60,alloy:10,elec:20,gold:60},pop:2,power:0,spec:'守備',grp:'def',req:'teslat',desc:'電気で攻撃する塔。稲妻が魔物から魔物へ跳ねる（4体まで・跳ねるごとに弱くなる）。群れに強く、大きな魔物1体には弱い。空の敵も撃てる。エーテルを使う',range:5,dmg:90,rate:2.5,chain:4,direct:true,antiAir:true,ammoKey:'elec',ammoUse:0.3};
 B.harpoon={name:'ハープーンランチャー',glyph:'銛',hp:500,heat:1,cost:{steel:120,stone:60,iron:60,alloy:15,gold:60},pop:3,power:0,spec:'守備',grp:'def',req:'harpoont',desc:'魔法で軽くした重い銛を撃ち、刺さると重くする。刺さった魔物は動けなくなり（2秒）、刺さっている間少しずつダメージ。空を飛ぶ魔物は地面に引きずり降ろす。ボスには刺さらない（ダメージだけ）。射程6',range:6,dmg:120,rate:3.5,harpoon:true,direct:true,antiAir:true,ammoKey:'iron',ammoUse:1};
 B.mray={name:'ミスリルレイ',glyph:'光',hp:500,heat:1,cost:{steel:100,stone:80,alloy:20,elec:40,gold:80},pop:2,power:0,spec:'守備',grp:'def',req:'mrayt',desc:'聖銀の結晶から光線を出す。同じ相手に当て続けるほど強くなる（最初は1秒に40、5秒たつと1秒に200）。相手を変えると最初から。大きな魔物に強く、群れに弱い。空の敵も撃てる。射程6',range:6,dmg:40,rate:0.2,beam:true,direct:true,antiAir:true,ammoKey:'elec',ammoUse:0.05};
@@ -3298,6 +3298,7 @@ function repairAllCost(){let n=0,c=0;for(const b of S.blds)if(damaged(b)){n++;c+
 function repairAll(){if(S.waveActive){se('error');toast('戦闘中は修理できない（昼に修理しよう）','warn');return;}
   const list=S.blds.filter(damaged).sort((a,b)=>(b.type==='hq')-(a.type==='hq')||(gunOf(b)?1:0)-(gunOf(a)?1:0)||a.hp/a.maxhp-b.hp/b.maxhp);
   let n=0,c=0;for(const b of list){const k=repairCost(b);if(repair(b,true)){n++;c+=k;}}
+  {let miss=0;for(const b of S.blds)if(b.shMax>0)miss+=Math.max(0,b.shMax-(b.shield||0));if(miss>0){const ec=Math.ceil(miss/10);if((S.elec||0)>=ec){S.elec-=ec;for(const b of S.blds)if(b.shMax>0)b.shield=b.shMax;log(`バリアストーンのシールドを張り直した（エーテル−${ec}）`,'good');}else log(`シールドを張り直すにはエーテルが${ec}要る`,'warn');}}   /* バリアストーン：朝の修理で張り直す */
   const pn0=pitsToDig().length+spikesBroken().length,p1=digPits(),p2=fixSpikes(),pn=p1+p2;c+=p1*PIT_DIG+p2*SPIKE_FIX;const pt=(p1?`・落とし穴${p1}個`:'')+(p2?`・トゲ床${p2}個`:'');
   const bc=S.blds.filter(b=>b.bt>0&&!b.upg&&b.hp<b.maxhp-0.5).length;const note=bc?`（建設中の${bc}棟は、完成すると耐久が満タンになります）`:'';
   if(n||pn){se('upgrade');log(`一括修理：${n}棟${pt}（木材${c}）`,'good');toast(`一括修理：${n}棟${pt}（木材${c}）${note}`,'good');}
@@ -3792,7 +3793,7 @@ function drawTents(c,an,burnt){
     const g=ctx.createRadialGradient(fx,fy,2,fx,fy,TU*1.6);g.addColorStop(0,'rgba(255,150,60,.25)');g.addColorStop(1,'rgba(255,150,60,0)');ctx.fillStyle=g;ctx.fillRect(fx-TU*1.6,fy-TU*1.6,TU*3.2,TU*3.2);}
   ctx.restore();
 }
-function startWave(){phaseReset();S._barT=0;for(const b of S.blds||[])b.shield=null;S.barrier=(S.baseLv||1)>=5?barrierMax():0;
+function startWave(){phaseReset();S._barT=0;S.barrier=(S.baseLv||1)>=5?barrierMax():0;
   S.wave++;if(S.mapId==='s'&&S.wave>=8&&!S.frozen)freezeRivers();S.waveActive=true;S.waveKills=0;S.subShown=-1;S.wled={};for(const b of S.blds){b.wlast=b.wuse;b.wuse=null;}
   S.cur=S.next;S.qi=0;S.waveT=0;S._mmT=null;S.navalLeft=0;S.waveStart={kia:S.kia,mat:S.mat,fallen:S.fallen.length,bld:S.bldLost};
   log(`第${S.wave}襲撃 接近！${S.wave===finalWave()?' — 最後の夜':''}`,'warn');
@@ -4452,10 +4453,10 @@ function update(dt,sim){
       }
     }
   }
-  // バリアストーン：周りの施設にシールド。割れたらエーテルを使って張り直す
+  // バリアストーン：周りの施設にシールド。割れたら朝の修理でエーテルを使って張り直す
   if(S.waveActive){S._barT=(S._barT||0)-dt;if(S._barT<=0){S._barT=1;const bs=S.blds.filter(b=>b.type==='barrier'&&!(b.bt>0&&!b.upg)&&eff(b)>0);
     for(const o of S.blds)o.shMax=0;for(const b of bs){const r=B.barrier.aura*TU,mx=B.barrier.shield*UP.hp[(b.lv||1)-1];for(const o of S.blds){if(o.type==='barrier'||WALL_TYPES.includes(o.type))continue;if(Math.hypot(bcx(o)-bcx(b),bcy(o)-bcy(b))<=r)o.shMax=Math.max(o.shMax||0,mx);}}}
-    for(const o of S.blds){if(!o.shMax){o.shield=0;continue;}if(o.shield==null)o.shield=o.shMax;if((o.shield||0)<o.shMax&&(S.elec||0)>0){const add=Math.min(o.shMax-(o.shield||0),20*dt);o.shield=(o.shield||0)+add;S.elec-=add*0.01;}}}
+    for(const o of S.blds){if(!o.shMax){o.shield=0;continue;}if(o.shield==null)o.shield=o.shMax;o.shield=Math.min(o.shield,o.shMax);}}   /* 夜の間は張り直さない（朝の修理でエーテルを使って張り直す） */
   // 部隊
   for(const s of S.squads){
     if(s.ut==='guard'&&!sim){const hq=hqOf();if(hq){const [qx,qy]=castleC(hq);
