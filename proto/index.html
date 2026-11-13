@@ -1853,8 +1853,8 @@ const UPG_EFF={
 const E={
   swarm:  {name:'ゴブリン',desc:'アビスの影響で凶暴化した小鬼。弱いが数が多く、兵士に群がる',hp:30,spd:40,dmg:5,rate:0.6,r:5,color:'#8ac060',xp:2,mat:0.15,vsS:1.6,hunt:4},
   charger:{name:'ゴブリンライダー',desc:'魔狼に乗ったゴブリン。足が速く、群れで真っ先に突っ込んでくる。狼を倒すと乗っていたゴブリンが降りて戦う',hp:80,spd:76,dmg:10,rate:0.6,r:7,color:'#9a9aa8',xp:4,mat:0.5,vsS:1.5,hunt:5,spill:{type:'swarm',n:1}},
-  grove:{name:'蠢く木陰',desc:'草原のラスボス。森の大木そのものが魔物になった怪物。周りに濃い木陰を広げ、その中では明るい明かり（石炭の篝火・蒼い炎）でしか魔物が見えない。数秒ごとに足元から根の触手が突き出る。体力が半分を切ると、足が増えて波打つように速くなる。火の攻撃で受けるダメージ200%',hp:30000,spd:14,dmg:150,rate:1.4,r:26,color:'#3a4a2a',xp:200,armor:0.4,bldMul:2,mat:120,boss:true,fireWeak:true,shade:7,roots:true},
-  treant:{name:'トレント',desc:'歩く巨木の魔物。とても硬いが、火に弱い（ドラゴンブレス・竜騎兵・魔術師の火・メイジの塔で受けるダメージ200%）',hp:1800,spd:24,dmg:45,rate:1.0,r:13,color:'#5a4a2a',xp:20,armor:0.3,bldMul:1.5,mat:6,fireWeak:true,hunt:3},
+  grove:{name:'蠢く木陰',desc:'草原のラスボス。森の大木そのものが魔物になった怪物。周りに濃い木陰を広げ、その中では明るい明かり（石炭の篝火・蒼い炎）でしか魔物が見えない。10秒ごとに足元から根の触手が突き出る（2秒前に影の円）。燃えている間は装甲がなくなる。体力が半分を切ると、足が増えて波打つように速くなる。火の攻撃で受けるダメージ200%',hp:30000,spd:14,dmg:150,rate:1.4,r:26,color:'#3a4a2a',xp:200,armor:0.4,bldMul:2,mat:120,boss:true,fireWeak:true,shade:7,roots:true},
+  treant:{name:'トレント',desc:'歩く巨木の魔物。とても硬いが、火に弱い（ドラゴンブレス・竜騎兵・魔術師の火・メイジの塔で受けるダメージ200%。燃えている5秒の間は装甲がなくなる）',hp:1800,spd:24,dmg:45,rate:1.0,r:13,color:'#5a4a2a',xp:20,armor:0.3,bldMul:1.5,mat:6,fireWeak:true,hunt:3},
   shogre:{name:'盾持ちオーガ',desc:'大きな盾を構えたオーガ。正面からの矢・弾を70%防ぐ（横・後ろからと曲射・魔法の範囲はそのまま）',hp:1400,spd:34,dmg:66,rate:1.1,r:12,color:'#6a7a5a',xp:24,armor:0.2,bldMul:1.3,mat:6,vsS:1.3,hunt:4,frontShield:0.7},
   maneater:{name:'マンイーター',desc:'根で歩いて近づく食人植物。噛みついた兵士を毒にする（3秒かけて、噛んだダメージと同じだけ追加）',hp:700,spd:32,dmg:30,rate:1.0,r:9,color:'#5aa040',xp:12,armor:0.1,mat:4,vsS:1.2,hunt:5,poison:true},
   vampire:{name:'吸血鬼',desc:'倒した兵士をグールに変える。聖銀の攻撃（銀装兵・ミスリルレイ）で受けるダメージ200%',hp:1600,spd:50,dmg:70,rate:1.0,r:10,color:'#7a2a4a',xp:30,armor:0.2,mat:10,vsS:1.5,hunt:6,vampire:true,silverWeak:true},
@@ -4529,9 +4529,9 @@ function update(dt,sim){
   for(const s of S.squads)if(s.psnT>0){s.psnT-=dt;damageSquad(s,(s.psnD||0)*dt);}   /* マンイーターの毒 */
   for(const s of S.squads)if(s.rootT>0)s.rootT-=dt;
   /* 蠢く木陰：数秒ごとに根の触手（出る前に影の円）。体力が半分を切ると速くなる */
-  if(S.waveActive){S.roots=S.roots||[];for(const g of S.enemies){const d=E[g.type];if(!d.roots||g.hp<=0)continue;g.rage=g.hp<g.maxhp*0.5;g.rootCd=(g.rootCd==null?3:g.rootCd)-dt;
-    if(g.rootCd<=0){g.rootCd=g.rage?4:6;const R0=9*TU,C=[];for(const q of S.squads)if(!q.gar&&Math.hypot(q.x-g.x,q.y-g.y)<R0)C.push([q.x,q.y]);for(const b of S.blds)if(Math.hypot(bcx(b)-g.x,bcy(b)-g.y)<R0&&!WALL_TYPES.includes(b.type))C.push([bcx(b),bcy(b)]);
-      for(let i=0;i<(g.rage?4:3)&&C.length;i++){const k=C.splice(Math.floor(Math.random()*C.length),1)[0];S.roots.push({x:k[0],y:k[1],t:1.2,r:1.3*TU});}}}
+  if(S.waveActive){S.roots=S.roots||[];for(const g of S.enemies){const d=E[g.type];if(!d.roots||g.hp<=0)continue;g.rage=g.hp<g.maxhp*0.5;g.rootCd=(g.rootCd==null?4:g.rootCd)-dt;
+    if(g.rootCd<=0){g.rootCd=g.rage?7:10;const R0=9*TU,C=[];for(const q of S.squads)if(!q.gar&&Math.hypot(q.x-g.x,q.y-g.y)<R0)C.push([q.x,q.y]);for(const b of S.blds)if(Math.hypot(bcx(b)-g.x,bcy(b)-g.y)<R0&&!WALL_TYPES.includes(b.type))C.push([bcx(b),bcy(b)]);
+      for(let i=0;i<(g.rage?4:3)&&C.length;i++){const k=C.splice(Math.floor(Math.random()*C.length),1)[0];S.roots.push({x:k[0],y:k[1],t:2,r:1.3*TU});}}}
     for(const rt of S.roots){rt.t-=dt;if(rt.t<=0&&!rt.done){rt.done=true;se('boom');S.fx.push({x:rt.x,y:rt.y,r:rt.r,t:0,dur:0.5,c:'#5a3a1a'});
       for(const q of S.squads)if(!q.gar&&Math.hypot(q.x-rt.x,q.y-rt.y)<rt.r){damageSquad(q,200);q.rootT=2;}
       for(const b of S.blds)if(Math.hypot(bcx(b)-rt.x,bcy(b)-rt.y)<rt.r+bsz(b)*T/2)damageB(b,250,null);}}
@@ -4709,7 +4709,7 @@ function update(dt,sim){
     let sx=0,sy=0;
     for(const o of S.enemies){if(o===e)continue;const ox=e.x-o.x,oy=e.y-o.y;if(Math.abs(ox)>30||Math.abs(oy)>30)continue;const od=ox*ox+oy*oy;const rr=(d.r+E[o.type].r)*1.1;if(od<rr*rr&&od>0.01){const l=Math.sqrt(od);sx+=ox/l;sy+=oy/l;}}
     const tr=terAt(e.x,e.y);const ev=elevPx(e.x,e.y),fx=Math.floor(e.x/T),fy=Math.floor(e.y/T);const step=(e.spdMul||1)*(e.far||1)*(e.buff?1.25:1)*(e.curse?0.7:1)*(e.fear||e.slowT>0?0.6:1)*d.spd*dt*(fx>=0&&fy>=0&&fx<COLS&&fy<ROWS&&S.ter[fy][fx]===6?0.55:fx>=0&&fy>=0&&fx<COLS&&fy<ROWS&&S.ter[fy][fx]===10?0.5:1)*FOREST_SLOW[forestAt(fx,fy)]*MARSH_SLOW[marshAt(fx,fy)]*[1,0.9,0.8,0.65][ev];
-    if(e.down>0)e.down-=dt;if(e.harpT>0){e.harpT-=dt;hitEnemy(e,(e.harpD||0)*dt,null);}
+    if(e.down>0)e.down-=dt;if(e.burnT>0){e.burnT-=dt;if(Math.random()<dt*6)S.fx.push({x:e.x+(Math.random()-.5)*d.r,y:e.y-d.r*0.5,r:4,t:0,dur:0.4,c:'#ff8a3a'});}if(e.harpT>0){e.harpT-=dt;hitEnemy(e,(e.harpD||0)*dt,null);}
     if(e.stun>0){e.stun-=dt;continue;}
     if(d.roots&&e.rage&&!e._spdUp){e._spdUp=true;e.spdMul=(e.spdMul||1)*1.6;log('蠢く木陰の足が増え、波打つように速くなった！','bad');}
     if(e.slowT>0)e.slowT-=dt;
@@ -4791,11 +4791,11 @@ function hitEnemy(e,dmg,src,pierce,ap){
   if(has('incend'))dmg*=1.15;
   if(ap==null&&src&&src.kind==='b')ap=elevAP(src);
   if(src){const st=src.kind==='s'?null:src.type,su=src.kind==='s'?src.ut:null;   /* 魔物の弱点・盾（2026-11-13） */
-    if(d.fireWeak&&(st==='dbreath'||st==='magetower'||su==='drake'||su==='mage'))dmg*=2;
+    if(d.fireWeak&&(st==='dbreath'||st==='magetower'||su==='drake'||su==='mage')){dmg*=2;e.burnT=5;}   /* 火に弱い：燃えている5秒の間は装甲がなくなる */
     if(d.magicWeak&&(st==='magetower'||st==='tesla'||st==='mray'||su==='mage'))dmg*=1.5;
     if(d.silverWeak&&(st==='mray'||(src.kind==='s'&&src.model==='silver')))dmg*=2;
     if(d.frontShield&&((src.kind==='b'&&isDirect(src))||su==='arch')){const sx=src.kind==='s'?src.x:bcx(src),sy=src.kind==='s'?src.y:bcy(src),tg=e.target&&S.blds.includes(e.target)?e.target:hqOf();if(tg){const fa=Math.atan2(bcy(tg)-e.y,bcx(tg)-e.x),sa=Math.atan2(sy-e.y,sx-e.x);let da=Math.abs(fa-sa);if(da>Math.PI)da=2*Math.PI-da;if(da<Math.PI/2)dmg*=1-d.frontShield;}}}
-  const armor=(pierce||has('incend'))?0:(d.armor||0)*(1-Math.min(1,ap||0));
+  const armor=(pierce||has('incend')||(d.fireWeak&&e.burnT>0))?0:(d.armor||0)*(1-Math.min(1,ap||0));
   e.hp-=dmg*(1-armor);
   if(has('poison')&&src&&!pierce&&src.kind!=='s'&&(src.type==='mg'||src.type==='tower')){e.psn=(e.psn||0)+dmg*0.3;e.psnR=Math.max(e.psnR||0,e.psn/3);}
   if(e.hp<=0){
@@ -5345,7 +5345,7 @@ function draw(){
     if(m.kind==='pit'){ctx.fillStyle=m.armed?'rgba(110,80,40,.75)':'#120c06';ctx.beginPath();ctx.ellipse(mx,my,TU*0.4,TU*0.32,0,0,7);ctx.fill();if(m.armed){ctx.strokeStyle='rgba(160,120,60,.8)';for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(mx-9,my+i*3);ctx.lineTo(mx+9,my+i*3+1);ctx.stroke();}}return;}
     ctx.fillStyle=m.armed?'#3a3020':'#222';ctx.beginPath();ctx.arc(mx,my,5,0,7);ctx.fill();ctx.strokeStyle=m.armed?'#8a7040':'#444';ctx.stroke();
     if(m.armed&&Math.sin(an*3+m.x)>0.6){ctx.fillStyle='#ff5a4e';ctx.beginPath();ctx.arc(mx,my,1.6,0,7);ctx.fill();}}}
-  for(const rt of (S.roots||[])){if(rt.done)continue;const k=1-rt.t/1.2;ctx.fillStyle=`rgba(30,18,8,${0.25+0.4*k})`;ctx.beginPath();ctx.arc(rt.x,rt.y,rt.r*(0.5+0.5*k),0,7);ctx.fill();ctx.strokeStyle='rgba(200,120,60,.6)';ctx.beginPath();ctx.arc(rt.x,rt.y,rt.r,0,7);ctx.stroke();}   /* 根の触手の前ぶれ */
+  for(const rt of (S.roots||[])){if(rt.done)continue;const k=1-rt.t/2;ctx.fillStyle=`rgba(30,18,8,${0.25+0.4*k})`;ctx.beginPath();ctx.arc(rt.x,rt.y,rt.r*(0.5+0.5*k),0,7);ctx.fill();ctx.strokeStyle='rgba(200,120,60,.6)';ctx.beginPath();ctx.arc(rt.x,rt.y,rt.r,0,7);ctx.stroke();}   /* 根の触手の前ぶれ */
   for(const e of S.enemies){if(e.sub){ctx.globalAlpha=0.35;drawEnemy(e);ctx.globalAlpha=1;}else drawEnemy(e);}
   for(const n of S.navShells){if(n.t<n.delay){const k=n.t/n.delay;ctx.strokeStyle=`rgba(255,227,138,${0.3+0.5*k})`;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(n.x-30*(1-k),n.y-160*(1-k));ctx.lineTo(n.x-30*(1-k)+4,n.y-160*(1-k)+20);ctx.stroke();ctx.lineWidth=1;
     ctx.strokeStyle='rgba(255,90,78,.35)';ctx.beginPath();ctx.arc(n.x,n.y,6,0,7);ctx.stroke();}}
