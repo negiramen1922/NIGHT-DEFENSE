@@ -1677,7 +1677,7 @@ const BASE_MAX=7;
 // 大きさ（マス）：基本は2×2、大きい施設は3×3、城は4×4
 const BIG_SZ=3;
 // 柵・石の壁・城壁は1×1（門は2×2）
-const BSIZE={hq:4,fence:1,swall:1,wall:1,wall3:1,wall5:1,brazier:1,aebomb:1,gravity:1,stake:1,meteor:1};for(const k of ['smelter','bastion','outpost','how','cannon','mortar','mabou','field','hvy','rail','mlrs','market','lab','magic','aerie','hangar','tankf','airfield','furnace','apart','reactor','elecf','power'])BSIZE[k]=BIG_SZ;BSIZE.church=BIG_SZ;for(const k of ['spike','pit','bomb','landmine'])BSIZE[k]=1;   // 罠は1×1（たくさん並べて使う）   // 馬小屋・酒場・兵舎・火薬工房は2×2（ドット絵v2）
+const BSIZE={hq:4,fence:1,swall:1,wall:1,wall3:1,wall5:1,brazier:1,aebomb:1,gravity:1,stake:1,meteor:1};for(const k of ['magetower','tesla','mray','dbreath','smelter','bastion','outpost','how','cannon','mortar','mabou','field','hvy','rail','mlrs','market','lab','magic','aerie','hangar','tankf','airfield','furnace','apart','reactor','elecf','power'])BSIZE[k]=BIG_SZ;BSIZE.church=BIG_SZ;for(const k of ['spike','pit','bomb','landmine'])BSIZE[k]=1;   // 罠は1×1（たくさん並べて使う）   // 馬小屋・酒場・兵舎・火薬工房は2×2（ドット絵v2）
 function newSz(t){return BSIZE[t]||U;}
 function bsz(b){return (b&&b.sz)||(b&&b.type?newSz(b.type):U);}
 function bcx(b){return (b.x+bsz(b)/2)*T;}
@@ -5568,15 +5568,16 @@ function drawBldV2(b,an){const r=bldSpr(b);if(!r||!r[0])return false;const [sp,a
   if(b.onB&&ICIMG.bastion)ctx.drawImage(ICIMG.bastion,x,y,S2,S2);
   else if(b.wall){const W=(SPR.walls[b.wall.wt]||SPR.walls.wall).img.tiles;for(let j=0;j<n;j++)for(let i=0;i<n;i++)ctx.drawImage(W[10],x+i*T,y+j*T,T,T);}
   let im;const ft=(performance.now()-(b.fireT||0))/1000;
-  if(anim==='dirs'){const dir=sprDir(b.ang||0);im=(dir===0&&ft>=0&&ft<0.72&&sp.img.fire)?sp.img.fire[Math.min(5,Math.floor(ft/0.12))]:sp.img.dirs[dir];}
+  if(anim==='dirs'){im=(ft>=0&&ft<0.72&&sp.img.fire)?sp.img.fire[Math.min(5,Math.floor(ft/0.12))]:sp.img.dirs[0];}   /* 兵器は右向きの絵を回して描く（斜めの絵が崩れていたため・2026-11-13） */
   else if(anim==='tiles')im=sp.img.tiles[wallMaskOf(b)];
   else if(anim==='open'){let md=1e9;for(const q of S.squads)if(!q.gar)md=Math.min(md,Math.hypot(q.x-cx,q.y-cy));const k=Math.max(0,Math.min(1,1-(md-0.6*TU)/(1.2*TU)));const L=sp.img.open;im=L[Math.round(k*(L.length-1))];}
   else{const L=sp.img.idle;const work=!(building||b.off||b.starved||b.dep);im=L[work?(Math.floor(an/0.2)+b.id)%L.length:0];}
   const sc=(b.onB?Math.min(1,(S2-4)/sp.size):S2/sp.size),w=im.width*sc,h=im.height*sc;
   if(building)ctx.globalAlpha=0.4;
-  ctx.drawImage(im,Math.round(cx-w/2),Math.round(cy-h/2),w,h);ctx.globalAlpha=1;
+  if(anim==='dirs'){ctx.save();ctx.translate(Math.round(cx),Math.round(cy));ctx.rotate(b.ang||0);ctx.drawImage(im,-w/2,-h/2,w,h);ctx.restore();}
+  else ctx.drawImage(im,Math.round(cx-w/2),Math.round(cy-h/2),w,h);ctx.globalAlpha=1;
   // 発射炎（右向き以外は muzzle を重ねる）
-  if(anim==='dirs'&&ft>=0&&ft<0.24&&sprDir(b.ang||0)!==0&&SPR.effects.muzzle){const M=SPR.effects.muzzle.img.play,mi=M[Math.min(M.length-1,Math.floor(ft/0.08))],L2=S2*0.42;ctx.drawImage(mi,Math.round(cx+Math.cos(b.ang)*L2-8),Math.round(cy+Math.sin(b.ang)*L2-8));}
+  if(false&&anim==='dirs'&&ft>=0&&ft<0.24&&sprDir(b.ang||0)!==0&&SPR.effects.muzzle){const M=SPR.effects.muzzle.img.play,mi=M[Math.min(M.length-1,Math.floor(ft/0.08))],L2=S2*0.42;ctx.drawImage(mi,Math.round(cx+Math.cos(b.ang)*L2-8),Math.round(cy+Math.sin(b.ang)*L2-8));}
   ctx.imageSmoothingEnabled=true;
   if(b.type==='brazier'||b.type==='hq'){const f=0.6+0.4*Math.sin(an*9+b.id);ctx.fillStyle=`rgba(255,180,80,${0.18*f})`;ctx.beginPath();ctx.arc(cx,cy-2,S2*0.35,0,7);ctx.fill();}
   // 建設中
