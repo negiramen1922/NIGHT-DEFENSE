@@ -1000,7 +1000,7 @@ body.land #saveMark{right:calc(var(--rail) + 8px);bottom:auto;top:44px}   /* ス
 .ov-res .tnode .te{font-size:11px;color:var(--dim);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ov-res .tnode .tl{font-size:10.5px;color:var(--off)}
 .ov-res .tnode .tm{display:flex;justify-content:space-between;align-items:center;font-size:11px}
-.ov-res .tnode .tm .cst{display:inline-flex;gap:8px}
+.ov-res .tnode .tm .cst{display:inline-flex;gap:8px;flex-wrap:wrap;row-gap:2px;min-width:0}.ov-res .tnode .tm{gap:6px}.ov-res .tnode .tm .tt2{flex-shrink:0;align-self:flex-end}   /* 材料が多い研究は折り返す */
 .ov-res .tnode .tm .tt2{color:var(--dim)}
 .ov-res .tnode .tbar{margin-top:3px}
 .ov-res .tnode.key{box-shadow:0 0 0 1px #6d8a72,inset 3px 0 0 var(--amber)}
@@ -2900,7 +2900,7 @@ function techCost(t){const L=lvl(t.id);const c={};const base=Object.assign({},t.
   {const M=TECH_MAT[t.tier||1];if(M&&!TECH_MAT_FREE.has(t.id))for(const k in M)if(!base[k])base[k]=M[k];}
   if((t.tier||1)>=2){if(base.stone)base.stone=Math.max(5,Math.round(base.stone*0.5/5)*5);if(base.iron)base.iron=Math.max(5,Math.round(base.iron*0.6/5)*5);}   /* 研究の石材・鉄を減らす（建設と壁に回す・2026-11-13） */for(const k in base)c[k]=Math.round(base[k]*(1+0.7*L));return c;}
 function techTurns(t){return t.t+lvl(t.id);}
-const MAP_MAXTIER={f:2,m:3,t:2,s:3};
+const MAP_MAXTIER={m:3,t:2,s:3};   // 草原（f）は城のランクを上げれば研究を最後までできる（2026-11-13）
 function mapMaxTier(){return MAP_MAXTIER[CUR_MAP]||7;}
 function techState(t){
   if(lvl(t.id)>=tMax(t))return'done';
@@ -7071,7 +7071,7 @@ function showResearch(){
       if(t.gate&&st==='locked')t.line=`ランク${RN[t.gate-1]}の研究 合計Lv${rankSum(cat,t.gate-1)}/${gateNeed(cat,t.gate)}`;else if(t.gate)t.line='';
       const outside=(t.pre||[]).filter(x=>!L.inTab(x));
       h+=`<div class="tnode ${st} ${t.excl?'excl':''} ${t.id===S.resSel?'sel':''} ${t.key||t.gate?'key':''}" data-node="${t.id}" style="margin-left:${dep*18}px">
-        <div class="tt"><b>${t.icon?`<span class="tic">${icSvg(t.icon,16)}</span>`:''}${t.name}</b>${stTxt}<span class="lv">Lv ${Lv}/${mx}</span></div>
+        <div class="tt"><b>${t.icon?`<span class="tic">${icSvg(t.icon,16)}</span>`:''}${t.name}</b>${stTxt}${mx>1?`<span class="lv">Lv ${Lv}/${mx}</span>`:''}</div>
         <div class="te">${t.eff||''}</div>
         ${t.line||t.excl||outside.length?`<div class="tl">${t.line?t.line:''}${t.excl?' <span style="color:var(--amber)">分岐</span>':''}${outside.length?' 要：'+outside.map(x=>techOf(x).name).join('・'):''}</div>`:''}
         <div class="tm"><span class="cst">${st==='done'?'':costText(techCost(t))}</span><span class="tt2">${techTurns(t)}T</span></div>
@@ -7093,7 +7093,7 @@ function showResearch(){
   else if(!t.gate&&!rankOpen(cat,t.tier||1))act=`<span class="muted">ランク${RN[t.tier||1]}は未解放：<span style="color:var(--red)">城をLv${t.tier||1}</span>にすると研究できます</span>`;
   else act=`<span class="muted">前提：${(t.pre||[]).map(p=>`<span style="color:${has(p)?'var(--green)':'var(--red)'}">${techOf(p).name}${techOf(p).cat!==cat?`（${techOf(p).cat}）<button data-jump="${p}" style="padding:1px 8px">そこへ移動</button>`:''}</span>`).join('・')}${t.preSum?`${(t.pre||[]).length?'・':''}<span style="color:${preSumLv(t)>=t.preSum.n?'var(--green)':'var(--red)'}">${t.preSum.label}の合計Lv ${preSumLv(t)}/${t.preSum.n}</span>`:''}</span>`;
   const exo=t.excl?TECH.filter(o=>o.excl===t.excl&&o.id!==t.id).map(o=>o.name).join('・'):'';
-  h+=`<div class="tdet"><div class="tdl"><div><b class="tdn" style="color:${CAT_COLOR[cat]}">${t.name}</b><span class="tdlv">${lvl(t.id)>=tMax(t)?`<b style="color:var(--green)">Lv ${lvl(t.id)}（最大）</b>`:`Lv ${lvl(t.id)} → ${lvl(t.id)+1} ／ 最大 ${tMax(t)}${t.lvRank?'（城のランク）':''}`}</span>${t.key?'<span style="color:var(--amber);margin-left:8px">重要</span>':''}</div>
+  h+=`<div class="tdet"><div class="tdl"><div><b class="tdn" style="color:${CAT_COLOR[cat]}">${t.name}</b><span class="tdlv">${tMax(t)<=1?'':lvl(t.id)>=tMax(t)?`<b style="color:var(--green)">Lv ${lvl(t.id)}（最大）</b>`:`Lv ${lvl(t.id)} → ${lvl(t.id)+1} ／ 最大 ${tMax(t)}${t.lvRank?'（城のランク）':''}`}</span>${t.key?'<span style="color:var(--amber);margin-left:8px">重要</span>':''}</div>
     <div class="tde">${t.eff}</div>${exo?`<div style="color:var(--amber);font-size:11px">分岐：「${exo}」とどちらか一方しか研究できません</div>`:''}</div>
     <div class="tdr">${act}</div></div>`;
   const card=openOverlay('res',h,true);
