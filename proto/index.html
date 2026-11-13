@@ -2743,6 +2743,7 @@ function pxTile(c,X,Y,v,lv,x,y,oil,ore,rich){
   if(ore){const n=[0,1,2,3][rich||1];const P=[[1,7],[6,2],[7,8]];for(let i=0;i<n;i++){pxStamp(c,ox+P[i][0],oy+P[i][1],BOULDER,{o:O,s:'#6a5a4a',S:'#4a3e32'});c.fillStyle='#e0843a';c.fillRect(ox+P[i][0]+3,oy+P[i][1]+2,1,1);c.fillRect(ox+P[i][0]+5,oy+P[i][1]+3,1,1);}}
 }
 
+function abyssHid(x,y){return S.ter[y][x]===7&&S.mode==='campaign'&&S.seen&&!S.seen[y*COLS+x];}
 function renderTerrain(){
   lblCv=null;
   terCv=document.createElement('canvas');terCv.width=W;terCv.height=H;const c=terCv.getContext('2d');
@@ -2754,7 +2755,7 @@ function renderTerrain(){
   const C0=COLS/U,R0=ROWS/U;
   const lo=document.createElement('canvas');lo.width=C0*TP;lo.height=R0*TP;const lc=lo.getContext('2d');
   // 1回目：地面の色むらだけを配列に書いて貼る。2回目：その上に飾り（草・岩・木など）を描く
-  const tileArgs=(X,Y)=>{const x=X*U,y=Y*U,v=S.ter[y][x];return [X,Y,v,v===1?elevAt(x,y):v===2?forestAt(x,y):v===4?marshAt(x,y):0,X,Y,S.oil[y][x],S.ore[y][x],richAt(x,y)];};
+  const tileArgs=(X,Y)=>{const x=X*U,y=Y*U,v=abyssHid(x,y)?1:S.ter[y][x];   /* まだ見ていないアビスの裂け目は草地に見せる（霧の中に場所が透けないように） */return [X,Y,v,v===1?elevAt(x,y):v===2?forestAt(x,y):v===4?marshAt(x,y):0,X,Y,S.oil[y][x],S.ore[y][x],richAt(x,y)];};
   try{FILL_BUF=lc.createImageData(lo.width,lo.height);FILL_MODE='buf';
     for(let Y=0;Y<R0;Y++)for(let X=0;X<C0;X++)pxTile(NOCTX,...tileArgs(X,Y));
     lc.putImageData(FILL_BUF,0,0);}finally{FILL_BUF=null;FILL_MODE=null;}
@@ -2771,7 +2772,7 @@ function renderTerrain(){
   miniCv=document.createElement('canvas');miniCv.width=MM.w;miniCv.height=MM.h;const m=miniCv.getContext('2d');
   const sx=MM.w/COLS,sy=MM.h/ROWS;const col={0:'#0b120d',1:'#24382a',2:'#11221a',3:'#4a4238',4:'#13282c',6:'#0a2236',7:'#6a1030',8:'#5a5030',9:'#1a4a6a',10:'#3a6a7a'};
   {const tc=document.createElement('canvas');tc.width=COLS;tc.height=ROWS;const tg=tc.getContext('2d'),id=tg.createImageData(COLS,ROWS),D=id.data;
-   for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const q=hexRGB(S.oil[y][x]?'#7a4fd0':S.ore[y][x]?'#4a3c1a':(col[S.ter[y][x]]||'#0b120d')),o=(y*COLS+x)*4;D[o]=q[0];D[o+1]=q[1];D[o+2]=q[2];D[o+3]=255;}
+   for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const q=hexRGB(S.oil[y][x]?'#7a4fd0':S.ore[y][x]?'#4a3c1a':(col[abyssHid(x,y)?1:S.ter[y][x]]||'#0b120d')),o=(y*COLS+x)*4;D[o]=q[0];D[o+1]=q[1];D[o+2]=q[2];D[o+3]=255;}
    tg.putImageData(id,0,0);m.imageSmoothingEnabled=false;m.drawImage(tc,0,0,MM.w,MM.h);}
 }
 // ===== 霧（未探索）と支配圏 =====
@@ -2791,7 +2792,8 @@ function isSeen(x,y){return x>=0&&y>=0&&x<COLS&&y<ROWS&&(!S.seen||S.seen[y*COLS+
 function reveal(cx,cy,r){
   if(!fogCv)return;r*=U;const c=fogCv.getContext('2d'),m=miniFog.getContext('2d'),sx=MM.w/COLS,sy=MM.h/ROWS;let ch=false;
   for(let y=Math.max(0,Math.floor(cy-r));y<=Math.min(ROWS-1,Math.ceil(cy+r));y++)for(let x=Math.max(0,Math.floor(cx-r));x<=Math.min(COLS-1,Math.ceil(cx+r));x++){
-    const i=y*COLS+x;if(S.seen[i])continue;if(Math.hypot(x-cx,y-cy)>r)continue;S.seen[i]=1;ch=true;c.clearRect(x,y,1,1);m.clearRect(x*sx,y*sy,Math.ceil(sx),Math.ceil(sy));}
+    const i=y*COLS+x;if(S.seen[i])continue;if(Math.hypot(x-cx,y-cy)>r)continue;S.seen[i]=1;ch=true;if(S.ter[y][x]===7)S._abyssNew=true;c.clearRect(x,y,1,1);m.clearRect(x*sx,y*sy,Math.ceil(sx),Math.ceil(sy));}
+  if(S._abyssNew&&terCv){S._abyssNew=false;renderTerrain();}   /* アビスの裂け目が見えたら地形を描き直す */
   return ch;
 }
 // 視界：城館・前哨砦は広く、ほかの施設と部隊は周囲だけ。偵察研究で広がる
