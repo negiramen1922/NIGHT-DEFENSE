@@ -32,7 +32,7 @@ im.alpha_composite(grad(W,H,(0,0,0,170),(0,0,0,0)).crop((0,0,W,H//2)),(0,0))
 im.alpha_composite(grad(W,420,(0,0,0,0),(0,0,0,220)),(0,H-420))
 lg=logo(760);im.alpha_composite(lg,(70,50))
 d=ImageDraw.Draw(im)
-T(d,(80,H-215),'昼に築き、夜に凌げ。',104,AMBER,'lm',7)
+T(d,(80,H-215),'昼に築き、夜に守り抜け。',104,AMBER,'lm',7)
 T(d,(84,H-105),'資材を集めて街を育てながら、夜ごと押し寄せる大群を守り抜く',46,WHITE,'lm',5)
 T(d,(W-60,60),'ブラウザで無料プレイ',44,WHITE,'rm',5)
 im.convert('RGB').save(OUT+'promo_16x9.png')
@@ -48,13 +48,13 @@ im.alpha_composite(grad(S,300,(0,0,0,0),(0,0,0,215)),(0,S-300))
 lg=logo(560);im.alpha_composite(lg,((S-lg.width)//2,40))
 d=ImageDraw.Draw(im)
 T(d,(S*0.22,S-205),'昼：築く',76,AMBER);T(d,(S*0.22,S-130),'資材を集め',38);T(d,(S*0.22,S-85),'街を育てる',38)
-T(d,(S*0.78,S-205),'夜：凌ぐ',76,RED);T(d,(S*0.78,S-130),'押し寄せる',38);T(d,(S*0.78,S-85),'大群を守り抜く',38)
+T(d,(S*0.78,S-205),'夜：守る',76,RED);T(d,(S*0.78,S-130),'押し寄せる',38);T(d,(S*0.78,S-85),'大群を守り抜く',38)
 im.convert('RGB').save(OUT+'promo_square.png')
 
-# ===== 3) 縦長（3段：築く・凌ぐ・攻める）
+# ===== 3) 縦長（3段：築く・守る・攻める）
 W,H=1080,1920
 im=Image.new('RGBA',(W,H),(8,10,12,255))
-panels=[(day,'築く','資材を集め、街を育てる',AMBER,(0.5,0.5,1.25)),(clash,'凌ぐ','押し寄せる大群を守り抜く',RED,(0.5,0.5,1.2)),(siege,'攻める','駐留地へ夜襲をかける',(150,200,255),(0.42,0.6,1.4))]
+panels=[(day,'築く','資材を集め、街を育てる',AMBER,(0.5,0.5,1.25)),(clash,'守る','押し寄せる大群を守り抜く',RED,(0.5,0.5,1.2)),(siege,'攻める','駐留地へ夜襲をかける',(150,200,255),(0.42,0.6,1.4))]
 y0=420;ph=440
 for i,(src,t1,t2,col,(cx,cy,z)) in enumerate(panels):
     y=y0+i*(ph+20);im.paste(crop_to(src,W,ph,cx,cy,z),(0,y))
@@ -62,7 +62,7 @@ for i,(src,t1,t2,col,(cx,cy,z)) in enumerate(panels):
     d=ImageDraw.Draw(im);T(d,(50,y+62),t1,96,col,'lm',8);T(d,(60+len(t1)*96,y+68),t2,46,WHITE,'lm',5)
 lg=logo(820);im.alpha_composite(lg,((W-lg.width)//2,40))
 d=ImageDraw.Draw(im)
-T(d,(W//2,H-150),'昼に築き、夜に凌げ。',84,AMBER,st=7)
+T(d,(W//2,H-150),'昼に築き、夜に守り抜け。',84,AMBER,st=7)
 T(d,(W//2,H-62),'ブラウザで無料プレイ ／ PC・スマホ対応',40,WHITE,st=5)
 im.convert('RGB').save(OUT+'promo_vertical.png')
 
@@ -70,9 +70,9 @@ im.convert('RGB').save(OUT+'promo_vertical.png')
 W,H=1920,1080
 im=crop_to(wide,W,H).filter(ImageFilter.GaussianBlur(3));im=ImageEnhance.Brightness(im).enhance(0.45).convert('RGBA')
 d=ImageDraw.Draw(im);lg=logo(560);im.alpha_composite(lg,((W-lg.width)//2,40))
-T(d,(W//2,330),'築いて、凌いで、攻め込め。',78,AMBER,st=7)
+T(d,(W//2,330),'築いて、守って、攻め込め。',78,AMBER,st=7)
 cards=[(day,'① 築く','森・岩場・平地に施設を建て','資材を集めて街を育てる',(0.5,0.5,1.3)),
-       (clash,'② 凌ぐ','夜ごと押し寄せる大群を','城壁・防衛施設・部隊で守る',(0.5,0.5,1.3)),
+       (clash,'② 守る','夜ごと押し寄せる大群を','城壁・防衛施設・部隊で守る',(0.5,0.5,1.3)),
        (siege,'③ 攻める','見つけた駐留地へ夜襲','次の襲撃を減らす',(0.42,0.6,1.5))]
 cw,ch=540,330;gap=60;x0=(W-3*cw-2*gap)//2;y0=420
 for i,(src,t1,t2,t3,(cx,cy,z)) in enumerate(cards):

@@ -62,7 +62,7 @@ for i in range(N):
     a=max(0,min(1,(i-25)/12))
     if a>0:
         band=Image.new('RGBA',(W,170),(6,8,10,int(190*a)));ov.alpha_composite(band,(0,H-230))
-        text_c(d,(W//2,H-145),'昼に築き、夜に凌げ。',96,AMBER+(int(255*a),),stroke=7)
+        text_c(d,(W//2,H-145),'昼に築き、夜に守り抜け。',96,AMBER+(int(255*a),),stroke=7)
     im=ov.convert('RGB')
     if i>N-8:im=fade(im,(N-1-i)/7)
     put(im)
@@ -74,7 +74,7 @@ CAP={'day':('資材を集め、街を築く','伐採所・石切り場・農場�
      'clash':('城壁と防衛施設で迎え撃て','バリスタ・大砲・メイジの塔・部隊を配置'),
      'wide':('四方から来る大群を、どう凌ぐか','生産を止めれば守れない。守りを怠れば街が落ちる'),
      'siege':('こちらから攻め込む','駐留地に夜襲をかけ、次の襲撃を減らせ')}
-TAG={'day':'① 築く','approach':'② 凌ぐ','clash':'② 凌ぐ','wide':'② 凌ぐ','siege':'③ 攻める'}
+TAG={'day':'① 築く','approach':'② 守る','clash':'② 守る','wide':'② 守る','siege':'③ 攻める'}
 def tag(im,s,a):
     if a<=0:return im
     ov=Image.new('RGBA',im.size,(0,0,0,0));d=ImageDraw.Draw(ov)
