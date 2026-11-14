@@ -3272,6 +3272,8 @@ function unitTime(m,b){const t=MT(m);return t.time*(has('assembly')?0.6:1)*(t.ut
 function squadTime(b){return unitTime((b.qm&&b.qm[0])||defModel(UNIT_HOME[b.type])||'mech',b);}
 function unitRange(u){return unitRange0(u)+(u.ut==='art'&&has('gunnery')?1.5:0)+(u.kind==='s'?eqS(u,'range'):0);}
 function unitRange0(u){const t=MT(u);return Math.max(1.2,t.range+0.5*elevPx(u.x,u.y)+(u.ut==='tank'?(has('tankgun')?1:0):(has('blade')?-1:0)+(has('support')?2:0)));}
+// 範囲攻撃は爆心から離れるほど弱くなる：中心100% → 爆風の端40%（群れにまとめて当てたときに強くなりすぎないように。2026-11-14）
+const SPLASH_EDGE=0.4;function splashFall(d,r){return r>0?1-(1-SPLASH_EDGE)*Math.min(1,d/r):1;}
 function unitSplash(u){const t=MT(u);if(u.kind==='s'){if(eqHas(u,'nosplash'))return 0;const es=eqS(u,'splash');if(es)return es;}return (t.splash||0)*(u.ut==='mage'&&has('highmagic')?1.3:1);}
 function unitsOf(b){return S.squads.filter(u=>u.home===b.id);}
 function unitLabel(u){if(u.ut==='adv')return `${MT(u).name}${u.no}`;if(['inf','arch','cav','drake','mage','mil','art','guard'].includes(u.ut))return `${MT(u).name}隊${u.no}`;return u.ut==='tank'?`${MT(u).name} ${u.no}号`:u.ut==='ship'?`${MT(u).name} ${u.no}番艦`:u.ut==='air'?`第${u.no}飛行隊（${MT(u).name}）`:`部隊${u.no}（${MT(u).name}）`;}
@@ -4809,18 +4811,18 @@ function update(dt,sim){
   S.mines=S.mines.filter(m=>!(m.used&&(m.kind==='bomb'||m.kind==='aebomb'||m.kind==='meteor')));if(!has('rearm'))S.mines=S.mines.filter(m=>!m.used||m.kind==='pit'||m.kind==='spike');
   // 艦砲射撃の着弾
   for(const n of S.navShells){n.t+=dt;if(n.t>=n.delay&&!n.done){n.done=true;se('boom');S.fx.push({x:n.x,y:n.y,r:n.splash,t:0,dur:0.5,c:'#ffe38a'});
-    for(const e of S.enemies){if(Math.hypot(e.x-n.x,e.y-n.y)<n.splash)hitEnemy(e,n.dmg,n.src&&S.blds.includes(n.src)?n.src:null);}}}
+    for(const e of S.enemies){const d=Math.hypot(e.x-n.x,e.y-n.y);if(d<n.splash)hitEnemy(e,n.dmg*splashFall(d,n.splash),n.src&&S.blds.includes(n.src)?n.src:null);}}}
   S.navShells=S.navShells.filter(n=>!n.done);
   for(const bm of S.beams)bm.t+=dt;S.beams=S.beams.filter(bm=>bm.t<0.25);
   for(const q of S.eshots){q.t+=dt;if(q.t>=q.dur&&!q.done){q.done=true;if(S.blds.includes(q.b)){damageB(q.b,q.dmg,null);S.fx.push({x:bcx(q.b),y:bcy(q.b),r:8,t:0,dur:0.3,c:'#b7d433'});}}}
   S.eshots=S.eshots.filter(q=>!q.done);
   for(const s of S.shots){if(s.balloon&&!s.done){/* 風船爆弾：魔物を追いかけて、近づくと爆発 */const tg=s.tg&&s.tg.hp>0?s.tg:null;if(tg){s.tx=tg.x;s.ty=tg.y;}const dx=s.tx-s.bx,dy=s.ty-s.by,d=Math.hypot(dx,dy),v=2.2*TU*dt;
       if(d<=Math.max(v,0.6*TU)||s.t>8){s.done=true;s.dur=0;se('boom');(S.vfx=S.vfx||[]).push({k:'explosion',x:s.bx,y:s.by,t0:nowS(),z:Math.max(1,Math.round(s.splash/TU))});S.fx.push({x:s.bx,y:s.by,r:s.splash,t:0,dur:0.35});
-        for(const e of S.enemies)if(e.hp>0&&Math.hypot(e.x-s.bx,e.y-s.by)<s.splash)hitEnemy(e,s.dmg,s.src);}
+        for(const e of S.enemies){if(e.hp<=0)continue;const d=Math.hypot(e.x-s.bx,e.y-s.by);if(d<s.splash)hitEnemy(e,s.dmg*splashFall(d,s.splash),s.src);}}
       else{s.bx+=dx/d*v;s.by+=dy/d*v;s.dur=s.t+dt+1;}}
     s.t+=dt;if(s.shell&&s.t>=s.dur&&!s.done){s.done=true;se('boom');(S.vfx=S.vfx||[]).push({k:s.src&&(s.src.kind==='s'&&s.src.ut==='mage'||s.src.type==='magetower')?'fire':'explosion',x:s.tx,y:s.ty,t0:nowS(),z:Math.max(1,Math.round((s.splash||TU)/TU))});
     S.fx.push({x:s.tx,y:s.ty,r:s.splash,t:0,dur:0.35});
-    for(const e of S.enemies){if(Math.hypot(e.x-s.tx,e.y-s.ty)<s.splash){hitEnemy(e,s.dmg,s.src);if(s.burn){e.psn=(e.psn||0)+s.dmg*s.burn;e.psnR=Math.max(e.psnR||0,e.psn/3);}if(s.slow)e.slowT=s.slow;}}
+    for(const e of S.enemies){const dd=Math.hypot(e.x-s.tx,e.y-s.ty);if(dd<s.splash){const fm=splashFall(dd,s.splash);hitEnemy(e,s.dmg*fm,s.src);if(s.burn){e.psn=(e.psn||0)+s.dmg*fm*s.burn;e.psnR=Math.max(e.psnR||0,e.psn/3);}if(s.slow)e.slowT=s.slow;}}
     if(s.cluster)for(let i=0;i<4;i++){const a=Math.random()*7,d=TU*(0.6+Math.random()*0.9);S.navShells.push({x:s.tx+Math.cos(a)*d,y:s.ty+Math.sin(a)*d,t:0,delay:0.15+i*0.08,dmg:s.dmg*0.4,splash:TU*0.7});}}}
   S.shots=S.shots.filter(s=>s.t<s.dur);
   for(const f of S.fx)f.t+=dt;S.fx=S.fx.filter(f=>f.t<f.dur);
