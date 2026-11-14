@@ -5336,6 +5336,7 @@ function draw(){
   ctx.textAlign='center';ctx.textBaseline='middle';
   drawRuins();
   for(const b of S.blds){drawBuilding(b,an);if(b.ench){const n=bsz(b);for(let i=0;i<b.ench;i++){const sx=b.x*T+3+i*5,sy=b.y*T+3;ctx.fillStyle='#1a0e2a';ctx.fillRect(sx-1,sy-1,5,5);ctx.fillStyle='#c48aff';ctx.fillRect(sx,sy,3,3);}}}
+  drawUpgBadges(an);
   drawClusters(an);
   drawMills(an);
   if(S.heat){ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
@@ -5667,6 +5668,21 @@ function bldSpr(b){const t=b.type,G=SPR.buildings;
   if(SPR.walls[t])return [SPR.walls[t],'tiles'];
   if(G[t])return [G[t],'idle'];
   return null;}
+// 改築中・強化中・造り替え中・城の強化中を、建物の上の札（残りターン＋進み具合）と光る点線の枠で見せる（2026-11-14）
+function drawUpgBadges(an){const placed=[];const z=cam.z||1,fs=Math.min(30,Math.max(6,13/z));   /* 画面上でおよそ13px */
+  for(const b of S.blds){const hqUp=b.type==='hq'&&S.baseUp,up=(b.bt>0&&b.upg)||hqUp;if(!up)continue;
+    const n=bsz(b),x=b.x*T,y=b.y*T,S2=n*T,cx=x+S2/2;
+    let lab,col,k;
+    if(hqUp){const tot=BASE_UP_T[S.baseUp.to-1]||S.baseUp.left;lab=`城Lv${S.baseUp.to}へ強化 残り${S.baseUp.left}T`;col='#f2b33d';k=Math.max(0,Math.min(1,1-S.baseUp.left/tot));}
+    else{const left=Math.ceil(b.bt/TURN_SEC-0.01);lab=(b.upg==='ench'?'魔核強化':b.upg==='mat'?'造り替え':'改築中')+` 残り${left}T`;col=b.upg==='ench'?'#c48aff':'#6fe08a';k=b.btTotal?Math.max(0,Math.min(1,1-b.bt/b.btTotal)):0;}
+    const pu=0.5+0.5*Math.sin(an*4+b.id);
+    ctx.save();ctx.setLineDash([5,4]);ctx.lineDashOffset=-an*10;ctx.lineWidth=2;ctx.globalAlpha=0.55+0.45*pu;ctx.strokeStyle=col;ctx.strokeRect(x+1,y+1,S2-2,S2-2);ctx.setLineDash([]);ctx.globalAlpha=1;
+    ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';const tw=ctx.measureText(lab).width,pw=tw+fs*0.9,ph=fs*1.55,bh=Math.max(3,fs*0.28);
+    const px=cx-pw/2;let py=y-ph-bh-3;const hh=ph+bh+2;for(let g=0;g<6;g++){const hit=placed.find(r=>px<r[0]+r[2]&&px+pw>r[0]&&py<r[1]+r[3]&&py+hh>r[1]);if(!hit)break;py=hit[1]-hh-2;}placed.push([px,py,pw,hh]);   /* 札が重なったら上へずらす */
+    ctx.fillStyle='rgba(8,12,10,.88)';ctx.fillRect(px,py,pw,ph+bh+2);ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.strokeRect(px+.5,py+.5,pw-1,ph+bh+1);
+    ctx.fillStyle=col;ctx.fillText(lab,cx,py+ph/2+1);
+    ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(px+3,py+ph,pw-6,bh);ctx.fillStyle=col;ctx.fillRect(px+3,py+ph,(pw-6)*k,bh);
+    ctx.restore();}}
 function drawBldV2(b,an){const r=bldSpr(b);if(!r||!r[0])return false;const [sp,anim]=r;const d=B[b.type],c=cmdOf(b);
   const n=bsz(b),x=b.x*T,y=b.y*T,S2=n*T,cx=x+S2/2,cy=y+S2/2,building=b.bt>0&&!b.upg;ctx.imageSmoothingEnabled=false;
   // 土台：櫓台の上／城壁の上
@@ -5700,7 +5716,7 @@ function drawBldV2(b,an){const r=bldSpr(b);if(!r||!r[0])return false;const [sp,a
   if((b.starved||b.noFuel||b.noAmmo)&&!building){ctx.fillStyle='#ff5a4e';ctx.font='bold 11px sans-serif';ctx.fillText('!',x+S2-4,y+8);}
   if(d.pop&&b.crew<crewNeed(b)&&!building){ctx.fillStyle=b.crew?'#f2b33d':'#ff5a4e';ctx.font='bold 8px sans-serif';ctx.fillText(b.crew+'/'+crewNeed(b),x+S2-8,y+S2-4);}
   if(b.off){ctx.fillStyle='rgba(20,16,28,.45)';ctx.fillRect(x,y,S2,S2);ctx.fillStyle='#e0d0b0';ctx.fillRect(cx-4,cy-5,2,10);ctx.fillRect(cx+2,cy-5,2,10);}
-  if(b.bt>0&&b.upg){ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(x+1,y+1,S2-2,S2-2);const k=1-b.bt/b.btTotal;ctx.fillStyle='#062';ctx.fillRect(x+2,y+S2-4,S2-4,3);ctx.fillStyle='#6fe08a';ctx.fillRect(x+2,y+S2-4,(S2-4)*k,3);ctx.fillStyle='#6fe08a';ctx.font='bold 9px sans-serif';ctx.fillText('改'+Math.ceil(b.bt/TURN_SEC-0.01),cx,cy);}
+  if(b.bt>0&&b.upg){ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(x+1,y+1,S2-2,S2-2);}   /* 札と進み具合は drawUpgBadges で上に描く */
   if(b.type==='hq'){const gq=S.squads.filter(q=>q.ut==='guard'&&q.gar===b.id);if(gq.length){ctx.fillStyle='#e8c860';ctx.font='bold 9px sans-serif';ctx.fillText('近衛'+gq.reduce((a,q)=>a+q.members,0),cx,y+S2+8);}
     if((S.baseLv||1)>=5){const fr=S.waveActive?Math.max(0,(S.barrier||0)/barrierMax()):1;if(fr>0){const pu=0.5+0.5*Math.sin(an*2.2);ctx.save();ctx.globalAlpha=(0.10+0.08*pu)*(0.35+0.65*fr);ctx.fillStyle='#9a6aff';ctx.beginPath();ctx.ellipse(cx,cy,S2*0.72,S2*0.68,0,0,7);ctx.fill();ctx.restore();}}}
   if(S.sel===b){ctx.strokeStyle='#f2b33d';ctx.lineWidth=2;ctx.strokeRect(x+.5,y+.5,S2-1,S2-1);ctx.lineWidth=1;
