@@ -5680,20 +5680,19 @@ function bldSpr(b){const t=b.type,G=SPR.buildings;
   if(SPR.walls[t])return [SPR.walls[t],'tiles'];
   if(G[t])return [G[t],'idle'];
   return null;}
-// 改築中・強化中・造り替え中・城の強化中を、建物の上の札（残りターン＋進み具合）と光る点線の枠で見せる（2026-11-14）
-function drawUpgBadges(an){const placed=[];const z=cam.z||1,fs=Math.min(30,Math.max(6,13/z));   /* 画面上でおよそ13px */
+// 改築中・強化中・造り替え中・城の強化中：建物の枠の中に「残りターン」の小さな札と進み具合のバー、光る点線の枠（2026-11-14。枠の外に出さないので密集しても重ならない）
+function drawUpgBadges(an){const z=cam.z||1;
   for(const b of S.blds){const hqUp=b.type==='hq'&&S.baseUp,up=(b.bt>0&&b.upg)||hqUp;if(!up)continue;
-    const n=bsz(b),x=b.x*T,y=b.y*T,S2=n*T,cx=x+S2/2;
+    const n=bsz(b),x=b.x*T,y=b.y*T,S2=n*T;
     let lab,col,k;
-    if(hqUp){const tot=BASE_UP_T[S.baseUp.to-1]||S.baseUp.left;lab=`城Lv${S.baseUp.to}へ強化 残り${S.baseUp.left}T`;col='#f2b33d';k=Math.max(0,Math.min(1,1-S.baseUp.left/tot));}
-    else{const left=Math.ceil(b.bt/TURN_SEC-0.01);lab=(b.upg==='ench'?'魔核強化':b.upg==='mat'?'造り替え':'改築中')+` 残り${left}T`;col=b.upg==='ench'?'#c48aff':'#6fe08a';k=b.btTotal?Math.max(0,Math.min(1,1-b.bt/b.btTotal)):0;}
+    if(hqUp){const tot=BASE_UP_T[S.baseUp.to-1]||S.baseUp.left;lab=`Lv${S.baseUp.to} ${S.baseUp.left}T`;col='#f2b33d';k=Math.max(0,Math.min(1,1-S.baseUp.left/tot));}
+    else{lab=Math.ceil(b.bt/TURN_SEC-0.01)+'T';col=b.upg==='ench'?'#c48aff':'#6fe08a';k=b.btTotal?Math.max(0,Math.min(1,1-b.bt/b.btTotal)):0;}
     const pu=0.5+0.5*Math.sin(an*4+b.id);
-    ctx.save();ctx.setLineDash([5,4]);ctx.lineDashOffset=-an*10;ctx.lineWidth=2;ctx.globalAlpha=0.55+0.45*pu;ctx.strokeStyle=col;ctx.strokeRect(x+1,y+1,S2-2,S2-2);ctx.setLineDash([]);ctx.globalAlpha=1;
-    ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';const tw=ctx.measureText(lab).width,pw=tw+fs*0.9,ph=fs*1.55,bh=Math.max(3,fs*0.28);
-    const px=cx-pw/2;let py=y-ph-bh-3;const hh=ph+bh+2;for(let g=0;g<6;g++){const hit=placed.find(r=>px<r[0]+r[2]&&px+pw>r[0]&&py<r[1]+r[3]&&py+hh>r[1]);if(!hit)break;py=hit[1]-hh-2;}placed.push([px,py,pw,hh]);   /* 札が重なったら上へずらす */
-    ctx.fillStyle='rgba(8,12,10,.88)';ctx.fillRect(px,py,pw,ph+bh+2);ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.strokeRect(px+.5,py+.5,pw-1,ph+bh+1);
-    ctx.fillStyle=col;ctx.fillText(lab,cx,py+ph/2+1);
-    ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(px+3,py+ph,pw-6,bh);ctx.fillStyle=col;ctx.fillRect(px+3,py+ph,(pw-6)*k,bh);
+    ctx.save();ctx.setLineDash([4,3]);ctx.lineDashOffset=-an*10;ctx.lineWidth=Math.max(1,1.5/z);ctx.globalAlpha=0.5+0.5*pu;ctx.strokeStyle=col;ctx.strokeRect(x+1,y+1,S2-2,S2-2);ctx.setLineDash([]);ctx.globalAlpha=1;
+    const bh=Math.max(2,S2*0.07);ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(x+2,y+S2-bh-2,S2-4,bh);ctx.fillStyle=col;ctx.fillRect(x+2,y+S2-bh-2,(S2-4)*k,bh);   /* 進み具合：枠の中の下の辺 */
+    const fs=Math.min(S2*0.42,Math.max(S2*0.26,11/z));ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='left';ctx.textBaseline='middle';
+    const tw=Math.min(S2-4,ctx.measureText(lab).width+fs*0.5),th=fs*1.25,px=x+2,py=y+S2-bh-3-th;   /* 札：枠の中の左下 */
+    ctx.fillStyle='rgba(8,12,10,.85)';ctx.fillRect(px,py,tw,th);ctx.fillStyle=col;ctx.fillText(lab,px+fs*0.25,py+th/2+0.5,tw-fs*0.4);
     ctx.restore();}}
 function drawBldV2(b,an){const r=bldSpr(b);if(!r||!r[0])return false;const [sp,anim]=r;const d=B[b.type],c=cmdOf(b);
   const n=bsz(b),x=b.x*T,y=b.y*T,S2=n*T,cx=x+S2/2,cy=y+S2/2,building=b.bt>0&&!b.upg;ctx.imageSmoothingEnabled=false;
