@@ -26,6 +26,10 @@
 - **資料**：`docs/RANKS.md`（ランクごとのまとめ・部隊・防衛施設・罠・改築の案）、`docs/ECONOMY.md`（収支表）、`docs/ENEMIES.md`（ステージ×ランクの魔物）、`docs/MONSTERS.md`（魔物の数字）、絵の依頼書 `docs/ART_BRIEF.md`・`ART_BRIEF_UNITS.md`・`ART_BRIEF_DEFENSE.md`・`ART_BRIEF_ENEMIES.md`
 - **ステージの予定**：0 チュートリアル（草原）→ 1 草原（40回）→ 2 沼地（？）→ 3 山脈 → 4 雪原 → 5 荒野
 - **ver 1.3（2026-11-13）**：ステージ選択は「ステージ0 廃村エルム（`t`）」「ステージ1 グレイヴェル平原（`f`・草原・40回。1.3 では「辺境の街グレイヴェル」）」だけ遊べる。沼地・山脈・雪原・荒野は Coming Soon（押せない。`showIntro()` の `MAPL`）。草原の40回の出方（`genWave` の `GL`）・ブラッドムーン・`FINAL_BY_MAP` は `f` と `7` の両方に効く（`7` はテスト用の古いマップ）。本番への入れ方：`proto/index.html` からセーブキー・バージョン・タイトルを戻し、`siege.js` の読み込みを外して `index.html` にする（`tools/mkproto.py` の逆）
+- **試作版だけ（2026-11-14・本番にはまだ入れていない）**：ユーザーの指定「試作版のメインに」で `proto/` だけを main に入れた（`mkprod.py` は走らせていない）
+  - **効果音・BGM ラボ**（`proto/soundlab.js`）：試作版のタイトルの「♪ 効果音・BGM ラボ」で読み込む（`siege.js` の `loadLab`）。効果音36種を「▶ 音」「▶ 演出つき」で確かめられる。演出つきは試験場（`newState('campaign')`・保存しない・夜の闇なし・待機用の敵の予定をずっと先に戻し続けて襲撃を終わらせない）に本物の施設・敵・部隊を出す。閉じるとページを読み直す
+  - 8bit 風 BGM：場面（home・prep・night・fest・battle・boss・siege）ごとに2〜3曲（`mkTrack`：矩形波の旋律・三角波のベース・ノイズの太鼓）。「★これにする」で `localStorage nd_bgm_pick` に保存し、`auMusicFor` を包んで試作版のゲームの曲を差し替える（選んであれば起動時にも soundlab.js を読み込む）。メモは `nd_lab_memo`。「メモ一覧」でまとめてコピー → ユーザーがチャットに貼る
+  - 軽量化（第2弾）：`litAt` は区画（`LB_CELL`）ごとの明かりだけ調べる、夜の闇は画面が動かなければ4コマに1回作り直す（`drawNightRest` は毎コマ）
 - **ver 1.4.2（2026-11-14）**
   - 罠の一列置き：`lineType(t)`（柵・壁と `isMine` の罠）・`lineCells(t,a,b)`（2×2 以上は大きさの分だけ空ける）。`placeWallLine` は罠の上限（`capBlock`）で止める
   - 取り消し：`placeB` が `free` でないとき記録（払った資源・人員・置き換えた柵や壁）。`beginUndo/endUndo` で一列ぶんを1回にまとめる。`undoLast()`（帯の「取り消し」・Ctrl+Z）。`S.undo` はターンが進む・襲撃が始まると `clearUndo()`。建設が終わったものは戻さない
