@@ -3225,14 +3225,19 @@ let nightCv=null;
 function drawSnow(an){const bl=S.waveActive&&S.cur&&S.cur.blizzard,N=bl?260:70,sp=bl?1:0.35;ctx.fillStyle=bl?'rgba(235,242,250,.8)':'rgba(240,246,252,.65)';
   for(let i=0;i<N;i++){const a=Math.sin(i*127.1)*43758.5,b=Math.sin(i*311.7)*43758.5;const fx=a-Math.floor(a),fy=b-Math.floor(b);const x=((fx*VW+an*(bl?140:18)*sp*(0.6+fx))%VW+VW)%VW,y=((fy*VH+an*(bl?90:30)*(0.5+fy))%VH+VH)%VH;const z=bl?2+(i%3):1+(i%2);ctx.fillRect(x,y,z,z);}
   if(bl){ctx.fillStyle='rgba(220,230,245,.12)';ctx.fillRect(0,0,VW,VH);}}
+// 明かりの形（中心は不透明→外は透明）を一度だけ作って使い回す（2026-11-14 軽量化）
+let _lightSpr=null;function lightSpr(){if(_lightSpr)return _lightSpr;const n=128,c=document.createElement('canvas');c.width=c.height=n;const g=c.getContext('2d');const gr=g.createRadialGradient(n/2,n/2,n/2*0.15,n/2,n/2,n/2);gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(0.7,'rgba(0,0,0,.85)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,n,n);return _lightSpr=c;}
+function viewRect(){const z=cam.z||1;return [cam.x,cam.y,VW/z,VH/z];}
 function drawNight(an){
-  if(!nightCv)nightCv=document.createElement('canvas');if(nightCv.width!==VW||nightCv.height!==VH){nightCv.width=VW;nightCv.height=VH;}
-  const c=nightCv.getContext('2d');c.globalCompositeOperation='source-over';c.clearRect(0,0,VW,VH);c.fillStyle=S.waveActive&&S.cur&&S.cur.blood?'rgba(26,2,4,.86)':S.waveActive?'rgba(3,4,14,.88)':'rgba(6,8,26,.72)';c.fillRect(0,0,VW,VH);
-  c.globalCompositeOperation='destination-out';
+  /* 夜の闇は 1/4 の解像度で作って引き伸ばす（ぼかした闇なので見た目はほぼ同じ。描く量が 1/16 になる。2026-11-14 軽量化） */
+  const NQ=0.25,nw=Math.max(1,Math.ceil(VW*NQ)),nh=Math.max(1,Math.ceil(VH*NQ));
+  if(!nightCv)nightCv=document.createElement('canvas');if(nightCv.width!==nw||nightCv.height!==nh){nightCv.width=nw;nightCv.height=nh;}
+  const c=nightCv.getContext('2d');c.globalCompositeOperation='source-over';c.clearRect(0,0,nw,nh);c.fillStyle=S.waveActive&&S.cur&&S.cur.blood?'rgba(26,2,4,.86)':S.waveActive?'rgba(3,4,14,.88)':'rgba(6,8,26,.72)';c.fillRect(0,0,nw,nh);
+  c.globalCompositeOperation='destination-out';const LS=lightSpr();
   for(const l of S.lights||[]){const x=(l[0]-cam.x)*cam.z,y=(l[1]-cam.y)*cam.z,r=l[2]*cam.z*(1+0.03*Math.sin(an*7+l[0]));if(x<-r||y<-r||x>VW+r||y>VH+r)continue;
-    const g=c.createRadialGradient(x,y,r*0.15,x,y,r);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(0.7,'rgba(0,0,0,.85)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,7);c.fill();}
+    c.drawImage(LS,(x-r)*NQ,(y-r)*NQ,r*2*NQ,r*2*NQ);}
   c.globalCompositeOperation='source-over';
-  ctx.drawImage(nightCv,0,0);
+  {const sm=ctx.imageSmoothingEnabled;ctx.imageSmoothingEnabled=true;ctx.drawImage(nightCv,0,0,nw/NQ,nh/NQ);ctx.imageSmoothingEnabled=sm;}
   if(S.cur&&S.cur.blood){const mx=VW-70,my=56;const g=ctx.createRadialGradient(mx,my,8,mx,my,60);g.addColorStop(0,'rgba(255,40,30,.55)');g.addColorStop(1,'rgba(255,0,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(mx,my,60,0,7);ctx.fill();
     ctx.fillStyle='#c01818';ctx.beginPath();ctx.arc(mx,my,18,0,7);ctx.fill();ctx.fillStyle='rgba(90,0,0,.5)';ctx.beginPath();ctx.arc(mx-5,my-4,5,0,7);ctx.arc(mx+6,my+5,3.5,0,7);ctx.fill();
     ctx.fillStyle='#ff6a5a';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText('ブラッドムーン',mx,my+34);}
@@ -3699,7 +3704,11 @@ function genWave(n){
   const dur=16+n*1.2,GAP=dur+26;
   const subs=[];
   FR.forEach((fr,k)=>{const t0=k*GAP;const c={};for(const ty in cnt){c[ty]=k===FR.length-1?cnt[ty]-subs.reduce((a,x)=>a+(x[ty]||0),0):Math.round(cnt[ty]*fr);}subs.push(c);
-    const add=(type,a,b2)=>{const side=pickSide();q.push({type,side,t:t0+a+Math.random()*(b2-a),lane:lanes[side],sub:k});};
+    /* 地上の雑兵は 10〜20 体の群れでまとめて来る（数はそのまま。群れごとに方角と出る時刻をそろえ、群れの中は 1.5 秒以内に出る。2026-11-14） */
+    const PACK=new Set(['swarm','charger','grappler','spitter','gobarcher','troll','wolf']),packs={};
+    const add=(type,a,b2)=>{if(n>2&&PACK.has(type)){let pk=packs[type];if(!pk||pk.left<=0){const side=pickSide();pk=packs[type]={side,t:t0+a+Math.random()*(b2-a),left:10+Math.floor(Math.random()*11)};}
+        pk.left--;q.push({type,side:pk.side,t:pk.t+Math.random()*1.5,lane:lanes[pk.side],sub:k});return;}
+      const side=pickSide();q.push({type,side,t:t0+a+Math.random()*(b2-a),lane:lanes[side],sub:k});};
     for(let i=0;i<c.charger;i++)add('charger',0,3);
     for(let i=0;i<(c.wolf||0);i++)add('wolf',1,6);for(let i=0;i<(c.tiger||0);i++)add('tiger',2,5);for(let i=0;i<(c.mammoth||0);i++)add('mammoth',5,10);
     if(n<=2){for(let i=0;i<c.swarm;i++){const pulse=Math.floor(Math.random()*3);add('swarm',pulse*dur/3+3,pulse*dur/3+dur/4+3);}}
@@ -5295,7 +5304,8 @@ function draw(){
   const an=nowS();if(viewKey!==curView())syncView();
   ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#050706';ctx.fillRect(0,0,VW,VH);
   ctx.setTransform(cam.z,0,0,cam.z,-cam.x*cam.z,-cam.y*cam.z);
-  if(terCv)ctx.drawImage(terCv,0,0);
+  const VR=viewRect();   /* 見えている範囲（ワールド座標）。画面外は描かない（2026-11-14 軽量化） */
+  if(terCv){const sx=Math.max(0,Math.floor(VR[0])),sy=Math.max(0,Math.floor(VR[1])),ex=Math.min(terCv.width,Math.ceil(VR[0]+VR[2])),ey=Math.min(terCv.height,Math.ceil(VR[1]+VR[3]));if(ex>sx&&ey>sy)ctx.drawImage(terCv,sx,sy,ex-sx,ey-sy,sx,sy,ex-sx,ey-sy);}
   if(S.showLv)drawLabels();
   // 襲撃方向
   const w=S.waveActive?S.cur:S.next;
@@ -5311,7 +5321,7 @@ function draw(){
       if(sd==='S'){g=ctx.createLinearGradient(0,H-3*TU,0,H);g.addColorStop(0,'rgba(255,60,50,0)');g.addColorStop(1,`rgba(255,60,50,${a})`);ctx.fillStyle=g;ctx.fillRect(lane*W-W*0.2,H-3*TU,W*0.4,3*TU);}
     }
   }
-  if(S.mode==='campaign'){
+  if(S.mode==='campaign'&&(!S.waveActive||S.buildMode||S.selTile)){   /* 襲撃中は領地の点線を描かない（建設中は出す。2026-11-14 軽量化） */
     const showT=S.buildMode||S.selTile;
     for(const b of terrCenters()){const r=(terrR(b)+.5)*TU,cx=bcx(b),cy=bcy(b);
       if(showT){ctx.fillStyle='rgba(111,224,138,.05)';ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();}
@@ -5335,7 +5345,7 @@ function draw(){
   }
   ctx.textAlign='center';ctx.textBaseline='middle';
   drawRuins();
-  for(const b of S.blds){drawBuilding(b,an);if(b.ench){const n=bsz(b);for(let i=0;i<b.ench;i++){const sx=b.x*T+3+i*5,sy=b.y*T+3;ctx.fillStyle='#1a0e2a';ctx.fillRect(sx-1,sy-1,5,5);ctx.fillStyle='#c48aff';ctx.fillRect(sx,sy,3,3);}}}
+  for(const b of S.blds){{const m=3*TU,bx=b.x*T,by=b.y*T,bs=bsz(b)*T;if(bx+bs<VR[0]-m||by+bs<VR[1]-m||bx>VR[0]+VR[2]+m||by>VR[1]+VR[3]+m)continue;}drawBuilding(b,an);if(b.ench){const n=bsz(b);for(let i=0;i<b.ench;i++){const sx=b.x*T+3+i*5,sy=b.y*T+3;ctx.fillStyle='#1a0e2a';ctx.fillRect(sx-1,sy-1,5,5);ctx.fillStyle='#c48aff';ctx.fillRect(sx,sy,3,3);}}}
   drawUpgBadges(an);
   drawClusters(an);
   drawMills(an);
@@ -5504,7 +5514,7 @@ function draw(){
     {const lr=lightOf({type:S.buildMode,bt:0});if(lr>0&&(S.buildMode==='brazier'||S.buildMode==='outpost'||S.buildMode==='tower')){ctx.strokeStyle='rgba(255,220,120,.6)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc((gx+NS/2)*T,(gy+NS/2)*T,lr*TU,0,7);ctx.stroke();ctx.setLineDash([]);
       ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#000';const tt='夜はこの円の中の敵だけ狙える';ctx.strokeText(tt,(gx+NS/2)*T,(gy+NS/2)*T+lr*TU+12);ctx.fillStyle='#ffe08a';ctx.fillText(tt,(gx+NS/2)*T,(gy+NS/2)*T+lr*TU+12);ctx.lineWidth=1;}}
   }
-  if(fogCv){ctx.imageSmoothingEnabled=true;ctx.drawImage(fogCv,0,0,W,H);}
+  if(fogCv){ctx.imageSmoothingEnabled=true;const kx=fogCv.width/W,ky=fogCv.height/H,c0=Math.max(0,Math.floor(VR[0]*kx)-2),r0=Math.max(0,Math.floor(VR[1]*ky)-2),c1=Math.min(fogCv.width,Math.ceil((VR[0]+VR[2])*kx)+2),r1=Math.min(fogCv.height,Math.ceil((VR[1]+VR[3])*ky)+2);if(c1>c0&&r1>r0)ctx.drawImage(fogCv,c0,r0,c1-c0,r1-r0,c0/kx,r0/ky,(c1-c0)/kx,(r1-r0)/ky);}
   drawCamps(an);   // 見つけた駐留地は霧の上にも出す
   for(const h of (S.island?hiveSpots():[])){ctx.fillStyle='#ffb0c8';ctx.font=`bold ${Math.round(11/Math.min(1,cam.z))}px sans-serif`;ctx.fillText(h.name,bcx(h),bcy(h)-TU*2.6);}
   // 地図の端
