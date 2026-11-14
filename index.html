@@ -7231,7 +7231,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=NEXT_PREP;S.prepTotal=NEXT_PREP;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.4',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.4.1',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over;}
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7285,6 +7285,7 @@ function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn()
   requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();}finally{b.classList.add('off');}}));}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.4.1','2026-11-14',['<b>軽量化</b>：夜の描画を大幅に軽く（敵の多い襲撃で約3倍軽く）','敵の地上部隊が10〜20体の群れでまとまって押し寄せるように（数は同じ）。範囲攻撃は爆心から離れるほど弱く（端で40%）','部隊の補給・補充・手当てを前哨砦・城館でも受けられるように（いちばん近いところへ行く）','矢・武具などの消費を少し増やした。石炭と関係のない研究には石炭を使わない','改築中・城の強化中がマップで分かるように（残りターンと進み具合）','研究画面：改築の研究を各ランクのいちばん上に','祭りの費用を人口に合わせた','盾持ちオーガなど、敵の向きが左右にパタパタ変わる不具合を修正']],
  ['1.4','2026-11-13',['<b>駐屯地襲撃モード β</b>：ステージ選択で ON にすると、見つけた駐留地へ攻め込むとき、別の戦場で夜襲をかけて戦う。手持ちの部隊で戦い、倒した魔物の分だけ次の襲撃が減る（部隊の損耗も残る）','ステージ1の名前を<b>グレイヴェル平原</b>に','<b>モンスター図鑑</b>をタイトルへ。セーブをまたいで記録が残る。立ち絵が少し動くように','<b>アップデート情報</b>をゲームの中で見られるように','上の資源の表示：新しい資材が増えても入りきるように詰めて表示。石炭・合金のアイコンを見やすく','襲撃の曲を40回の襲撃に合わせて、ランクが上がるごとに盛り上がるように']],
  ['1.3','2026-11-13',['<b>ステージ1（草原）を40回の襲撃まで</b>：20回目に中ボス「ゴブリンキング」、40回目にラスボス「蠢く木陰」','ステージ選択：沼地・山脈・雪原・荒野は Coming Soon','新しい魔物：トレント・エルダートレント・盾持ちオーガ・マンイーター・吸血鬼・グール・ストーンゴーレム・ワーウルフ','ランクⅠ〜Ⅶ（城Lv7まで）、新しい素材、施設の改築','新しい防衛施設・罠：風船爆弾・メイジの塔・バリアストーン・テスラタワー・ハープーンランチャー・ミスリルレイ・ドラゴンブレス ほか','新しい部隊：エーテルゴーレム・狙撃兵・銀装兵・グリフォン騎兵','図鑑の特徴に名前、数字は小数なしで表示']],
  ['1.2','2026-11-10',['夜の過ごし方（休む・宴・祈り・夜警・夜なべ）と夜の出来事','教会・熟練度・罠の見直し・市場の売り買い','部隊の範囲選択、オートセーブ、読み込み画面']],
