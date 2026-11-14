@@ -3355,11 +3355,34 @@ function repair(b,quiet){if(S.waveActive){if(!quiet){se('error');log('戦闘中�
 function wallLineCells(a,b){const dx=b[0]-a[0],dy=b[1]-a[1],ax=Math.abs(dx),ay=Math.abs(dy);let ex=dx,ey=dy;
   if(ax>ay*2)ey=0;else if(ay>ax*2)ex=0;else{const m=Math.max(ax,ay);ex=Math.sign(dx)*m;ey=Math.sign(dy)*m;}
   const n=Math.max(Math.abs(ex),Math.abs(ey)),L=[];for(let i=0;i<=n;i++)L.push([a[0]+Math.round(ex*i/Math.max(1,n)),a[1]+Math.round(ey*i/Math.max(1,n))]);return L;}
-function placeWallLine(a,b){const t=S.buildMode;if(!t)return;let n=0,miss=0;
-  for(const [x,y] of wallLineCells(a,b)){if(!placeOK(t,x,y)){continue;}if(!canPlace(t,x,y)){miss++;continue;}placeB(t,x,y);n++;}
-  if(n){S.fx.push({x:(b[0]+.5)*T,y:(b[1]+.5)*T,r:TU,t:0,dur:0.35,c:'#6fe08a'});log(`${B[t].name}を${n}枚まとめて置いた`);}
+// ドラッグで一列に置ける種類：柵・壁と罠（2026-11-14 罠も）。2×2 の罠は大きさの分だけ間を空けて並べる
+function lineType(t){return !!t&&(WALL_TYPES.includes(t)||!!(B[t]&&B[t].isMine));}
+function lineCells(t,a,b){const L=wallLineCells(a,b),n=Math.max(1,newSz(t));if(n===1)return L;const out=[];let last=null;for(const c of L){if(!last||Math.max(Math.abs(c[0]-last[0]),Math.abs(c[1]-last[1]))>=n){out.push(c);last=c;}}return out;}
+function placeWallLine(a,b){const t=S.buildMode;if(!t)return;let n=0,miss=0,cap=0;beginUndo();
+  for(const [x,y] of lineCells(t,a,b)){if(!placeOK(t,x,y)){continue;}if(capBlock(t)){cap++;continue;}if(!canPlace(t,x,y)){miss++;continue;}placeB(t,x,y);n++;}
+  endUndo();
+  if(n){S.fx.push({x:(b[0]+.5)*T,y:(b[1]+.5)*T,r:TU,t:0,dur:0.35,c:'#6fe08a'});log(`${B[t].name}を${n}${B[t].isMine?'個':'枚'}まとめて置いた（取り消し：Ctrl+Z か「取り消し」）`);}
+  if(cap){toast(capBlock(t),'warn');}
   if(miss){se('error');toast(`資源が足りず、${miss}枚は置けませんでした`,'warn');}
   renderBuild();renderInfo(true);renderMode();}
+// ===== 取り消し（2026-11-14）：その日のうちに置いたものを、置いた順に戻す（全額返す）。まとめ置きは一列ぶんで1回 =====
+let _ub=null;
+function beginUndo(){_ub=[];}
+function endUndo(){const u=_ub;_ub=null;if(u&&u.length){(S.undo=S.undo||[]).push(u);if(S.undo.length>50)S.undo.shift();}}
+function addUndo(r){if(_ub)_ub.push(r);else{(S.undo=S.undo||[]).push([r]);if(S.undo.length>50)S.undo.shift();}}
+function clearUndo(){S.undo=[];}
+function undoLast(){if(S.waveActive||!S.undo||!S.undo.length){se('error');toast('取り消せるものはありません','warn');return;}
+  const u=S.undo.pop();let n=0;const nm=u[0]&&B[u[0].type]?B[u[0].type].name:'';
+  for(const r of u.slice().reverse()){
+    if(r.mine){if(!S.mines.includes(r.mine))continue;S.mines=S.mines.filter(m=>m!==r.mine);}
+    else{const b=r.b;if(!b||!S.blds.includes(b)||!(b.bt>0)||b.upg)continue;const c=cmdOf(b);if(c)assign(c,null);S.blds=S.blds.filter(x=>x!==b);gridSet(b,false);
+      for(const o of r.replaced||[]){if(!S.blds.includes(o)){S.blds.push(o);gridSet(o,true);}}}
+    for(const k in r.paid)S[k]+=r.paid[k];S.pop+=r.pop||0;n++;}
+  if(n){se('click');log(`取り消した：${nm}${u.length>1?' ×'+n:''}（資源は全額戻った）`);toast(`${nm}${n>1?' ×'+n:''} を取り消した`,'good');}else{se('error');toast('もう取り消せません（建設が終わったものなど）','warn');}
+  if(S.sel&&S.sel.kind==='b'&&!S.blds.includes(S.sel))S.sel=null;renderBuild();renderInfo(true);renderMode();renderTop&&renderTop();}
+// 罠の撤去：費用の半分が戻る
+function removeTrap(x,y){const m=mineAt(x,y);if(!m||S.waveActive)return;const t=Object.keys(B).find(k=>B[k].isMine&&(B[k].kind||'mine')===m.kind)||'landmine';const c=costOf(t);
+  S.mines=S.mines.filter(o=>o!==m);for(const k in c)S[k]+=Math.floor(c[k]/2);se('click');log(`${B[t].name}を撤去した（費用の半分が戻った）`);S.selTile=null;renderInfo(true);renderTop&&renderTop();}
 // つながった柵・壁・門・物見櫓（となり合うもの）を集める
 function wallGroup(b0){const K=o=>WALL_TYPES.includes(o.type)||o.type==='gate'||o.type==='tower';if(!K(b0))return[b0];
   const seen=new Set([b0]),q=[b0];while(q.length){const b=q.pop();const n=bsz(b);for(let y=b.y-1;y<=b.y+n;y++)for(let x=b.x-1;x<=b.x+n;x++){const o=S.grid[y]&&S.grid[y][x];if(o&&!seen.has(o)&&K(o)){seen.add(o);q.push(o);}}}
@@ -3391,8 +3414,8 @@ const SPIKE_DUR=30,SPIKE_FIX=6,SPIKE_DPS=9;
 function spikesBroken(){return (S.mines||[]).filter(m=>m.kind==='spike'&&!m.armed);}
 function placeB(type,x,y,free,szo){
   const d=B[type];
-  if(!free){const c=costOf(type);for(const k in c)S[k]-=c[k];S.pop-=d.pop;se(BSND[type]||'build');}
-  if(d.isMine){const m={x,y,armed:true,kind:d.kind||'mine',sz:newSz(type)};if(m.kind==='spike')m.dur=SPIKE_DUR;S.mines.push(m);return null;}
+  let urec=null;if(!free){const c=costOf(type);for(const k in c)S[k]-=c[k];S.pop-=d.pop;se(BSND[type]||'build');urec={paid:Object.assign({},c),pop:d.pop,replaced:[]};}
+  if(d.isMine){const m={x,y,armed:true,kind:d.kind||'mine',sz:newSz(type)};if(m.kind==='spike')m.dur=SPIKE_DUR;S.mines.push(m);if(urec){urec.mine=m;urec.type=type;addUndo(urec);}return null;}
   const mat=0;const hp=hpOf(type,1,mat);   /* 新しく建てると1段目（木）。石・城塞は改築で */
   const b={id:S.nextId++,kind:'b',type,x,y,sz:szo||newSz(type),lv:1,mat,hp,maxhp:hp,cd:0,cmd:null,queue:0,qt:0,xpT:0,absorbed:0,ang:-Math.PI/2+Math.random(),offOre:false,ym:YIELD[type]?yieldFp(type,x,y,szo||newSz(type)):1,res:YIELD[type]?Math.round(reserveOf(type,x,y)*yieldFp(type,x,y,szo||newSz(type))/Math.max(0.01,yieldAt(type,x,y))):null,crew:d.pop,dmgAcc:0};
   const under=S.grid[y][x];
@@ -3403,9 +3426,11 @@ function placeB(type,x,y,free,szo){
       const ws=occ.filter(o=>CWALL.has(o.type));
       if(ws.length&&!WALL_TYPES.includes(type)&&type!=='gate'&&type!=='tower'){const k=2/ws.length;b.wall={hp:ws.reduce((a,o)=>a+o.hp,0)*k,maxhp:ws.reduce((a,o)=>a+o.maxhp,0)*k,lv:Math.min(...ws.map(o=>o.lv||1)),wt:ws[0].type};}
       for(const o of occ){const oc=cmdOf(o);if(oc)oc.assign=null;}
+      if(urec)urec.replaced=occ.slice();
       S.blds=S.blds.filter(o=>!occ.includes(o));}
   }
   if(!free){b.bt=b.btTotal=buildTurns(type)*TURN_SEC;b.hp=Math.round(hp*0.4);}
+  if(urec){urec.b=b;urec.type=type;addUndo(urec);}
   S.blds.push(b);gridSet(b,true);if(S.ruins){const n=b.sz;S.ruins=S.ruins.filter(r=>{const rn=r.sz||newSz(r.type);return r.x+rn<=x||r.x>=x+n||r.y+rn<=y||r.y>=y+n;});}
   return b;
 }
@@ -3900,7 +3925,7 @@ function drawTents(c,an,burnt){
     const g=ctx.createRadialGradient(fx,fy,2,fx,fy,TU*1.6);g.addColorStop(0,'rgba(255,150,60,.25)');g.addColorStop(1,'rgba(255,150,60,0)');ctx.fillStyle=g;ctx.fillRect(fx-TU*1.6,fy-TU*1.6,TU*3.2,TU*3.2);}
   ctx.restore();
 }
-function startWave(){phaseReset();S._barT=0;S.barrier=(S.baseLv||1)>=5?barrierMax():0;
+function startWave(){phaseReset();clearUndo();S._barT=0;S.barrier=(S.baseLv||1)>=5?barrierMax():0;
   S.wave++;if(S.mapId==='s'&&S.wave>=8&&!S.frozen)freezeRivers();S.waveActive=true;S.waveKills=0;S.subShown=-1;S.wled={};for(const b of S.blds){b.wlast=b.wuse;b.wuse=null;}
   S.cur=S.next;S.qi=0;S.waveT=0;S._mmT=null;S.navalLeft=0;S.waveStart={kia:S.kia,mat:S.mat,fallen:S.fallen.length,bld:S.bldLost};
   log(`第${S.wave}襲撃 接近！${S.wave===finalWave()?' — 最後の夜':''}`,'warn');
@@ -4196,7 +4221,7 @@ function doEndTurn(){
   if(filled)log(`欠員補充：${filled}名を各施設に配置`);
   if(has('rearm')){let n=0;for(const m of S.mines)if(m.kind!=='bomb'&&!m.armed&&S.ammo>=4){S.ammo-=4;m.armed=true;m.used=false;n++;}if(n)log(`地雷 ${n}個を再装填（矢−${n*4}）`);}
   S.shortCrew=short;
-  S.turnsLeft--;S.turn++;
+  S.turnsLeft--;S.turn++;clearUndo();
   const ev=S.rep;S.rep=null;
   const dn=Object.entries(S.doneCnt);if(dn.length){const m='完成：'+dn.map(([k,v])=>k+(v>1?'×'+v:'')).join('、');ev.unshift({msg:m,cls:'good'});log(m,'good');}
   if(S.turnsLeft<=0)startWave();
@@ -5497,8 +5522,8 @@ function draw(){
     for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const ok=cov[(y-by0)*bw+(x-bx0)];ctx.fillStyle=ok?'rgba(111,224,138,.10)':'rgba(0,0,0,.28)';ctx.fillRect(x*T,y*T,T,T);}
   }
   if(S.wline&&S.buildMode){const t=S.buildMode,c=costOf(t);let have={};for(const k in c)have[k]=S[k]||0;let n=0;
-    for(const [x,y] of wallLineCells(S.wline.a,S.wline.b)){const ok=placeOK(t,x,y);let pay=ok;if(ok){for(const k in c)if(have[k]<c[k])pay=false;if(pay){for(const k in c)have[k]-=c[k];n++;}}
-      ctx.fillStyle=pay?'rgba(111,224,138,.45)':ok?'rgba(242,179,61,.35)':'rgba(255,90,78,.30)';ctx.fillRect(x*T,y*T,T,T);}
+    const ns=Math.max(1,newSz(t));for(const [x,y] of lineCells(t,S.wline.a,S.wline.b)){const ok=placeOK(t,x,y);let pay=ok;if(ok){for(const k in c)if(have[k]<c[k])pay=false;if(pay){for(const k in c)have[k]-=c[k];n++;}}
+      ctx.fillStyle=pay?'rgba(111,224,138,.45)':ok?'rgba(242,179,61,.35)':'rgba(255,90,78,.30)';ctx.fillRect(x*T,y*T,T*ns,T*ns);}
     const [bx,by]=S.wline.b;ctx.font='bold 11px sans-serif';ctx.lineWidth=3;ctx.strokeStyle='#000';const tt=`${B[t].name} ×${n}`;ctx.strokeText(tt,(bx+.5)*T,by*T-8);ctx.fillStyle='#ffe08a';ctx.fillText(tt,(bx+.5)*T,by*T-8);ctx.lineWidth=1;}
   const gp=padMode()?(bGhost?{x:(bGhost.x+.5)*T,y:(bGhost.y+.5)*T}:null):(mouse.in?mouse:null);
   if(S.buildMode&&gp&&!S.wline){
@@ -6093,7 +6118,7 @@ cv.addEventListener('pointerdown',ev=>{
     // 範囲で部隊を選ぶ：PCは Shift＋ドラッグ、スマホは「範囲選択」を押してからドラッグ
     if(ev.button===0&&(ev.shiftKey||S.boxMode)&&!S.buildMode&&!S.buildPick){gest.mode='box0';gest.a=[p.x,p.y];}
     // 柵・壁の建設中は、ドラッグで一列にまとめて置く
-    if(ev.button!==1&&S.buildMode&&WALL_TYPES.includes(S.buildMode)&&!S.waveActive&&S.phase!=='night'){gest.mode='wline';gest.a=[Math.floor(p.x/T),Math.floor(p.y/T)];gest.b=gest.a;S.wline=gest;}
+    if(ev.button!==1&&S.buildMode&&lineType(S.buildMode)&&!S.waveActive&&S.phase!=='night'){gest.mode='wline';gest.a=[Math.floor(p.x/T),Math.floor(p.y/T)];gest.b=gest.a;S.wline=gest;}
     if(ev.button===1)ev.preventDefault();
   }else if(ptrs.size===2){
     const [a,b]=[...ptrs.values()];const r=cv.getBoundingClientRect();
@@ -6262,6 +6287,7 @@ function placeOK(type,gx,gy){
 document.addEventListener('keydown',ev=>{
   if(document.body.classList.contains('siegeOn'))return;   // 駐屯地襲撃の画面では本編のキーを使わない
   if(ev.target.tagName==='SELECT')return;
+  if((ev.ctrlKey||ev.metaKey)&&!ev.shiftKey&&ev.key.toLowerCase()==='z'&&S&&!S.overlay&&!(ev.target&&/INPUT|TEXTAREA/.test(ev.target.tagName))){ev.preventDefault();undoLast();return;}   // 取り消し
   const kl=ev.key.toLowerCase();if(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown'].includes(kl)){keysDown.add(kl);if(kl.startsWith('arrow'))ev.preventDefault();}
   if(ev.key==='Escape'){if(S.overlay==='dex'){dexStop();if(DEX_FROM_TITLE)showTitle();else closeOverlay();return;}if(['res','hire','army','retry','legend'].includes(S.overlay)){closeOverlay();return;}if(S.buildMode||S.buildPick){exitBuild();return;}S.multi=[];S.sel=null;S.selTile=null;renderBuild();renderInfo(true);}
   if(ev.key==='Tab'&&!S.overlay){ev.preventDefault();if(S.buildMode||S.buildPick)exitBuild();else enterBuild(S.lastBuild||null);return;}
@@ -6453,7 +6479,7 @@ function tileDesc(x,y){
   {const ys=Object.keys(YIELD).map(k=>[k,yieldAt(k,x,y)]).filter(a=>a[1]>0);
    if(ys.length)L.push(`<div style="font-size:11px;color:#9fe39a">この土地で採れる：${ys.map(([k,v])=>`${ic(YIELD[k],12)}${YNAME[k]}${v!==1?` ×${v}`:''}`).join('　')}</div>`);
    else if(S.ter[y][x]!==6&&S.ter[y][x]!==3)L.push(`<div class="muted" style="font-size:11px">この土地で採れる資源はありません</div>`);}
-  {const m=mineAt(x,y);if(m){const nm={spike:'トゲ床',pit:'落とし穴',bomb:'爆弾罠',aebomb:'エーテル爆弾',gravity:'重力の罠',stake:'聖銀の杭',meteor:'メテオコール'}[m.kind]||'地雷';const st=m.kind==='spike'?(m.armed?`耐久 ${Math.ceil(m.dur==null?SPIKE_DUR:m.dur)} / ${SPIKE_DUR}`:'壊れている（一括修理 木材'+SPIKE_FIX+'）'):m.kind==='pit'?(m.armed?'使える':'埋まっている（一括修理 木材'+PIT_DIG+'・襲撃後に自動）'):(m.armed?'敷設済み':'使用済み');L.push(`<div style="font-size:11px;color:#ffb14e">${nm}：${st}</div>`);}}
+  {const m=mineAt(x,y);if(m){const nm={spike:'トゲ床',pit:'落とし穴',bomb:'爆弾罠',aebomb:'エーテル爆弾',gravity:'重力の罠',stake:'聖銀の杭',meteor:'メテオコール'}[m.kind]||'地雷';const st=m.kind==='spike'?(m.armed?`耐久 ${Math.ceil(m.dur==null?SPIKE_DUR:m.dur)} / ${SPIKE_DUR}`:'壊れている（一括修理 木材'+SPIKE_FIX+'）'):m.kind==='pit'?(m.armed?'使える':'埋まっている（一括修理 木材'+PIT_DIG+'・襲撃後に自動）'):(m.armed?'敷設済み':'使用済み');L.push(`<div style="font-size:11px;color:#ffb14e">${nm}：${st}</div>`);if(!S.waveActive)L.push(`<button class="danger" style="margin-top:4px" onclick="removeTrap(${m.x},${m.y})">${nm}を撤去（費用の半分が戻る）</button>`);}}
   
   
   return L.join('');
@@ -8014,8 +8040,9 @@ function renderMode(){
   const tap=IS_TOUCH?'タップ':'クリック';
   let t;
   if(S.buildMode){const d=B[S.buildMode],c=costOf(S.buildMode),ok=canAfford(c,d.pop),sz=newSz(S.buildMode);
-    t=`${icSvg(S.buildMode,24)}<b class="mn">${d.name}</b><span class="szt">${sz}×${sz}</span>${!ok&&isNarrow()?mktBtn(c):''}<span class="ms">・${ok?(padMode()?(bGhost?'十字キーで調整して「決定」':(WALL_TYPES.includes(S.buildMode)?'場所をタップ・なぞると一列に配置':'建てたい場所をタップ')):(WALL_TYPES.includes(S.buildMode)?`${tap}で1枚・ドラッグで一列に配置`:`マップを${tap}して配置（続けて置けます）`)):`<span style="color:var(--red)">${lackNames(c,d.pop)||'資源が足りません'}</span>${isNarrow()?'':mktBtn(c)}`}</span><span class="mc">${costText(c,d.pop)}</span>`;}
+    t=`${icSvg(S.buildMode,24)}<b class="mn">${d.name}</b><span class="szt">${sz}×${sz}</span>${!ok&&isNarrow()?mktBtn(c):''}<span class="ms">・${ok?(padMode()?(bGhost?'十字キーで調整して「決定」':(lineType(S.buildMode)?'場所をタップ・なぞると一列に配置':'建てたい場所をタップ')):(lineType(S.buildMode)?`${tap}で1つ・ドラッグで一列に配置`:`マップを${tap}して配置（続けて置けます）`)):`<span style="color:var(--red)">${lackNames(c,d.pop)||'資源が足りません'}</span>${isNarrow()?'':mktBtn(c)}`}</span><span class="mc">${costText(c,d.pop)}</span>`;}
   else if(S.buildPick)t=`<b class="mn">建設モード</b><span class="ms">・建てる施設を「建設」の一覧から選んでください</span>`;
+  if((S.buildMode||S.buildPick)&&S.undo&&S.undo.length&&!S.waveActive)t+=`<button id="mUndo" class="ghost" title="さっき置いたもの（一列ぶん）を取り消す。資源は全額戻る"><span>↶ 取り消し</span>${IS_TOUCH?'':'<kbd>Ctrl+Z</kbd>'}</button>`;
   else if(S.aimNaval)t='<b class="mn" style="color:#ffe38a">艦砲射撃</b><span class="ms">・目標地点をクリック（Escで取消）</span>';
   else if(S.multi&&S.multi.length){const us=S.squads.filter(x=>S.multi.includes(x.id)&&!x.gar);const md=us.length&&us.every(u=>u.mode===us[0].mode)?us[0].mode:null;
     t=`<b class="mn">${S.multi.length}部隊</b>${isNarrow()?'':`<span class="ms">を選択中・地図を${tap}でまとめて移動</span>`}<span class="mmb">${['guard','hold','return'].map(m=>`<button data-mm="${m}" class="${md===m?'on':''}">${MODE_NAME[m]}</button>`).join('')}</span>${X}`;}
@@ -8026,7 +8053,7 @@ function renderMode(){
   bar.classList.toggle('idle',!t);bar.classList.toggle('hint',!S.buildMode&&!S.buildPick&&!S.sel&&!(S.multi&&S.multi.length)&&!S.aimNaval);
   if(t!==modeKey){modeKey=t;document.getElementById('modeTxt').innerHTML=t;const d=document.getElementById('mDesel');if(d)d.onclick=deselect;
     document.querySelectorAll('#modeTxt [data-mm]').forEach(b=>b.onclick=e=>{e.stopPropagation();multiMode(b.dataset.mm);});
-    {const mb=document.getElementById('mBox');if(mb)mb.onclick=e=>{e.stopPropagation();S.boxMode=true;se('click');renderMode();};const mx=document.getElementById('mBoxX');if(mx)mx.onclick=e=>{e.stopPropagation();S.boxMode=false;renderMode();};}}
+    {const mb=document.getElementById('mBox');if(mb)mb.onclick=e=>{e.stopPropagation();S.boxMode=true;se('click');renderMode();};const mx=document.getElementById('mBoxX');if(mx)mx.onclick=e=>{e.stopPropagation();S.boxMode=false;renderMode();};const mu=document.getElementById('mUndo');if(mu)mu.onclick=e=>{e.stopPropagation();undoLast();};}}
   {const bb=document.getElementById('bBuild');if(bb)bb.classList.toggle('on',on);}
   if(!S.buildMode)bGhost=null;
   renderPad();
