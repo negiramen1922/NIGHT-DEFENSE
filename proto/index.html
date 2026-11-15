@@ -1509,6 +1509,14 @@ body.tlOn #topbar,body.tlOn #intel,body.tlOn #controls,body.tlOn #right,body.tlO
 #tlHud{position:fixed;left:0;right:0;bottom:0;z-index:9500;background:rgba(10,12,10,.88);border-top:2px solid var(--amber,#f2b33d);padding:8px max(12px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-right));color:#e8e4d8;font-size:13px}
 #tlHud .tlTop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}#tlHud .tlTop b{color:#f2b33d;font-size:15px}#tlHud .sp{flex:1}#tlHud input{width:100%;margin:6px 0}
 #tlHud .tlInfo{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px}#tlHud .tlInfo i{display:inline-block;width:9px;height:9px;margin-right:4px;vertical-align:-1px}
+/* ダブルタップで拡大しない（2本指の拡大縮小はゲームの地図の操作として使える）2026-11-15 */
+html,body{touch-action:manipulation}
+/* タブレット（iPad など）：PC 用の配置のまま指で使いやすく 2026-11-15 */
+body.tabUI kbd,body.tabUI .bt .key,body.tabUI span.help{display:none!important}
+body.tabUI button{min-height:40px!important}
+body.tabUI #controls button,body.tabUI #modeBar button{min-height:44px;padding-left:14px;padding-right:14px}
+body.tabUI #viewSeg button{min-height:40px;padding-left:12px;padding-right:12px}
+body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font-size:14px}
 </style>
 </head>
 <body>
@@ -1598,7 +1606,7 @@ body.tlOn #topbar,body.tlOn #intel,body.tlOn #controls,body.tlOn #right,body.tlO
   </div>
   <div id="right">
     <div id="sheetHandle"><span id="sheetSel"></span><span id="sheetLbl">▲ 詳細・建設</span></div>
-    <div class="box" id="info"><h3>選択中</h3><div id="infoBody" class="muted">施設か部隊をクリック</div></div>
+    <div class="box" id="info"><h3>選択中</h3><div id="infoBody" class="muted">施設か部隊を選んでください</div></div>
     <div id="infoSplit" title="上下にドラッグして、詳細と下のパネルの高さを変える（ダブルクリックで元に戻す）"><span class="grip"></span></div><button id="infoClose" title="詳細を閉じる">×</button>
     <div id="rtabs"><button data-rt="info" class="tabInfo">選択中</button><button data-rt="build" class="on">建設</button><button data-rt="res">研究</button><button data-rt="army">軍事</button><button data-rt="econ">街</button></div>
     <div class="box" data-rt="econ" style="display:none"><h3>街の状況</h3><div id="econ"></div></div>
@@ -1642,6 +1650,9 @@ function hqTX(dx){return HQX-1+U*dx;}function hqTY(dy){return HQY-1+U*dy;}
 const isBlock=t=>t===3||t===6||t===9;  // 岩場・海・川は通れない（浅瀬は通れる）
 const cam={x:0,y:0,z:1};
 const IS_TOUCH=matchMedia('(pointer: coarse)').matches;
+// タブレット（iPad など）：画面が広くて指で操作する端末。PC 用の配置のまま、指で使いやすくする（キーの案内を隠す・ボタンを大きく・範囲選択ボタン）2026-11-15
+function tabUI(){return IS_TOUCH&&innerWidth>900;}
+function stripKeyHints(){if(!IS_TOUCH)return;for(const b of document.querySelectorAll('button,label.help')){for(const n of b.childNodes){if(n.nodeType===3&&/\s?\[[A-Z]\]/.test(n.nodeValue))n.nodeValue=n.nodeValue.replace(/\s?\[[A-Z]\]/g,'');}}}
 const MM={w:192,h:128};    // ミニマップ
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 cv.width=VW; cv.height=VH;
@@ -6196,7 +6207,7 @@ function houseOf(b){return b.type==='hq'?30+10*((S.baseLv||1)-1):b.type==='barra
 function popCapOf(){let c=0;for(const b of S.blds)c+=houseOf(b);return c;}
 function popTotal(){let t=S.pop;for(const b of S.blds){t+=b.crew||0;if(b.qm)for(const m of b.qm){const u=MTC[m];t+=u.popEach*u.members;}}
   for(const s of S.squads)t+=s.members*MT(s).popEach;for(const r of S.research)t+=(r.paid&&r.paid.pop)||0;return t;}
-function deselect(){S.multi=[];S.sel=null;S.selTile=null;renderInfo(true);renderMode();}
+function deselect(){if(S.buildMode||S.buildPick){S.buildMode=null;S.buildPick=false;renderBuild();}S.multi=[];S.sel=null;S.selTile=null;renderInfo(true);renderMode();}   /* 建設中なら建設もやめる（タブレットの帯の「解除」用。2026-11-15） */
 // 範囲の中の部隊をまとめて選ぶ（Shift を押していたら今の選択に足す）
 function boxSelect(a,b,add){const x0=Math.min(a[0],b[0]),x1=Math.max(a[0],b[0]),y0=Math.min(a[1],b[1]),y1=Math.max(a[1],b[1]);
   const ids=S.squads.filter(s=>!s.gar&&s.x>=x0&&s.x<=x1&&s.y>=y0&&s.y<=y1).map(s=>s.id);
@@ -6474,7 +6485,7 @@ function renderBuild(){
      for(const g of BUILD_GROUPS){if(!groupList(g).length)continue;const b=document.createElement('button');b.textContent=g.name;b.dataset.g=g.id;b.onclick=()=>{se('click');buildJump(g.id);};ch.appendChild(b);}
      el.appendChild(ch);}
     for(const g of BUILD_GROUPS){
-      const h=document.createElement('div');h.className='bh'+(bgClosed[g.id]?' closed':'');const nk=Math.min(10,groupList(g).length);h.innerHTML=`<span>${g.name}</span>${g.keys==='-'?'':`<small>${g.keys?'Shift＋':''}数字キー 1–${nk%10}</small>`}`;
+      const h=document.createElement('div');h.className='bh'+(bgClosed[g.id]?' closed':'');const nk=Math.min(10,groupList(g).length);h.innerHTML=`<span>${g.name}</span>${g.keys==='-'||IS_TOUCH?'':`<small>${g.keys?'Shift＋':''}数字キー 1–${nk%10}</small>`}`;
       h.onclick=()=>{h.classList.toggle('closed');bgClosed[g.id]=h.classList.contains('closed');try{localStorage.setItem('bd_bgrp',JSON.stringify(bgClosed));}catch(e){}};
       const box=document.createElement('div');box.className='bg'+(S.bgTab===g.id?' cur':'');box.dataset.g=g.id;
       h.dataset.g=g.id;
@@ -6649,7 +6660,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(!o&&S.heroView){const c=S.cmds.find(x=>x.id===S.heroView&&x.alive);if(c){const key='hv'+c.id+c.lv+Math.floor(c.xp)+c.assign+c.kills;if(!force&&key===lastInfoKey)return;lastInfoKey=key;el.innerHTML=heroDetail(c);const hc=document.getElementById('hvClose');if(hc)hc.onclick=closeHeroView;const g=document.getElementById('hvGo');if(g)g.onclick=()=>{const t=findObj(c.assign);if(t){S.sel=t;renderInfo(true);}};return;}S.heroView=null;}
   if(S.buildMode&&!o){
     const key='bm'+S.buildMode;if(!force&&key===lastInfoKey)return;lastInfoKey=key;
-    const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)}ターン　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。右クリック・Escで建設モードを終了</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div><button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
+    const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)}ターン　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。${IS_TOUCH?'「建設をやめる」で建設モードを終了':'右クリック・Escで建設モードを終了'}</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div><button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
   if(!o&&S.selTile){const {x,y}=S.selTile;const key='tile'+x+','+y+affordSig()+(S.grid[y][x]?1:0)+S.enemies.length%7+'r'+((S.ruins||[]).length);
     if(!force&&key===lastInfoKey)return;lastInfoKey=key;
     let h=`<div class="row"><b>マス（${x}, ${y}）</b><button id="tClose" style="padding:0 6px">×</button></div>`+tileDesc(x,y);
@@ -6667,7 +6678,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
      const c2=document.getElementById('ruinClr');if(c2)c2.onclick=()=>{S.ruins=S.ruins.filter(r=>r!==rn);renderInfo(true);};}
     return;}
   if(!o){const key='none'+tutHTML()+S.squads.map(s=>s.id+':'+Math.round(s.hp/s.maxhp*20)+':'+s.members+(s.gar?'g':'')+(s.mode||'')).join();if(lastInfoKey!==key||force){lastInfoKey=key;
-    let h=tutHTML()+'<span class="muted">施設か部隊をクリック</span>';
+    let h=tutHTML()+`<span class="muted">施設か部隊を${IS_TOUCH?'タップ':'クリック'}</span>`;
     if(false){h+=`<div style="margin-top:8px" class="muted">部隊 <span style="font-size:10px">[Q]で順に選択</span></div><div style="display:flex;flex-direction:column;gap:3px;margin-top:3px">`+S.squads.map(s=>{const r=Math.max(0,s.hp/s.maxhp),hc=cmdOf(s),ik=hc&&WICON['h_'+hc.spec]&&s.ut!=='drake'?'h_'+hc.spec:(s.model||defModel(s.ut));
       return `<button data-sq="${s.id}" style="display:flex;align-items:center;gap:6px;text-align:left;padding:3px 6px">${icSvg(ik,22)}<span style="min-width:74px;font-size:12px">${unitLabel(s)}</span><span style="flex:1;height:7px;background:#2a1a1a;border:1px solid #000;position:relative"><i style="position:absolute;left:0;top:0;bottom:0;width:${Math.round(r*100)}%;background:${r>0.6?'#5ac05a':r>0.3?'#e0b040':'#e04030'}"></i></span><span class="muted" style="font-size:11px;min-width:58px;text-align:right">${s.members}/${MT(s).members}${UT[s.ut].unit}${s.gar?'・櫓':''}</span></button>`;}).join('')+'</div>';}
     el.innerHTML=h;el.querySelectorAll('[data-sq]').forEach(b=>b.onclick=()=>{S.sel=S.squads.find(s=>s.id==b.dataset.sq);renderInfo(true);});}return;}
@@ -8232,6 +8243,7 @@ function resizeView(){
     vh=Math.round(Math.max(12*TU,Math.min(40*TU,VW*avail/w)));
   }
   document.body.classList.toggle('land',isLand());
+  document.body.classList.toggle('tabUI',tabUI());
   if(isLand()){
     const r=cv.getBoundingClientRect();const used=document.getElementById('topbar').offsetHeight+document.getElementById('intel').offsetHeight+2;
     const h=Math.max(160,innerHeight-used);vh=Math.round(Math.max(6*TU,Math.min(60*TU,VW*h/Math.max(1,r.width))));
@@ -8325,14 +8337,16 @@ function renderMode(){
   if(S.buildMode){const d=B[S.buildMode],c=costOf(S.buildMode),ok=canAfford(c,d.pop),sz=newSz(S.buildMode);
     t=`${icSvg(S.buildMode,24)}<b class="mn">${d.name}</b><span class="szt">${sz}×${sz}</span>${!ok&&isNarrow()?mktBtn(c):''}<span class="ms">・${ok?(padMode()?(bGhost?'十字キーで調整して「決定」':(lineType(S.buildMode)?'場所をタップ・なぞると一列に配置':'建てたい場所をタップ')):(lineType(S.buildMode)?`${tap}で1つ・ドラッグで一列に配置`:`マップを${tap}して配置（続けて置けます）`)):`<span style="color:var(--red)">${lackNames(c,d.pop)||'資源が足りません'}</span>${isNarrow()?'':mktBtn(c)}`}</span><span class="mc">${costText(c,d.pop)}</span>`;}
   else if(S.buildPick)t=`<b class="mn">建設モード</b><span class="ms">・建てる施設を「建設」の一覧から選んでください</span>`;
-  if((S.buildMode||S.buildPick)&&S.undo&&S.undo.length&&!S.waveActive)t+=`<button id="mUndo" class="ghost" title="さっき置いたもの（一列ぶん）を取り消す。資源は全額戻る"><span>↶ 取り消し</span>${IS_TOUCH?'':'<kbd>Ctrl+Z</kbd>'}</button>`;
   else if(S.aimNaval)t='<b class="mn" style="color:#ffe38a">艦砲射撃</b><span class="ms">・目標地点をクリック（Escで取消）</span>';
   else if(S.multi&&S.multi.length){const us=S.squads.filter(x=>S.multi.includes(x.id)&&!x.gar);const md=us.length&&us.every(u=>u.mode===us[0].mode)?us[0].mode:null;
     t=`<b class="mn">${S.multi.length}部隊</b>${isNarrow()?'':`<span class="ms">を選択中・地図を${tap}でまとめて移動</span>`}<span class="mmb">${['guard','hold','return'].map(m=>`<button data-mm="${m}" class="${md===m?'on':''}">${MODE_NAME[m]}</button>`).join('')}</span>${X}`;}
   else if(S.sel&&S.sel.kind==='s')t=`${icSvg(S.sel.model||defModel(S.sel.ut),24)}<b class="mn">${unitLabel(S.sel)}</b><span class="ms">を指揮中・${tap}で移動</span>${X}`;
   else if(S.sel)t=`${icSvg(S.sel.type,24)}<b class="mn">${B[S.sel.type]?B[S.sel.type].name:''}</b><span class="ms">を選択中${gunOf(S.sel)?'・射程を表示':''}</span>${X}`;
   else if(S.boxMode)t=`<b class="mn">範囲選択</b><span class="ms">・選びたい部隊を囲むようにドラッグ</span><button id="mBoxX" class="ghost">やめる</button>`;
-  else t=isNarrow()?'<span class="ms">指揮・タップで選択、2本指で拡大</span><button id="mBox" class="ghost">範囲選択</button>':(S.squads.length>1?'<span class="ms">Shift＋ドラッグで部隊を範囲選択</span>':'');
+  else t=(isNarrow()||IS_TOUCH)?'<span class="ms">指揮・タップで選択、2本指で拡大</span><button id="mBox" class="ghost">範囲選択</button>':(S.squads.length>1?'<span class="ms">Shift＋ドラッグで部隊を範囲選択</span>':'');
+  if(S.buildMode&&tabUI())t+=X;   // タブレット：建設をやめるボタン（PC は右クリック・Esc）
+  // 取り消しボタンは、帯の中身が決まったあとに足す（2026-11-15 修正：前は「もし〜なら」のつながりの途中に入っていて、建設の帯が上書きされていた）
+  if((S.buildMode||S.buildPick)&&S.undo&&S.undo.length&&!S.waveActive)t+=`<button id="mUndo" class="ghost" title="さっき置いたもの（一列ぶん）を取り消す。資源は全額戻る"><span>↶ 取り消し</span>${IS_TOUCH?'':'<kbd>Ctrl+Z</kbd>'}</button>`;
   bar.classList.toggle('idle',!t);bar.classList.toggle('hint',!S.buildMode&&!S.buildPick&&!S.sel&&!(S.multi&&S.multi.length)&&!S.aimNaval);
   if(t!==modeKey){modeKey=t;document.getElementById('modeTxt').innerHTML=t;const d=document.getElementById('mDesel');if(d)d.onclick=deselect;
     document.querySelectorAll('#modeTxt [data-mm]').forEach(b=>b.onclick=e=>{e.stopPropagation();multiMode(b.dataset.mm);});
@@ -8390,7 +8404,7 @@ function loop(now){
   }
   try{draw();}catch(e){if(!drawErr++)console.error(e);}
   S.fogT=(S.fogT||0)+dt;if(S.fogT>0.5){S.fogT=0;revealAll();}
-  uiT+=dt;if(uiT>0.2){uiT=0;renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
+  uiT+=dt;if(uiT>0.2){uiT=0;stripKeyHints();renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
 }
 auUi();newState();S.backdrop=true;renderAll();resizeView();setTimeout(resizeView,300);showTitle();requestAnimationFrame(loop);
 </script>
