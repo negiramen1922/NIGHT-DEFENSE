@@ -7732,44 +7732,55 @@ function noise(t,dur,o){
 }
 // ---- 効果音 ----
 const SE_GAP={mg:0.05,squad:0.07,kill:0.04,bigkill:0.08,boom:0.07,how:0.15,rail:0.12,click:0.03,hit:0.1};
-const BSND={church:'b_stone',powder:'b_fire',mortar:'b_metal',fence:'b_wood',gate:'b_wood',tower:'b_wood',miner:'b_wood',barracks:'b_wood',apart:'b_wood',outpost:'b_wood',train:'b_wood',stable:'b_wood',tavern:'b_wood',market:'b_wood',spike:'b_wood',pit:'b_stone',swall:'b_stone',wall:'b_stone',quarry:'b_stone',ironmine:'b_stone',totem:'b_stone',mg:'b_metal',cannon:'b_metal',how:'b_metal',hisou:'b_metal',mabou:'b_metal',ammo:'b_metal',lab:'b_magic',magic:'b_magic',magetower:'b_magic',well:'b_magic',furnace:'b_fire',brazier:'b_fire',farm:'b_farm',fishery:'b_water',aerie:'b_stone'};
+const BSND={smelter:'b_metal',mithmine:'b_metal',goldmine:'b_metal',coalmine:'b_metal',church:'b_stone',powder:'b_fire',mortar:'b_metal',fence:'b_wood',gate:'b_wood',tower:'b_wood',miner:'b_wood',barracks:'b_wood',apart:'b_wood',outpost:'b_wood',train:'b_wood',stable:'b_wood',tavern:'b_wood',market:'b_wood',spike:'b_wood',pit:'b_stone',swall:'b_stone',wall:'b_stone',quarry:'b_stone',ironmine:'b_metal',totem:'b_stone',mg:'b_metal',cannon:'b_metal',how:'b_metal',hisou:'b_metal',mabou:'b_metal',ammo:'b_metal',lab:'b_magic',magic:'b_magic',magetower:'b_magic',well:'b_magic',furnace:'b_fire',brazier:'b_fire',farm:'b_farm',fishery:'b_water',aerie:'b_stone'};
+// 効果音（2026-11-15 作り直し：ユーザーのメモ「全体的に変なので一般的なものに」）
+// 金属を叩いた音：倍音がずれたサイン波を重ねて、すぐ減衰させる（カーン）
+function ring(t,f,dur,vol,o){o=o||{};for(const [m,a] of [[1,1],[2.76,0.5],[5.4,0.28],[8.9,0.12]])tone(f*m,t,dur*(1.1-a*0.3),{type:'sine',vol:vol*a,a:0.001,r:dur*0.9,send:o.send});noise(t,0.012,{ft:'highpass',f:5000,vol:vol*0.8});}
+// 木を叩いた音：中音域のこもった短い打音（コッ）
+function knock(t,f,vol){tone(f,t,0.07,{type:'sine',to:f*0.8,vol:vol,a:0.001,r:0.06});tone(f*2.3,t,0.03,{type:'triangle',vol:vol*0.35,a:0.001});noise(t,0.025,{ft:'bandpass',f:f*2.5,q:2,vol:vol*0.9});}
 function se(name){
   if(!AU.ctx||!AU.on)return;const t=AU.ctx.currentTime;
   if(SE_GAP[name]&&t-(AU.last[name]??-1)<SE_GAP[name])return;AU.last[name]=t;
+  const rv=(a,b)=>a+Math.random()*(b-a);   // 毎回少しずつ違う音に
   switch(name){
-    case 'click':tone(900,t,0.03,{type:'square',vol:0.025,lp:3000});break;
-    case 'build':noise(t,0.12,{f:500,vol:0.2});tone(220,t+0.06,0.08,{type:'square',vol:0.04,lp:1200});noise(t+0.13,0.1,{f:700,vol:0.12});break;
-    case 'upgrade':[0,4,7,12].forEach((n,i)=>tone(mtof(72+n),t+i*0.06,0.25,{type:'triangle',vol:0.07,send:true}));noise(t,0.2,{ft:'highpass',f:4000,vol:0.03});break;
-    case 'error':tone(130,t,0.08,{type:'square',vol:0.05,lp:800});tone(110,t+0.1,0.1,{type:'square',vol:0.05,lp:800});break;
-    case 'bell':for(let i=0;i<2;i++){const s0=t+i*0.32;[1,2.76,5.4].forEach((m,j)=>tone(988*m*(i?0.94:1),s0,0.9-j*0.25,{type:'sine',vol:0.07/(j+1),send:true}));tone(2400,s0,0.03,{type:'square',vol:0.015});}break;
-    case 'pop':noise(t,0.25,{f:1400,fTo:200,vol:0.18});for(let i=0;i<5;i++)noise(t+0.12+i*0.05,0.03,{ft:'highpass',f:3500,vol:0.05});break;
-    case 'turn':tone(660,t,0.05,{type:'sine',vol:0.06});tone(990,t+0.06,0.08,{type:'sine',vol:0.04});noise(t,0.5,{ft:'bandpass',f:300,fTo:1200,vol:0.03});break;
-    case 'resStart':tone(mtof(72),t,0.18,{type:'triangle',vol:0.06});tone(mtof(79),t+0.09,0.3,{type:'triangle',vol:0.06,send:true});noise(t,0.12,{ft:'highpass',f:3500,vol:0.04});break;
-    case 'b_wood':for(let i=0;i<3;i++){noise(t+i*0.09,0.05,{ft:'bandpass',f:900,q:3,vol:0.25});tone(180,t+i*0.09,0.05,{type:'triangle',vol:0.06});}break;
-    case 'b_stone':noise(t,0.18,{f:400,fTo:150,vol:0.25});noise(t+0.15,0.14,{f:300,vol:0.18});tone(90,t,0.15,{to:60,vol:0.08});break;
-    case 'b_metal':tone(1250,t,0.3,{type:'triangle',vol:0.06});tone(1870,t,0.2,{type:'sine',vol:0.03});tone(1250,t+0.16,0.35,{type:'triangle',vol:0.05});noise(t,0.05,{ft:'highpass',f:3000,vol:0.06});break;
-    case 'b_magic':[0,5,9,14].forEach((n,i)=>tone(mtof(76+n),t+i*0.05,0.5,{type:'sine',vol:0.04,send:true}));noise(t,0.4,{ft:'highpass',f:5000,vol:0.02});break;
-    case 'b_fire':noise(t,0.5,{ft:'bandpass',f:600,fTo:1800,q:0.7,vol:0.14});noise(t+0.1,0.6,{ft:'highpass',f:2000,vol:0.04});break;
-    case 'b_farm':noise(t,0.15,{ft:'lowpass',f:700,vol:0.2});tone(mtof(67),t+0.1,0.15,{type:'triangle',vol:0.05});tone(mtof(71),t+0.2,0.25,{type:'triangle',vol:0.05});break;
-    case 'b_water':for(let i=0;i<3;i++)tone(500+i*180,t+i*0.07,0.12,{type:'sine',to:900+i*200,vol:0.05});break;
-    case 'research':[0,7,12,16].forEach((n,i)=>{tone(mtof(79+n),t+i*0.09,1.2,{vol:0.05,send:true});tone(mtof(79+n)*2.01,t+i*0.09,0.6,{vol:0.015});});break;
-    case 'alarm':for(let i=0;i<3;i++){const s=t+i*0.75;tone(520,s,0.7,{type:'sawtooth',to:820,vol:0.12,lp:1800});}
-      tone(mtof(38),t,2.2,{type:'sawtooth',vol:0.06,lp:400});break;
-    case 'clear':[[62,0],[65,0.14],[69,0.28],[74,0.42]].forEach(([m,d])=>{tone(mtof(m),t+d,0.5,{type:'sawtooth',vol:0.05,lp:1600,lpTo:600,send:true});tone(mtof(m-12),t+d,0.5,{type:'triangle',vol:0.05});});break;
-    case 'mg':noise(t,0.04,{ft:'bandpass',f:1500,q:0.8,vol:0.22});break;
-    case 'squad':noise(t,0.035,{ft:'bandpass',f:2600,q:0.8,vol:0.14});tone(1600,t,0.02,{type:'square',vol:0.01});break;
-    case 'how':noise(t,0.45,{f:380,fTo:90,vol:0.28});tone(110,t,0.35,{to:38,vol:0.18});break;
-    case 'boom':noise(t,0.35,{f:900,fTo:120,vol:0.16});tone(70,t,0.25,{to:35,vol:0.1});break;
-    case 'rail':tone(2400,t,0.22,{type:'sawtooth',to:180,vol:0.06,lp:5000});noise(t,0.18,{ft:'highpass',f:3000,vol:0.06});tone(55,t,0.3,{vol:0.12});break;
-    case 'kill':noise(t,0.06,{ft:'bandpass',f:900+Math.random()*500,q:2,vol:0.035});break;
-    case 'bigkill':noise(t,0.3,{f:600,fTo:100,vol:0.12});tone(90,t,0.25,{to:40,type:'triangle',vol:0.08});break;
-    case 'hit':noise(t,0.08,{f:1500,vol:0.05});tone(160,t,0.06,{type:'square',vol:0.02,lp:600});break;
-    case 'destroy':noise(t,1.1,{f:700,fTo:60,vol:0.32});tone(60,t,0.9,{to:28,vol:0.2});noise(t+0.15,0.6,{ft:'bandpass',f:400,vol:0.08});break;
+    // ---- 操作 ----
+    case 'click':tone(1800,t,0.025,{type:'sine',to:1400,vol:0.05,a:0.001});break;                                             // カチッ
+    case 'error':tone(180,t,0.09,{type:'square',vol:0.045,lp:900});tone(180,t+0.12,0.12,{type:'square',vol:0.045,lp:900});break;   // ブブッ
+    case 'turn':noise(t,0.22,{ft:'bandpass',f:1200,fTo:3500,q:0.8,vol:0.05});tone(mtof(76),t+0.12,0.35,{type:'triangle',vol:0.05,send:true});tone(mtof(83),t+0.2,0.45,{type:'triangle',vol:0.04,send:true});break;   // ページをめくる＋ポーン
+    case 'hire':ring(t,2400,0.25,0.03);ring(t+0.08,3000,0.3,0.025);[67,72,76].forEach((n,i)=>tone(mtof(n),t+0.18+i*0.09,0.3,{type:'square',vol:0.035,lp:3000}));break;   // 金貨の音＋小さなファンファーレ
+    // ---- 建設 ----
+    case 'build':for(let i=0;i<3;i++)knock(t+i*0.13,rv(520,620),0.08);noise(t+0.4,0.15,{f:600,vol:0.05});break;   // トントントン
+    case 'b_wood':for(let i=0;i<4;i++)knock(t+i*0.12+rv(0,0.015),rv(700,820)*(i===3?0.9:1),0.09);break;   // コッコッコッ（木を叩いて組む）
+    case 'b_stone':for(let i=0;i<4;i++){const s0=t+i*0.14+rv(0,0.02);noise(s0,0.05,{ft:'bandpass',f:rv(2200,2800),q:1.5,vol:0.2});tone(rv(300,360),s0,0.05,{type:'triangle',vol:0.06,a:0.001});}noise(t+0.58,0.25,{f:900,fTo:300,vol:0.06});break;   // ガッガッガッガッ（石を割る）＋ガラガラ
+    case 'b_metal':for(let i=0;i<3;i++)ring(t+i*0.17+rv(0,0.01),rv(1350,1450)*(i===2?1.06:1),0.32,0.05);break;   // カンカンカン（金床を叩く）
+    case 'b_fire':noise(t,0.35,{ft:'bandpass',f:300,fTo:1400,q:0.7,vol:0.2});tone(90,t,0.25,{to:180,vol:0.08});   // ボッ（火がつく）
+      for(let i=0;i<9;i++)noise(t+0.15+rv(0,0.7),0.012,{ft:'highpass',f:rv(2500,5000),vol:rv(0.04,0.09)});break;   // パチパチ
+    case 'b_farm':for(let i=0;i<2;i++)noise(t+i*0.2,0.12,{ft:'lowpass',f:900,fTo:300,vol:0.22});tone(mtof(79),t+0.45,0.2,{type:'triangle',vol:0.04});tone(mtof(84),t+0.55,0.3,{type:'triangle',vol:0.04,send:true});break;   // ザクッザクッ（土を掘る）＋ポロン
+    case 'b_water':tone(400,t,0.12,{type:'sine',to:1100,vol:0.09,a:0.002});noise(t+0.02,0.3,{ft:'bandpass',f:1800,fTo:700,q:0.8,vol:0.08});tone(700,t+0.18,0.1,{type:'sine',to:1300,vol:0.04});break;   // チャポン
+    case 'b_magic':[0,4,7,11,14].forEach((n,i)=>tone(mtof(84+n),t+i*0.05,0.6,{type:'sine',vol:0.035,send:true}));noise(t,0.5,{ft:'highpass',f:6000,fTo:9000,vol:0.025});break;   // キラキラ
+    case 'upgrade':[0,4,7,12].forEach((n,i)=>tone(mtof(72+n),t+i*0.07,0.16,{type:'square',vol:0.04,lp:3500}));tone(mtof(84),t+0.28,0.4,{type:'square',vol:0.035,lp:3500,send:true});break;   // パワーアップ（タタタター）
+    case 'resStart':tone(mtof(76),t,0.1,{type:'square',vol:0.035,lp:3000});tone(mtof(81),t+0.08,0.2,{type:'square',vol:0.035,lp:3000});break;   // ピポッ
+    case 'research':[72,76,79,84].forEach((n,i)=>{tone(mtof(n),t+i*0.1,0.7,{type:'triangle',vol:0.05,send:true});tone(mtof(n)*2,t+i*0.1,0.25,{type:'sine',vol:0.015});});break;   // ひらめき
+    // ---- 戦闘 ----
+    case 'mg':tone(rv(170,200),t,0.09,{type:'triangle',to:90,vol:0.09,a:0.001});noise(t,0.12,{ft:'bandpass',f:2400,fTo:900,q:0.9,vol:0.07});break;   // ビュン（弦の弾ける音＋風切り）
+    case 'rail':tone(1600,t,0.2,{type:'sawtooth',to:300,vol:0.045,lp:4500});noise(t,0.16,{ft:'highpass',f:2500,fTo:6000,vol:0.06});tone(80,t,0.2,{to:45,vol:0.09});break;   // ビシュッ（貫く）
+    case 'how':tone(110,t,0.2,{to:55,vol:0.18});noise(t,0.12,{f:500,vol:0.12});noise(t+0.08,0.5,{ft:'bandpass',f:500,fTo:1500,q:0.7,vol:0.05});break;   // ドン＋ヒュー（投げ上げる）
+    case 'boom':noise(t,0.7,{f:1600,fTo:80,vol:0.22});tone(80,t,0.45,{to:32,vol:0.2});noise(t+0.05,0.4,{ft:'bandpass',f:300,vol:0.08});break;   // ドーン
+    case 'squad':noise(t,0.07,{ft:'bandpass',f:rv(2600,3600),fTo:1200,q:1.2,vol:0.08});tone(rv(900,1100),t,0.03,{type:'triangle',vol:0.02});break;   // シュッ（矢・剣）
+    case 'hit':tone(120,t,0.14,{to:55,vol:0.12});noise(t,0.1,{f:900,vol:0.08});break;   // ドスッ（ぶつかる）
+    case 'kill':tone(rv(500,640),t,0.08,{type:'square',to:180,vol:0.022,lp:2000});noise(t,0.04,{ft:'bandpass',f:1200,vol:0.03});break;   // ポコッ（小さな敵が倒れる）
+    case 'bigkill':tone(220,t,0.35,{type:'sawtooth',to:70,vol:0.05,lp:900});tone(70,t+0.05,0.3,{to:35,vol:0.11});noise(t+0.05,0.3,{f:600,fTo:150,vol:0.1});break;   // ドサッ（大きな敵が倒れる）
+    case 'destroy':noise(t,1.2,{f:1200,fTo:80,vol:0.25});tone(60,t,0.8,{to:30,vol:0.18});for(let i=0;i<6;i++)noise(t+0.2+i*0.12+rv(0,0.06),0.06,{ft:'bandpass',f:rv(500,1200),q:2,vol:0.06});break;   // ガラガラドシャーン（崩れる）
+    case 'launch':[[67,0],[72,0.12],[76,0.24]].forEach(([n,d])=>tone(mtof(n),t+d,d<0.2?0.12:0.35,{type:'sawtooth',vol:0.04,lp:2200,send:d>0.2}));noise(t,0.2,{ft:'lowpass',f:500,vol:0.06});break;   // パパパーン（出撃のラッパ）
     case 'kia':tone(mtof(67),t,0.7,{type:'triangle',vol:0.07,lp:1500,send:true});tone(mtof(64),t+0.6,1.2,{type:'triangle',vol:0.07,lp:1500,send:true});tone(mtof(43),t,1.8,{vol:0.05});break;
-    case 'launch':noise(t,0.8,{ft:'bandpass',f:300,fTo:2500,q:1.5,vol:0.1});tone(140,t,0.6,{type:'sawtooth',to:300,vol:0.03,lp:800});break;
-    case 'hire':tone(mtof(69),t,0.15,{type:'triangle',vol:0.07});tone(mtof(76),t+0.12,0.3,{type:'triangle',vol:0.07});break;
-    case 'win':[[62,0],[66,.2],[69,.4],[74,.6],[78,.9]].forEach(([m,d])=>{tone(mtof(m),t+d,1.4,{type:'sawtooth',vol:0.05,lp:2000,lpTo:700,send:true});tone(mtof(m-24),t+d,1.2,{type:'triangle',vol:0.05});});break;
-    case 'lose':[[62,0],[60,.5],[58,1.0],[57,1.5]].forEach(([m,d])=>{tone(mtof(m),t+d,1.2,{type:'triangle',vol:0.07,lp:1200,send:true});tone(mtof(m-24),t+d,1.4,{vol:0.06});});break;
+    // ---- 知らせ ----
+    case 'alarm':for(let i=0;i<2;i++){const s0=t+i*0.9;tone(mtof(45),s0,0.8,{type:'sawtooth',vol:0.09,lp:900,a:0.08,r:0.3});tone(mtof(52),s0,0.8,{type:'sawtooth',vol:0.05,lp:900,a:0.08,r:0.3});}   // ブォーー（角笛）×2＋太鼓
+      for(let i=0;i<4;i++)tone(110,t+1.8+i*0.18,0.2,{to:50,vol:0.18});break;
+    case 'clear':[[72,0,0.12],[72,0.12,0.12],[72,0.24,0.12],[76,0.38,0.5]].forEach(([n,d,l])=>{tone(mtof(n),t+d,l,{type:'square',vol:0.04,lp:3000,send:true});tone(mtof(n-12),t+d,l,{type:'triangle',vol:0.05});});break;   // タタタターン
+    case 'bell':tone(mtof(88),t,0.8,{type:'sine',vol:0.06,send:true});tone(mtof(84),t+0.35,1.0,{type:'sine',vol:0.06,send:true});break;   // ピンポーン（訪問者）
+    case 'pop':noise(t,0.3,{f:1500,fTo:200,vol:0.18});for(let i=0;i<8;i++)noise(t+0.15+i*0.05+rv(0,0.03),0.02,{ft:'highpass',f:4000,vol:0.05});break;   // パーン＋パチパチ
+    case 'win':[[72,0,0.15],[72,0.15,0.15],[72,0.3,0.15],[76,0.45,0.3],[74,0.8,0.3],[77,1.15,0.3],[76,1.5,0.9]].forEach(([n,d,l])=>{tone(mtof(n),t+d,l,{type:'square',vol:0.045,lp:3000,send:true});tone(mtof(n-24),t+d,l,{type:'triangle',vol:0.06});});break;
+    case 'lose':[[64,0],[63,0.4],[62,0.8],[61,1.2]].forEach(([n,d])=>{tone(mtof(n),t+d,0.45,{type:'square',vol:0.04,lp:1800});tone(mtof(n-24),t+d,0.45,{type:'triangle',vol:0.06});});break;   // ちゃらら〜（下がっていく）
   }
 }
 // ---- BGM ----
