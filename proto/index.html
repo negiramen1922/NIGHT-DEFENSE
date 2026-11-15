@@ -1517,6 +1517,8 @@ body.tabUI button{min-height:40px!important}
 body.tabUI #controls button,body.tabUI #modeBar button{min-height:44px;padding-left:14px;padding-right:14px}
 body.tabUI #viewSeg button{min-height:40px;padding-left:12px;padding-right:12px}
 body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font-size:14px}
+/* 帯のボタンは縮めない・折り返さない（「解除」が2行になっていた）2026-11-15 */
+#modeBar button,#modeTxt button{white-space:nowrap;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -8344,7 +8346,6 @@ function renderMode(){
   else if(S.sel)t=`${icSvg(S.sel.type,24)}<b class="mn">${B[S.sel.type]?B[S.sel.type].name:''}</b><span class="ms">を選択中${gunOf(S.sel)?'・射程を表示':''}</span>${X}`;
   else if(S.boxMode)t=`<b class="mn">範囲選択</b><span class="ms">・選びたい部隊を囲むようにドラッグ</span><button id="mBoxX" class="ghost">やめる</button>`;
   else t=(isNarrow()||IS_TOUCH)?'<span class="ms">指揮・タップで選択、2本指で拡大</span><button id="mBox" class="ghost">範囲選択</button>':(S.squads.length>1?'<span class="ms">Shift＋ドラッグで部隊を範囲選択</span>':'');
-  if(S.buildMode&&tabUI())t+=X;   // タブレット：建設をやめるボタン（PC は右クリック・Esc）
   // 取り消しボタンは、帯の中身が決まったあとに足す（2026-11-15 修正：前は「もし〜なら」のつながりの途中に入っていて、建設の帯が上書きされていた）
   if((S.buildMode||S.buildPick)&&S.undo&&S.undo.length&&!S.waveActive)t+=`<button id="mUndo" class="ghost" title="さっき置いたもの（一列ぶん）を取り消す。資源は全額戻る"><span>↶ 取り消し</span>${IS_TOUCH?'':'<kbd>Ctrl+Z</kbd>'}</button>`;
   bar.classList.toggle('idle',!t);bar.classList.toggle('hint',!S.buildMode&&!S.buildPick&&!S.sel&&!(S.multi&&S.multi.length)&&!S.aimNaval);
