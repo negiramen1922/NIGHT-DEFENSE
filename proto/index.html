@@ -1506,6 +1506,24 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .kcnext{display:flex;gap:8px;align-items:center;margin:4px 0}.kcnext img{width:32px;height:32px;image-rendering:pixelated;background:#0003;border-radius:4px}
 #nShort{position:absolute;bottom:calc(100% + 4px);left:0;z-index:30;background:#3a0d0a;border:1px solid #ff6a5a;color:#ffd0c8;font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none}#controls{position:relative}
 .dhints{font-size:13px;line-height:1.8;margin:2px 0 8px}.dhints b{color:var(--amber,#f2b33d)}
+/* 施設の中身の小さなムービー（2026-11-15） */
+.fbox{margin:6px 0 8px;border:1px solid var(--line,#33402f);background:rgba(0,0,0,.25);border-radius:3px}
+.flow{position:relative;display:flex;align-items:center;justify-content:center;height:64px;overflow:hidden;background:linear-gradient(90deg,rgba(255,120,90,.06),transparent 35%,transparent 65%,rgba(120,240,140,.07))}
+.flow .fb{position:relative;z-index:2;animation:fbWork 1.1s ease-in-out infinite}
+.flow .fl{position:relative;flex:1;height:100%}
+.flow .fl i{position:absolute;transform:translateY(-50%);opacity:0;line-height:0}
+.flow .fin i{animation:flowIn 1.65s linear infinite}
+.flow .fout i{animation:flowOut 1.65s linear infinite}
+.flow.gun .fshot i{top:50%;animation:flowShot .9s linear infinite}
+.flow.gun .fen{position:relative;width:46px;display:flex;justify-content:center;animation:fenHit .9s linear infinite}
+@keyframes flowIn{0%{left:2%;opacity:0}15%{opacity:1}80%{opacity:1}100%{left:88%;opacity:0}}
+@keyframes flowOut{0%{left:4%;opacity:0}20%{opacity:1}85%{opacity:1}100%{left:90%;opacity:0}}
+@keyframes flowShot{0%{left:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:92%;opacity:0}}
+@keyframes fbWork{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.06)}}
+@keyframes fenHit{0%,85%{transform:translateX(0)}92%{transform:translateX(4px);filter:brightness(2)}100%{transform:translateX(0)}}
+.ftxt{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12px;padding:4px 8px 6px;line-height:1.6}
+.fnote{padding:8px;font-size:12px}
+@media (prefers-reduced-motion:reduce){.flow i,.flow .fb,.flow .fen{animation:none!important;opacity:1}}
 /* タイムラプス（2026-11-15） */
 body.tlOn #topbar,body.tlOn #intel,body.tlOn #controls,body.tlOn #right,body.tlOn #modeBar,body.tlOn #viewSeg,body.tlOn #guide,body.tlOn #toasts,body.tlOn #reviewBar,body.tlOn .logbox,body.tlOn #pauseMsg,body.tlOn #bpad,body.tlOn #saveMark{display:none!important}
 #tlHud{position:fixed;left:0;right:0;bottom:0;z-index:9500;background:rgba(10,12,10,.88);border-top:2px solid var(--amber,#f2b33d);padding:8px max(12px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-right));color:#e8e4d8;font-size:13px}
@@ -1557,7 +1575,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
     <div id="mapWrap">
     <div id="modeBar"><span id="modeTxt"></span><button id="mExit" class="ghost"><span class="xic"></span><span>解除</span><kbd>Esc</kbd></button></div>
     <canvas id="cv"></canvas>
-    <div id="viewSeg" title="マップの表示を切り替え"><button data-v="n">通常</button><button data-v="lv">土地Lv<kbd>T</kbd></button><button data-v="heat">狙われやすさ<kbd>H</kbd></button><span id="viewCap"></span></div>
+    <div id="viewSeg" title="マップの表示を切り替え"><button data-v="n">通常</button><button data-v="lv">土地Lv<kbd>T</kbd></button><button data-v="heat">狙われやすさ<kbd>H</kbd></button><button data-v="prod">生産</button><span id="viewCap"></span></div>
     <div id="pauseMsg"><b>一時停止中</b><small>指示はそのまま出せます・Space で再開</small></div>
     </div>
     <div id="toasts" style="position:fixed;z-index:40;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;transform:translateX(-50%)"></div>
@@ -5429,6 +5447,7 @@ function draw(){
   drawRuins();
   for(const b of S.blds){{const m=3*TU,bx=b.x*T,by=b.y*T,bs=bsz(b)*T;if(bx+bs<VR[0]-m||by+bs<VR[1]-m||bx>VR[0]+VR[2]+m||by>VR[1]+VR[3]+m)continue;}drawBuilding(b,an);if(b.ench){const n=bsz(b);for(let i=0;i<b.ench;i++){const sx=b.x*T+3+i*5,sy=b.y*T+3;ctx.fillStyle='#1a0e2a';ctx.fillRect(sx-1,sy-1,5,5);ctx.fillStyle='#c48aff';ctx.fillRect(sx,sy,3,3);}}}
   drawUpgBadges(an);
+  if(S.viewProd&&!S.waveActive)drawProdView();
   drawClusters(an);
   drawMills(an);
   if(S.heat){ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
@@ -6292,6 +6311,27 @@ function yieldAt(type,x,y){
 }
 // 採集する資源には埋蔵量があり、掘り尽くすと止まる（遠くの資源へ広げる理由）
 function reserveOf(type,x,y){const v=yieldAt(type,x,y);return type==='miner'?Math.round(700*v):type==='quarry'?Math.round(900*v):type==='ironmine'?Math.round(600*v):type==='well'?Math.round(320*v):Infinity;}
+// ===== 施設の中身の小さなムービー（2026-11-15）：使う資源 → 施設 → 作る資源 がアイコンで流れる。防衛施設は弾が敵へ飛ぶ =====
+// b があればその施設の今の量（レベル・研究・場所・幸福度こみ）。b が null（これから建てる）なら Lv1・ふつうの場所での目安
+function flowOf(type,b){let pr=null;if(b)pr=prodOf(b);else{const h=hqOf();const f={type,x:h?h.x:0,y:h?h.y:0,lv:1,bt:0,ym:1,id:-1,crew:B[type].pop||0};try{const r0=richAt;window.richAt=()=>1;try{pr=prodOf(f);}finally{window.richAt=r0;}}catch(e){pr=null;}}
+  return pr;}
+function flowHTML(type,b){const d=B[type];if(!d)return '';const g=b?gunOf(b):(d.range&&d.grp==='def'?d:null);let pr=null;try{pr=flowOf(type,b);}catch(e){}
+  const tIc=icSvg(type,40);const lane=(items,cls)=>`<div class="fl ${cls}">${items.map((k,i)=>`<i style="animation-delay:${(i*0.55).toFixed(2)}s;top:${items.length>1?20+i*(60/Math.max(1,items.length-1)):50}%">${ic(k,16)}</i>`).join('')}</div>`;
+  if(pr){const pos=Object.entries(pr).filter(a=>a[1]>0.05),neg=Object.entries(pr).filter(a=>a[1]<-0.05);if(!pos.length&&!neg.length&&b)return `<div class="fbox"><div class="fnote muted">今は何も作っていません（${b.dep?'資源を掘り尽くした':b.off?'止めている':'人員や資源が足りない'}）</div></div>`;
+    const keysIn=neg.map(a=>a[0]),keysOut=pos.map(a=>a[0]);const nm=k=>RES_NAME[k]||k;const v=x=>Math.max(1,Math.round(Math.abs(x)));
+    return `<div class="fbox"><div class="flow">${lane(keysIn.length?keysIn:[],'fin')}<div class="fb">${tIc}</div>${lane(keysOut,'fout')}</div>
+      <div class="ftxt">${neg.length?`<span class="bd">使う ${neg.map(([k,x])=>`${ic(k,12)}${nm(k)} −${v(x)}`).join('・')}</span>`:'<span class="muted">使う物なし</span>'}<span class="gd">作る ${pos.map(([k,x])=>`${ic(k,12)}${nm(k)} +${v(x)}`).join('・')||'—'}</span><span class="muted">（1ターン${b?'':'・Lv1の目安。場所や研究で変わる'}）</span></div></div>`;}
+  if(g&&type!=='hq'){const ak=g.ammoKey||'ammo',per=[[ak,(g.ammoUse||1)*USE_MUL]].concat(Object.entries(g.ammo2||{}));
+    return `<div class="fbox"><div class="flow gun"><div class="fb">${tIc}</div><div class="fl fshot">${per.map(([k],i)=>`<i style="animation-delay:${(i*0.3).toFixed(2)}s">${ic(k,14)}</i>`).join('')}</div><div class="fen">${typeof eSpr==='function'?eSpr('swarm',26):'敵'}</div></div>
+      <div class="ftxt"><span class="bd">1発ごとに ${per.map(([k,x])=>`${ic(k,12)}${RES_NAME[k]||k}×${Math.round(x*10)/10}`).join('・')}</span><span class="muted">（弾が尽きると撃てない。${g.splash?'範囲攻撃':'1体ずつ'}・射程${Math.round((g.range||0)*U)}マス）</span></div></div>`;}
+  return '';}
+// マップの「生産」表示（切り替え式）：各施設の上に、1ターンに作る物（緑）と使う物（赤）
+function drawProdView(){const z=cam.z||1,fs=Math.min(26,Math.max(7,11/z));ctx.save();ctx.font=`bold ${fs}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+  for(const b of S.blds){let pr=null;try{pr=prodOf(b);}catch(e){}if(!pr)continue;const L=Object.entries(pr).filter(a=>Math.abs(a[1])>=0.5&&a[0]!=='pop');if(!L.length)continue;
+    const n=bsz(b),cx=(b.x+n/2)*T,y=b.y*T+n*T*0.5;const parts=L.map(([k,x])=>({t:(x>0?'+':'−')+Math.round(Math.abs(x))+(RES_NAME[k]||k).slice(0,2),c:x>0?'#8ef09a':'#ff8a7a'}));
+    const w=parts.reduce((a,p)=>a+ctx.measureText(p.t).width,0)+fs*0.5*(parts.length+1),h=fs*1.4;let x=cx-w/2;
+    ctx.fillStyle='rgba(8,12,10,.82)';ctx.fillRect(x,y-h/2,w,h);x+=fs*0.5;for(const p of parts){const tw=ctx.measureText(p.t).width;ctx.fillStyle=p.c;ctx.fillText(p.t,x+tw/2,y+0.5);x+=tw+fs*0.5;}}
+  ctx.restore();}
 function prodOf(b){const k=TURN_SEC,bn=bonus(b),um=UP.prod[b.lv-1]*eff(b)*happyMul();if(b.bt>0||b.dep||b.off)return null;
   switch(b.type){case 'miner':return {steel:1.0*um*(b.ym||1)*(techMul('miner')+bn.prod-1)*k};case 'quarry':return {stone:0.6*um*(b.ym||1)*(techMul('quarry')+bn.prod-1)*k};
   case 'ironmine':return {iron:0.6*um*RICH[richAt(b.x,b.y)]*(techMul('ironmine')+bn.prod-1)*k};case 'farm':return {fuel:0.8*um*(techMul('farm')+bn.prod-1)*k};
@@ -6379,10 +6419,10 @@ function renderPauseUI(){if(!S)return;const p=!!S.paused&&!S.over;const b=docume
   {const t=document.getElementById('bSpdT');if(t)setText(t,'速度 ×'+(S.speed||1));const sb=document.getElementById('bSpd');if(sb)sb.classList.toggle('fast',(S.speed||1)>1);}}
 // 表示の切り替え（通常／土地レベル／狙われやすさ。どれか1つ）
 let viewKey='';
-function curView(){return S.showLv?'lv':S.heat?'heat':'n';}
-function setView(v){S.showLv=v==='lv';S.heat=v==='heat';syncView();}
+function curView(){return S.showLv?'lv':S.heat?'heat':S.viewProd?'prod':'n';}
+function setView(v){S.showLv=v==='lv';S.heat=v==='heat';S.viewProd=v==='prod';syncView();}
 function syncView(){viewKey=curView();document.querySelectorAll('#viewSeg [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===viewKey));
-  const c=document.getElementById('viewCap');c.textContent=viewKey==='lv'?'色が濃いほど Lv が高い　岩=黄・森=緑・沼=青・鉱脈=橙・泉=紫':viewKey==='heat'?'赤く広がるほど敵が先に狙う（壁・防衛施設は狙われにくい）':'';c.style.display=viewKey==='n'?'none':'';}
+  const c=document.getElementById('viewCap');c.textContent=viewKey==='prod'?'1ターンに作る物（緑）と使う物（赤）':viewKey==='lv'?'色が濃いほど Lv が高い　岩=黄・森=緑・沼=青・鉱脈=橙・泉=紫':viewKey==='heat'?'赤く広がるほど敵が先に狙う（壁・防衛施設は狙われにくい）':'';c.style.display=viewKey==='n'?'none':'';}
 function toggleHeat(){setView(S.heat?'n':'heat');}
 document.querySelectorAll('#viewSeg [data-v]').forEach(b=>b.onclick=()=>{setView(b.dataset.v);se&&se('click');});
 document.getElementById('bPause').onclick=togglePause;document.getElementById('bPauseSeg').onclick=togglePause;
@@ -6661,6 +6701,7 @@ function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
   if(tiles.length<3&&o.type==='hq')tiles.push(`<small>城のレベル</small><b>${S.baseLv}<span>/ ${BASE_MAX}</span></b>`);
   if(tiles.length<3){const pr=prodOf(o);const k=pr&&Object.keys(pr).find(x=>pr[x]>0);if(k)tiles.push(`<small>つくる</small><b>${ic(k,12)}+${Math.round(pr[k])}<span>/T</span></b>`);}
   h+=`<div class="stats">${tiles.slice(0,3).map(t=>t.startsWith('<div id="iCrew"')?t:`<div>${t}</div>`).join('')}</div>`;
+  h+=flowHTML(o.type,o);   /* 施設の中身の小さなムービー（2026-11-15） */
   return h;}
 // .upg の箱を折りたたみ（details）にする。開閉は項目ごとに保存
 function detailsify(root){let st={};try{st=JSON.parse(localStorage.getItem('nd_info_open')||'{}');}catch(e){}
@@ -6682,7 +6723,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(!o&&S.heroView){const c=S.cmds.find(x=>x.id===S.heroView&&x.alive);if(c){const key='hv'+c.id+c.lv+Math.floor(c.xp)+c.assign+c.kills;if(!force&&key===lastInfoKey)return;lastInfoKey=key;el.innerHTML=heroDetail(c);const hc=document.getElementById('hvClose');if(hc)hc.onclick=closeHeroView;const g=document.getElementById('hvGo');if(g)g.onclick=()=>{const t=findObj(c.assign);if(t){S.sel=t;renderInfo(true);}};return;}S.heroView=null;}
   if(S.buildMode&&!o){
     const key='bm'+S.buildMode;if(!force&&key===lastInfoKey)return;lastInfoKey=key;
-    const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)}ターン　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。${IS_TOUCH?'「建設をやめる」で建設モードを終了':'右クリック・Escで建設モードを終了'}</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div><button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
+    const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)}ターン　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。${IS_TOUCH?'「建設をやめる」で建設モードを終了':'右クリック・Escで建設モードを終了'}</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div>${flowHTML(S.buildMode,null)}<button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
   if(!o&&S.selTile){const {x,y}=S.selTile;const key='tile'+x+','+y+affordSig()+(S.grid[y][x]?1:0)+S.enemies.length%7+'r'+((S.ruins||[]).length);
     if(!force&&key===lastInfoKey)return;lastInfoKey=key;
     let h=`<div class="row"><b>マス（${x}, ${y}）</b><button id="tClose" style="padding:0 6px">×</button></div>`+tileDesc(x,y);
@@ -6801,9 +6842,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     if(full&&!o.queue)h+=`<div class="muted" style="font-size:11px">この施設の部隊は上限です。倒れた兵は、部隊がこの施設のそばで休むと補充されます</div>`;
     h+=`</div></div>`;
   }
-  if(!isS){const pr=prodOf(o);if(pr){const pos=Object.entries(pr).filter(a=>a[1]>0),neg=Object.entries(pr).filter(a=>a[1]<0);
-    h+=`<div class="row"><span class="muted">つくる（1ターン）</span><span class="gd">${pos.map(([k,v])=>`${ic(k,12)}+${Math.round(v)}`).join(' ')||'—'}</span></div>`;
-    if(neg.length)h+=`<div class="row"><span class="muted">使う（1ターン）</span><span class="bd">${neg.map(([k,v])=>`${ic(k,12)}${Math.round(v)}`).join(' ')}</span></div>`;}
+  if(!isS){
     {const g=gunOf(o)||(B[o.type].range?B[o.type]:null);if(g&&o.type!=='hq'){const ak=g.ammoKey||'ammo',per={[ak]:(g.ammoUse||1)*USE_MUL,...(g.ammo2||{})};const rt=g.rate;
       h+=`<div class="row"><span class="muted">弾の消費</span><span>10秒で${Math.round(10/rt)}発　<span class="muted" style="font-size:11px">1分で約${Object.entries(per).map(([k,v])=>`${ic(k,11)}${Math.round(v*60/rt)}`).join(' ')}</span></span></div>`;   /* 小数を出さない */
       if(o.wuse)h+=`<div class="row"><span class="muted">${S.waveActive?'今夜の消費':'前回の夜の消費'}</span><span class="bd">${Object.entries(o.wuse).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;
@@ -6984,7 +7023,7 @@ function renderIntel(){
     if(it.cnt)types=Object.keys(E).filter(k=>it.cnt[k]).map(k=>`<span class="et" title="${E[k].desc}">${eSpr(k,24)}×${it.cnt[k]}</span>`).join('');
     else if(it.types)types=Object.keys(E).filter(k=>it.types.includes(k)).map(k=>`<span class="et" title="${E[k].name}：${E[k].desc}">${eSpr(k,24)}</span>`).join('')+'<span class="muted">（数は不明）</span>';
     else types=`<span>不明</span><span class="muted">（偵察Lv${it.L}）</span>`;
-    h=`<div class="lbl"><span>敵情予測</span><b>第${w.n}襲撃</b></div><span class="imini">規模 <b>${it.total}</b>　あと ${S.turnsLeft} 日${w.blood?'　<span style="color:#ff7a6a">ブラッドムーン</span>':''}</span>${tags(w)}<div class="icell"><small>規模</small><b class="big">${it.total}</b></div><div class="icell"><small>襲撃元</small><span>${it.sides.map(sd=>sideSrc(sd)+campTag(sd)).join('・')}${it.hidden?' <span class="muted">ほか不明</span>':''}</span></div><div class="icell itypes"><small>敵の種類</small><span class="ets">${types}</span></div><div class="icell" title="敵の強さと、推奨に対する今の備えから出した目安"><small>危険度</small>${pipsHTML(dg,5,'danger-pips')}</div><div class="isep"></div><div class="recs">${recMeters(w)}</div>`;
+    h=`<div class="lbl"><span>敵情予測</span><b>第${w.n}襲撃</b></div><span class="imini">規模 <b>${it.total}</b>　あと ${S.turnsLeft} 日${w.blood?'　<span style="color:#ff7a6a">ブラッドムーン</span>':''}</span>${tags(w)}<div class="icell"><small>規模</small><b class="big">${it.total}</b></div><div class="icell"><small>襲撃元</small><span>${it.sides.map(sd=>sideSrc(sd)+campTag(sd)).join('・')}${it.hidden?' <span class="muted">ほか不明</span>':''}</span></div><div class="icell itypes"><small>敵の種類</small><span class="ets">${types}</span></div><div class="icell" title="敵の強さと、推奨に対する今の備えから出した目安"><small>危険度</small>${pipsHTML(dg,5,'danger-pips')}</div>`;   /* 推奨の目安（人口・防衛施設・部隊）は外した：足りない資源の警告に置き換え（2026-11-15） */
     const det=[];
     if(w.blood)det.push('<span style="color:#ff7a6a">赤い月が昇る……魔物が強く、レッドキャップが現れる</span>');
     if(it.tactic)det.push(`<span style="color:var(--amber)">戦術：${it.tactic}</span>`);
@@ -6993,8 +7032,8 @@ function renderIntel(){
     det.push(`<span class="muted">偵察Lv${it.L}${it.L<3?'（研究「斥候」で精度向上）':''}</span>`);
     if(S.camps&&S.camps.length){const st=S.camps.map(c=>`${campName(c)}：${c.state==='gone'?'壊滅':c.found?'発見済み':'未発見'}`).join('　');
       det.push(`<span><b style="color:var(--amber)">駐留地</b>　${st}<br><span class="muted">魔物は駐留地で夜を待っています。${lvl('scout')<1?'研究「斥候」で地図に場所の目安が出ます。':'地図の赤い点線の円が目安。'}斥候で見つけて昼に部隊で叩くと、倒した分だけ次の襲撃が減ります</span></span>`);}
-    {const r=recOf(w),c=curDev(),sh=[['人口',c.pop,r.pop],['防衛施設',c.def,r.def],['部隊',c.sq,r.sq]].filter(x=>x[1]<x[2]);
-     h+=`<div class="imob"><div class="iml"><small>敵情予測</small><b>${it.total}・${it.sides.map(sd=>{const m=sideName(sd).match(/（(.+?)）/);return (m?m[1]:SIDE_NAME[sd]||'')+' '+(S.hives&&S.hives[sd]?S.hives[sd].s:'');}).join('・')}</b></div>${pipsHTML(dg,5,'danger-pips')}<span class="mrec">${sh.map(x=>`<span class="rtg">${x[0]} ${x[1]}/${x[2]}</span>`).join('')}</span></div>`;}
+    {/* 推奨の目安は外した（2026-11-15）：足りない資源の警告に置き換え */
+     h+=`<div class="imob"><div class="iml"><small>敵情予測</small><b>${it.total}・${it.sides.map(sd=>{const m=sideName(sd).match(/（(.+?)）/);return (m?m[1]:SIDE_NAME[sd]||'')+' '+(S.hives&&S.hives[sd]?S.hives[sd].s:'');}).join('・')}</b></div>${pipsHTML(dg,5,'danger-pips')}</div>`;}
     h+=`<button id="intelTg" class="ghost">${S.intelOpen?'▴ たたむ':'▾ 詳しく'}</button>`;
     if(S.intelOpen)h+=`<div class="idet">${det.join('')}</div>`;
     el.classList.toggle('hot',dg>=4);
@@ -7303,7 +7342,7 @@ function tlSnap(tag){if(!S||S.mode!=='campaign'||S.review)return;S.tl=S.tl||[];S
   const g={};for(const [n] of TL_GROUPS)g[n]=0;for(const b of S.blds){if(b.bt>0&&!b.upg)continue;g[tlGroup(b.type)]++;}g['罠']=(S.mines||[]).length;
   const e=econ(),R=o=>{const r={};for(const k in o)r[k]=Math.round((o[k]||0)*10)/10;return r;},res={};for(const k of TL_RES)res[k]=Math.round(S[k]||0);
   S.tl.push({d:S.turn,w:S.wave,tag,n:S.blds.filter(b=>!(b.bt>0&&!b.upg)).length,g,pop:popTotal(),res,gross:R(e.gross||{}),net:R(e.net||{}),bl:S.baseLv||1,tech:TECH.filter(t=>has(t.id)).length});}
-function recordWave(ws,ok){if(S&&!S.gid)S.gid=Date.now();try{tlSnap(ok?'襲撃のあと':'陥落');}catch(e){}S.hist=S.hist||[];ws=ws||S.waveStart||{};S.hist.push({n:S.wave,day:S.turn,blood:!!(S.cur&&S.cur.blood),kills:S.waveKills,bld:S.bldLost-(ws.bld||0),kia:S.kia-(ws.kia||0),mat:S.mat-(ws.mat||0),heroes:S.fallen.length-(ws.fallen||0),ok,pop:popTotal(),tech:TECH.filter(t=>has(t.id)).length});}
+function recordWave(ws,ok){if(S&&!S.gid)S.gid=Date.now();if(ok)try{const k='nd_best_'+(S.mapId||CUR_MAP);if((+localStorage.getItem(k)||0)<S.wave)localStorage.setItem(k,S.wave);}catch(e){}try{tlSnap(ok?'襲撃のあと':'陥落');}catch(e){}S.hist=S.hist||[];ws=ws||S.waveStart||{};S.hist.push({n:S.wave,day:S.turn,blood:!!(S.cur&&S.cur.blood),kills:S.waveKills,bld:S.bldLost-(ws.bld||0),kia:S.kia-(ws.kia||0),mat:S.mat-(ws.mat||0),heroes:S.fallen.length-(ws.fallen||0),ok,pop:popTotal(),tech:TECH.filter(t=>has(t.id)).length});}
 // 大きな損害を受けた翌朝の立て直し：避難民がすぐ来て、王都の援助は2ターン後に届く
 function reliefAfter(ws){const lb=S.bldLost-(ws.bld||0),lk=S.kia-(ws.kia||0),sev=lb*2+lk;if(sev<20)return '';
   const ref=Math.min(40,Math.round(10+sev*0.4));S.pop+=ref;log(`近くの村から避難民 ${ref}人が逃げ込んできた`,'good');
@@ -7445,6 +7484,7 @@ function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.a
 function confirmNew(){return true;}
 function showIntro(){
   /* ステージ（2026-11-13）：いま遊べるのはチュートリアルと草原だけ。ほかは Coming Soon で入れない */
+  const stageBest=id=>{try{return Math.min(10,+localStorage.getItem('nd_best_'+id)||0);}catch(e){return 0;}};   /* ステージ2の解放：ステージ1で第10襲撃をしのぐ（2026-11-15 決定。ステージ2はまだ準備中） */
   const MAPL=[['t','ステージ0　廃村エルム','チュートリアル','#8ad08a','入門','焼け落ちた村の跡。壊れた柵やバリスタが残っていて、半額ですぐに建て直せる。初心者タスクに沿って準備し、<b>6回の襲撃</b>を守り抜く。魔物は少なめ'],
     ['f','ステージ1　グレイヴェル平原','草原','#e8c070','ふつう','森と岩場に囲まれた草原の辺境の街。北のアビスから始まり、やがて3方向から魔物が押し寄せる。20回目にゴブリンキング、最後の夜には森の化け物「蠢く木陰」が現れる。<b>40回の襲撃</b>'],
     ['swamp','ステージ2','沼地','#7a9a6a','Coming Soon',''],
@@ -7457,7 +7497,7 @@ function showIntro(){
   <div id="inTasks" class="tskRow"><span><b>初心者タスク</b><small>生産・防衛の目標と、やり方のヒントをマップに表示します（どのステージでも使えます）</small></span><span class="tskSw"><button data-tsk="1">ON</button><button data-tsk="0">OFF</button></span></div>
   <div style="display:flex;flex-direction:column;gap:8px;margin:4px 0 6px">`+MAPL.map(([id,nm,sub,col,diff,desc])=>diff==='Coming Soon'?`<button disabled style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px;opacity:.55;cursor:default">
     <span style="position:relative;width:144px;height:84px;flex-shrink:0;border:1px solid var(--line);background:#14161a;display:flex;align-items:center;justify-content:center">${soonImg(id)?`<img src="${soonImg(id)}" width="144" height="84" style="image-rendering:pixelated;position:absolute;inset:0;filter:grayscale(1) brightness(.45)" alt="">`:''}<b style="position:relative;color:#e8dcc0;font-size:13px;letter-spacing:1px">COMING SOON</b></span>
-    <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">Coming Soon</small><br><small style="color:var(--dim)">準備中です</small></span></button>`:`<button data-map="${id}" style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px">
+    <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">Coming Soon</small><br><small style="color:var(--dim)">準備中です${id==='swamp'?`<br>解放の条件：ステージ1で第10襲撃をしのぐ（いま ${stageBest('f')}／10）`:''}</small></span></button>`:`<button data-map="${id}" style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px">
     <img src="${mapIcon(id)}" width="144" height="84" style="image-rendering:pixelated;border:1px solid var(--line);flex-shrink:0" alt="">
     <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">${diff}</small><br><small style="color:var(--dim);line-height:1.6">${desc}</small></span></button>`).join('')+`</div>`,true);
   const go=(mid)=>{closeOverlay();withLoading('マップを作っています…',()=>{CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');renderAll();resizeView();});};
