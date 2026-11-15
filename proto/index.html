@@ -3865,7 +3865,8 @@ function makeCamps(){
 }
 function campSync(){if(S.waveActive||S.mode!=='campaign')return;if(S.campWave!==S.wave+1||!S.camps)makeCamps();
   if(!S.campHint&&S.wave>=1&&S.camps&&S.camps.length&&!S.overlay){S.campHint=true;
-    toast('次の襲撃の魔物が、街とアビスのあいだの「駐留地」に集まっています。研究「斥候」で場所の目安が分かり、昼に部隊で叩くと次の襲撃が減ります','warn',9000);
+    const how=S.siegeMode===false?'（駐屯地襲撃モードが OFF なので攻め込めません）':S.siegeMode?'昼に部隊を近づけると夜襲をかけられ、倒した分だけ次の襲撃が減ります':'昼に部隊で叩くと次の襲撃が減ります';
+    toast('次の襲撃の魔物が、街とアビスのあいだの「駐留地」に集まっています。研究「斥候」で場所の目安が分かります。'+how,'warn',9000);
     log('【駐留地】次の襲撃の魔物は、街とアビスのあいだの駐留地で待っている。研究「斥候」で場所の目安、斥候で正確な場所が分かる。昼に部隊で攻め込むと、倒した分だけ次の襲撃の敵が減る','warn');}}
 function campName(c){return `${sideShort(c.side)}駐留地`;}
 function campTag(sd){const c=S.camps&&S.camps.find(x=>x.side===sd);if(!c||S.waveActive)return '';
@@ -7392,13 +7393,17 @@ function saveMark(ok){let el=document.getElementById('saveMark');if(!el){el=docu
   clearTimeout(el._t1);clearTimeout(el._t2);el.className='on busy';el.innerHTML=`${ui('disk','amber',24)}<span>セーブしています…</span>`;
   el._t1=setTimeout(()=>{el.className='on'+(ok?'':' ng');el.innerHTML=`${ui('disk',ok?'green':'red',24)}<span>${ok?'セーブしました':'セーブできませんでした'}</span>`;
     el._t2=setTimeout(()=>{el.className='';},1600);},500);}
-function saveGame(quiet){if(!canSave())return false;try{const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}
+// セーブを小さく：鉱脈・油田の true/false の升目を「同じ値の続く長さ」で詰める（1つ約320KB → 数KB。2026-11-15）
+function packG(g){if(!Array.isArray(g)||!Array.isArray(g[0]))return g;const w=g[0].length,R=[];let cur=!!g[0][0],n=0;for(const row of g)for(const v of row){if(!!v===cur)n++;else{R.push(n);cur=!cur;n=1;}}R.push(n);return {pk:1,w,h:g.length,f:g[0][0]?1:0,r:R.join(',')};}
+function unpackG(o){if(!o||!o.pk)return o;const R=o.r.split(',').map(Number),out=[];let cur=!!o.f,row=[];for(const n of R){for(let i=0;i<n;i++){row.push(cur);if(row.length===o.w){out.push(row);row=[];}}cur=!cur;}return out;}
+function packSave(o){for(const k of ['ore','oil'])if(o[k])o[k]=packG(o[k]);return o;}
+function saveGame(quiet){if(!canSave())return false;try{const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}packSave(o);
   o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:MAPS[CUR_MAP]?MAPS[CUR_MAP].name:''};
   localStorage.setItem(SAVE_KEY,JSON.stringify({meta,S:o}));saveMark(true);return true;}catch(e){saveMark(false);if(!quiet)toast('セーブできませんでした（ブラウザの保存領域）','bad');return false;}}
 function saveInfo(){try{const r=localStorage.getItem(SAVE_KEY);if(!r)return null;return JSON.parse(r).meta;}catch(e){return null;}}
 function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catch(e){return false;}if(!d||!d.S)return false;
   const m=d.meta;CUR_MAP=m.map;BLOOD_MODE=!!m.blood;setDims('campaign');upDims();squadNo=m.squadNo||1;tankNo=m.tankNo||1;
-  S=d.S;S.flow=new Map();
+  S=d.S;S.flow=new Map();for(const k of ['ore','oil'])if(S[k]&&S[k].pk)S[k]=unpackG(S[k]);
   // 前のセッションの時刻（performance.now 基準）は持ち越さない：発射アニメなどのコマ番号が狂って描画が止まるため
   for(const b of S.blds){delete b.fireT;}for(const q of S.squads||[]){delete q.atkT;}S.vfx=[];
   if(S.skirm||!S.waveActive){S.skirm=null;if(!S.waveActive)S.enemies=[];if(S.camps)for(const c of S.camps)if(c.state==='fight')c.state='idle';}for(const k in AF)delete AF[k];S.grid=Array.from({length:ROWS},()=>new Array(COLS).fill(null));
@@ -7416,11 +7421,11 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   for(const b of S.blds||[])if((b.type==='tower'||b.type==='magetower')&&b.gar){const q=S.squads.find(x=>x.id===b.gar);b.gar=null;if(q){q.gar=null;q.x=bcx(b);q.y=bcy(b)+0.9*TU;}}   /* 櫓・塔は人員で撃つようになった（2026-11-12） */
   return true;}
 // ===== 襲撃のあとの区切り（2026-11-15）：負けたら「第N襲撃のあと」からやり直せる。ゲームごとの番号 gid で、別のゲームの区切りは使わない =====
-function saveCkpt(){if(!S||S.mode!=='campaign')return;S.gid=S.gid||Date.now();const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}
+function saveCkpt(){if(!S||S.mode!=='campaign')return;S.gid=S.gid||Date.now();const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}packSave(o);
   o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'',gid:S.gid,ck:true};
   try{localStorage.setItem(SAVE_KEY+'_ck',JSON.stringify({meta,S:o}));}catch(e){}}
 function ckptInfo(){try{const d=JSON.parse(localStorage.getItem(SAVE_KEY+'_ck'));if(!d||!d.meta)return null;if(S&&S.gid&&d.meta.gid!==S.gid)return null;return d.meta;}catch(e){return null;}}
-function loadCkpt(){const r=localStorage.getItem(SAVE_KEY+'_ck');if(!r)return false;try{localStorage.setItem(SAVE_KEY,r);}catch(e){return false;}closeOverlay();const ok=loadGame();
+function loadCkpt(){const r=localStorage.getItem(SAVE_KEY+'_ck');if(!r)return false;try{localStorage.setItem(SAVE_KEY,r);}catch(e){return false;}closeOverlay();const ok=loadGame();if(ok&&S.wave>=1)S.campHint=true;   /* やり直しで駐留地の案内をもう一度出さない */
   if(ok){const m=JSON.parse(r).meta;log(`第${m.wave}襲撃のあと（${m.turn}日目）からやり直します`,'good');toast(`第${m.wave}襲撃のあと（${m.turn}日目）からやり直します。次の襲撃に備えましょう`,'good',6000);}return ok;}
 function dryNote(k){if(!S.cur)return;const d=S.cur.dry=S.cur.dry||{};d[k]=(d[k]||0)+1;}
 // 負けた理由の手がかり：その襲撃で起きたことだけを並べる（推測で決めつけない）
@@ -7456,7 +7461,7 @@ function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn()
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
  ['1.5','2026-11-15',['<b>街の記録</b>：「記録」ボタンで、襲撃ごとの結果と、施設の数・生産量・資源の移り変わりをグラフで見られる（5回ごとの襲撃の目印つき）。数字をまとめてコピーして表計算ソフトに貼れる','<b>街の成長のタイムラプス</b>：ゲームの終わり（勝っても負けても）や街の記録から、最初の日からの街の移り変わりを早送りで見られる','<b>iPad などタブレット</b>で指で遊びやすく：キーの案内を隠し、ボタンを大きく、範囲選択ボタンを出す。ダブルタップで画面が拡大されないように','不具合の修正：建設する施設を選んでも、上の帯に名前・費用・置き方が出ないことがあった']],
- ['1.4.3','2026-11-15',['<b>矢・武具などの消費を元に戻した</b>（1.4.1 で約1.3倍にしたもの。矢が途中で尽きて守れなくなることがあった）','<b>BGM を 8bit 風に</b>：ホーム・昼・静かな夜・祭り・襲撃の曲を新しく。ブラッドムーンの夜に専用の曲、勝ったとき・負けたときの結果画面に曲。ボスの曲はそのまま','<b>効果音を作り直し</b>：建設（木・石・金属・火・畑）、研究、敵を倒す（ザシュッ）、騎兵の突撃（バシン）、襲撃の知らせ、しのいだとき・勝利・敗北のファンファーレ など']],
+ ['1.4.3','2026-11-15',['<b>矢・武具などの消費を元に戻した</b>（1.4.1 で約130%にしたもの。矢が途中で尽きて守れなくなることがあった）','<b>BGM を 8bit 風に</b>：ホーム・昼・静かな夜・祭り・襲撃の曲を新しく。ブラッドムーンの夜に専用の曲、勝ったとき・負けたときの結果画面に曲。ボスの曲はそのまま','<b>効果音を作り直し</b>：建設（木・石・金属・火・畑）、研究、敵を倒す（ザシュッ）、騎兵の突撃（バシン）、襲撃の知らせ、しのいだとき・勝利・敗北のファンファーレ など']],
  ['1.4.2','2026-11-14',['<b>罠もドラッグで一列にまとめて置ける</b>ように（壁と同じ操作）','<b>取り消し</b>：さっき置いたもの（一列ぶん）を全額返して戻せる。帯の「取り消し」か Ctrl+Z。その日のうちなら何回でも','罠を押すと「撤去」できるように（費用の半分が戻る）','改築中の残りターンを建物の枠の中に出して、密集した街でも重ならないように']],
  ['1.4.1','2026-11-14',['<b>軽量化</b>：夜の描画を大幅に軽く（敵の多い襲撃で約3倍軽く）','敵の地上部隊が10〜20体の群れでまとまって押し寄せるように（数は同じ）。範囲攻撃は爆心から離れるほど弱く（端で40%）','部隊の補給・補充・手当てを前哨砦・城館でも受けられるように（いちばん近いところへ行く）','矢・武具などの消費を少し増やした。石炭と関係のない研究には石炭を使わない','改築中・城の強化中がマップで分かるように（残りターンと進み具合）','研究画面：改築の研究を各ランクのいちばん上に','祭りの費用を人口に合わせた','盾持ちオーガなど、敵の向きが左右にパタパタ変わる不具合を修正']],
  ['1.4','2026-11-13',['<b>駐屯地襲撃モード β</b>：ステージ選択で ON にすると、見つけた駐留地へ攻め込むとき、別の戦場で夜襲をかけて戦う。手持ちの部隊で戦い、倒した魔物の分だけ次の襲撃が減る（部隊の損耗も残る）','ステージ1の名前を<b>グレイヴェル平原</b>に','<b>モンスター図鑑</b>をタイトルへ。セーブをまたいで記録が残る。立ち絵が少し動くように','<b>アップデート情報</b>をゲームの中で見られるように','上の資源の表示：新しい資材が増えても入りきるように詰めて表示。石炭・合金のアイコンを見やすく','襲撃の曲を40回の襲撃に合わせて、ランクが上がるごとに盛り上がるように']],
