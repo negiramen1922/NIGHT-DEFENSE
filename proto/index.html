@@ -4955,16 +4955,16 @@ function destroyB(b){
   if(S.sel===b)S.sel=null;
   if(b.type==='hq'){S.over=true;showEnd(false);}
 }
-// 部隊ごとの補給（矢筒・武具の消耗・エーテル・竜の餌）。2026-11-14 消費を約1.3倍に
-const USE_MUL=1.3;   // 防衛施設の弾・矢の消費倍率（2026-11-14）
+// 部隊ごとの補給（矢筒・武具の消耗・エーテル・竜の餌）。2026-11-14 に消費を約1.3倍にしたが、2026-11-15 ユーザーの希望で元に戻した
+const USE_MUL=1;   // 防衛施設の弾・矢の消費倍率（2026-11-14 に 1.3 → 2026-11-15 に 1 へ戻した）
 const SUP={
-  inf:{key:'sword',max:60,per:0.065,name:'武具',melee:true,desc:'攻撃するたびに武具が傷む。尽きると火力半減（刃こぼれ）'},
-  cav:{key:'sword',max:60,per:0.08,name:'武具',melee:true,desc:'攻撃するたびに武具が傷む。尽きると火力半減'},
-  arch:{key:'ammo',get max(){return has('bigquiver')?100:60;},per:0.33,name:'矢筒',desc:'1斉射ごとに矢を使う。尽きると撃てない'},
-  mage:{key:'elec',max:30,get per(){return has('highmagic')?0.27:0.39;},name:'魔力',desc:'魔法1回ごとにエーテルを使う。尽きると撃てない'},
+  inf:{key:'sword',max:60,per:0.05,name:'武具',melee:true,desc:'攻撃するたびに武具が傷む。尽きると火力半減（刃こぼれ）'},
+  cav:{key:'sword',max:60,per:0.06,name:'武具',melee:true,desc:'攻撃するたびに武具が傷む。尽きると火力半減'},
+  arch:{key:'ammo',get max(){return has('bigquiver')?100:60;},per:0.25,name:'矢筒',desc:'1斉射ごとに矢を使う。尽きると撃てない'},
+  mage:{key:'elec',max:30,get per(){return has('highmagic')?0.21:0.3;},name:'魔力',desc:'魔法1回ごとにエーテルを使う。尽きると撃てない'},
   art:{key:'powder',costs:{iron:1,powder:1},max:16,per:1,name:'砲弾',desc:'1発ごとに砲弾1発（鉄1・火薬1）を使う。尽きると撃てない'},
-  guard:{key:'sword',max:60,per:0.065,name:'武具',melee:true,desc:'攻撃するたびに武具が傷む。尽きると火力半減'},
-  drake:{key:'fuel',max:40,per:0.8,name:'竜の餌',melee:true,desc:'攻撃するたびに竜が消耗する。尽きると火力半減'},
+  guard:{key:'sword',max:60,per:0.05,name:'武具',melee:true,desc:'攻撃するたびに武具が傷む。尽きると火力半減'},
+  drake:{key:'fuel',max:40,per:0.6,name:'竜の餌',melee:true,desc:'攻撃するたびに竜が消耗する。尽きると火力半減'},
 };
 // 冒険者も補給が必要：剣士→武具、狩人→矢筒、魔導士→魔力（エーテル）
 const ADV_SUP={advSword:'inf',advBow:'arch',advMage:'mage'};
