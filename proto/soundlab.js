@@ -22,10 +22,10 @@ const SE_LIST=[
  ]],
  ['建設・研究',[
   ['build','建設（ほか）','下の素材別の音がない施設を置いたとき',{demo:'build_other'}],
-  ['b_wood','建設：木','柵・門・物見櫓・伐採所・兵舎・前哨砦・酒場・市場・トゲ床など',{demo:'b_wood'}],
-  ['b_stone','建設：石','教会・石の壁・城壁・石切り場・鉱山・落とし穴など',{demo:'b_stone'}],
-  ['b_metal','建設：金属','バリスタ・大砲・投石機・迫撃砲・工房など',{demo:'b_metal'}],
-  ['b_fire','建設：火','篝火・火薬工房・精製炉',{demo:'b_fire'}],
+  ['b_wood','建設：木（コッコッコッ）','柵・門・物見櫓・伐採所・兵舎・前哨砦・酒場・市場・トゲ床など',{demo:'b_wood'}],
+  ['b_stone','建設：石（ガッガッガッ）','教会・石の壁・城壁・石切り場・落とし穴など',{demo:'b_stone'}],
+  ['b_metal','建設：金属・鉱山（カンカンカン）','バリスタ・大砲・投石機・迫撃砲・工房・鉱山（鉄・石炭・金・聖銀）・製錬所',{demo:'b_metal'}],
+  ['b_fire','建設：火（ボッ＋パチパチ）','篝火・火薬工房・精製炉',{demo:'b_fire'}],
   ['b_farm','建設：畑','農場',{demo:'b_farm'}],
   ['b_water','建設：水','漁場',{demo:'b_water'}],
   ['b_magic','建設：魔法／英雄の技','研究室・魔法施設・メイジの塔を置いたとき。英雄が技を使ったときも',{demo:'b_magic'}],
@@ -207,6 +207,14 @@ const BGM=[
   {id:'c_bat_c',n:'8bit C：重い行軍',d:'Cマイナー・どっしり。刻む和音と太鼓',t:mkTrack({bpm:140,prog:['Cm','Cm','Ab','Bb','Cm','Cm','Fm','G'],bass:'gallop',arp:'stab',drums:DR.march,lstep:2,lw:0.5,lv:0.045,av:0.02,
     lead:'C5 - - - G4 - - - C5 - Eb5 - D5 - C5 - Bb4 - - - - - - - . . . . . . . . Ab4 - - - C5 - Eb5 - Bb4 - - - D5 - F5 - C5 - - - G4 - - - C5 - Eb5 - G5 - F5 - Eb5 - D5 - Ab5 - - - G5 - - - - - - - B4 - - - D5 - - -'})},
  ]},
+ {scene:'blood',base:'battle',n:'ブラッドムーンの夜',orig:'今の曲（通常の襲撃と同じ曲）',origTrack:'battle',origIt:2,list:[
+  {id:'c_blood_a',n:'8bit A：紅い月',d:'Dマイナー・不穏。半音上の和音がぶつかる。跳ねるベース',t:mkTrack({bpm:152,prog:['Dm','Eb','Dm','C','Bb','A','Eb','A'],bass:'gallop',arp:'stab',drums:DR.rock,lstep:2,lw:0.5,lv:0.05,av:0.02,
+    lead:'D5 - - - Eb5 - D5 - A4 - - - - - - - Bb4 - A4 - G4 - A4 - Eb5 - - - D5 - - - F5 - E5 - D5 - C5 - Bb4 - - - A4 - - - G4 - Bb4 - Eb5 - D5 - C#5 - - - - - E5 - - -'})},
+  {id:'c_blood_b',n:'8bit B：狂乱',d:'Cマイナー・とても速い。16分のベースと細かい分散和音',t:mkTrack({bpm:184,prog:['Cm','Cm','Db','Cm','Ab','G','Db','G'],bass:'16',arp:'16',drums:DR.fast,lstep:2,lw:0.25,lv:0.045,av:0.012,
+    lead:'C5 - Eb5 - G5 - F#5 - G5 - - - Eb5 - C5 - Db5 - - - F5 - Ab5 - G5 - - - - - - - Ab4 - C5 - Eb5 - D5 - Eb5 - Ab5 - G5 - F5 - Db5 - - - F5 - - - G5 - B4 - D5 - F5 -'})},
+  {id:'c_blood_c',n:'8bit C：血の儀式',d:'Aマイナー・遅く重い。低い太鼓と、こだまする細い旋律',t:mkTrack({bpm:100,prog:['Am','Bb','Am','E','Am','Bb','F','E'],bass:'half',arp:'pad',drums:DR.boss,lstep:2,lw:0.125,lv:0.045,echo:true,
+    lead:'A4 - - - - - Bb4 - A4 - - - - - - - E5 - - - D5 - C5 - Bb4 - - - A4 - - - G#4 - - - - - - - - - A4 - - - C5 - Bb4 - A4 - G4 - F4 - - - E4 - - - - - - - G#4 - - -'})},
+ ]},
  {scene:'boss',n:'ボス襲来',orig:'今の曲（重い金管とティンパニ）',list:[
   {id:'c_boss_a',n:'8bit A：魔王の影',d:'Cマイナー・重い。半音で下がる不気味な進行',t:mkTrack({bpm:124,prog:['Cm','B','Bb','A','Ab','G','Ab','G'],bass:'8',arp:'stab',drums:DR.boss,lstep:2,lw:0.5,lv:0.05,av:0.02,
     lead:'C5 - - - - - Eb5 - D5 - - - - - B4 - Bb4 - - - - - D5 - C#5 - - - A4 - - - Ab4 - - - C5 - Eb5 - G5 - - - F#5 - - - Eb5 - - - F5 - Ab5 - G5 - - - - - - -'})},
@@ -221,15 +229,16 @@ const BGM=[
  ]},
 ];
 for(const g of BGM)for(const x of g.list)TRACK[x.id]=x.t;   // ゲームの曲表に足す（auSched が鳴らす）
-const CHIP_SCENE={};for(const g of BGM)for(const x of g.list)CHIP_SCENE[x.id]=g.scene;
+const CHIP_SCENE={},CHIP_PICK={};for(const g of BGM)for(const x of g.list){CHIP_SCENE[x.id]=g.base||g.scene;CHIP_PICK[x.id]=g.scene;}
 // 場面の曲を、選んだ 8bit の曲に差し替える（試作版のゲームでも効く）。ラボで聴いている間はその曲を固定
 let LAB_PLAY=null;   // null＝ふつう／'stop'＝止める／曲の名前＝その曲
 function hookMusic(){if(window.__labMusicHooked||typeof auMusicFor!=='function')return;window.__labMusicHooked=true;const orig=auMusicFor;
   window.auMusicFor=auMusicFor=function(){if(typeof AU==='undefined'||!AU.ctx)return orig.apply(this,arguments);
     if(LAB_PLAY){const want=LAB_PLAY==='stop'?null:LAB_PLAY.track;AU.intensity=LAB_PLAY.it||0;if(AU.track!==want){AU.track=want;AU.step=0;AU.nextT=AU.ctx.currentTime+0.15;}return;}
     const cur=AU.track;if(cur&&CHIP_SCENE[cur])AU.track=CHIP_SCENE[cur];   // いったん場面の名前に戻してから元の処理
-    const r=orig.apply(this,arguments);const sc=AU.track,pk=PICK[sc];
-    if(pk&&TRACK[pk]&&CHIP_SCENE[pk]===sc){AU.track=pk;if(cur!==pk&&CHIP_SCENE[cur]!==sc){AU.step=0;}}
+    const r=orig.apply(this,arguments);const sc=AU.track;
+    const ps=(sc==='battle'&&S&&S.cur&&S.cur.blood&&PICK.blood)?'blood':sc,pk=PICK[ps];   /* ブラッドムーンの夜は「ブラッドムーン」で選んだ曲 */
+    if(pk&&TRACK[pk]&&CHIP_PICK[pk]===ps){AU.track=pk;if(cur!==pk&&CHIP_SCENE[cur]!==sc){AU.step=0;}}
     return r;};}
 hookMusic();
 function playBgm(track,it){try{auInit();}catch(e){}LAB_PLAY={track,it:it||0};try{auMusicFor();}catch(e){}renderLab();}
@@ -272,7 +281,7 @@ function renderLab(){const r=document.getElementById('ndLab');if(!r)return;const
     const cur=LAB_PLAY&&LAB_PLAY.track;
     for(const g of BGM){h+=`<div class="grp scene">${g.n}</div>`;
       const origPick=!PICK[g.scene];
-      h+=`<div class="it"><div class="ir"><b class="${cur===g.scene?'now':''}">${cur===g.scene?'♪ ':''}今の曲</b><span class="sp"></span><button data-play="${g.scene}" data-it="${g.scene==='battle'?1:0}">▶ 聴く</button><button class="pick ${origPick?'on':''}" data-pick="${g.scene}" data-id="">${origPick?'★ 使用中':'★ これにする'}</button></div><div class="ds">${g.orig}</div>${memoBox('bgm:'+g.scene)}</div>`;
+      h+=`<div class="it"><div class="ir"><b class="${cur===(g.origTrack||g.scene)?'now':''}">${cur===(g.origTrack||g.scene)?'♪ ':''}今の曲</b><span class="sp"></span><button data-play="${g.origTrack||g.scene}" data-it="${g.origIt!=null?g.origIt:g.scene==='battle'?1:0}">▶ 聴く</button><button class="pick ${origPick?'on':''}" data-pick="${g.scene}" data-id="">${origPick?'★ 使用中':'★ これにする'}</button></div><div class="ds">${g.orig}</div>${memoBox('bgm:'+g.scene)}</div>`;
       for(const x of g.list){const pk=PICK[g.scene]===x.id;h+=`<div class="it"><div class="ir"><b class="${cur===x.id?'now':''}">${cur===x.id?'♪ ':''}${x.n}</b><span class="sp"></span><button data-play="${x.id}">▶ 聴く</button><button class="pick ${pk?'on':''}" data-pick="${g.scene}" data-id="${x.id}">${pk?'★ 使用中':'★ これにする'}</button></div><div class="ds">${x.d}（${x.t.bpm} BPM）</div>${memoBox('bgm:'+x.id)}</div>`;}}
   }else{
     h+=`<div class="ds">効果音・BGM に書いたメモと、選んだ BGM をまとめたものです。「コピー」してチャットに貼り付けてください。</div><textarea id="labAll" style="min-height:260px" readonly>${esc(allMemoText())}</textarea>
