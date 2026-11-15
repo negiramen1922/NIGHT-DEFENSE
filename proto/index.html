@@ -7656,10 +7656,12 @@ function lineChart(series,xs,o){o=o||{};const W=680,H=o.h||220,L=46,R=10,T=10,Bt
   const X=k=>L+(W-L-R)*k/(n-1),Y=v=>T+(H-T-Bt)*(1-v/top);let g='';
   for(let k=0;k<=4;k++){const v=top*k/4,y=Y(v);g+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="rgba(255,255,255,.08)"/><text x="${L-4}" y="${y+4}" text-anchor="end" font-size="10" fill="#9aa79a">${Math.round(v)}</text>`;}
   const step=Math.max(1,Math.ceil(n/10));for(let k=0;k<n;k+=step)g+=`<text x="${X(k)}" y="${H-8}" text-anchor="middle" font-size="10" fill="#9aa79a">${xs[k]}</text>`;
+  for(const m of (o.marks||[])){const x=X(m.k);g+=`<line x1="${x}" y1="${T}" x2="${x}" y2="${H-Bt}" stroke="rgba(242,179,61,.35)" stroke-dasharray="3,3"/><text x="${x>W-R-34?x-2:x+2}" y="${T+9}" text-anchor="${x>W-R-34?'end':'start'}" font-size="9" fill="#f2b33d">${m.t}</text>`;}   /* 襲撃の目印（5回ごと） */
   for(const s of series){const pts=s.v.map((v,k)=>X(k).toFixed(1)+','+Y(v||0).toFixed(1)).join(' ');g+=`<polyline points="${pts}" fill="none" stroke="${s.c}" stroke-width="2"/><circle cx="${X(n-1)}" cy="${Y(s.v[n-1]||0)}" r="3" fill="${s.c}"/>`;}
   const leg=series.map(s=>`<span style="white-space:nowrap"><i style="display:inline-block;width:10px;height:10px;background:${s.c};margin-right:3px;vertical-align:-1px"></i>${s.n} <b>${Math.round(s.v[n-1]||0)}</b></span>`).join('　');
   return `<div style="overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:420px;height:auto;display:block">${g}</svg></div><div style="font-size:11.5px;margin:2px 0 10px;line-height:1.8">${leg}</div>`;}
 function tlRows(){return S.tl||[];}
+function tlMarks(){const TL=tlRows(),M=[];TL.forEach((r,k)=>{if((r.tag==='襲撃のあと'||r.tag==='陥落')&&r.w%5===0)M.push({k,t:'第'+r.w});});return M;}
 function histData(){const H=S.hist||[],TL=tlRows();const L=[];
   L.push('【襲撃ごと】\n襲撃\t日\t結果\tブラッドムーン\t撃破\t戦死\t英雄の戦死\t施設損失\t魔核\t人口\t研究数');
   for(const r of H)L.push([r.n,r.day,r.ok?'撃退':'陥落',r.blood?'○':'',r.kills,r.kia,r.heroes||0,r.bld,r.mat,r.pop,r.tech].join('\t'));
@@ -7673,13 +7675,13 @@ function showHist(){const TL=tlRows(),xs=TL.map(r=>r.d+'日');
   if(HIST_TAB==='wave'){h+=`<div class="muted" style="margin:6px 0">襲撃ごとの結果です。</div>${histTable()}`;
     const H=S.hist||[];if(H.length>=2)h+=`<div class="ehist" style="margin-top:10px"><span>撃破と損失の推移</span></div>`+lineChart([{n:'撃破',c:'#6fe08a',v:H.map(r=>r.kills)},{n:'戦死',c:'#e8735c',v:H.map(r=>r.kia)},{n:'施設損失',c:'#f2b33d',v:H.map(r=>r.bld)}],H.map(r=>'第'+r.n));}
   else if(HIST_TAB==='bld'&&TL.length){const last=TL[TL.length-1];
-    h+=`<div class="muted" style="margin:6px 0">種類ごとの施設の数（建設中は数えない）。罠は置いてある数。</div>`+lineChart(TL_GROUPS.map(([n,c])=>({n,c,v:TL.map(r=>r.g[n]||0)})),xs)+lineChart([{n:'施設の合計',c:'#e8e4d8',v:TL.map(r=>r.n)},{n:'人口',c:'#f2b33d',v:TL.map(r=>r.pop)}],xs,{h:170})+lineChart([{n:'城Lv×10',c:'#c48aff',v:TL.map(r=>r.bl*10)},{n:'研究の数',c:'#62c6d9',v:TL.map(r=>r.tech)}],xs,{h:150});
+    h+=`<div class="muted" style="margin:6px 0">種類ごとの施設の数（建設中は数えない）。罠は置いてある数。</div>`+lineChart(TL_GROUPS.map(([n,c])=>({n,c,v:TL.map(r=>r.g[n]||0)})),xs,{marks:tlMarks()})+lineChart([{n:'施設の合計',c:'#e8e4d8',v:TL.map(r=>r.n)},{n:'人口',c:'#f2b33d',v:TL.map(r=>r.pop)}],xs,{h:170,marks:tlMarks()})+lineChart([{n:'城Lv×10',c:'#c48aff',v:TL.map(r=>r.bl*10)},{n:'研究の数',c:'#62c6d9',v:TL.map(r=>r.tech)}],xs,{h:150,marks:tlMarks()});
     const cnt={};for(const b of S.blds){if(b.bt>0&&!b.upg)continue;cnt[b.type]=(cnt[b.type]||0)+1;}h+=`<div class="ehist"><span>いまの施設（多い順）</span></div><div style="display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px">${Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<span>${B[t]?B[t].name:t} <b>${n}</b></span>`).join('')}</div>`;}
   else if(HIST_TAB==='prod'&&TL.length){const ks=['steel','stone','iron','fuel','gold','ammo','sword','elec','powder'].filter(k=>TL.some(r=>(r.gross||{})[k]));
-    h+=`<div class="muted" style="margin:6px 0">1ターンに生産する量（使う分を引く前）。そのターンのはじめの時点の施設と研究で計算。</div>`+lineChart(ks.map(k=>({n:RES_NAME[k]||k,c:RES_COL[k]||'#ccc',v:TL.map(r=>(r.gross||{})[k]||0)})),xs)
-      +`<div class="ehist"><span>差し引き（生産 − 食料・給料・工房などで使う分）</span></div>`+lineChart(ks.map(k=>({n:RES_NAME[k]||k,c:RES_COL[k]||'#ccc',v:TL.map(r=>Math.max(0,(r.net||{})[k]||0))})),xs,{h:180});}
+    h+=`<div class="muted" style="margin:6px 0">1ターンに生産する量（使う分を引く前）。そのターンのはじめの時点の施設と研究で計算。</div>`+lineChart(ks.map(k=>({n:RES_NAME[k]||k,c:RES_COL[k]||'#ccc',v:TL.map(r=>(r.gross||{})[k]||0)})),xs,{marks:tlMarks()})
+      +`<div class="ehist"><span>差し引き（生産 − 食料・給料・工房などで使う分）</span></div>`+lineChart(ks.map(k=>({n:RES_NAME[k]||k,c:RES_COL[k]||'#ccc',v:TL.map(r=>Math.max(0,(r.net||{})[k]||0))})),xs,{h:180,marks:tlMarks()});}
   else if(HIST_TAB==='res'&&TL.length){const ks=TL_RES.filter(k=>TL.some(r=>r.res[k]));
-    h+=`<div class="muted" style="margin:6px 0">ターンのはじめと襲撃のあとの、資源の在庫。</div>`+lineChart(ks.map(k=>({n:RES_NAME[k]||k,c:RES_COL[k]||'#ccc',v:TL.map(r=>r.res[k]||0)})),xs,{h:260});}
+    h+=`<div class="muted" style="margin:6px 0">ターンのはじめと襲撃のあとの、資源の在庫。</div>`+lineChart(ks.map(k=>({n:RES_NAME[k]||k,c:RES_COL[k]||'#ccc',v:TL.map(r=>r.res[k]||0)})),xs,{h:260,marks:tlMarks()});}
   h+=`<textarea id="hsData" readonly style="position:absolute;left:-9999px;top:0;width:10px;height:10px">${histData().replace(/</g,'&lt;')}</textarea>`;
   if(S.over)h+=`<div style="margin-top:12px;display:flex;gap:8px"><button id="hsRestart" class="on">最初から</button></div>`;
   openOverlay('hist',h,true);document.getElementById('ovClose').onclick=closeOverlay;
