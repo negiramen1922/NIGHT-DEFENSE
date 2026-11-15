@@ -66,7 +66,8 @@ function putB(type,gx,gy,free){const p=findSpot(type,gx,gy);if(!p)return null;co
 function foes(type,gx,gy,n,spread){const n0=S.enemies.length;spawnAt(type,(gx+.5)*T,(gy+.5)*T,n,(spread||1.5)*TU);for(const e of S.enemies.slice(n0))e.labDemo=1;return S.enemies.slice(n0);}
 function squad(model,gx,gy){let h=LAB.home;if(!h||!S.blds.includes(h)){h=LAB.home=putB('train',LAB.p.x-6,LAB.p.y-3);}const ut=MTC[model].ut;spawnUnit(h,ut,model);const s=S.squads[S.squads.length-1];s.x=(gx+.5)*T;s.y=(gy+.5)*T;s.ax=s.x;s.ay=s.y;s.tx=null;s.mode='guard';return s;}
 function clearDemo(){const keepH=hqOf();S.blds=S.blds.filter(b=>{if(b===keepH)return true;gridSet(b,false);return false;});S.enemies=[];S.squads=[];S.shots=[];S.fx=[];S.vfx=[];S.mines=[];S.eshots=[];S.beams=[];LAB.objs=[];LAB.home=null;}
-function camTo(x,y,z){cam.z=z||2.2;const vw=VW*(innerWidth>900?0.55:0.5);cam.x=(x+.5)*T-vw/2/cam.z;cam.y=(y+.5)*T-VH/2/cam.z;try{clampCam();}catch(e){}}
+function camTo(x,y,z){if(LAB&&LAB.camSet)return;if(LAB)LAB.camSet=true;   /* 表示位置を合わせるのは最初の1回だけ（押すたびに戻されないように。2026-11-15） */
+  cam.z=z||2.2;const vw=VW*(innerWidth>900?0.55:0.5);cam.x=(x+.5)*T-vw/2/cam.z;cam.y=(y+.5)*T-VH/2/cam.z;try{clampCam();}catch(e){}}
 function typeBySnd(n){return Object.keys(BSND).find(k=>BSND[k]===n&&B[k]&&!B[k].isMine&&!['wall','swall','gate','fence'].includes(k))||Object.keys(BSND).find(k=>BSND[k]===n);}
 const DEMO={   // 敵は施設の南に出す（北の城館へ向かう途中で施設の前を通る）
   mg(){const p=LAB.p;putB('mg',p.x,p.y);foes('swarm',p.x,p.y+7,6,1.2);camTo(p.x,p.y+3);return 'バリスタが撃つ（発射音・倒したときの音）';},
@@ -259,12 +260,11 @@ function allMemoText(){const L=[];const se=Object.keys(MEMO).filter(k=>k.startsW
   const pk=Object.keys(PICK).filter(k=>PICK[k]);if(pk.length){L.push('【選んだBGM】');for(const k of pk){const g=BGM.find(x=>x.scene===k);const it=g&&g.list.find(x=>x.id===PICK[k]);L.push(`・${g?g.n:k}：${it?it.n:'今の曲'}`);}}
   if(ot)L.push('【そのほか】\n'+ot);
   return L.join('\n')||'（まだメモはありません）';}
-function renderLab(){const r=document.getElementById('ndLab');if(!r)return;const on=typeof AU!=='undefined'&&AU.on;const bv=AU.bgmVol,svv=AU.seVol;
+function renderLab(){const r=document.getElementById('ndLab');if(!r)return;const lb0=r.querySelector('.lb'),keepY=lb0?lb0.scrollTop:0,keepTab=r.dataset.tab;const on=typeof AU!=='undefined'&&AU.on;const bv=AU.bgmVol,svv=AU.seVol;
   let h=`<div class="lh"><h2>効果音・BGM ラボ</h2><small style="color:#9aa79a">試作版だけ</small><div class="lt">${[['se','効果音'],['bgm','BGM'],['memo','メモ一覧']].map(([k,n])=>`<button data-tab="${k}" class="${TAB===k?'on':''}">${n}</button>`).join('')}<button id="labX">閉じる</button></div>
-    <div class="vol" style="width:100%">${on?'':'<b style="color:#ff8a7e">消音中</b>'}<label>BGM <input id="labVB" type="range" min="0" max="1" step="0.05" value="${bv}"></label><label>効果音 <input id="labVS" type="range" min="0" max="1" step="0.05" value="${svv}"></label><button id="labMute">${on?'消音にする':'音を出す'}</button>${TAB==='bgm'?'<button id="labStop">曲を止める</button>':''}</div></div><div class="lb">`;
+    <div class="vol" style="width:100%">${on?'':'<b style="color:#ff8a7e">消音中</b>'}<label>BGM <input id="labVB" type="range" min="0" max="1" step="0.05" value="${bv}"></label><label>効果音 <input id="labVS" type="range" min="0" max="1" step="0.05" value="${svv}"></label><button id="labMute">${on?'消音にする':'音を出す'}</button>${TAB==='bgm'?'<button id="labStop">曲を止める</button>':''}</div>${TAB==='se'&&LAB.msg?`<div class="msg" style="width:100%;margin:0">▶ ${esc(LAB.msg)}</div>`:''}</div><div class="lb">`;
   if(TAB==='se'){
     h+=`<div class="ds">「▶ 音」は音だけ、「▶ 演出つき」は左のマップに本物の施設・敵・部隊を出して、実際の演出と一緒に鳴らします（何度押してもやり直せます）。メモは書いたらすぐこの端末に保存されます。</div>`;
-    if(LAB.msg)h+=`<div class="msg">${esc(LAB.msg)}</div>`;
     for(const [g,L] of SE_LIST){h+=`<div class="grp">${g}</div>`;
       for(const [id,n,where,o] of L)h+=`<div class="it"><div class="ir"><b>${n}</b><code>${id}</code><span class="sp"></span><button data-se="${id}">▶ 音</button>${o&&o.demo?`<button data-demo="${o.demo}">▶ 演出つき</button>`:''}</div><div class="ds">${where}</div>${memoBox('se:'+id)}</div>`;}
   }else if(TAB==='bgm'){
@@ -279,6 +279,7 @@ function renderLab(){const r=document.getElementById('ndLab');if(!r)return;const
       <div class="ir" style="margin:6px 0"><button id="labCopy">コピー</button><span id="labCopied" class="ds"></span></div><div class="grp">そのほかのメモ</div>${memoBox('other')}
       <div class="ir" style="margin-top:12px"><button id="labClear" style="border-color:#a04040;color:#ff8a7e">メモを全部消す</button></div>`;}
   h+='</div>';r.innerHTML=h;
+  {const lb=r.querySelector('.lb');if(lb&&keepTab===TAB)lb.scrollTop=keepY;r.dataset.tab=TAB;}   /* 押しても一覧がいちばん上に戻らないように（2026-11-15） */
   r.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;renderLab();});
   r.querySelector('#labX').onclick=closeLab;
   r.querySelector('#labVB').oninput=e=>{try{auSetBgm(+e.target.value);}catch(x){}};r.querySelector('#labVS').oninput=e=>{try{auSetSe(+e.target.value);}catch(x){}};
