@@ -17,6 +17,8 @@
 
 ## 1. 進め方（このプロジェクトでの決まりごと）
 
+- **改良の参考（2026-11-15 ユーザーの指定）**：[kociden/sakurai-skill](https://github.com/kociden/sakurai-skill)（桜井政博氏の YouTube 全257本から作ったゲーム制作の原則の Agent Skill。非公式）。ライセンスの表記がないのでリポジトリには写していない。使うときは `git clone https://github.com/kociden/sakurai-skill.git && cp -r sakurai-skill/skills/sakurai ~/.claude/skills/`。このゲームに当てはめた改善案は `docs/SAKURAI_REVIEW.md`（優先度つき）
+
 - **今の作業の順番（2026-11-12 ユーザーの指定。この順で進める）**
   1. **部隊**のランクⅠ〜Ⅶの成長段階 → 済（`docs/RANKS.md` の「部隊の成長」）
   2. **防衛施設**のランクⅠ〜Ⅶの成長段階と強さ → 済（`docs/RANKS.md`）
