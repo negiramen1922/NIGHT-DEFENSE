@@ -1,6 +1,6 @@
 # 引き継ぎメモ（ナイトディフェンス）
 
-最終更新：2026-11-14　／　公開中：**ver 1.4.3**（本番と試作版は同じ中身。違いは、試作版だけタイトルに単独の攻城戦・音楽室があること）
+最終更新：2026-11-14　／　公開中：**ver 1.5**（本番と試作版は同じ中身。違いは、試作版だけタイトルに単独の攻城戦・音楽室があること）
 
 | | URL |
 |---|---|
@@ -26,6 +26,11 @@
 - **資料**：`docs/RANKS.md`（ランクごとのまとめ・部隊・防衛施設・罠・改築の案）、`docs/ECONOMY.md`（収支表）、`docs/ENEMIES.md`（ステージ×ランクの魔物）、`docs/MONSTERS.md`（魔物の数字）、絵の依頼書 `docs/ART_BRIEF.md`・`ART_BRIEF_UNITS.md`・`ART_BRIEF_DEFENSE.md`・`ART_BRIEF_ENEMIES.md`
 - **ステージの予定**：0 チュートリアル（草原）→ 1 草原（40回）→ 2 沼地（？）→ 3 山脈 → 4 雪原 → 5 荒野
 - **ver 1.3（2026-11-13）**：ステージ選択は「ステージ0 廃村エルム（`t`）」「ステージ1 グレイヴェル平原（`f`・草原・40回。1.3 では「辺境の街グレイヴェル」）」だけ遊べる。沼地・山脈・雪原・荒野は Coming Soon（押せない。`showIntro()` の `MAPL`）。草原の40回の出方（`genWave` の `GL`）・ブラッドムーン・`FINAL_BY_MAP` は `f` と `7` の両方に効く（`7` はテスト用の古いマップ）。本番への入れ方：`proto/index.html` からセーブキー・バージョン・タイトルを戻し、`siege.js` の読み込みを外して `index.html` にする（`tools/mkproto.py` の逆）
+- **ver 1.5（2026-11-15）**
+  - 街の記録：`tlSnap(tag)` をターンのはじめ（`doEndTurn`）と襲撃のあと（`recordWave`）に。`S.tl`（ターンごとの種類別の施設の数 `TL_GROUPS`・人口・在庫 `TL_RES`・生産 `econ().gross`・差し引き・城Lv・研究数）、`S.tlb`（施設の出入りを差分だけ。40回で約110KB）。画面は `showHist()`（タブ：襲撃・施設・生産・資源。`lineChart` は SVG、`tlMarks` で5回ごとの襲撃の目印）。`histData()` は表計算向けのタブ区切り
+  - タイムラプス：`playTimelapse(back)`。`tlFrames` で日ごとの施設を作り直し、`S.blds`・`S.mines`・`S.grid` を一時的に差し替えてメインの画面で描く（`S.overlay='timelapse'`・`body.tlOn`・保存しない・ミニマップなし・Esc）。`stopTimelapse` で元に戻す
+  - タブレット：`tabUI()`（指で操作・幅900超）で `body.tabUI`。キーの案内を隠す（`kbd`・`.key`・`span.help`、ボタンの「[L]」は `stripKeyHints`）・ボタン40px以上・帯に「範囲選択」。`touch-action:manipulation` でダブルタップの拡大を止める
+  - 不具合：`renderMode` の「取り消し」ボタンの行が else-if のつながりを切っていて、建設の帯が上書きされていた（1.4.2〜1.4.3）。帯のボタンは縮めない（`white-space:nowrap`）
 - **ver 1.4.3（2026-11-15）**
   - 消費を元に戻した：`SUP` の `per` と `USE_MUL`=1（1.4.1 の約1.3倍で、第6襲撃あたり矢が尽きて負けるとテストプレイヤーから。矢260本の試験で 1.4.2 は5/5で陥落、戻すと0/5）
   - BGM：`CHIP`（8bit の音源）と `TRACK.home/prep/night/fest/battle/blood` をラボで選んだ曲に。前の曲は `TRACK.o_<場面>`。ブラッドムーンの夜は場面 `blood`、結果画面は `res_win`/`res_lose`（効果音が鳴り終わってから流れる）。ボスは前の曲

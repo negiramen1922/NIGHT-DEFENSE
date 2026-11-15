@@ -1504,6 +1504,21 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .dxi.big .dxcv{width:300px;height:120px;image-rendering:pixelated;display:block}
 @media (max-width:900px){.dxi.big{width:100%;max-width:300px;height:auto}}
 .kcnext{display:flex;gap:8px;align-items:center;margin:4px 0}.kcnext img{width:32px;height:32px;image-rendering:pixelated;background:#0003;border-radius:4px}
+/* タイムラプス（2026-11-15） */
+body.tlOn #topbar,body.tlOn #intel,body.tlOn #controls,body.tlOn #right,body.tlOn #modeBar,body.tlOn #viewSeg,body.tlOn #guide,body.tlOn #toasts,body.tlOn #reviewBar,body.tlOn .logbox,body.tlOn #pauseMsg,body.tlOn #bpad,body.tlOn #saveMark{display:none!important}
+#tlHud{position:fixed;left:0;right:0;bottom:0;z-index:9500;background:rgba(10,12,10,.88);border-top:2px solid var(--amber,#f2b33d);padding:8px max(12px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-right));color:#e8e4d8;font-size:13px}
+#tlHud .tlTop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}#tlHud .tlTop b{color:#f2b33d;font-size:15px}#tlHud .sp{flex:1}#tlHud input{width:100%;margin:6px 0}
+#tlHud .tlInfo{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px}#tlHud .tlInfo i{display:inline-block;width:9px;height:9px;margin-right:4px;vertical-align:-1px}
+/* ダブルタップで拡大しない（2本指の拡大縮小はゲームの地図の操作として使える）2026-11-15 */
+html,body{touch-action:manipulation}
+/* タブレット（iPad など）：PC 用の配置のまま指で使いやすく 2026-11-15 */
+body.tabUI kbd,body.tabUI .bt .key,body.tabUI span.help{display:none!important}
+body.tabUI button{min-height:40px!important}
+body.tabUI #controls button,body.tabUI #modeBar button{min-height:44px;padding-left:14px;padding-right:14px}
+body.tabUI #viewSeg button{min-height:40px;padding-left:12px;padding-right:12px}
+body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font-size:14px}
+/* 帯のボタンは縮めない・折り返さない（「解除」が2行になっていた）2026-11-15 */
+#modeBar button,#modeTxt button{white-space:nowrap;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -1570,7 +1585,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
       <span class="grow"></span>
       <button id="bHist" class="dOnly">記録</button>
       <details id="more" class="more"><summary title="表示・設定"><span class="mic"></span><span class="mtx">表示・設定</span></summary><div class="moreBody">
-      <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mSup">一括補給</button><button id="mHist">襲撃の記録</button><button id="mLog">通信ログ</button></div>
+      <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mSup">一括補給</button><button id="mHist">街の記録</button><button id="mLog">通信ログ</button></div>
       <div class="mOnly mspeed"><span class="help">速度</span><div class="speed"><button data-spd="1">×1</button><button data-spd="2">×2</button><button data-spd="3">×3</button></div></div>
       <button id="bOrient" style="display:none">画面の向き：横で固定</button>
       <button id="bInstall2" style="display:none">ホーム画面に追加（アプリにする）</button>
@@ -1593,7 +1608,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
   </div>
   <div id="right">
     <div id="sheetHandle"><span id="sheetSel"></span><span id="sheetLbl">▲ 詳細・建設</span></div>
-    <div class="box" id="info"><h3>選択中</h3><div id="infoBody" class="muted">施設か部隊をクリック</div></div>
+    <div class="box" id="info"><h3>選択中</h3><div id="infoBody" class="muted">施設か部隊を選んでください</div></div>
     <div id="infoSplit" title="上下にドラッグして、詳細と下のパネルの高さを変える（ダブルクリックで元に戻す）"><span class="grip"></span></div><button id="infoClose" title="詳細を閉じる">×</button>
     <div id="rtabs"><button data-rt="info" class="tabInfo">選択中</button><button data-rt="build" class="on">建設</button><button data-rt="res">研究</button><button data-rt="army">軍事</button><button data-rt="econ">街</button></div>
     <div class="box" data-rt="econ" style="display:none"><h3>街の状況</h3><div id="econ"></div></div>
@@ -1637,6 +1652,9 @@ function hqTX(dx){return HQX-1+U*dx;}function hqTY(dy){return HQY-1+U*dy;}
 const isBlock=t=>t===3||t===6||t===9;  // 岩場・海・川は通れない（浅瀬は通れる）
 const cam={x:0,y:0,z:1};
 const IS_TOUCH=matchMedia('(pointer: coarse)').matches;
+// タブレット（iPad など）：画面が広くて指で操作する端末。PC 用の配置のまま、指で使いやすくする（キーの案内を隠す・ボタンを大きく・範囲選択ボタン）2026-11-15
+function tabUI(){return IS_TOUCH&&innerWidth>900;}
+function stripKeyHints(){if(!IS_TOUCH)return;for(const b of document.querySelectorAll('button,label.help')){for(const n of b.childNodes){if(n.nodeType===3&&/\s?\[[A-Z]\]/.test(n.nodeValue))n.nodeValue=n.nodeValue.replace(/\s?\[[A-Z]\]/g,'');}}}
 const MM={w:192,h:128};    // ミニマップ
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 cv.width=VW; cv.height=VH;
@@ -4237,7 +4255,7 @@ function doEndTurn(){
   if(filled)log(`欠員補充：${filled}名を各施設に配置`);
   if(has('rearm')){let n=0;for(const m of S.mines)if(m.kind!=='bomb'&&!m.armed&&S.ammo>=4){S.ammo-=4;m.armed=true;m.used=false;n++;}if(n)log(`地雷 ${n}個を再装填（矢−${n*4}）`);}
   S.shortCrew=short;
-  S.turnsLeft--;S.turn++;clearUndo();
+  if(!S.tl)tlSnap('開始');S.turnsLeft--;S.turn++;clearUndo();tlSnap('朝');
   const ev=S.rep;S.rep=null;
   const dn=Object.entries(S.doneCnt);if(dn.length){const m='完成：'+dn.map(([k,v])=>k+(v>1?'×'+v:'')).join('、');ev.unshift({msg:m,cls:'good'});log(m,'good');}
   if(S.turnsLeft<=0)startWave();
@@ -5236,6 +5254,7 @@ function econ(){
   const foodUse=popTotal()*FOOD_PER*foodMul()*TURN_SEC+tavernUse;const taxP=popTotal()*TAX[S.tax].g+HQ_GOLD;
   r.raw={steelP,stoneP,ironP,fuelP,elecP,ammoP,steelAmmo,ironAmmo,foodUse,goldP,taxP,swordP,powP,steelPow};
   r.net={gold:goldP+taxP-wages(),sword:swordP,steel:steelP-steelAmmo-steelPow,powder:powP,stone:stoneP,iron:ironP-ironAmmo,fuel:fuelP-foodUse,ammo:ammoP,elec:elecP,pop:S.fuel<=0&&fuelP<foodUse?0:Math.min(pop,Math.max(0,S.popCap-popTotal()))};
+  r.gross={gold:goldP+taxP,steel:steelP,stone:stoneP,iron:ironP,fuel:fuelP,ammo:ammoP,sword:swordP,elec:elecP,powder:powP};   /* 生産だけの量（使う分を引く前）。街の記録で使う */
   r.ammo=ammoP;r.ammoF=r.cnt.ammo||0;r.pop=r.net.pop;S._econ=r;
   return r;
 }
@@ -6114,7 +6133,7 @@ function artOf(o){{const k=artKey(o);if(k)return artPx(k,o.kind==='s'?unitLabel(
 const mouse={x:0,y:0,in:false};
 function toScreen(ev){const r=cv.getBoundingClientRect();return{x:(ev.clientX-r.left)*VW/r.width,y:(ev.clientY-r.top)*VH/r.height};}
 function toCanvas(ev){const p=toScreen(ev);return{x:cam.x+p.x/cam.z,y:cam.y+p.y/cam.z,sx:p.x,sy:p.y};}
-function mmPos(){const off=document.body.classList.contains('fullmap')&&!isNarrow()&&document.getElementById('right').classList.contains('open')?350:0;return[VW-MM.w-8-off,VH-MM.h-8-(document.body.classList.contains('fullmap')&&!isNarrow()?46:0)];}
+function mmPos(){if(typeof TLP!=='undefined'&&TLP)return [-9999,-9999];   /* タイムラプス中はミニマップを出さない */const off=document.body.classList.contains('fullmap')&&!isNarrow()&&document.getElementById('right').classList.contains('open')?350:0;return[VW-MM.w-8-off,VH-MM.h-8-(document.body.classList.contains('fullmap')&&!isNarrow()?46:0)];}
 function inMini(p){const [mx,my]=mmPos();return p.sx>=mx&&p.sy>=my&&p.sx<mx+MM.w&&p.sy<my+MM.h?{x:(p.sx-mx)/MM.w*W,y:(p.sy-my)/MM.h*H}:null;}
 const drag={mini:false};
 cv.addEventListener('mousemove',ev=>{const p=toCanvas(ev);mouse.x=p.x;mouse.y=p.y;mouse.in=true;});
@@ -6190,7 +6209,7 @@ function houseOf(b){return b.type==='hq'?30+10*((S.baseLv||1)-1):b.type==='barra
 function popCapOf(){let c=0;for(const b of S.blds)c+=houseOf(b);return c;}
 function popTotal(){let t=S.pop;for(const b of S.blds){t+=b.crew||0;if(b.qm)for(const m of b.qm){const u=MTC[m];t+=u.popEach*u.members;}}
   for(const s of S.squads)t+=s.members*MT(s).popEach;for(const r of S.research)t+=(r.paid&&r.paid.pop)||0;return t;}
-function deselect(){S.multi=[];S.sel=null;S.selTile=null;renderInfo(true);renderMode();}
+function deselect(){if(S.buildMode||S.buildPick){S.buildMode=null;S.buildPick=false;renderBuild();}S.multi=[];S.sel=null;S.selTile=null;renderInfo(true);renderMode();}   /* 建設中なら建設もやめる（タブレットの帯の「解除」用。2026-11-15） */
 // 範囲の中の部隊をまとめて選ぶ（Shift を押していたら今の選択に足す）
 function boxSelect(a,b,add){const x0=Math.min(a[0],b[0]),x1=Math.max(a[0],b[0]),y0=Math.min(a[1],b[1]),y1=Math.max(a[1],b[1]);
   const ids=S.squads.filter(s=>!s.gar&&s.x>=x0&&s.x<=x1&&s.y>=y0&&s.y<=y1).map(s=>s.id);
@@ -6303,6 +6322,7 @@ function placeOK(type,gx,gy){
 document.addEventListener('keydown',ev=>{
   if(document.body.classList.contains('siegeOn'))return;   // 駐屯地襲撃の画面では本編のキーを使わない
   if(ev.target.tagName==='SELECT')return;
+  if(TLP&&ev.key==='Escape'){stopTimelapse();return;}
   if((ev.ctrlKey||ev.metaKey)&&!ev.shiftKey&&ev.key.toLowerCase()==='z'&&S&&!S.overlay&&!(ev.target&&/INPUT|TEXTAREA/.test(ev.target.tagName))){ev.preventDefault();undoLast();return;}   // 取り消し
   const kl=ev.key.toLowerCase();if(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown'].includes(kl)){keysDown.add(kl);if(kl.startsWith('arrow'))ev.preventDefault();}
   if(ev.key==='Escape'){if(S.overlay==='dex'){dexStop();if(DEX_FROM_TITLE)showTitle();else closeOverlay();return;}if(['res','hire','army','retry','legend'].includes(S.overlay)){closeOverlay();return;}if(S.buildMode||S.buildPick){exitBuild();return;}S.multi=[];S.sel=null;S.selTile=null;renderBuild();renderInfo(true);}
@@ -6467,7 +6487,7 @@ function renderBuild(){
      for(const g of BUILD_GROUPS){if(!groupList(g).length)continue;const b=document.createElement('button');b.textContent=g.name;b.dataset.g=g.id;b.onclick=()=>{se('click');buildJump(g.id);};ch.appendChild(b);}
      el.appendChild(ch);}
     for(const g of BUILD_GROUPS){
-      const h=document.createElement('div');h.className='bh'+(bgClosed[g.id]?' closed':'');const nk=Math.min(10,groupList(g).length);h.innerHTML=`<span>${g.name}</span>${g.keys==='-'?'':`<small>${g.keys?'Shift＋':''}数字キー 1–${nk%10}</small>`}`;
+      const h=document.createElement('div');h.className='bh'+(bgClosed[g.id]?' closed':'');const nk=Math.min(10,groupList(g).length);h.innerHTML=`<span>${g.name}</span>${g.keys==='-'||IS_TOUCH?'':`<small>${g.keys?'Shift＋':''}数字キー 1–${nk%10}</small>`}`;
       h.onclick=()=>{h.classList.toggle('closed');bgClosed[g.id]=h.classList.contains('closed');try{localStorage.setItem('bd_bgrp',JSON.stringify(bgClosed));}catch(e){}};
       const box=document.createElement('div');box.className='bg'+(S.bgTab===g.id?' cur':'');box.dataset.g=g.id;
       h.dataset.g=g.id;
@@ -6642,7 +6662,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(!o&&S.heroView){const c=S.cmds.find(x=>x.id===S.heroView&&x.alive);if(c){const key='hv'+c.id+c.lv+Math.floor(c.xp)+c.assign+c.kills;if(!force&&key===lastInfoKey)return;lastInfoKey=key;el.innerHTML=heroDetail(c);const hc=document.getElementById('hvClose');if(hc)hc.onclick=closeHeroView;const g=document.getElementById('hvGo');if(g)g.onclick=()=>{const t=findObj(c.assign);if(t){S.sel=t;renderInfo(true);}};return;}S.heroView=null;}
   if(S.buildMode&&!o){
     const key='bm'+S.buildMode;if(!force&&key===lastInfoKey)return;lastInfoKey=key;
-    const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)}ターン　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。右クリック・Escで建設モードを終了</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div><button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
+    const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)}ターン　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。${IS_TOUCH?'「建設をやめる」で建設モードを終了':'右クリック・Escで建設モードを終了'}</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div><button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
   if(!o&&S.selTile){const {x,y}=S.selTile;const key='tile'+x+','+y+affordSig()+(S.grid[y][x]?1:0)+S.enemies.length%7+'r'+((S.ruins||[]).length);
     if(!force&&key===lastInfoKey)return;lastInfoKey=key;
     let h=`<div class="row"><b>マス（${x}, ${y}）</b><button id="tClose" style="padding:0 6px">×</button></div>`+tileDesc(x,y);
@@ -6660,7 +6680,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
      const c2=document.getElementById('ruinClr');if(c2)c2.onclick=()=>{S.ruins=S.ruins.filter(r=>r!==rn);renderInfo(true);};}
     return;}
   if(!o){const key='none'+tutHTML()+S.squads.map(s=>s.id+':'+Math.round(s.hp/s.maxhp*20)+':'+s.members+(s.gar?'g':'')+(s.mode||'')).join();if(lastInfoKey!==key||force){lastInfoKey=key;
-    let h=tutHTML()+'<span class="muted">施設か部隊をクリック</span>';
+    let h=tutHTML()+`<span class="muted">施設か部隊を${IS_TOUCH?'タップ':'クリック'}</span>`;
     if(false){h+=`<div style="margin-top:8px" class="muted">部隊 <span style="font-size:10px">[Q]で順に選択</span></div><div style="display:flex;flex-direction:column;gap:3px;margin-top:3px">`+S.squads.map(s=>{const r=Math.max(0,s.hp/s.maxhp),hc=cmdOf(s),ik=hc&&WICON['h_'+hc.spec]&&s.ut!=='drake'?'h_'+hc.spec:(s.model||defModel(s.ut));
       return `<button data-sq="${s.id}" style="display:flex;align-items:center;gap:6px;text-align:left;padding:3px 6px">${icSvg(ik,22)}<span style="min-width:74px;font-size:12px">${unitLabel(s)}</span><span style="flex:1;height:7px;background:#2a1a1a;border:1px solid #000;position:relative"><i style="position:absolute;left:0;top:0;bottom:0;width:${Math.round(r*100)}%;background:${r>0.6?'#5ac05a':r>0.3?'#e0b040':'#e04030'}"></i></span><span class="muted" style="font-size:11px;min-width:58px;text-align:right">${s.members}/${MT(s).members}${UT[s.ut].unit}${s.gar?'・櫓':''}</span></button>`;}).join('')+'</div>';}
     el.innerHTML=h;el.querySelectorAll('[data-sq]').forEach(b=>b.onclick=()=>{S.sel=S.squads.find(s=>s.id==b.dataset.sq);renderInfo(true);});}return;}
@@ -7247,7 +7267,22 @@ function showHire(target,mode){
   card.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{hire(b.dataset.hire);again();renderCmds(true);});
   {const rr=card.querySelector('#hReroll');if(rr)rr.onclick=()=>{S.gold-=30;genCands();again();};}
 }
-function recordWave(ws,ok){S.hist=S.hist||[];ws=ws||S.waveStart||{};S.hist.push({n:S.wave,day:S.turn,blood:!!(S.cur&&S.cur.blood),kills:S.waveKills,bld:S.bldLost-(ws.bld||0),kia:S.kia-(ws.kia||0),mat:S.mat-(ws.mat||0),heroes:S.fallen.length-(ws.fallen||0),ok,pop:popTotal(),tech:TECH.filter(t=>has(t.id)).length});}
+// ===== 街の記録（2026-11-15）：ターンごとの施設の数・人口・資源・生産量と、タイムラプス用の施設の出入り =====
+// S.tl：[{d:日,w:襲撃,tag,n:施設数,g:{種類別の数},pop,res:{在庫},gross:{1ターンの生産},net:{差し引き},bl:城Lv,tech}]
+// S.tlb：{keys:今ある施設の鍵, ev:[[記録の番号, 増えた鍵の一覧, 減った鍵の一覧], ...]}（差分だけ残すのでセーブが大きくならない）
+const TL_RES=['gold','steel','stone','iron','fuel','ammo','sword','elec','powder','coal','alloy','mat'];
+const TL_GROUPS=[['防衛','#e8735c'],['壁・門','#9aa5a8'],['生産','#6fe08a'],['住居','#f2b33d'],['軍','#7fb0ff'],['罠','#c48aff'],['その他','#b9a98a']];
+function tlGroup(t){const d=B[t];if(!d)return 'その他';if(WALL_TYPES.includes(t)||t==='gate'||t==='bastion')return '壁・門';if(d.grp==='def')return '防衛';
+  if(['barracks','apart'].includes(t))return '住居';if(['train','stable','aerie','magic','hangar','airfield','port','tankf'].includes(t))return '軍';if(d.grp==='prod')return '生産';return 'その他';}
+function tlKeyB(b){return b.type+'|'+b.x+'|'+b.y+'|'+(b.lv||1);}
+function tlSnap(tag){if(!S||S.mode!=='campaign'||S.review)return;S.tl=S.tl||[];S.tlb=S.tlb||{keys:[],ev:[]};
+  const cur=new Set(S.blds.filter(b=>!(b.bt>0&&!b.upg)).map(tlKeyB));for(const m of S.mines||[])cur.add('m:'+m.kind+'|'+m.x+'|'+m.y);
+  const prev=new Set(S.tlb.keys),i=S.tl.length,add=[...cur].filter(k=>!prev.has(k)),rem=[...prev].filter(k=>!cur.has(k));
+  if(add.length||rem.length)S.tlb.ev.push([i,add,rem]);S.tlb.keys=[...cur];
+  const g={};for(const [n] of TL_GROUPS)g[n]=0;for(const b of S.blds){if(b.bt>0&&!b.upg)continue;g[tlGroup(b.type)]++;}g['罠']=(S.mines||[]).length;
+  const e=econ(),R=o=>{const r={};for(const k in o)r[k]=Math.round((o[k]||0)*10)/10;return r;},res={};for(const k of TL_RES)res[k]=Math.round(S[k]||0);
+  S.tl.push({d:S.turn,w:S.wave,tag,n:S.blds.filter(b=>!(b.bt>0&&!b.upg)).length,g,pop:popTotal(),res,gross:R(e.gross||{}),net:R(e.net||{}),bl:S.baseLv||1,tech:TECH.filter(t=>has(t.id)).length});}
+function recordWave(ws,ok){try{tlSnap(ok?'襲撃のあと':'陥落');}catch(e){}S.hist=S.hist||[];ws=ws||S.waveStart||{};S.hist.push({n:S.wave,day:S.turn,blood:!!(S.cur&&S.cur.blood),kills:S.waveKills,bld:S.bldLost-(ws.bld||0),kia:S.kia-(ws.kia||0),mat:S.mat-(ws.mat||0),heroes:S.fallen.length-(ws.fallen||0),ok,pop:popTotal(),tech:TECH.filter(t=>has(t.id)).length});}
 // 大きな損害を受けた翌朝の立て直し：避難民がすぐ来て、王都の援助は2ターン後に届く
 function reliefAfter(ws){const lb=S.bldLost-(ws.bld||0),lk=S.kia-(ws.kia||0),sev=lb*2+lk;if(sev<20)return '';
   const ref=Math.min(40,Math.round(10+sev*0.4));S.pop+=ref;log(`近くの村から避難民 ${ref}人が逃げ込んできた`,'good');
@@ -7266,15 +7301,16 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   ${statGrid([['撃破数',S.kills],['戦死者（人員）',S.kia,'var(--red)'],['生存英雄',S.cmds.length,'var(--green)'],['獲得した魔核','+'+matSum,'var(--mat)']])}
   <div class="efallen"><span>戦没英雄</span>${fallen}</div>
   <div class="ehist"><span>襲撃ごとの記録</span></div>${histTable()}
-  <div class="ebtns"><button id="ovReview" class="primary">街と研究を振り返る</button>${win?'<button id="ovEndless">防衛を続行（エンドレス）</button>':''}<button id="ovRestart" class="ghost">最初から</button></div>`);
+  <div class="ebtns"><button id="ovTl" class="primary">▶ 街の成長を見る</button><button id="ovRec">街の記録</button><button id="ovReview">街と研究を振り返る</button>${win?'<button id="ovEndless">防衛を続行（エンドレス）</button>':''}<button id="ovRestart" class="ghost">最初から</button></div>`);
   document.getElementById('ovReview').onclick=()=>{S.review=true;closeOverlay();renderAll();renderReviewBar();};
+  document.getElementById('ovTl').onclick=()=>{closeOverlay();playTimelapse(()=>showEnd(win));};document.getElementById('ovRec').onclick=()=>{closeOverlay();showHist();};
   document.getElementById('ovRestart').onclick=()=>{closeOverlay();document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState(S.mode);renderAll();auMusicFor();};
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=NEXT_PREP;S.prepTotal=NEXT_PREP;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.4.3 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.5 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
-function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over;}
+function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
 function saveMark(ok){let el=document.getElementById('saveMark');if(!el){el=document.createElement('div');el.id='saveMark';document.body.appendChild(el);}
   clearTimeout(el._t1);clearTimeout(el._t2);el.className='on busy';el.innerHTML=`${ui('disk','amber',24)}<span>セーブしています…</span>`;
@@ -7326,6 +7362,7 @@ function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn()
   requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();}finally{b.classList.add('off');}}));}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.5','2026-11-15',['<b>街の記録</b>：「記録」ボタンで、襲撃ごとの結果と、施設の数・生産量・資源の移り変わりをグラフで見られる（5回ごとの襲撃の目印つき）。数字をまとめてコピーして表計算ソフトに貼れる','<b>街の成長のタイムラプス</b>：ゲームの終わり（勝っても負けても）や街の記録から、最初の日からの街の移り変わりを早送りで見られる','<b>iPad などタブレット</b>で指で遊びやすく：キーの案内を隠し、ボタンを大きく、範囲選択ボタンを出す。ダブルタップで画面が拡大されないように','不具合の修正：建設する施設を選んでも、上の帯に名前・費用・置き方が出ないことがあった']],
  ['1.4.3','2026-11-15',['<b>矢・武具などの消費を元に戻した</b>（1.4.1 で約1.3倍にしたもの。矢が途中で尽きて守れなくなることがあった）','<b>BGM を 8bit 風に</b>：ホーム・昼・静かな夜・祭り・襲撃の曲を新しく。ブラッドムーンの夜に専用の曲、勝ったとき・負けたときの結果画面に曲。ボスの曲はそのまま','<b>効果音を作り直し</b>：建設（木・石・金属・火・畑）、研究、敵を倒す（ザシュッ）、騎兵の突撃（バシン）、襲撃の知らせ、しのいだとき・勝利・敗北のファンファーレ など']],
  ['1.4.2','2026-11-14',['<b>罠もドラッグで一列にまとめて置ける</b>ように（壁と同じ操作）','<b>取り消し</b>：さっき置いたもの（一列ぶん）を全額返して戻せる。帯の「取り消し」か Ctrl+Z。その日のうちなら何回でも','罠を押すと「撤去」できるように（費用の半分が戻る）','改築中の残りターンを建物の枠の中に出して、密集した街でも重ならないように']],
  ['1.4.1','2026-11-14',['<b>軽量化</b>：夜の描画を大幅に軽く（敵の多い襲撃で約3倍軽く）','敵の地上部隊が10〜20体の群れでまとまって押し寄せるように（数は同じ）。範囲攻撃は爆心から離れるほど弱く（端で40%）','部隊の補給・補充・手当てを前哨砦・城館でも受けられるように（いちばん近いところへ行く）','矢・武具などの消費を少し増やした。石炭と関係のない研究には石炭を使わない','改築中・城の強化中がマップで分かるように（残りターンと進み具合）','研究画面：改築の研究を各ランクのいちばん上に','祭りの費用を人口に合わせた','盾持ちオーガなど、敵の向きが左右にパタパタ変わる不具合を修正']],
@@ -7624,9 +7661,79 @@ function mapIcon(id){if(MAPICON[id])return MAPICON[id];const W=96,H=56,c=documen
   for(let i=0;i<(id==='t'?3:id==='f'?6:id==='m'?8:9);i++){const x=4+Math.floor(rnd()*88),y=4+Math.floor(rnd()*14)+(snow||rock?6:12);R2(x,y,1,1,'#ff5a3a');R2(x+2,y,1,1,'#ff5a3a');}
   if(snow)for(let i=0;i<40;i++)R2(Math.floor(rnd()*W),Math.floor(rnd()*H),1,1,'#ffffff');
   MAPICON[id]=c.toDataURL();return MAPICON[id];}
-function showHist(){let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">襲撃の記録</h2><button id="ovClose">閉じる</button></div>${histTable()}`;
+// ===== 街の記録（2026-11-15）：襲撃の経緯・施設の数・生産力・資源の推移。プレイ中でも見られる。調整資料として数字をコピーできる =====
+let HIST_TAB='wave';
+const RES_COL={gold:'#f2b33d',steel:'#c08a4a',stone:'#a9b0b4',iron:'#7f9bb8',fuel:'#9bd36a',ammo:'#e8d8b0',sword:'#d8dce4',elec:'#62c6d9',powder:'#e07a5a',coal:'#6a6a72',alloy:'#c4a0e0',mat:'#c48aff'};
+// 折れ線グラフ（SVG）。series：[{n:名前,c:色,v:[値…]}]、xs：横軸の文字
+function lineChart(series,xs,o){o=o||{};const W=680,H=o.h||220,L=46,R=10,T=10,Bt=26,n=xs.length;if(n<2)return '<div class="muted">まだ記録が少ないので、グラフは2ターン目から出ます</div>';
+  let mx=0;for(const s of series)for(const v of s.v)if(v>mx)mx=v;mx=mx||1;const p10=Math.pow(10,Math.floor(Math.log10(mx))),top=Math.ceil(mx/p10)*p10;
+  const X=k=>L+(W-L-R)*k/(n-1),Y=v=>T+(H-T-Bt)*(1-v/top);let g='';
+  for(let k=0;k<=4;k++){const v=top*k/4,y=Y(v);g+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="rgba(255,255,255,.08)"/><text x="${L-4}" y="${y+4}" text-anchor="end" font-size="10" fill="#9aa79a">${Math.round(v)}</text>`;}
+  const step=Math.max(1,Math.ceil(n/10));for(let k=0;k<n;k+=step)g+=`<text x="${X(k)}" y="${H-8}" text-anchor="middle" font-size="10" fill="#9aa79a">${xs[k]}</text>`;
+  for(const m of (o.marks||[])){const x=X(m.k);g+=`<line x1="${x}" y1="${T}" x2="${x}" y2="${H-Bt}" stroke="rgba(242,179,61,.35)" stroke-dasharray="3,3"/><text x="${x>W-R-34?x-2:x+2}" y="${T+9}" text-anchor="${x>W-R-34?'end':'start'}" font-size="9" fill="#f2b33d">${m.t}</text>`;}   /* 襲撃の目印（5回ごと） */
+  for(const s of series){const pts=s.v.map((v,k)=>X(k).toFixed(1)+','+Y(v||0).toFixed(1)).join(' ');g+=`<polyline points="${pts}" fill="none" stroke="${s.c}" stroke-width="2"/><circle cx="${X(n-1)}" cy="${Y(s.v[n-1]||0)}" r="3" fill="${s.c}"/>`;}
+  const leg=series.map(s=>`<span style="white-space:nowrap"><i style="display:inline-block;width:10px;height:10px;background:${s.c};margin-right:3px;vertical-align:-1px"></i>${s.n} <b>${Math.round(s.v[n-1]||0)}</b></span>`).join('　');
+  return `<div style="overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:420px;height:auto;display:block">${g}</svg></div><div style="font-size:11.5px;margin:2px 0 10px;line-height:1.8">${leg}</div>`;}
+function tlRows(){return S.tl||[];}
+function tlMarks(){const TL=tlRows(),M=[];TL.forEach((r,k)=>{if((r.tag==='襲撃のあと'||r.tag==='陥落')&&r.w%5===0)M.push({k,t:'第'+r.w});});return M;}
+function histData(){const H=S.hist||[],TL=tlRows();const L=[];
+  L.push('【襲撃ごと】\n襲撃\t日\t結果\tブラッドムーン\t撃破\t戦死\t英雄の戦死\t施設損失\t魔核\t人口\t研究数');
+  for(const r of H)L.push([r.n,r.day,r.ok?'撃退':'陥落',r.blood?'○':'',r.kills,r.kia,r.heroes||0,r.bld,r.mat,r.pop,r.tech].join('\t'));
+  L.push('\n【ターンごと】\n日\t襲撃\tとき\t施設\t'+TL_GROUPS.map(g=>g[0]).join('\t')+'\t人口\t城Lv\t研究数\t'+TL_RES.map(k=>'在庫:'+(RES_NAME[k]||k)).join('\t')+'\t'+Object.keys((TL[0]||{}).gross||{}).map(k=>'生産:'+(RES_NAME[k]||k)).join('\t'));
+  for(const r of TL)L.push([r.d,r.w,r.tag,r.n].concat(TL_GROUPS.map(g=>r.g[g[0]]||0),[r.pop,r.bl,r.tech],TL_RES.map(k=>r.res[k]||0),Object.keys((TL[0]||{}).gross||{}).map(k=>(r.gross||{})[k]||0)).join('\t'));
+  return L.join('\n');}
+function showHist(){const TL=tlRows(),xs=TL.map(r=>r.d+'日');
+  const tabs=[['wave','襲撃'],['bld','施設'],['prod','生産'],['res','資源']];
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">街の記録</h2><div style="display:flex;gap:6px;flex-wrap:wrap">${tabs.map(([k,n])=>`<button data-ht="${k}" class="${HIST_TAB===k?'on':''}">${n}</button>`).join('')}<button id="hsTl">▶ 街の成長（タイムラプス）</button><button id="hsCopy">数字をコピー</button><button id="ovClose">閉じる</button></div></div>`;
+  if(!TL.length&&HIST_TAB!=='wave')h+=`<div class="muted" style="margin:10px 0">記録はこの版から始まりました。次のターンから記録されます（前のセーブの続きでは、途中からの記録になります）。</div>`;
+  if(HIST_TAB==='wave'){h+=`<div class="muted" style="margin:6px 0">襲撃ごとの結果です。</div>${histTable()}`;
+    const H=S.hist||[];if(H.length>=2)h+=`<div class="ehist" style="margin-top:10px"><span>撃破と損失の推移</span></div>`+lineChart([{n:'撃破',c:'#6fe08a',v:H.map(r=>r.kills)},{n:'戦死',c:'#e8735c',v:H.map(r=>r.kia)},{n:'施設損失',c:'#f2b33d',v:H.map(r=>r.bld)}],H.map(r=>'第'+r.n));}
+  else if(HIST_TAB==='bld'&&TL.length){const last=TL[TL.length-1];
+    h+=`<div class="muted" style="margin:6px 0">種類ごとの施設の数（建設中は数えない）。罠は置いてある数。</div>`+lineChart(TL_GROUPS.map(([n,c])=>({n,c,v:TL.map(r=>r.g[n]||0)})),xs,{marks:tlMarks()})+lineChart([{n:'施設の合計',c:'#e8e4d8',v:TL.map(r=>r.n)},{n:'人口',c:'#f2b33d',v:TL.map(r=>r.pop)}],xs,{h:170,marks:tlMarks()})+lineChart([{n:'城Lv×10',c:'#c48aff',v:TL.map(r=>r.bl*10)},{n:'研究の数',c:'#62c6d9',v:TL.map(r=>r.tech)}],xs,{h:150,marks:tlMarks()});
+    const cnt={};for(const b of S.blds){if(b.bt>0&&!b.upg)continue;cnt[b.type]=(cnt[b.type]||0)+1;}h+=`<div class="ehist"><span>いまの施設（多い順）</span></div><div style="display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px">${Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<span>${B[t]?B[t].name:t} <b>${n}</b></span>`).join('')}</div>`;}
+  else if(HIST_TAB==='prod'&&TL.length){const ks=['steel','stone','iron','fuel','gold','ammo','sword','elec','powder'].filter(k=>TL.some(r=>(r.gross||{})[k]));
+    h+=`<div class="muted" style="margin:6px 0">1ターンに生産する量（使う分を引く前）。そのターンのはじめの時点の施設と研究で計算。</div>`+lineChart(ks.map(k=>({n:RES_NAME[k]||k,c:RES_COL[k]||'#ccc',v:TL.map(r=>(r.gross||{})[k]||0)})),xs,{marks:tlMarks()})
+      +`<div class="ehist"><span>差し引き（生産 − 食料・給料・工房などで使う分）</span></div>`+lineChart(ks.map(k=>({n:RES_NAME[k]||k,c:RES_COL[k]||'#ccc',v:TL.map(r=>Math.max(0,(r.net||{})[k]||0))})),xs,{h:180,marks:tlMarks()});}
+  else if(HIST_TAB==='res'&&TL.length){const ks=TL_RES.filter(k=>TL.some(r=>r.res[k]));
+    h+=`<div class="muted" style="margin:6px 0">ターンのはじめと襲撃のあとの、資源の在庫。</div>`+lineChart(ks.map(k=>({n:RES_NAME[k]||k,c:RES_COL[k]||'#ccc',v:TL.map(r=>r.res[k]||0)})),xs,{h:260,marks:tlMarks()});}
+  h+=`<textarea id="hsData" readonly style="position:absolute;left:-9999px;top:0;width:10px;height:10px">${histData().replace(/</g,'&lt;')}</textarea>`;
   if(S.over)h+=`<div style="margin-top:12px;display:flex;gap:8px"><button id="hsRestart" class="on">最初から</button></div>`;
-  openOverlay('hist',h,true);document.getElementById('ovClose').onclick=closeOverlay;const r=document.getElementById('hsRestart');if(r)r.onclick=()=>{closeOverlay();document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState(S.mode);renderAll();auMusicFor();};}
+  openOverlay('hist',h,true);document.getElementById('ovClose').onclick=closeOverlay;
+  document.querySelectorAll('[data-ht]').forEach(b=>b.onclick=()=>{HIST_TAB=b.dataset.ht;showHist();});
+  document.getElementById('hsTl').onclick=()=>{closeOverlay();playTimelapse(()=>showHist());};
+  document.getElementById('hsCopy').onclick=()=>{const a=document.getElementById('hsData'),done=()=>toast('記録の数字をコピーしました（表計算ソフトに貼り付けられます）','good');try{navigator.clipboard.writeText(a.value).then(done,()=>{a.select();document.execCommand('copy');done();});}catch(e){a.select();try{document.execCommand('copy');}catch(x){}done();}};
+  const r=document.getElementById('hsRestart');if(r)r.onclick=()=>{closeOverlay();document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState(S.mode);renderAll();auMusicFor();};}
+// ===== タイムラプス（2026-11-15）：記録から日ごとの街を作り直して、本物の絵で早送り。ゲームの終わり（勝ち負けどちらでも）や街の記録から =====
+let TLP=null;
+function tlFrames(){const ev=(S.tlb&&S.tlb.ev)||[],n=(S.tl||[]).length;const F=[];let cur=new Set();let ei=0;for(let i=0;i<n;i++){while(ei<ev.length&&ev[ei][0]<=i){for(const k of ev[ei][1])cur.add(k);for(const k of ev[ei][2])cur.delete(k);ei++;}F.push([...cur]);}return F;}
+function tlBuild(keys){const bl=[],mn=[];let id=-1;for(const k of keys){if(k.startsWith('m:')){const [kind,x,y]=k.slice(2).split('|');mn.push({x:+x,y:+y,kind,armed:true,sz:1});continue;}
+    const [type,x,y,lv]=k.split('|');if(!B[type])continue;bl.push({id:id--,kind:'b',type,x:+x,y:+y,sz:newSz(type),lv:+lv||1,mat:Math.min(2,(+lv||1)-1),hp:1,maxhp:1,bt:0,cd:0,cmd:null,queue:0,qt:0,ang:-Math.PI/2,crew:0,xpT:0,absorbed:0});}
+  return {bl,mn};}
+function playTimelapse(back){const F=tlFrames();if(F.length<2){toast('まだ記録が少ないので、タイムラプスは2ターン目から見られます','warn');if(back)back();return;}
+  const keep={blds:S.blds,mines:S.mines,enemies:S.enemies,squads:S.squads,wa:S.waveActive,ph:S.phase,night:S.night,ov:S.overlay,pa:S.paused,sel:S.sel,grid:S.grid.map(r=>r.slice()),cam:{x:cam.x,y:cam.y,z:cam.z},full:document.body.classList.contains('fullmap')};
+  // 地図の中で、これまでに施設があった範囲に合わせて画面を寄せる
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const f of F)for(const k of f){if(k.startsWith('m:'))continue;const [t,x,y]=k.split('|');x0=Math.min(x0,+x);y0=Math.min(y0,+y);x1=Math.max(x1,+x+newSz(t));y1=Math.max(y1,+y+newSz(t));}
+  TLP={F,i:0,play:true,speed:1,keep,back,acc:0,box:[x0-4,y0-4,x1+4,y1+4]};
+  S.overlay='timelapse';S.enemies=[];S.squads=[];S.waveActive=false;S.phase='day';S.night=null;S.sel=null;document.body.classList.add('tlOn');try{toggleFull(true);}catch(e){}
+  let hud=document.getElementById('tlHud');if(!hud){hud=document.createElement('div');hud.id='tlHud';document.body.appendChild(hud);}
+  hud.innerHTML=`<div class="tlTop"><b>街の成長</b><span id="tlDay"></span><span class="sp"></span><button id="tlPlay">一時停止</button><button id="tlSpd">速さ ×1</button><button id="tlX" class="primary">閉じる</button></div><input id="tlBar" type="range" min="0" max="${F.length-1}" value="0"><div id="tlInfo" class="tlInfo"></div>`;
+  document.getElementById('tlPlay').onclick=()=>{TLP.play=!TLP.play;if(TLP.play&&TLP.i>=F.length-1)TLP.i=0;tlUi();};
+  document.getElementById('tlSpd').onclick=()=>{TLP.speed=TLP.speed>=4?1:TLP.speed*2;tlUi();};
+  document.getElementById('tlBar').oninput=e=>{TLP.i=+e.target.value;TLP.play=false;tlShow();};
+  document.getElementById('tlX').onclick=stopTimelapse;
+  setTimeout(()=>{try{resizeView();}catch(e){}tlFit();tlShow();},60);
+  TLP.timer=setInterval(()=>{if(!TLP||!TLP.play)return;if(TLP.i>=F.length-1){TLP.play=false;tlUi();return;}TLP.i++;tlShow();},400);}
+function tlFit(){const [x0,y0,x1,y1]=TLP.box,w=(x1-x0)*T,h=(y1-y0)*T;cam.z=Math.max(0.3,Math.min(2,Math.min(VW/w,VH/h)));cam.x=(x0*T+w/2)-VW/cam.z/2;cam.y=(y0*T+h/2)-VH/cam.z/2;}
+function tlShow(){if(!TLP)return;const {bl,mn}=tlBuild(TLP.F[TLP.i]);S.blds=bl;S.mines=mn;for(const r of S.grid)r.fill(null);for(const b of bl)try{gridSet(b,true);}catch(e){}tlUi();}
+function tlUi(){if(!TLP)return;const r=S.tl[TLP.i]||{},bar=document.getElementById('tlBar');if(bar)bar.value=TLP.i;
+  document.getElementById('tlDay').textContent=`${r.d||'?'}日目・第${(r.w||0)+(r.tag==='朝'||r.tag==='開始'?1:0)}襲撃${r.tag==='朝'||r.tag==='開始'?'の前':'のあと'}`;
+  document.getElementById('tlPlay').textContent=TLP.play?'一時停止':'再生';document.getElementById('tlSpd').textContent='速さ ×'+TLP.speed;
+  document.getElementById('tlInfo').innerHTML=TL_GROUPS.map(([n,c])=>`<span><i style="background:${c}"></i>${n} ${(r.g||{})[n]||0}</span>`).join('')+`<span>人口 ${r.pop||0}</span><span>城Lv ${r.bl||1}</span>`;
+  clearInterval(TLP.timer);TLP.timer=setInterval(()=>{if(!TLP||!TLP.play)return;if(TLP.i>=TLP.F.length-1){TLP.play=false;tlUi();return;}TLP.i++;tlShow();},400/TLP.speed);}
+function stopTimelapse(){if(!TLP)return;const k=TLP.keep,back=TLP.back;clearInterval(TLP.timer);
+  S.blds=k.blds;S.mines=k.mines;S.enemies=k.enemies;S.squads=k.squads;S.waveActive=k.wa;S.phase=k.ph;S.night=k.night;S.sel=k.sel;S.paused=k.pa;for(let y=0;y<S.grid.length;y++)S.grid[y]=k.grid[y];
+  cam.x=k.cam.x;cam.y=k.cam.y;cam.z=k.cam.z;document.body.classList.remove('tlOn');try{toggleFull(k.full);}catch(e){}const hud=document.getElementById('tlHud');if(hud)hud.remove();
+  TLP=null;S.overlay=null;setTimeout(()=>{try{resizeView();}catch(e){}renderAll();if(back)back();},60);}
 document.addEventListener('DOMContentLoaded',()=>{});
 // ===== 廃墟：壊された施設の跡。半額ですぐに建て直せる =====
 function ruinAt(x,y){return (S.ruins||[]).find(r=>{const n=r.sz||newSz(r.type);return x>=r.x&&x<r.x+n&&y>=r.y&&y<r.y+n;});}
@@ -8139,6 +8246,7 @@ function resizeView(){
     vh=Math.round(Math.max(12*TU,Math.min(40*TU,VW*avail/w)));
   }
   document.body.classList.toggle('land',isLand());
+  document.body.classList.toggle('tabUI',tabUI());
   if(isLand()){
     const r=cv.getBoundingClientRect();const used=document.getElementById('topbar').offsetHeight+document.getElementById('intel').offsetHeight+2;
     const h=Math.max(160,innerHeight-used);vh=Math.round(Math.max(6*TU,Math.min(60*TU,VW*h/Math.max(1,r.width))));
@@ -8232,14 +8340,15 @@ function renderMode(){
   if(S.buildMode){const d=B[S.buildMode],c=costOf(S.buildMode),ok=canAfford(c,d.pop),sz=newSz(S.buildMode);
     t=`${icSvg(S.buildMode,24)}<b class="mn">${d.name}</b><span class="szt">${sz}×${sz}</span>${!ok&&isNarrow()?mktBtn(c):''}<span class="ms">・${ok?(padMode()?(bGhost?'十字キーで調整して「決定」':(lineType(S.buildMode)?'場所をタップ・なぞると一列に配置':'建てたい場所をタップ')):(lineType(S.buildMode)?`${tap}で1つ・ドラッグで一列に配置`:`マップを${tap}して配置（続けて置けます）`)):`<span style="color:var(--red)">${lackNames(c,d.pop)||'資源が足りません'}</span>${isNarrow()?'':mktBtn(c)}`}</span><span class="mc">${costText(c,d.pop)}</span>`;}
   else if(S.buildPick)t=`<b class="mn">建設モード</b><span class="ms">・建てる施設を「建設」の一覧から選んでください</span>`;
-  if((S.buildMode||S.buildPick)&&S.undo&&S.undo.length&&!S.waveActive)t+=`<button id="mUndo" class="ghost" title="さっき置いたもの（一列ぶん）を取り消す。資源は全額戻る"><span>↶ 取り消し</span>${IS_TOUCH?'':'<kbd>Ctrl+Z</kbd>'}</button>`;
   else if(S.aimNaval)t='<b class="mn" style="color:#ffe38a">艦砲射撃</b><span class="ms">・目標地点をクリック（Escで取消）</span>';
   else if(S.multi&&S.multi.length){const us=S.squads.filter(x=>S.multi.includes(x.id)&&!x.gar);const md=us.length&&us.every(u=>u.mode===us[0].mode)?us[0].mode:null;
     t=`<b class="mn">${S.multi.length}部隊</b>${isNarrow()?'':`<span class="ms">を選択中・地図を${tap}でまとめて移動</span>`}<span class="mmb">${['guard','hold','return'].map(m=>`<button data-mm="${m}" class="${md===m?'on':''}">${MODE_NAME[m]}</button>`).join('')}</span>${X}`;}
   else if(S.sel&&S.sel.kind==='s')t=`${icSvg(S.sel.model||defModel(S.sel.ut),24)}<b class="mn">${unitLabel(S.sel)}</b><span class="ms">を指揮中・${tap}で移動</span>${X}`;
   else if(S.sel)t=`${icSvg(S.sel.type,24)}<b class="mn">${B[S.sel.type]?B[S.sel.type].name:''}</b><span class="ms">を選択中${gunOf(S.sel)?'・射程を表示':''}</span>${X}`;
   else if(S.boxMode)t=`<b class="mn">範囲選択</b><span class="ms">・選びたい部隊を囲むようにドラッグ</span><button id="mBoxX" class="ghost">やめる</button>`;
-  else t=isNarrow()?'<span class="ms">指揮・タップで選択、2本指で拡大</span><button id="mBox" class="ghost">範囲選択</button>':(S.squads.length>1?'<span class="ms">Shift＋ドラッグで部隊を範囲選択</span>':'');
+  else t=(isNarrow()||IS_TOUCH)?'<span class="ms">指揮・タップで選択、2本指で拡大</span><button id="mBox" class="ghost">範囲選択</button>':(S.squads.length>1?'<span class="ms">Shift＋ドラッグで部隊を範囲選択</span>':'');
+  // 取り消しボタンは、帯の中身が決まったあとに足す（2026-11-15 修正：前は「もし〜なら」のつながりの途中に入っていて、建設の帯が上書きされていた）
+  if((S.buildMode||S.buildPick)&&S.undo&&S.undo.length&&!S.waveActive)t+=`<button id="mUndo" class="ghost" title="さっき置いたもの（一列ぶん）を取り消す。資源は全額戻る"><span>↶ 取り消し</span>${IS_TOUCH?'':'<kbd>Ctrl+Z</kbd>'}</button>`;
   bar.classList.toggle('idle',!t);bar.classList.toggle('hint',!S.buildMode&&!S.buildPick&&!S.sel&&!(S.multi&&S.multi.length)&&!S.aimNaval);
   if(t!==modeKey){modeKey=t;document.getElementById('modeTxt').innerHTML=t;const d=document.getElementById('mDesel');if(d)d.onclick=deselect;
     document.querySelectorAll('#modeTxt [data-mm]').forEach(b=>b.onclick=e=>{e.stopPropagation();multiMode(b.dataset.mm);});
@@ -8297,7 +8406,7 @@ function loop(now){
   }
   try{draw();}catch(e){if(!drawErr++)console.error(e);}
   S.fogT=(S.fogT||0)+dt;if(S.fogT>0.5){S.fogT=0;revealAll();}
-  uiT+=dt;if(uiT>0.2){uiT=0;renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
+  uiT+=dt;if(uiT>0.2){uiT=0;stripKeyHints();renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
 }
 auUi();newState();S.backdrop=true;renderAll();resizeView();setTimeout(resizeView,300);showTitle();requestAnimationFrame(loop);
 </script>
