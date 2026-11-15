@@ -169,7 +169,7 @@ const DR={
 };
 // 場面ごとの候補（scene：ゲームの場面の名前。orig＝今の曲）
 const BGM=[
- {scene:'home',n:'ホーム（タイトル）',orig:'今の曲（ゆっくり・寂しげ）',list:[
+ {scene:'home',n:'ホーム（タイトル）',orig:'今の曲＝8bit A：夜明け前（2026-11-15 に決定）',old:'前の曲（ゆっくり・寂しげ）',list:[
   {id:'c_home_a',n:'8bit A：夜明け前',d:'Dマイナー・ゆったり。矩形波の旋律と分散和音',t:mkTrack({bpm:84,prog:['Dm','Bb','F','C','Dm','Bb','Gm','A'],bass:'half',arp:'updown',drums:DR.none,lstep:2,echo:true,lw:0.25,lv:0.05,
     lead:'A4 - - - D5 - E5 - F5 - - - E5 - D5 - C5 - - - A4 - - - G4 - A4 - C5 - - - A4 - - - D5 - E5 - F5 - - - G5 - F5 - E5 - - - C5 - D5 - E5 - - - - - - -'})},
   {id:'c_home_b',n:'8bit B：勇ましい序曲',d:'Aマイナー・行進。旋律2本の掛け合い',t:mkTrack({bpm:104,prog:['Am','F','G','E','Am','F','G','Am'],bass:'oct',arp:'none',drums:DR.march,lstep:2,lw:0.5,lv:0.045,l2w:0.25,l2v:0.028,
@@ -178,7 +178,7 @@ const BGM=[
   {id:'c_home_c',n:'8bit C：小さな街の灯',d:'Fメジャー・あたたかい。三連の分散和音',t:mkTrack({bpm:92,prog:['F','C','Dm','Bb','F','C','Bb','C'],bass:'walk',arp:'8',drums:DR.soft,lstep:2,lw:0.25,lv:0.05,av:0.02,
     lead:'C5 - A4 - F4 - A4 - G4 - - - - - C5 - D5 - C5 - A4 - F4 - G4 - - - - - - - F4 - G4 - A4 - Bb4 - C5 - - - D5 - C5 - A4 - - - G4 - - - F4 - - - - - - -'})},
  ]},
- {scene:'prep',n:'昼（街づくり）',orig:'今の曲（静かな緊張感）',list:[
+ {scene:'prep',n:'昼（街づくり）',orig:'今の曲＝8bit A：のどかな村（2026-11-15 に決定）',old:'前の曲（静かな緊張感）',list:[
   {id:'c_prep_a',n:'8bit A：のどかな村',d:'Cメジャー・軽快。はずむベース',t:mkTrack({bpm:116,prog:['C','Am','F','G'],bass:'oct',arp:'8',drums:DR.polka,lstep:2,lw:0.5,lv:0.04,av:0.018,
     lead:'E5 - G5 - C6 - B5 A5 G5 - E5 - D5 - - - C5 - E5 - A5 - G5 E5 F5 - - - . . . . E5 - F5 - G5 - C6 - B5 - A5 - G5 - - - F5 - E5 - D5 - - - C5 - - - - - - -'})},
   {id:'c_prep_b',n:'8bit B：職人の朝',d:'Gメジャー・せわしい。16分の刻み',t:mkTrack({bpm:132,prog:['G','Em','C','D'],bass:'8',arp:'16',drums:DR.rock,lstep:2,lw:0.25,lv:0.045,av:0.014,
@@ -186,19 +186,19 @@ const BGM=[
   {id:'c_prep_c',n:'8bit C：備える昼',d:'Dマイナー・少し緊張。ゆっくりした行進',t:mkTrack({bpm:100,prog:['Dm','C','Bb','A'],bass:'walk',arp:'stab',drums:DR.halftime,lstep:2,lw:0.25,lv:0.05,
     lead:'D5 - - - F5 - E5 - D5 - C5 - A4 - - - Bb4 - - - C5 - D5 - C#5 - - - - - - - D5 - - - F5 - G5 - A5 - G5 - F5 - E5 - D5 - E5 - F5 - E5 - C#5 - - - - - - -'})},
  ]},
- {scene:'night',n:'静かな夜',orig:'今の曲（鈴と虫の声）',list:[
+ {scene:'night',n:'静かな夜',orig:'今の曲＝8bit A：月明かり（2026-11-15 に決定）',old:'前の曲（鈴と虫の声）',list:[
   {id:'c_night_a',n:'8bit A：月明かり',d:'Aマイナー・ゆっくり。こだまする細い音',t:mkTrack({bpm:72,prog:['Am','F','C','G'],bass:'pedal',arp:'updown',drums:DR.none,lstep:4,lw:0.125,lv:0.04,echo:true,av:0.018,
     lead:'E5 - - - C5 - - - D5 - B4 - - - - - A4 - - - C5 - - - G4 - - - - - - -'})},
   {id:'c_night_b',n:'8bit B：子守歌',d:'Fメジャー・やさしい3拍子ふう',t:mkTrack({bpm:78,prog:['F','Dm','Bb','C'],bass:'half',arp:'pad',drums:DR.none,lstep:2,lw:0.5,lv:0.035,echo:true,
     lead:'A4 - - - - - C5 - Bb4 - A4 - G4 - - - F4 - - - - - A4 - G4 - - - - - - - A4 - - - - - D5 - C5 - Bb4 - A4 - - - G4 - - - - - E4 - F4 - - - - - - -'})},
  ]},
- {scene:'fest',n:'祭りの夜',orig:'今の曲（太鼓・手拍子・笛）',list:[
+ {scene:'fest',n:'祭りの夜',orig:'今の曲＝8bit B：酒場の踊り（2026-11-15 に決定）',old:'前の曲（太鼓・手拍子・笛）',list:[
   {id:'c_fest_a',n:'8bit A：広場のポルカ',d:'Dメジャー・跳ねる',t:mkTrack({bpm:144,prog:['D','A','D','G','D','A','G','D'],bass:'oct',arp:'stab',drums:DR.polka,lstep:2,lw:0.5,lv:0.045,
     lead:'F#5 - A5 - F#5 - D5 - E5 - F#5 - E5 - C#5 - D5 - F#5 - A5 - - - B5 - A5 - G5 - - - F#5 - A5 - F#5 - D5 - E5 - G5 - F#5 - E5 - D5 - E5 - F#5 - D5 - D5 - - - - - - -'})},
   {id:'c_fest_b',n:'8bit B：酒場の踊り',d:'Gメジャー・16分で速い',t:mkTrack({bpm:136,prog:['G','C','G','D'],bass:'gallop',arp:'none',drums:DR.fast,lstep:1,lw:0.25,lv:0.04,
     lead:'G5 A5 B5 G5 D5 G5 B5 D6 C6 B5 A5 G5 E5 G5 C6 E6 D6 C6 B5 A5 G5 A5 B5 G5 A5 G5 F#5 E5 D5 - - - G5 A5 B5 G5 D5 G5 B5 D6 C6 B5 A5 G5 E5 G5 C6 E6 D6 C6 B5 A5 B5 G5 A5 F#5 G5 - - - - - - -'})},
  ]},
- {scene:'battle',n:'敵の襲撃',orig:'今の曲（太鼓とベースの行進。襲撃が進むと旋律が入る）',list:[
+ {scene:'battle',n:'敵の襲撃',orig:'今の曲＝8bit C：重い行軍（2026-11-15 に決定）',old:'前の曲（太鼓とベースの行進。襲撃が進むと旋律が入る）',list:[
   {id:'c_bat_a',n:'8bit A：王道バトル',d:'Dマイナー・速い。16分のベースと矩形波の旋律',t:mkTrack({bpm:160,prog:['Dm','Dm','Bb','C','Dm','Dm','Gm','A'],bass:'16',arp:'none',drums:DR.rock,lstep:2,lw:0.5,lv:0.045,l2w:0.25,l2v:0.025,
     lead:'D5 - - - A4 - D5 - F5 - E5 - D5 - C5 - D5 - - - - - - - . . . . . . . . Bb4 - - - D5 - F5 - C5 - - - E5 - G5 - D5 - - - A4 - D5 - F5 - A5 - G5 - F5 - E5 - G5 - - - F5 - E5 - D5 - - - C#5 - - - E5 - - - A5 - - -',
     lead2:'. . . . . . . . . . . . . . . . . . . . F4 - A4 - D5 - A4 - F4 - A4 - . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .'})},
@@ -207,7 +207,7 @@ const BGM=[
   {id:'c_bat_c',n:'8bit C：重い行軍',d:'Cマイナー・どっしり。刻む和音と太鼓',t:mkTrack({bpm:140,prog:['Cm','Cm','Ab','Bb','Cm','Cm','Fm','G'],bass:'gallop',arp:'stab',drums:DR.march,lstep:2,lw:0.5,lv:0.045,av:0.02,
     lead:'C5 - - - G4 - - - C5 - Eb5 - D5 - C5 - Bb4 - - - - - - - . . . . . . . . Ab4 - - - C5 - Eb5 - Bb4 - - - D5 - F5 - C5 - - - G4 - - - C5 - Eb5 - G5 - F5 - Eb5 - D5 - Ab5 - - - G5 - - - - - - - B4 - - - D5 - - -'})},
  ]},
- {scene:'blood',base:'battle',n:'ブラッドムーンの夜',orig:'今の曲（通常の襲撃と同じ曲）',origTrack:'battle',origIt:2,list:[
+ {scene:'blood',n:'ブラッドムーンの夜',orig:'今の曲＝8bit B：狂乱（2026-11-15 に決定）',list:[
   {id:'c_blood_a',n:'8bit A：紅い月',d:'Dマイナー・不穏。半音上の和音がぶつかる。跳ねるベース',t:mkTrack({bpm:152,prog:['Dm','Eb','Dm','C','Bb','A','Eb','A'],bass:'gallop',arp:'stab',drums:DR.rock,lstep:2,lw:0.5,lv:0.05,av:0.02,
     lead:'D5 - - - Eb5 - D5 - A4 - - - - - - - Bb4 - A4 - G4 - A4 - Eb5 - - - D5 - - - F5 - E5 - D5 - C5 - Bb4 - - - A4 - - - G4 - Bb4 - Eb5 - D5 - C#5 - - - - - E5 - - -'})},
   {id:'c_blood_b',n:'8bit B：狂乱',d:'Cマイナー・とても速い。16分のベースと細かい分散和音',t:mkTrack({bpm:184,prog:['Cm','Cm','Db','Cm','Ab','G','Db','G'],bass:'16',arp:'16',drums:DR.fast,lstep:2,lw:0.25,lv:0.045,av:0.012,
@@ -215,7 +215,7 @@ const BGM=[
   {id:'c_blood_c',n:'8bit C：血の儀式',d:'Aマイナー・遅く重い。低い太鼓と、こだまする細い旋律',t:mkTrack({bpm:100,prog:['Am','Bb','Am','E','Am','Bb','F','E'],bass:'half',arp:'pad',drums:DR.boss,lstep:2,lw:0.125,lv:0.045,echo:true,
     lead:'A4 - - - - - Bb4 - A4 - - - - - - - E5 - - - D5 - C5 - Bb4 - - - A4 - - - G#4 - - - - - - - - - A4 - - - C5 - Bb4 - A4 - G4 - F4 - - - E4 - - - - - - - G#4 - - -'})},
  ]},
- {scene:'boss',n:'ボス襲来',orig:'今の曲（重い金管とティンパニ）',list:[
+ {scene:'boss',n:'ボス襲来',orig:'今の曲（重い金管とティンパニ。そのまま使う）',list:[
   {id:'c_boss_a',n:'8bit A：魔王の影',d:'Cマイナー・重い。半音で下がる不気味な進行',t:mkTrack({bpm:124,prog:['Cm','B','Bb','A','Ab','G','Ab','G'],bass:'8',arp:'stab',drums:DR.boss,lstep:2,lw:0.5,lv:0.05,av:0.02,
     lead:'C5 - - - - - Eb5 - D5 - - - - - B4 - Bb4 - - - - - D5 - C#5 - - - A4 - - - Ab4 - - - C5 - Eb5 - G5 - - - F#5 - - - Eb5 - - - F5 - Ab5 - G5 - - - - - - -'})},
   {id:'c_boss_b',n:'8bit B：決戦',d:'Bbマイナー・速く激しい',t:mkTrack({bpm:156,prog:['Bbm','Bbm','Gb','Ab','Bbm','Bbm','Ebm','F'],bass:'16',arp:'16',drums:DR.fast,lstep:2,lw:0.25,lv:0.045,av:0.012,
@@ -228,6 +228,7 @@ const BGM=[
     lead:'A4 - C5 - E5 - A5 - G5 - E5 - C5 - D5 - E5 - - - - - - - . . . . F5 - E5 - D5 - C5 - B4 - G#4 - B4 - E5 - - - - - - -'})},
  ]},
 ];
+for(const g of BGM)if(g.old&&TRACK['o_'+g.scene])g.list.push({id:'o_'+g.scene,n:'前の曲',d:g.old,t:TRACK['o_'+g.scene]});
 for(const g of BGM)for(const x of g.list)TRACK[x.id]=x.t;   // ゲームの曲表に足す（auSched が鳴らす）
 const CHIP_SCENE={},CHIP_PICK={};for(const g of BGM)for(const x of g.list){CHIP_SCENE[x.id]=g.base||g.scene;CHIP_PICK[x.id]=g.scene;}
 // 場面の曲を、選んだ 8bit の曲に差し替える（試作版のゲームでも効く）。ラボで聴いている間はその曲を固定
@@ -237,8 +238,8 @@ function hookMusic(){if(window.__labMusicHooked||typeof auMusicFor!=='function')
     if(LAB_PLAY){const want=LAB_PLAY==='stop'?null:LAB_PLAY.track;AU.intensity=LAB_PLAY.it||0;if(AU.track!==want){AU.track=want;AU.step=0;AU.nextT=AU.ctx.currentTime+0.15;}return;}
     const cur=AU.track;if(cur&&CHIP_SCENE[cur])AU.track=CHIP_SCENE[cur];   // いったん場面の名前に戻してから元の処理
     const r=orig.apply(this,arguments);const sc=AU.track;
-    const ps=(sc==='battle'&&S&&S.cur&&S.cur.blood&&PICK.blood)?'blood':sc,pk=PICK[ps];   /* ブラッドムーンの夜は「ブラッドムーン」で選んだ曲 */
-    if(pk&&TRACK[pk]&&CHIP_PICK[pk]===ps){AU.track=pk;if(cur!==pk&&CHIP_SCENE[cur]!==sc){AU.step=0;}}
+    const pk=PICK[sc];
+    if(pk&&TRACK[pk]&&CHIP_PICK[pk]===sc){AU.track=pk;if(cur!==pk&&CHIP_SCENE[cur]!==sc){AU.step=0;}}
     return r;};}
 hookMusic();
 function playBgm(track,it){try{auInit();}catch(e){}LAB_PLAY={track,it:it||0};try{auMusicFor();}catch(e){}renderLab();}
@@ -282,7 +283,7 @@ function renderLab(){const r=document.getElementById('ndLab');if(!r)return;const
     for(const g of BGM){h+=`<div class="grp scene">${g.n}</div>`;
       const origPick=!PICK[g.scene];
       h+=`<div class="it"><div class="ir"><b class="${cur===(g.origTrack||g.scene)?'now':''}">${cur===(g.origTrack||g.scene)?'♪ ':''}今の曲</b><span class="sp"></span><button data-play="${g.origTrack||g.scene}" data-it="${g.origIt!=null?g.origIt:g.scene==='battle'?1:0}">▶ 聴く</button><button class="pick ${origPick?'on':''}" data-pick="${g.scene}" data-id="">${origPick?'★ 使用中':'★ これにする'}</button></div><div class="ds">${g.orig}</div>${memoBox('bgm:'+g.scene)}</div>`;
-      for(const x of g.list){const pk=PICK[g.scene]===x.id;h+=`<div class="it"><div class="ir"><b class="${cur===x.id?'now':''}">${cur===x.id?'♪ ':''}${x.n}</b><span class="sp"></span><button data-play="${x.id}">▶ 聴く</button><button class="pick ${pk?'on':''}" data-pick="${g.scene}" data-id="${x.id}">${pk?'★ 使用中':'★ これにする'}</button></div><div class="ds">${x.d}（${x.t.bpm} BPM）</div>${memoBox('bgm:'+x.id)}</div>`;}}
+      for(const x of g.list){const pk=PICK[g.scene]===x.id;h+=`<div class="it"><div class="ir"><b class="${cur===x.id?'now':''}">${cur===x.id?'♪ ':''}${x.n}</b><span class="sp"></span><button data-play="${x.id}">▶ 聴く</button><button class="pick ${pk?'on':''}" data-pick="${g.scene}" data-id="${x.id}">${pk?'★ 使用中':'★ これにする'}</button></div><div class="ds">${x.d}${typeof x.t.bpm==='number'?`（${x.t.bpm} BPM）`:''}</div>${memoBox('bgm:'+x.id)}</div>`;}}
   }else{
     h+=`<div class="ds">効果音・BGM に書いたメモと、選んだ BGM をまとめたものです。「コピー」してチャットに貼り付けてください。</div><textarea id="labAll" style="min-height:260px" readonly>${esc(allMemoText())}</textarea>
       <div class="ir" style="margin:6px 0"><button id="labCopy">コピー</button><span id="labCopied" class="ds"></span></div><div class="grp">そのほかのメモ</div>${memoBox('other')}
