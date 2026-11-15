@@ -7935,7 +7935,7 @@ function noise(t,dur,o){
 }
 // ---- 効果音 ----
 const SE_GAP={mg:0.05,squad:0.07,kill:0.04,bigkill:0.08,boom:0.07,how:0.15,rail:0.12,click:0.03,hit:0.1};
-const BSND={smelter:'b_metal',mithmine:'b_metal',goldmine:'b_metal',coalmine:'b_metal',church:'b_stone',powder:'b_fire',mortar:'b_metal',fence:'b_wood',gate:'b_wood',tower:'b_wood',miner:'b_wood',barracks:'b_wood',apart:'b_wood',outpost:'b_wood',train:'b_wood',stable:'b_wood',tavern:'b_wood',market:'b_wood',spike:'b_wood',pit:'b_stone',swall:'b_stone',wall:'b_stone',quarry:'b_stone',ironmine:'b_metal',totem:'b_stone',mg:'b_metal',cannon:'b_metal',how:'b_metal',hisou:'b_metal',mabou:'b_metal',ammo:'b_metal',lab:'b_magic',magic:'b_magic',magetower:'b_magic',well:'b_magic',furnace:'b_fire',brazier:'b_fire',farm:'b_farm',fishery:'b_water',aerie:'b_stone'};
+const BSND={smelter:'b_metal',mithmine:'b_metal',goldmine:'b_metal',coalmine:'b_metal',church:'b_stone',powder:'b_metal',mortar:'b_metal',fence:'b_wood',gate:'b_wood',tower:'b_wood',miner:'b_wood',barracks:'b_wood',apart:'b_wood',outpost:'b_wood',train:'b_wood',stable:'b_wood',tavern:'b_wood',market:'b_wood',spike:'b_wood',pit:'b_stone',swall:'b_stone',wall:'b_stone',quarry:'b_stone',ironmine:'b_metal',totem:'b_stone',mg:'b_metal',cannon:'b_metal',how:'b_metal',hisou:'b_metal',mabou:'b_metal',ammo:'b_metal',lab:'b_magic',magic:'b_magic',magetower:'b_magic',well:'b_magic',furnace:'b_metal',brazier:'b_fire',farm:'b_farm',fishery:'b_water',aerie:'b_stone'};
 // 効果音（2026-11-15 作り直し：ユーザーのメモ「全体的に変なので一般的なものに」）
 // 金属を叩いた音：倍音がずれたサイン波を重ねて、すぐ減衰させる（カーン）
 function ring(t,f,dur,vol,o){o=o||{};for(const [m,a] of [[1,1],[2.76,0.5],[5.4,0.28],[8.9,0.12]])tone(f*m,t,dur*(1.1-a*0.3),{type:'sine',vol:vol*a,a:0.001,r:dur*0.9,send:o.send});noise(t,0.012,{ft:'highpass',f:5000,vol:vol*0.8});}
@@ -8081,7 +8081,7 @@ const SE_ALT={
  // 前回までの「今の音」の説明（ラボの表示用）
  SE_ALT.click[0][1]='カチッ';SE_ALT.error[0][1]='ブブッ';SE_ALT.turn[0][1]='ページをめくる＋ポーン';SE_ALT.upgrade[0][1]='パワーアップ（タタタター）';SE_ALT.hire[0][1]='金貨の音＋小さなファンファーレ';SE_ALT.launch[0][1]='パパパーン（出撃のラッパ）';
  // ユーザーが選んだ案を、選んでいない人の標準に（2026-11-15）
- for(const [n,lb] of [['b_wood','案C'],['b_stone','案C'],['b_metal','案C'],['b_farm','案B'],['resStart','案B'],['hit','案C'],['bigkill','案C'],['clear','案B'],['lose','案B']]){const i=SE_ALT[n].findIndex(x=>x[0].startsWith(lb));if(i>0)SE_DEF[n]=i;}
+ for(const [n,lb] of [['b_wood','案C'],['b_stone','案C'],['b_metal','案C'],['b_farm','案B'],['resStart','案B'],['hit','案C'],['bigkill','案C'],['clear','案B'],['lose','案B'],['alarm','案E'],['kia','案D'],['research','案F'],['click','案A'],['error','案C'],['upgrade','案C'],['hire','案A']]){const i=SE_ALT[n].findIndex(x=>x[0].startsWith(lb));if(i>0)SE_DEF[n]=i;}
 }
 // 効果音の優先順位（2026-11-15 決定）：大事な音が鳴っている間は、それより下の音を小さくする
 // 1 襲撃の知らせ・陥落 ＞ 2 英雄の戦死 ＞ 3 施設の破壊 ＞ 4 大きな敵の撃破 ＞ 5 範囲攻撃 ＞ 6 発射 ＞ 7 小さな敵の撃破 ＞ 8 建設。操作の音（0）は下げない
@@ -8361,7 +8361,7 @@ function auUi(){const b=document.getElementById('bMute');if(b){b.textContent=AU.
   const a=document.getElementById('vBgm'),c=document.getElementById('vSe');if(a)a.value=AU.bgmVol;if(c)c.value=AU.seVol;}
 document.addEventListener('pointerdown',auInit);
 document.addEventListener('keydown',auInit);
-document.addEventListener('click',ev=>{if(ev.target.closest&&ev.target.closest('button')&&!ev.target.closest('button').disabled)se('click');},true);
+document.addEventListener('click',ev=>{const bt=ev.target.closest&&ev.target.closest('button');if(bt&&!bt.disabled&&!bt.matches('[data-se],[data-sev],[data-demo],[data-play]'))se('click');},true);   // ラボの「▶」は鳴らす音を聴くので、ボタンの音は出さない
 
 // ===== スマホ用シート =====
 function isNarrow(){return innerWidth<=900;}
