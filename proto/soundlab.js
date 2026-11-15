@@ -221,6 +221,8 @@ const BGM=[
   {id:'c_boss_b',n:'8bit B：決戦',d:'Bbマイナー・速く激しい',t:mkTrack({bpm:156,prog:['Bbm','Bbm','Gb','Ab','Bbm','Bbm','Ebm','F'],bass:'16',arp:'16',drums:DR.fast,lstep:2,lw:0.25,lv:0.045,av:0.012,
     lead:'Bb4 - Db5 - F5 - - - E5 - F5 - Ab5 - Gb5 - F5 - - - Db5 - - - Eb5 - F5 - Gb5 - - - F5 - Eb5 - Db5 - - - Ab4 - - - Bb4 - Db5 - F5 - Bb5 - Ab5 - Gb5 - F5 - Eb5 - F5 - - - A4 - - - C5 - - - F5 - - -'})},
  ]},
+ {scene:'res_win',n:'勝利の結果画面',orig:'今の曲＝凱旋（Cメジャー・行進）',list:[{id:'res_win_b',n:'案B：夜明けの街',d:'Fメジャー・ゆったり、あたたかい',t:TRACK.res_win_b}]},
+ {scene:'res_lose',n:'敗北の結果画面',orig:'今の曲＝鎮魂（Aマイナー・ゆっくり、こだまする細い音）',list:[{id:'res_lose_b',n:'案B：灰の朝',d:'Dマイナー・少し動きのある悲しい旋律',t:TRACK.res_lose_b}]},
  {scene:'siege',n:'駐留地への夜襲',orig:'今の曲（忍び寄る→戦太鼓）',list:[
   {id:'c_siege_a',n:'8bit A：忍び足',d:'Eマイナー・低く静か。ぽつぽつ鳴る旋律',t:mkTrack({bpm:112,prog:['Em','Em','C','B'],bass:'walk',arp:'none',drums:DR.sneak,lstep:2,lw:0.125,lv:0.04,echo:true,
     lead:'E4 - . . G4 - . . F#4 - . . E4 - - - . . . . B4 - . . A4 - G4 - F#4 - - - . . . . . . . . . . . . . . . .'})},
@@ -268,6 +270,7 @@ function allMemoText(){const L=[];const se=Object.keys(MEMO).filter(k=>k.startsW
   if(se.length){L.push('【効果音】');for(const k of se)L.push(`・${seName(k.slice(3))}（${k.slice(3)}）：${MEMO[k].trim().replace(/\n/g,' / ')}`);}
   if(bg.length){L.push('【BGM】');for(const k of bg)L.push(`・${bgmName(k.slice(4))}：${MEMO[k].trim().replace(/\n/g,' / ')}`);}
   const pk=Object.keys(PICK).filter(k=>PICK[k]);if(pk.length){L.push('【選んだBGM】');for(const k of pk){const g=BGM.find(x=>x.scene===k);const it=g&&g.list.find(x=>x.id===PICK[k]);L.push(`・${g?g.n:k}：${it?it.n:'今の曲'}`);}}
+  if(typeof SE_ALT!=='undefined'){const sp=Object.keys(SE_ALT).filter(k=>SE_PICK[k]!=null);if(sp.length){L.push('【選んだ効果音の案】');for(const k of sp)L.push(`・${seName(k)}（${k}）：${SE_ALT[k][SE_PICK[k]][0]}`);}}
   if(ot)L.push('【そのほか】\n'+ot);
   return L.join('\n')||'（まだメモはありません）';}
 function renderLab(){const r=document.getElementById('ndLab');if(!r)return;const lb0=r.querySelector('.lb'),keepY=lb0?lb0.scrollTop:0,keepTab=r.dataset.tab;const on=typeof AU!=='undefined'&&AU.on;const bv=AU.bgmVol,svv=AU.seVol;
@@ -276,7 +279,10 @@ function renderLab(){const r=document.getElementById('ndLab');if(!r)return;const
   if(TAB==='se'){
     h+=`<div class="ds">「▶ 音」は音だけ、「▶ 演出つき」は左のマップに本物の施設・敵・部隊を出して、実際の演出と一緒に鳴らします（何度押してもやり直せます）。メモは書いたらすぐこの端末に保存されます。</div>`;
     for(const [g,L] of SE_LIST){h+=`<div class="grp">${g}</div>`;
-      for(const [id,n,where,o] of L)h+=`<div class="it"><div class="ir"><b>${n}</b><code>${id}</code><span class="sp"></span><button data-se="${id}">▶ 音</button>${o&&o.demo?`<button data-demo="${o.demo}">▶ 演出つき</button>`:''}</div><div class="ds">${where}</div>${memoBox('se:'+id)}</div>`;}
+      for(const [id,n,where,o] of L){const ALT=typeof SE_ALT!=='undefined'&&SE_ALT[id],pk=ALT?sePick(id):0;
+        h+=`<div class="it"><div class="ir"><b>${n}</b><code>${id}</code><span class="sp"></span><button data-se="${id}">▶ 音${ALT?'（選んだ案）':''}</button>${o&&o.demo?`<button data-demo="${o.demo}">▶ 演出つき</button>`:''}</div><div class="ds">${where}</div>`;
+        if(ALT)h+=`<div style="margin:2px 0 6px 10px;border-left:2px solid #445a40;padding-left:8px">${ALT.map((v,k)=>`<div class="ir" style="padding:2px 0"><span style="min-width:0;flex:1"><b style="${pk===k?'color:#6fe08a':''}">${pk===k?'★ ':''}${v[0]}</b><br><span class="ds">${v[1]}</span></span><button data-sev="${id}" data-k="${k}">▶</button><button class="pick ${pk===k?'on':''}" data-sepick="${id}" data-k="${k}">${pk===k?'★ 使用中':'★ これにする'}</button></div>`).join('')}</div>`;
+        h+=`${memoBox('se:'+id)}</div>`;}}
   }else if(TAB==='bgm'){
     h+=`<div class="ds">場面ごとに「今の曲」と 8bit 風の曲を聴き比べられます。<b>「★これにする」</b>を押すと、試作版のゲームのその場面でその曲が流れます（もう一度押すと今の曲に戻ります）。</div>`;
     const cur=LAB_PLAY&&LAB_PLAY.track;
@@ -296,6 +302,8 @@ function renderLab(){const r=document.getElementById('ndLab');if(!r)return;const
   r.querySelector('#labMute').onclick=()=>{try{auInit();auToggle();}catch(e){}renderLab();};
   const ls=r.querySelector('#labStop');if(ls)ls.onclick=stopBgm;
   r.querySelectorAll('[data-se]').forEach(b=>b.onclick=()=>{try{auInit();}catch(e){}if(AU.last)AU.last[b.dataset.se]=-9;se(b.dataset.se);});
+  r.querySelectorAll('[data-sev]').forEach(b=>b.onclick=()=>{try{auInit();}catch(e){}seVariant(b.dataset.sev,+b.dataset.k);});
+  r.querySelectorAll('[data-sepick]').forEach(b=>b.onclick=()=>{const id=b.dataset.sepick,k=+b.dataset.k;SE_PICK[id]=k;try{localStorage.setItem('nd_se_pick',JSON.stringify(SE_PICK));}catch(e){}try{auInit();}catch(e){}seVariant(id,k);renderLab();});
   r.querySelectorAll('[data-demo]').forEach(b=>b.onclick=()=>{try{auInit();}catch(e){}runDemo(b.dataset.demo);});
   r.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>playBgm(b.dataset.play,+(b.dataset.it||0)));
   r.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{const sc=b.dataset.pick,id=b.dataset.id;if(id&&PICK[sc]!==id)PICK[sc]=id;else delete PICK[sc];sv(PICK_KEY,PICK);try{se('click');}catch(e){}renderLab();});

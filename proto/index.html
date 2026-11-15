@@ -7738,10 +7738,78 @@ const BSND={smelter:'b_metal',mithmine:'b_metal',goldmine:'b_metal',coalmine:'b_
 function ring(t,f,dur,vol,o){o=o||{};for(const [m,a] of [[1,1],[2.76,0.5],[5.4,0.28],[8.9,0.12]])tone(f*m,t,dur*(1.1-a*0.3),{type:'sine',vol:vol*a,a:0.001,r:dur*0.9,send:o.send});noise(t,0.012,{ft:'highpass',f:5000,vol:vol*0.8});}
 // 木を叩いた音：中音域のこもった短い打音（コッ）
 function knock(t,f,vol){tone(f,t,0.07,{type:'sine',to:f*0.8,vol:vol,a:0.001,r:0.06});tone(f*2.3,t,0.03,{type:'triangle',vol:vol*0.35,a:0.001});noise(t,0.025,{ft:'bandpass',f:f*2.5,q:2,vol:vol*0.9});}
+// ===== 効果音の案（2026-11-15）。ラボで聴き比べて「★これにする」で選ぶ（localStorage nd_se_pick）。0 番は「今の音」（下の switch） =====
+// SE_DEF：選んでいないときに使う案（ユーザーのメモで「変えてほしい」となった音は、新しい案Aを使う）
+const SE_DEF={resStart:1,research:1,hit:1,kill:1,bigkill:1,clear:1,win:1,lose:1,kia:1};
+let SE_PICK=(()=>{try{return JSON.parse(localStorage.getItem('nd_se_pick'))||{};}catch(e){return {};}})();
+function sePick(n){return SE_PICK[n]!=null?SE_PICK[n]:(SE_DEF[n]||0);}
+function seVariant(n,k){if(!AU.ctx)return;const L=SE_ALT[n];if(!L||!L[k])return;const t=AU.ctx.currentTime,rv=(a,b)=>a+Math.random()*(b-a);if(L[k][2])L[k][2](t,rv);else{const sv=SE_PICK[n];SE_PICK[n]=0;AU.last[n]=-9;se(n);if(sv==null)delete SE_PICK[n];else SE_PICK[n]=sv;}}
+const bub=(t,f,v)=>{tone(f,t,0.06,{type:'sine',to:f*2.4,vol:v,a:0.003,r:0.04});};   // 泡（ポコッ）：短く上がるサイン波
+const slash=(t,f0,f1,dur,v)=>{noise(t,dur,{ft:'bandpass',f:f0,fTo:f1,q:1.6,vol:v,a:0.004});noise(t,dur*0.6,{ft:'highpass',f:5000,vol:v*0.35});};   // ザシュ：高い所から下がる擦れた音
+const crash=(t,dur,v)=>{noise(t,dur,{ft:'highpass',f:4500,fTo:2500,vol:v});noise(t,dur*0.5,{ft:'bandpass',f:7000,q:0.5,vol:v*0.6});};   // シンバル
+const brass=(t,m,dur,v,o)=>{o=o||{};for(const dt of [-6,6])tone(mtof(m),t,dur,{type:'sawtooth',det:dt,vol:v,lp:2600,lpTo:1400,a:0.025,r:Math.min(0.25,dur*0.5),send:o.send});tone(mtof(m-12),t,dur,{type:'triangle',vol:v*1.2,a:0.02});};   // 金管っぽい和音の1音
+const SE_ALT={
+ b_wood:[['今の音','コッ・コッ・コッ（同じ高さで3回）'],
+  ['案B：釘を打つ','トントン、トン（金づちで釘を打つ。低めでこもった音）',(t,rv)=>{for(const d of [0,0.11,0.32])knock(t+d,560,0.1);}],
+  ['案C：のこぎり＋トン','ギコギコ（のこぎり）のあとにトン',(t,rv)=>{for(let i=0;i<3;i++)noise(t+i*0.14,0.12,{ft:'bandpass',f:i%2?2200:1600,q:3,vol:0.07,a:0.03});knock(t+0.48,640,0.1);}]],
+ b_stone:[['今の音','ガッガッガッガッ（石を割る）＋ガラガラ'],
+  ['案B：のみで刻む','コンコンコン（のみで石を刻む、高く乾いた音）',(t,rv)=>{for(let i=0;i<4;i++){const s0=t+i*0.12;noise(s0,0.03,{ft:'bandpass',f:3600,q:3,vol:0.15});tone(1900,s0,0.05,{type:'triangle',vol:0.025,a:0.001});}}],
+  ['案C：石を積む','ゴトッ、ゴトッ（重い石を積む低い音）',(t,rv)=>{for(let i=0;i<2;i++){const s0=t+i*0.28;tone(140,s0,0.12,{to:80,vol:0.14,a:0.002});noise(s0,0.1,{ft:'lowpass',f:700,vol:0.16});}noise(t+0.6,0.2,{f:900,fTo:300,vol:0.04});}]],
+ b_metal:[['今の音','カンカンカン（金床を叩く）'],
+  ['案B：高いキンキン','キンキンキン（細い金具を叩く、高く鋭い音）',(t,rv)=>{for(let i=0;i<3;i++)ring(t+i*0.13,2300,0.22,0.04);}],
+  ['案C：つるはし','カーン……カーン（つるはしで岩を掘る、ゆっくり長く響く）',(t,rv)=>{for(let i=0;i<2;i++){ring(t+i*0.38,1150,0.5,0.05);noise(t+i*0.38,0.06,{ft:'bandpass',f:2500,vol:0.08});}}]],
+ b_fire:[['今の音','シュボッ（擦って燃え上がる）＋パチパチ'],
+  ['案B：ボワッ','ボワッと大きく燃え広がる（低い風の音がふくらむ）',(t,rv)=>{noise(t,0.6,{ft:'lowpass',f:250,fTo:1200,vol:0.22,a:0.12});for(let i=0;i<5;i++)noise(t+0.3+rv(0,0.5),0.01,{ft:'highpass',f:rv(3000,5000),vol:0.06});}],
+  ['案C：たき火','パチパチだけ（たき火がはぜる音が1秒ほど）',(t,rv)=>{noise(t,1,{ft:'lowpass',f:500,vol:0.04,a:0.1});for(let i=0;i<14;i++)noise(t+rv(0,1),0.008,{ft:'highpass',f:rv(2500,6000),vol:rv(0.04,0.1)});}]],
+ b_farm:[['今の音','ザクッ、ザクッ（くわで土を起こす）'],
+  ['案B：耕して種まき','ザクッ×3のあと、サラサラ（種をまく）',(t,rv)=>{for(let i=0;i<3;i++){const s0=t+i*0.17;noise(s0,0.08,{ft:'bandpass',f:1500,q:0.9,vol:0.14});noise(s0,0.1,{ft:'lowpass',f:450,vol:0.12});}noise(t+0.6,0.45,{ft:'highpass',f:5000,vol:0.035,a:0.1});}],
+  ['案C：芽が出る','ポコン（芽が出る）＋キラッ',(t,rv)=>{tone(300,t,0.12,{type:'sine',to:700,vol:0.1,a:0.003});tone(mtof(88),t+0.12,0.35,{type:'triangle',vol:0.035,send:true});tone(mtof(91),t+0.2,0.4,{type:'triangle',vol:0.03,send:true});}]],
+ alarm:[['今の音','角笛「ブォーー」×2（音を重ねて厚く）＋大太鼓'],
+  ['案B：警鐘','カンカンカンカン（見張り台の鐘を乱打）＋大太鼓',(t,rv)=>{for(let i=0;i<8;i++)ring(t+i*0.2,880,0.35,0.05);for(let i=0;i<4;i++)tone(95,t+1.7+i*0.2,0.35,{to:42,vol:0.2});}],
+  ['案C：ラッパの号令','パッパカパーン（戦いの合図のラッパ・短調）＋太鼓',(t,rv)=>{[[57,0,0.12],[57,0.14,0.12],[60,0.28,0.12],[64,0.42,0.6],[62,1.1,0.25],[60,1.4,0.9]].forEach(([m,d,l])=>brass(t+d,m+12,l,0.035,{send:true}));for(let i=0;i<5;i++)tone(100,t+2.4+i*0.15,0.3,{to:45,vol:0.18});}]],
+ kia:[['今の音','ゴーーン（低い鐘）……低すぎる'],
+  ['案A：鐘（高め）','ゴーーン（少し高い鐘。暗いけれど聞き取りやすい）',(t,rv)=>{for(const [m,a] of [[1,1],[2.0,0.45],[2.4,0.4],[3.0,0.22],[4.16,0.12]])tone(196*m,t,3*(1.05-a*0.2),{type:'sine',vol:0.08*a,a:0.004,r:2.8,send:true});noise(t,0.03,{ft:'lowpass',f:1500,vol:0.06});}],
+  ['案B：鐘＋悲しい和音','ゴーン＋ゆっくり下がる短調の和音',(t,rv)=>{for(const [m,a] of [[1,1],[2.4,0.4],[3.0,0.2]])tone(220*m,t,2.2,{type:'sine',vol:0.07*a,a:0.004,r:2,send:true});[[69,72,76],[67,70,74]].forEach((c,i)=>c.forEach(n=>tone(mtof(n-12),t+0.6+i*1.1,1.3,{type:'triangle',vol:0.03,a:0.2,r:0.8,send:true})));}],
+  ['案C：太鼓と3つの音','ドン……と、短調の3音（ラ・ソ・ミ）',(t,rv)=>{tone(90,t,0.6,{to:40,vol:0.2});[[69,0.4],[67,0.9],[64,1.4]].forEach(([n,d])=>tone(mtof(n),t+d,d>1?1.2:0.5,{type:'triangle',vol:0.07,lp:1800,send:true}));}]],
+ resStart:[['今の音','ピポッ'],
+  ['案A：こぽぽ','こぽぽぽ（フラスコの泡）',(t,rv)=>{for(let i=0;i<5;i++)bub(t+i*0.07+rv(0,0.03),rv(300,520)*(1+i*0.08),0.06);}],
+  ['案B：こぽぽ＋カチン','泡のあとに、ガラスが触れるカチン',(t,rv)=>{for(let i=0;i<4;i++)bub(t+i*0.08,rv(320,480),0.055);ring(t+0.38,3200,0.25,0.025);}],
+  ['案C：ピロリン','ピロリン（魔法っぽく始まる）',(t,rv)=>{[76,79,83].forEach((n,i)=>tone(mtof(n),t+i*0.06,0.25,{type:'sine',vol:0.05,send:true}));}]],
+ research:[['今の音','ひらめき（上がる4音）'],
+  ['案A：ピコーン！','ピコーン！（ひらめいた！の2音＋キラキラ）',(t,rv)=>{tone(mtof(84),t,0.09,{type:'square',vol:0.04,lp:4000});tone(mtof(91),t+0.09,0.55,{type:'square',vol:0.04,lp:4000,send:true});noise(t+0.1,0.5,{ft:'highpass',f:7000,vol:0.025});}],
+  ['案B：泡からジャーン','こぽぽ……ジャーン（研究が完成した和音）',(t,rv)=>{for(let i=0;i<4;i++)bub(t+i*0.07,rv(320,520),0.05);[72,76,79,84].forEach(n=>brass(t+0.35,n,0.8,0.022,{send:true}));}],
+  ['案C：本を閉じる＋チャイム','パタン（本を閉じる）＋キンコーン',(t,rv)=>{noise(t,0.06,{ft:'lowpass',f:900,vol:0.15});tone(mtof(83),t+0.12,0.7,{type:'sine',vol:0.06,send:true});tone(mtof(79),t+0.45,0.9,{type:'sine',vol:0.06,send:true});}]],
+ hit:[['今の音','ドスッ'],
+  ['案A：バシン','バシン！（乾いた強い衝撃）',(t,rv)=>{noise(t,0.12,{ft:'bandpass',f:2500,q:0.6,vol:0.14,a:0.001});noise(t,0.05,{ft:'highpass',f:6000,vol:0.07});tone(140,t,0.12,{to:60,vol:0.1,a:0.001});}],
+  ['案B：ドガッ','ドガッ！（重い体当たり＋ガシャ）',(t,rv)=>{tone(110,t,0.2,{to:45,vol:0.09,a:0.001});noise(t,0.18,{f:1800,fTo:400,vol:0.08});ring(t+0.02,900,0.15,0.012);}],
+  ['案C：バシーン','バシーン（ムチのような鋭い音が少し響く）',(t,rv)=>{noise(t,0.04,{ft:'highpass',f:3000,vol:0.2,a:0.001});noise(t+0.02,0.3,{ft:'bandpass',f:1800,fTo:900,q:1,vol:0.07});tone(160,t,0.1,{to:70,vol:0.1});}]],
+ kill:[['今の音','ポコッ'],
+  ['案A：ザシュ','ザシュッ（斬る）',(t,rv)=>{slash(t,rv(4500,5500),900,0.11,0.07);}],
+  ['案B：ズバッ','ズバッ（少し重く斬る）',(t,rv)=>{slash(t,3500,500,0.14,0.08);tone(160,t+0.03,0.06,{to:80,vol:0.05});}],
+  ['案C：ザシュ＋ポコッ','ザシュッのあとに小さく倒れる音',(t,rv)=>{slash(t,5000,1000,0.09,0.06);tone(rv(450,560),t+0.07,0.07,{type:'square',to:180,vol:0.015,lp:1800});}]],
+ bigkill:[['今の音','ドサッ'],
+  ['案A：ザシュッ…ドサァ','大きく斬って、重く倒れる',(t,rv)=>{slash(t,4500,600,0.18,0.1);tone(75,t+0.18,0.35,{to:35,vol:0.15});noise(t+0.18,0.3,{f:600,fTo:150,vol:0.1});}],
+  ['案B：ズバァン','ズバァン（大きな一撃＋地響き）',(t,rv)=>{slash(t,3000,300,0.22,0.12);noise(t+0.05,0.6,{f:500,fTo:60,vol:0.12});tone(55,t+0.05,0.5,{to:30,vol:0.15});}],
+  ['案C：うめき声＋ドサッ','低いうめき声のあと倒れる',(t,rv)=>{tone(180,t,0.35,{type:'sawtooth',to:90,vol:0.04,lp:700});tone(70,t+0.3,0.3,{to:35,vol:0.14});noise(t+0.3,0.25,{f:600,fTo:150,vol:0.1});}]],
+ clear:[['今の音','タタタターン（8bit）'],
+  ['案A：勝ちどきのファンファーレ','パッパッパッパーー、パパーン（金管・約2秒）',(t,rv)=>{const F=[[60,64,67],[60,64,67],[60,64,67],[65,69,72],[67,71,74],[72,76,79]];const D=[[0,0.13],[0.15,0.13],[0.3,0.13],[0.45,0.55],[1.05,0.2],[1.3,1.1]];F.forEach((c,i)=>c.forEach(n=>brass(t+D[i][0],n+12,D[i][1],0.018,{send:true})));for(const d of [0,0.45,1.3])tone(100,t+d,0.3,{to:45,vol:0.15});crash(t+1.3,1.2,0.05);}],
+  ['案B：8bit の勝利','チャララッチャッチャーン（8bit の勝利の短い曲）',(t,rv)=>{[[72,0,0.1],[76,0.1,0.1],[79,0.2,0.1],[84,0.3,0.25],[79,0.6,0.1],[84,0.72,0.8]].forEach(([n,d,l])=>{tone(mtof(n),t+d,l,{type:'square',vol:0.045,lp:4000,send:true});tone(mtof(n-24),t+d,l,{type:'triangle',vol:0.06});});}],
+  ['案C：歓声と太鼓','ドドドン！＋「わーっ」という歓声（ざわめき）',(t,rv)=>{for(const d of [0,0.12,0.24,0.5])tone(100,t+d,0.3,{to:45,vol:0.18});noise(t+0.5,1.5,{ft:'bandpass',f:900,q:0.4,vol:0.06,a:0.25});crash(t+0.5,1,0.05);}]],
+ win:[['今の音','ファンファーレ（8bit）'],
+  ['案A：大勝利','パパパパーン！から続く長いファンファーレ＋シンバル＋花火（約4秒）',(t,rv)=>{const N=[[67,0,0.12],[67,0.13,0.12],[67,0.26,0.12],[72,0.4,0.5],[71,0.95,0.2],[72,1.2,0.2],[74,1.45,0.2],[76,1.7,0.6],[74,2.35,0.2],[76,2.6,0.2],[79,2.85,1.4]];
+    for(const [m,d,l] of N){brass(t+d,m+12,l,0.024,{send:true});const ch=m>=76?[4,7]:m>=72?[4,7]:[0];for(const c of ch)brass(t+d,m+c,l,0.012);}
+    for(const d of [0.4,1.7,2.85])crash(t+d,1.2,0.06);for(let i=0;i<10;i++)tone(100,t+2.3+i*0.055,0.12,{to:60,vol:0.1});tone(90,t+2.85,0.6,{to:40,vol:0.22});
+    for(let i=0;i<6;i++){const s0=t+3.2+i*0.18+rv(0,0.1);noise(s0,0.25,{f:1500,fTo:200,vol:0.1});for(let j=0;j<4;j++)noise(s0+0.12+j*0.04,0.015,{ft:'highpass',f:5000,vol:0.04});}}],
+  ['案B：8bit の大団円','8bit で長く盛り上がる勝利の曲（約4秒）',(t,rv)=>{const N=[72,76,79,84,79,84,88,84,86,88,91,96];N.forEach((n,i)=>{const l=i===N.length-1?1.4:0.16;tone(mtof(n),t+i*0.17,l,{type:'square',vol:0.045,lp:4500,send:true});if(i%2===0)tone(mtof(n-24),t+i*0.17,0.3,{type:'triangle',vol:0.07});});for(let i=0;i<8;i++)noise(t+i*0.34,0.03,{ft:'highpass',f:7000,vol:0.05});crash(t+1.87,1.5,0.05);}]],
+ lose:[['今の音','ちゃらら〜（下がっていく）'],
+  ['案A：悲しい鐘と和音','ゴーン……と、ゆっくり沈む短調の和音（約3秒）',(t,rv)=>{for(const [m,a] of [[1,1],[2.4,0.4],[3.0,0.2]])tone(147*m,t,3,{type:'sine',vol:0.07*a,a:0.004,r:2.8,send:true});[[57,60,64],[53,57,60],[52,56,59]].forEach((c,i)=>c.forEach(n=>tone(mtof(n),t+0.5+i*0.9,1.1,{type:'triangle',vol:0.03,a:0.15,r:0.6,send:true})));}],
+  ['案B：8bit のゲームオーバー','テレレ〜ン……（8bit の負けの曲）',(t,rv)=>{[[71,0,0.15],[70,0.18,0.15],[69,0.36,0.15],[68,0.54,0.9]].forEach(([n,d,l])=>{tone(mtof(n),t+d,l,{type:'square',vol:0.045,lp:3000,send:true});tone(mtof(n-24),t+d,l,{type:'triangle',vol:0.06});});tone(mtof(44),t+1.5,1.2,{type:'triangle',vol:0.08});}]],
+};
 function se(name){
   if(!AU.ctx||!AU.on)return;const t=AU.ctx.currentTime;
   if(SE_GAP[name]&&t-(AU.last[name]??-1)<SE_GAP[name])return;AU.last[name]=t;
   const rv=(a,b)=>a+Math.random()*(b-a);   // 毎回少しずつ違う音に
+  {const L=SE_ALT[name],k=sePick(name);if(L&&L[k]&&L[k][2]){L[k][2](t,rv);return;}}   // 案が選ばれていればその音（0＝今の音＝下の switch）
   switch(name){
     // ---- 操作 ----
     case 'click':tone(1800,t,0.025,{type:'sine',to:1400,vol:0.05,a:0.001});break;                                             // カチッ
@@ -7800,7 +7868,7 @@ function auMusicFor(){
   if(!AU.ctx||!S)return;
   // 場面ごとの曲：ホーム（タイトル）・昼・静かな夜・祭りの夜・敵の襲撃・ボス襲来（攻城戦は siege.js が上書きする）
   const boss=(S.waveActive||S.skirm)&&S.enemies&&S.enemies.some(e=>e.hp>0&&E[e.type]&&E[e.type].boss);
-  const want=(S.overlay==='title'||S.overlay==='intro')?'home':S.over?null:(S.waveActive||S.skirm)?(boss?'boss':(S.waveActive&&S.cur&&S.cur.blood?'blood':'battle')):S.night?(S.night.plan==='fest'?'fest':'night'):'prep';
+  const want=(S.overlay==='title'||S.overlay==='intro')?'home':S.over?(S.endShown?(S.endWin?'res_win':'res_lose'):null):(S.waveActive||S.skirm)?(boss?'boss':(S.waveActive&&S.cur&&S.cur.blood?'blood':'battle')):S.night?(S.night.plan==='fest'?'fest':'night'):'prep';
   AU.intensity=S.waveActive?battleLv():0;
   AU.map=AU.mapForce||S.mapId||'f';
   if(want!==AU.track){
@@ -7808,7 +7876,7 @@ function auMusicFor(){
     AU.music.gain.cancelScheduledValues(t);AU.music.gain.setValueAtTime(AU.music.gain.value,t);
     AU.music.gain.linearRampToValueAtTime(0.0001,t+0.25);
     AU.music.gain.linearRampToValueAtTime(AU.bgmVol*0.9,t+0.6);
-    AU.track=want;AU.step=0;AU.nextT=t+0.3;
+    AU.track=want;AU.step=0;AU.nextT=t+(want==='res_win'?4.3:want==='res_lose'?3.2:0.3);   /* 結果の曲は、勝利／敗北の効果音が鳴り終わってから */
   }
 }
 function auSched(){
@@ -7946,6 +8014,15 @@ TRACK.battle=CHIP.mkTrack({bpm:140,prog:['Cm','Cm','Ab','Bb','Cm','Cm','Fm','G']
     lead:'C5 - - - G4 - - - C5 - Eb5 - D5 - C5 - Bb4 - - - - - - - . . . . . . . . Ab4 - - - C5 - Eb5 - Bb4 - - - D5 - F5 - C5 - - - G4 - - - C5 - Eb5 - G5 - F5 - Eb5 - D5 - Ab5 - - - G5 - - - - - - - B4 - - - D5 - - -'});   // 重い行軍
 TRACK.blood=CHIP.mkTrack({bpm:184,prog:['Cm','Cm','Db','Cm','Ab','G','Db','G'],bass:'16',arp:'16',drums:CHIP.DR.fast,lstep:2,lw:0.25,lv:0.045,av:0.012,
     lead:'C5 - Eb5 - G5 - F#5 - G5 - - - Eb5 - C5 - Db5 - - - F5 - Ab5 - G5 - - - - - - - Ab4 - C5 - Eb5 - D5 - Eb5 - Ab5 - G5 - F5 - Db5 - - - F5 - - - G5 - B4 - D5 - F5 -'});   // 狂乱
+// 結果画面の曲（2026-11-15）：勝ったとき・負けたとき。勝利／敗北の効果音が鳴り終わってから流れる（_b はラボで選べる別の案）
+TRACK.res_win=CHIP.mkTrack({bpm:112,prog:['C','G','Am','F','C','G','F','C'],bass:'oct',arp:'8',drums:CHIP.DR.march,lstep:2,lw:0.5,lv:0.045,av:0.018,
+  lead:'C5 - E5 - G5 - - - A5 - G5 - E5 - C5 - D5 - E5 - - - D5 - - - . . . . F5 - A5 - C6 - - - B5 - A5 - G5 - E5 - F5 - D5 - C5 - - - - - - -'});   // 凱旋
+TRACK.res_win_b=CHIP.mkTrack({bpm:88,prog:['F','C','Dm','Bb','F','C','Bb','F'],bass:'half',arp:'updown',drums:CHIP.DR.soft,lstep:2,lw:0.25,lv:0.05,echo:true,
+  lead:'A4 - - - C5 - F5 - E5 - - - C5 - - - D5 - - - F5 - A5 - G5 - - - - - - - A5 - - - G5 - F5 - E5 - D5 - C5 - - - Bb4 - C5 - D5 - C5 - - - - - - -'});   // 夜明けの街
+TRACK.res_lose=CHIP.mkTrack({bpm:66,prog:['Am','F','Dm','E'],bass:'pedal',arp:'pad',drums:CHIP.DR.none,lstep:4,lw:0.125,lv:0.045,echo:true,
+  lead:'E5 - - - C5 - B4 - A4 - - - - - - - D5 - - - C5 - A4 - G#4 - - - - - - -'});   // 鎮魂
+TRACK.res_lose_b=CHIP.mkTrack({bpm:76,prog:['Dm','Bb','Gm','A'],bass:'half',arp:'updown',drums:CHIP.DR.none,lstep:2,lw:0.25,lv:0.04,echo:true,
+  lead:'F5 - - - E5 - D5 - A4 - - - - - - - G4 - Bb4 - D5 - C5 - A4 - - - - - - - F4 - G4 - A4 - D5 - C#5 - - - E5 - - - D5 - - - - - - - - - - - - - - -'});   // 灰の朝
 // ホーム：ゆっくり・少し寂しげ（Dマイナー）。弦のような和音と、ゆっくりした旋律
 const HOME_CH=[[50,53,57],[46,50,53],[41,45,48],[43,46,50],[50,53,57],[46,50,53],[45,49,52],[45,49,52]];
 const HOME_M=[69,null,null,72,74,null,72,69, 70,null,69,67,65,null,null,null, 65,null,67,69,72,null,70,69, 67,null,null,64,65,null,null,null];
