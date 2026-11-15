@@ -1504,6 +1504,8 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .dxi.big .dxcv{width:300px;height:120px;image-rendering:pixelated;display:block}
 @media (max-width:900px){.dxi.big{width:100%;max-width:300px;height:auto}}
 .kcnext{display:flex;gap:8px;align-items:center;margin:4px 0}.kcnext img{width:32px;height:32px;image-rendering:pixelated;background:#0003;border-radius:4px}
+#nShort{position:absolute;bottom:calc(100% + 4px);left:0;z-index:30;background:#3a0d0a;border:1px solid #ff6a5a;color:#ffd0c8;font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none}#controls{position:relative}
+.dhints{font-size:13px;line-height:1.8;margin:2px 0 8px}.dhints b{color:var(--amber,#f2b33d)}
 /* タイムラプス（2026-11-15） */
 body.tlOn #topbar,body.tlOn #intel,body.tlOn #controls,body.tlOn #right,body.tlOn #modeBar,body.tlOn #viewSeg,body.tlOn #guide,body.tlOn #toasts,body.tlOn #reviewBar,body.tlOn .logbox,body.tlOn #pauseMsg,body.tlOn #bpad,body.tlOn #saveMark{display:none!important}
 #tlHud{position:fixed;left:0;right:0;bottom:0;z-index:9500;background:rgba(10,12,10,.88);border-top:2px solid var(--amber,#f2b33d);padding:8px max(12px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-right));color:#e8e4d8;font-size:13px}
@@ -3751,9 +3753,9 @@ function genWave(n){
     heavy:n<7?0:Math.round((n-6)*1.5*bm),
     redcap:blood?Math.round(4+n*1.5):0,
   };
-  if(GL){/* 古い魔物は出てから頭打ち（cap回ぶんまで増える）、後半は新しい魔物に入れ替わる */const bm2=(blood?1.45:after?0.7:1)*(1+0.03*(n-1));const g=(from,k,cap)=>n<from?0:Math.round(Math.min(n-from+1,cap||8)*k*bm2);
+  if(GL){/* 古い魔物は出てから頭打ち（cap回ぶんまで増える）、後半は新しい魔物に入れ替わる */const bm2=(blood?1.45:after?0.7:1)*(1+0.03*(n-1))*(n<=10?0.7+0.03*n:1);   /* 序盤（〜第10襲撃）は少なめ：第1は0.73倍・第6は0.88倍・第10で1倍（2026-11-15。第6襲撃で負けるという声） */const g=(from,k,cap)=>n<from?0:Math.round(Math.min(n-from+1,cap||8)*k*bm2);
     const ns=Math.min(n,10),late=n>26?0.35:n>18?0.5:1;
-    Object.assign(cnt,{swarm:Math.round((14+ns*8+ns*ns*1.6)*(n<=4?1.1:1.4)*late*bm2),charger:n<2?0:Math.round(ns*5*late*bm2),harpy:g(3,3,10),troll:g(4,1.1,10),grappler:n<5?0:Math.round((3+Math.min(n-5,10)*2.4)*bm2),spitter:g(5,1.2,10),
+    Object.assign(cnt,{swarm:Math.round((14+ns*8+ns*ns*1.6)*(n<=4?1.1:n<=9?1.1+0.06*(n-4):1.4)*late*bm2),   /* 第5襲撃での1.1→1.4の段差を、第5〜9でなだらかに */charger:n<2?0:Math.round(ns*5*late*bm2),harpy:g(3,3,10),troll:g(4,1.1,10),grappler:n<5?0:Math.round((3+Math.min(n-5,10)*2.4)*bm2),spitter:g(5,1.2,10),
       gobarcher:g(8,2.2,10),heavy:g(9,1.1),wyvern:g(13,0.7),treant:g(15,0.8),eltreant:g(28,0.4,6),shogre:g(22,1.0),maneater:g(23,1.4),vampire:g(30,0.6,6),ghoul:g(30,1.4,6),golem:g(37,0.5,4),
       werewolf:blood&&n>=21?Math.round(3+(n-20)*0.4):0,redcap:blood?Math.round(4+Math.min(n,20)*1.2):0});}
   if(S&&S.mapId==='s'){cnt.charger=Math.round(cnt.charger*0.5);cnt.wolf=n<3?0:Math.round(ns2*4*bm);cnt.tiger=n<9?0:Math.round((n-8)*0.8*bm);cnt.mammoth=n<13?0:Math.max(1,Math.round((n-12)*0.35*bm));}
@@ -4566,7 +4568,7 @@ function update(dt,sim){
         const gs=g.garrison?garOf(b):null;const dm=(gs?gs.members/MT(gs).members:1)*los*dmgB(b);
         const ak=g.ammoKey||'ammo';
         const a2ok=!g.ammo2||Object.entries(g.ammo2).every(([k,v])=>(S[k]||0)>=v);
-        if(tg&&S[ak]>=au&&!a2ok)b.noAmmo=true;
+        if(tg&&S[ak]>=au&&!a2ok){b.noAmmo=true;for(const [k,v] of Object.entries(g.ammo2))if((S[k]||0)<v)dryNote(k);}
         if(tg&&S[ak]>=au&&a2ok){
           useRes(B[b.type].name,ak,au,b);if(g.ammo2)for(const k in g.ammo2)useRes(B[b.type].name,k,g.ammo2[k],b);b.cd=g.rate;b.noAmmo=false;b.ang=Math.atan2(tg.y-cy,tg.x-cx);b.fireT=performance.now();
           if(g.splash){se('how');}else se(g.pierce?'rail':'mg');
@@ -4627,7 +4629,7 @@ function update(dt,sim){
             S.shots.push({x:cx,y:cy,tx:ex,ty:ey,t:0,dur:0.3,c:'#e3c2ff',w:4});
           }
           else{hitEnemy(tg,dm,b,false);S.shots.push((b.type==='mg'||b.type==='tower')?{x:cx,y:cy-(b.type==='tower'?8:0),tx:tg.x,ty:tg.y,t:0,dur:b.type==='mg'?0.16:0.22,arrow:true,big:b.type==='mg'}:{x:cx,y:cy,tx:tg.x,ty:tg.y,t:0,dur:g.pierce?0.25:0.08,c:g.pierce?'#d48cff':null,w:g.pierce?3:1});}
-        }else if(tg){b.cd=0.5;b.noAmmo=true;}else b.noAmmo=false;
+        }else if(tg){b.cd=0.5;b.noAmmo=true;dryNote(ak);}else b.noAmmo=false;
       }
     }
   }
@@ -4714,7 +4716,7 @@ function update(dt,sim){
       const lostC=S.fallen.slice(ws.fallen||0);
       const newSide=S.next.sides.find(sd=>!S.cur.sides.includes(sd));
       S.recentLoss=(S.bldLost-(ws.bld||0))+Math.round((S.kia-(ws.kia||0))/3);
-      recordWave(ws,true);
+      recordWave(ws,true);try{saveCkpt();}catch(e){}
       const relief=reliefAfter(ws);
       if(S.mapId==='s'&&S.wave+1===8&&!S.frozen){log('❄ 冷え込みが厳しい。次の襲撃までに川が凍りつきそうだ（川を渡ってくる）','warn');}
       showReport(`第${S.wave}襲撃（${S.turn}日目） 戦闘報告`,statGrid([['撃破',S.waveKills,'var(--green)'],['戦死',S.kia-(ws.kia||0),S.kia-(ws.kia||0)?'var(--red)':''],['施設損失',S.bldLost-(ws.bld||0),S.bldLost-(ws.bld||0)?'var(--amber)':''],['魔核','+'+(S.mat-(ws.mat||0)),'var(--mat)']])+`<div class="rsup">補給 ${resTxt({steel:rew})}</div>`
@@ -4934,7 +4936,7 @@ function isFly(e){return E[e.type].fly&&!(e.down>0);}   // ハープーンで落
 function beamTick(b,g,dt,ef){   // ミスリルレイ：同じ相手に当て続けるほど強く（1秒に40 → 5秒で200）
   const cx=bcx(b),cy=bcy(b),R0=rangeOf(b)*TU;let tg=b.beamT&&b.beamT.hp>0&&S.enemies.includes(b.beamT)&&Math.hypot(b.beamT.x-cx,b.beamT.y-cy)<R0&&seenE(b.beamT)?b.beamT:null;
   if(!tg){b.ramp=0;let bd=R0;for(const e of S.enemies){if(e.hp<=0||!seenE(e)||(isFly(e)&&!g.antiAir))continue;const d=Math.hypot(e.x-cx,e.y-cy);if(d<bd&&!mtnBlock(b,e.x,e.y)){bd=d;tg=e;}}b.beamT=tg;}
-  if(!tg)return;const au=(g.ammoUse||0)*dt*10*USE_MUL;if((S[g.ammoKey]||0)<au){b.noAmmo=true;return;}S[g.ammoKey]-=au;b.noAmmo=false;
+  if(!tg)return;const au=(g.ammoUse||0)*dt*10*USE_MUL;if((S[g.ammoKey]||0)<au){b.noAmmo=true;dryNote(g.ammoKey);return;}S[g.ammoKey]-=au;b.noAmmo=false;
   b.ramp=Math.min(5,(b.ramp||0)+dt);const dps=dmgB(b)*(1+0.8*b.ramp)*ef;hitEnemy(tg,dps*dt,b);b.ang=Math.atan2(tg.y-cy,tg.x-cx);
   S.shots.push({x:cx,y:cy-10,tx:tg.x,ty:tg.y,t:0,dur:dt*1.5,c:b.ramp>3?'#ffffff':'#d8ecff',w:1+Math.round(b.ramp),ray:Math.min(4,1+Math.floor(b.ramp*0.7)),rayK:(b.lv||1)>=2?'fx_ray_dragon':'fx_ray'});}
 function damageB(b,dmg,attacker){
@@ -5276,6 +5278,24 @@ function ammoForecast(){
   const have=Math.round(S.ammo+(S.waveActive?0:e.net.ammo*S.turnsLeft));
   return{need,have,hp:Math.round(hp),guns:aps>0,estimated:lvl('scout')<2&&!S.waveActive};
 }
+// 次の夜に使う資源の見込み（2026-11-15）：今夜の敵を倒し切るまでに、防衛施設（弾の種類ごと）と部隊（補給）と篝火が使う量。
+// 手持ち＋夜までの生産（差し引き）と比べて、足りないものを返す。[{k,need,have}]
+function nightShortChip(){const bn=document.getElementById('bNext');if(!bn)return;let c=document.getElementById('nShort');if(!c){c=document.createElement('div');c.id='nShort';bn.parentElement.insertBefore(c,bn);}
+  let L=[];try{if(S&&S.mode==='campaign'&&!S.waveActive&&!S.over&&S.turnsLeft<=2)L=nightNeeds().filter(r=>r.have<r.need);}catch(e){}
+  const h=L.length?`⚠ 次の襲撃で足りない：${L.map(r=>`${RES_NAME[r.k]||r.k} −${r.need-r.have}`).join('・')}`:'';if(c.textContent!==h)c.textContent=h;c.hidden=!L.length;}
+function nightNeeds(){const w=S.waveActive?S.cur:S.next;if(!w)return [];
+  const list=S.waveActive?S.enemies.map(e=>({type:e.type,hp:e.hp})).concat(S.cur.q.slice(S.qi).map(q=>({type:q.type}))):w.q;
+  let hp=0;for(const e of list){const d=E[e.type];if(!d)continue;hp+=(e.hp!=null?e.hp:d.hp)/(has('incend')?1:1-(d.armor||0));}if(has('analysis'))hp/=1.1;if(has('incend'))hp/=1.15;
+  let dps=0;const use={};const add=(k,v)=>{use[k]=(use[k]||0)+v;};
+  for(const b of S.blds){const g=gunOf(b);if(!g||b.bt>0)continue;const bn=bonus(b),gm=gunMods(b);const dm=dmgB(b)*(g.splash?2.5*gm.splash:1)*(gm.cluster?1.6:1)*(g.salvo||1);
+    const rt=g.rate/(bn.rate+gm.rate-1+0.15*lvl('autoload'));dps+=dm/rt;add(g.ammoKey||'ammo',(g.ammoUse||1)*USE_MUL/rt);if(g.ammo2)for(const k in g.ammo2)add(k,g.ammo2[k]/rt);}
+  for(const q of S.squads){const t=MT(q);const dm=unitDmg(q)*(unitSplash(q)?2:1);dps+=dm/t.rate;const sp=supOf(q);if(sp){const c=supCosts(sp);for(const k in c)add(k,c[k]*(sp.costs?1:1)/t.rate);}}
+  if(dps<=0)return [];const T=hp*1.25/dps;const need={};for(const k in use)need[k]=use[k]*T;
+  // 篝火の燃料（襲撃の夜に1回）
+  for(const b of S.blds)if(b.type==='brazier'&&!(b.bt>0)){const [k,n]=BRAZ_FUEL[(b.lv||1)-1]||BRAZ_FUEL[0];need[k]=(need[k]||0)+n;}
+  const e=econ(),TL=S.waveActive?0:S.turnsLeft,out=[];
+  for(const k in need){const n=Math.ceil(need[k]);if(n<1)continue;const have=Math.floor((S[k]||0)+Math.max(0,TL-1)*((e.net||{})[k]||0));out.push({k,need:n,have});}
+  return out.sort((a,b)=>(a.have-a.need)-(b.have-b.need));}
 // あと何ターンで尽きるか
 function runOut(k,e){const d=e.net[k];return d<0?S[k]/-d:Infinity;}
 function econWarnings(e,f){
@@ -5283,7 +5303,7 @@ function econWarnings(e,f){
   const need=(k,turns,msg)=>{const t=runOut(k,e);if(t<=turns+0.01)w.push([t<=TL?'bd':'wn',msg.replace('N',Math.max(0,Math.floor(t)))]);};
   if(!c.ammo)w.push(['bd','武器工房がありません（矢を作れません）']);
   if(c.ammo&&!c.ironmine&&e.net.iron<0)w.push(['bd','鉱山がありません（鉄が減り続けます）']);
-  if(f&&f.need!=null&&f.have<f.need)w.push(['bd',`次の夜で矢が約${f.need-f.have}不足する見込み`]);
+  for(const r of nightNeeds()){if(r.have<r.need)w.push(['bd',`次の襲撃で${RES_NAME[r.k]||r.k}が約${r.need-r.have}足りなくなる見込み（必要 約${r.need}・夜までに ${Math.max(0,r.have)}）`]);else if(r.have<r.need*1.3)w.push(['wn',`次の襲撃で${RES_NAME[r.k]||r.k}がぎりぎり（必要 約${r.need}・夜までに ${r.have}）`]);}
   if(f&&!f.guns)w.push(['bd','稼働中の防衛施設がありません']);
   need('fuel',TL+3,'食料があと約Nターンで尽きます（住民が増えなくなります）');
   need('steel',TL+2,'木材があと約Nターンで尽きます');
@@ -7011,6 +7031,7 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   else if(!S.over){const tot=Math.max(S.prepTotal||S.turnsLeft,S.turnsLeft),past=tot-S.turnsLeft+1;let pips='';for(let i=0;i<tot;i++)pips+=`<i class="${i<past?'on':''}"></i>`;
     wv=`${S.phase==='night'?ui('moon','amber',24):ui('sun','amber',24)}<div class="wvm"><b>${S.turn}日目・${S.phase==='night'?'夜':'昼'}</b><div class="daypips">${pips}</div></div><div class="wvc"><small>第${S.wave+1}襲撃まで${S.wave+1===finalWave()?'（最後の夜）':''}</small><b>${S.turnsLeft}日</b></div>`;}
   setHTML(document.getElementById('wave'),wv);
+  nightShortChip();
   renderSheetHandle();
   const bn=document.getElementById('bNext');
   if(bn.disabled!==S.waveActive)bn.disabled=S.waveActive;
@@ -7282,7 +7303,7 @@ function tlSnap(tag){if(!S||S.mode!=='campaign'||S.review)return;S.tl=S.tl||[];S
   const g={};for(const [n] of TL_GROUPS)g[n]=0;for(const b of S.blds){if(b.bt>0&&!b.upg)continue;g[tlGroup(b.type)]++;}g['罠']=(S.mines||[]).length;
   const e=econ(),R=o=>{const r={};for(const k in o)r[k]=Math.round((o[k]||0)*10)/10;return r;},res={};for(const k of TL_RES)res[k]=Math.round(S[k]||0);
   S.tl.push({d:S.turn,w:S.wave,tag,n:S.blds.filter(b=>!(b.bt>0&&!b.upg)).length,g,pop:popTotal(),res,gross:R(e.gross||{}),net:R(e.net||{}),bl:S.baseLv||1,tech:TECH.filter(t=>has(t.id)).length});}
-function recordWave(ws,ok){try{tlSnap(ok?'襲撃のあと':'陥落');}catch(e){}S.hist=S.hist||[];ws=ws||S.waveStart||{};S.hist.push({n:S.wave,day:S.turn,blood:!!(S.cur&&S.cur.blood),kills:S.waveKills,bld:S.bldLost-(ws.bld||0),kia:S.kia-(ws.kia||0),mat:S.mat-(ws.mat||0),heroes:S.fallen.length-(ws.fallen||0),ok,pop:popTotal(),tech:TECH.filter(t=>has(t.id)).length});}
+function recordWave(ws,ok){if(S&&!S.gid)S.gid=Date.now();try{tlSnap(ok?'襲撃のあと':'陥落');}catch(e){}S.hist=S.hist||[];ws=ws||S.waveStart||{};S.hist.push({n:S.wave,day:S.turn,blood:!!(S.cur&&S.cur.blood),kills:S.waveKills,bld:S.bldLost-(ws.bld||0),kia:S.kia-(ws.kia||0),mat:S.mat-(ws.mat||0),heroes:S.fallen.length-(ws.fallen||0),ok,pop:popTotal(),tech:TECH.filter(t=>has(t.id)).length});}
 // 大きな損害を受けた翌朝の立て直し：避難民がすぐ来て、王都の援助は2ターン後に届く
 function reliefAfter(ws){const lb=S.bldLost-(ws.bld||0),lk=S.kia-(ws.kia||0),sev=lb*2+lk;if(sev<20)return '';
   const ref=Math.min(40,Math.round(10+sev*0.4));S.pop+=ref;log(`近くの村から避難民 ${ref}人が逃げ込んできた`,'good');
@@ -7301,8 +7322,10 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   ${statGrid([['撃破数',S.kills],['戦死者（人員）',S.kia,'var(--red)'],['生存英雄',S.cmds.length,'var(--green)'],['獲得した魔核','+'+matSum,'var(--mat)']])}
   <div class="efallen"><span>戦没英雄</span>${fallen}</div>
   <div class="ehist"><span>襲撃ごとの記録</span></div>${histTable()}
-  <div class="ebtns"><button id="ovTl" class="primary">▶ 街の成長を見る</button><button id="ovRec">街の記録</button><button id="ovReview">街と研究を振り返る</button>${win?'<button id="ovEndless">防衛を続行（エンドレス）</button>':''}<button id="ovRestart" class="ghost">最初から</button></div>`);
+  ${!win?`<div class="ehist"><span>この襲撃で起きたこと</span></div><div class="dhints">${defeatHints().map(t=>`<div>・${t}</div>`).join('')}</div>`:''}
+  <div class="ebtns">${!win&&ckptInfo()?`<button id="ovCk" class="primary" title="${ckptInfo().turn}日目・第${ckptInfo().wave}襲撃をしのいだあとから。次の襲撃に備え直せます">第${ckptInfo().wave}襲撃のあとからやり直す</button>`:''}<button id="ovTl" class="${!win&&ckptInfo()?'':'primary'}">▶ 街の成長を見る</button><button id="ovRec">街の記録</button><button id="ovReview">街と研究を振り返る</button>${win?'<button id="ovEndless">防衛を続行（エンドレス）</button>':''}<button id="ovRestart" class="ghost">最初から</button></div>`);
   document.getElementById('ovReview').onclick=()=>{S.review=true;closeOverlay();renderAll();renderReviewBar();};
+  {const ck=document.getElementById('ovCk');if(ck)ck.onclick=()=>{withLoading('やり直しの準備をしています…',()=>{if(!loadCkpt())toast('やり直しのデータを読み込めませんでした','bad');});};}
   document.getElementById('ovTl').onclick=()=>{closeOverlay();playTimelapse(()=>showEnd(win));};document.getElementById('ovRec').onclick=()=>{closeOverlay();showHist();};
   document.getElementById('ovRestart').onclick=()=>{closeOverlay();document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState(S.mode);renderAll();auMusicFor();};
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=NEXT_PREP;S.prepTotal=NEXT_PREP;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
@@ -7339,6 +7362,23 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   for(const b of S.blds||[]){if(b.type==='wall2'){b.type='wall';}if(b.type==='wall4'){b.type='wall3';}if(b.wall&&b.wall.wt==='wall2')b.wall.wt='wall';if(b.wall&&b.wall.wt==='wall4')b.wall.wt='wall3';}   /* 合金・ミスリルの城壁はやめた */
   for(const b of S.blds||[])if((b.type==='tower'||b.type==='magetower')&&b.gar){const q=S.squads.find(x=>x.id===b.gar);b.gar=null;if(q){q.gar=null;q.x=bcx(b);q.y=bcy(b)+0.9*TU;}}   /* 櫓・塔は人員で撃つようになった（2026-11-12） */
   return true;}
+// ===== 襲撃のあとの区切り（2026-11-15）：負けたら「第N襲撃のあと」からやり直せる。ゲームごとの番号 gid で、別のゲームの区切りは使わない =====
+function saveCkpt(){if(!S||S.mode!=='campaign')return;S.gid=S.gid||Date.now();const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}
+  o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'',gid:S.gid,ck:true};
+  try{localStorage.setItem(SAVE_KEY+'_ck',JSON.stringify({meta,S:o}));}catch(e){}}
+function ckptInfo(){try{const d=JSON.parse(localStorage.getItem(SAVE_KEY+'_ck'));if(!d||!d.meta)return null;if(S&&S.gid&&d.meta.gid!==S.gid)return null;return d.meta;}catch(e){return null;}}
+function loadCkpt(){const r=localStorage.getItem(SAVE_KEY+'_ck');if(!r)return false;try{localStorage.setItem(SAVE_KEY,r);}catch(e){return false;}closeOverlay();const ok=loadGame();
+  if(ok){const m=JSON.parse(r).meta;log(`第${m.wave}襲撃のあと（${m.turn}日目）からやり直します`,'good');toast(`第${m.wave}襲撃のあと（${m.turn}日目）からやり直します。次の襲撃に備えましょう`,'good',6000);}return ok;}
+function dryNote(k){if(!S.cur)return;const d=S.cur.dry=S.cur.dry||{};d[k]=(d[k]||0)+1;}
+// 負けた理由の手がかり：その襲撃で起きたことだけを並べる（推測で決めつけない）
+function defeatHints(){const L=[],c=S.cur||{},ws=S.waveStart||{},dry=c.dry||{};
+  const make={ammo:'武器工房で矢を作る（工房を増やす・矢の研究）',stone:'石切り場を増やす',iron:'鉱山を増やす',powder:'火薬工房を増やす',elec:'エーテル採掘所を増やす',steel:'伐採所を増やす',mat:'魔核を集める'};
+  for(const [k,n] of Object.entries(dry).sort((a,b)=>b[1]-a[1]))if(n>=5)L.push(`<b>${RES_NAME[k]||k}が尽きて</b>、防衛施設が <b>${n}回</b> 撃てなかった　<span class="muted">→ ${make[k]||RES_NAME[k]+'を増やす'}</span>`);
+  const dryS=(S.squads||[]).filter(q=>{const sp=supOf(q);return sp&&q.sup<1;}).length;if(dryS)L.push(`補給が尽きた部隊が <b>${dryS}部隊</b>（矢・武具・魔力）　<span class="muted">→ 襲撃の前に一括補給、補給の資源を多めに</span>`);
+  const lost=S.bldLost-(ws.bld||0);if(lost>0){const walls=(S.waveLostTypes||{});L.push(`施設が <b>${lost}棟</b> 壊された`);}
+  const left=(S.enemies||[]).filter(e=>e.hp>0).length+Math.max(0,((c.q||[]).length)-(S.qi||0));if(left)L.push(`残っていた敵 <b>${left}体</b>（撃破 ${S.waveKills||0}体）`);
+  if(!L.length)L.push('大きな弾切れはありませんでした。防衛施設の数や配置、城壁を見直してみてください');
+  return L;}
 function delSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
 addEventListener('beforeunload',()=>{if(canSave())saveGame(true);});
 // ===== ロゴ（ドット文字） =====
