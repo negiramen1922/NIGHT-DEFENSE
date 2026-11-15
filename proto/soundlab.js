@@ -66,7 +66,8 @@ function putB(type,gx,gy,free){const p=findSpot(type,gx,gy);if(!p)return null;co
 function foes(type,gx,gy,n,spread){const n0=S.enemies.length;spawnAt(type,(gx+.5)*T,(gy+.5)*T,n,(spread||1.5)*TU);for(const e of S.enemies.slice(n0))e.labDemo=1;return S.enemies.slice(n0);}
 function squad(model,gx,gy){let h=LAB.home;if(!h||!S.blds.includes(h)){h=LAB.home=putB('train',LAB.p.x-6,LAB.p.y-3);}const ut=MTC[model].ut;spawnUnit(h,ut,model);const s=S.squads[S.squads.length-1];s.x=(gx+.5)*T;s.y=(gy+.5)*T;s.ax=s.x;s.ay=s.y;s.tx=null;s.mode='guard';return s;}
 function clearDemo(){const keepH=hqOf();S.blds=S.blds.filter(b=>{if(b===keepH)return true;gridSet(b,false);return false;});S.enemies=[];S.squads=[];S.shots=[];S.fx=[];S.vfx=[];S.mines=[];S.eshots=[];S.beams=[];LAB.objs=[];LAB.home=null;}
-function camTo(x,y,z){cam.z=z||2.2;const vw=VW*(innerWidth>900?0.55:0.5);cam.x=(x+.5)*T-vw/2/cam.z;cam.y=(y+.5)*T-VH/2/cam.z;try{clampCam();}catch(e){}}
+function camTo(x,y,z){if(LAB&&LAB.camSet)return;if(LAB)LAB.camSet=true;   /* 表示位置を合わせるのは最初の1回だけ（押すたびに戻されないように。2026-11-15） */
+  cam.z=z||2.2;const vw=VW*(innerWidth>900?0.55:0.5);cam.x=(x+.5)*T-vw/2/cam.z;cam.y=(y+.5)*T-VH/2/cam.z;try{clampCam();}catch(e){}}
 function typeBySnd(n){return Object.keys(BSND).find(k=>BSND[k]===n&&B[k]&&!B[k].isMine&&!['wall','swall','gate','fence'].includes(k))||Object.keys(BSND).find(k=>BSND[k]===n);}
 const DEMO={   // 敵は施設の南に出す（北の城館へ向かう途中で施設の前を通る）
   mg(){const p=LAB.p;putB('mg',p.x,p.y);foes('swarm',p.x,p.y+7,6,1.2);camTo(p.x,p.y+3);return 'バリスタが撃つ（発射音・倒したときの音）';},
