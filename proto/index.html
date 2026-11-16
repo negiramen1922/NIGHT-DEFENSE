@@ -615,7 +615,7 @@ body.night #intel .lbl{background:#5a1a14;color:#ffb0a8}
 
 /* ---------- 初心者タスク：たたんだ時は「今のタスク1つ」だけ ---------- */
 #guide{box-shadow:0 -2px 0 #8a6a3a,0 2px 0 #8a6a3a,-2px 0 0 #8a6a3a,2px 0 0 #8a6a3a,0 4px 16px #000a;border:none;width:440px}   /* 2026-11-16：チュートリアルの説明が読めるように広く */
-#guide .gb{max-height:min(58vh,calc(100vh - 260px))}#guide .gdet2 .lart{max-width:260px}#guide .lmov{margin:8px 0 4px}#guide .lmov video{display:block;width:100%;border:1px solid #5a4a2a;background:#000}#guide .lmov small{display:block;color:#c8b890;font-size:11px;margin-top:2px}#guide .gdet2 .lmov{max-width:340px}
+#guide .gb{max-height:min(58vh,calc(100vh - 260px))}#guide .gdet2 .lart{max-width:260px}#guide .limg{margin:8px 0 4px}#guide .limg img{display:block;max-width:100%;border:1px solid #5a4a2a}#guide .lmov{margin:8px 0 4px}#guide .lmov video{display:block;width:100%;border:1px solid #5a4a2a;background:#000}#guide .lmov small{display:block;color:#c8b890;font-size:11px;margin-top:2px}#guide .gdet2 .lmov{max-width:340px}
 #guide.min .gcur{display:block}   /* 【追加】.gcur = 現在のタスク1行＋バー */
 #guide .gcur{display:none;padding:8px 10px}
 
@@ -3036,7 +3036,7 @@ function dmgPctB(b){const L=[];const add=(n,v)=>{if(v)L.push([n,v]);};const h=bo
   const gs=B[b.type].garrison?garOf(b):null;if(gs)add('守備隊の英雄',bonus0(gs).dmg-1);return L;}
 function pctSum(L){return L.reduce((a,x)=>a+x[1],0);}
 // 詳細パネル用：「基礎 60 ＋ 上乗せ +133% → 140」
-function brkHTML(label,base,L,unit){const P=pctSum(L);const fin=base*(1+P);const f=v=>v>=100?Math.round(v):Math.round(v*10)/10;
+function brkHTML(label,base,L,unit){const P=pctSum(L);const fin=base*(1+P);const f=v=>Math.round(v);   /* 小数は出さない */
   return `<div class="row"><span class="muted">${label}</span><span>基礎 ${f(base)}${unit||''} ＋ 上乗せ <b style="color:${P>0?'var(--green)':'var(--dim)'}">+${Math.round(P*100)}%</b> → <b style="color:var(--amber)">${f(fin)}${unit||''}</b></span></div>${L.length?`<div class="muted" style="font-size:10.5px;text-align:right;margin-top:-2px">（${L.map(x=>`${x[0]} +${Math.round(x[1]*100)}%`).join('・')}）</div>`:''}`;}
 function prodPctB(b){const L=[];const add=(n,v)=>{if(v>0.001)L.push([n,v]);};const h=bonus0(b);add('英雄',h.prod-1);add('魔核★',0.15*(b.ench||0));const nb=PROD_BT.includes(b.type)?prodNeighborMul(b)-1:0;add('近くの指導',nb);
   const tm=['miner','quarry','ironmine','farm','fishery','ammo'].includes(b.type)?techMul(b.type)-1:0;add('研究',tm);return L;}
@@ -5395,7 +5395,7 @@ function renderEcon(){
   const sg=v=>(v>=0?'+':'')+Math.round(v);
   const BRK={};for(const b of S.blds){const pr=prodOf(b);if(!pr)continue;for(const k in pr){if(!pr[k])continue;const o=(BRK[k]=BRK[k]||{p:{},c:{}});const side=pr[k]>0?o.p:o.c;side[B[b.type].name]=(side[B[b.type].name]||0)+Math.abs(pr[k]);}}
   {const fu=(BRK.fuel=BRK.fuel||{p:{},c:{}});fu.c['住民の食事']=R.foodUse-(BRK.fuel.c['酒場']||0);const go=(BRK.gold=BRK.gold||{p:{},c:{}});go.p['税']=R.taxP;go.c['給金']=wages();}
-  const brk=k=>{const o=BRK[k];if(!o)return '';const f=(m,sg2,col)=>Object.entries(m).filter(([,v])=>v>=0.05).map(([n2,v])=>`<span style="color:${col}">${n2}${sg2}${Math.round(v*10)/10}</span>`).join('・');const a=f(o.p,'+','var(--green)'),b2=f(o.c,'−','var(--red)');return a||b2?`<div class="muted" style="font-size:10.5px;margin:-2px 0 3px 22px">${[a,b2].filter(Boolean).join('　')}</div>`:'';};
+  const brk=k=>{const o=BRK[k];if(!o)return '';const f=(m,sg2,col)=>Object.entries(m).filter(([,v])=>v>=0.5).map(([n2,v])=>`<span style="color:${col}">${n2}${sg2}${Math.round(v)}</span>`).join('・');const a=f(o.p,'+','var(--green)'),b2=f(o.c,'−','var(--red)');return a||b2?`<div class="muted" style="font-size:10.5px;margin:-2px 0 3px 22px">${[a,b2].filter(Boolean).join('　')}</div>`:'';};
   const row=(k,detail)=>{const d=n[k];const t=runOut(k,e);const cls=d<0?(t<=Math.max(1,S.turnsLeft)?'bd':'wn'):d>0?'gd':'muted';
     return `<div class="rrow" title="${detail}">${ic(k)}<span class="muted">${RES_NAME[k]}</span><b>${Math.floor(S[k])}</b><span class="${cls}">${sg(d)}/T${t<99?` <span style="font-size:10px">（あと${Math.floor(t)}T）</span>`:''}</span></div>`+brk(k);};
   let h='';
@@ -6562,7 +6562,7 @@ document.getElementById('bNext').onclick=endTurn;
 document.getElementById('bRes').onclick=showResearch;
 document.getElementById('bHire').onclick=()=>openArmyTab('hero');
 document.getElementById('bArmy').onclick=()=>openArmyTab('list',true);
-function setRT(t){if(t==='info'&&!isNarrow())t='build';document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
+function setRT(t){if(t==='info'&&!isNarrow())t='build';if(S&&t==='econ')S.econSeen=(S.econSeen||0)+1;if(S&&t==='army'&&S.armySub==='hero')S.heroSeen=(S.heroSeen||0)+1;document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
 document.getElementById('bRepAll').onclick=repairAll;document.getElementById('bRepB').onclick=repairAll;document.getElementById('bSupAll').onclick=supplyAll;
@@ -7427,7 +7427,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.8.1 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.8.2 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7502,6 +7502,7 @@ function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn()
   requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();}finally{b.classList.add('off');}}));}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.8.2','2026-11-16',['チュートリアル：「人」のミッションで、右の「街」のタブで生産と収支（税・給金）を見られることを案内（画面の絵つき）','チュートリアル：「英雄と熟練度」のミッションで、街にいる英雄の見かた（軍事 → 英雄）と配属のしかたを案内（画面の絵つき）','チュートリアル：「兵士」のミッションの農兵を2部隊から1部隊に（最初の襲撃までに武器工房が間に合うように）','「街」のタブなどの数字を小数なしに']],
  ['1.8.1','2026-11-16',['不具合の修正：施設の詳しい画面の小さな動き（流れのカード）で、作る物（農場ならパン）が一瞬だけ見えてはすぐ消えていた','防衛施設の流れのカードで、矢などがないのに敵に当たっているように動いていた。今は「矢がないので撃てない」と出る','弾の使う量の表示を小数なしに（「2発で矢1」など）']],
  ['1.8','2026-11-16',['<b>タイトル画面</b>：後ろで、夜の襲撃を城壁でしのぐ街の様子が動くように（前は真っ暗だった）','タイトルのボタンを減らして、スクロールしなくても全部見えるように：「つづきから」「はじめから」「モンスター図鑑」「アップデート情報」。「つづきから」には街の名前と何回目の襲撃の前かを出す','右下に「遊び方」と<b>設定（⚙）</b>：BGM・効果音の音量、消音、<b>音楽室</b>（ゲームの曲を聴ける）、クレジット、ホーム画面に追加','旧版（ver 0.9）へのボタンをなくした']],
  ['1.7','2026-11-16',['<b>チュートリアルを作り直し</b>（ステージ0 廃村エルム）：書記官リリアが「領主様」に話しかけて、9つのミッションで基本を案内する（生産施設の建設 → 人 → 研究 → 防衛 → 兵士 → 英雄と熟練度 → 軍需 → 夜と朝 → 城のレベル上げ）。実際に手を動かして進める','説明には動く絵を。柵の一列置きと部隊の移動は、実際の操作の短い動画で見られる','<b>番外編「偵察と駐屯地攻め」</b>：街が育ったところから始めて、斥候で駐屯地を見つけ、夜襲をかけるまでを覚える','兵科の「兵士」を<b>剣士</b>に（兵全体の「兵士」とまぎらわしいため）','廃村エルムの廃墟をなくした（最初の資材が建て直しに使われてしまうため）','<b>街の名前</b>を始めに決められるように。結果の画面・街の記録・タイムラプス（「○○の歴史」）に出る','<b>研究員</b>：研究のたびに待機中の住民を使うのをやめた。城に5人、研究室を建てると3人が研究員としてつく（バリスタの射手と同じ）','<b>新しくできるようになったことの知らせ</b>：城のレベルが上がったとき・研究で新しい施設が建てられるようになったとき、施設のアイコンつきで画面の上に出す（押すとその画面へ）','エーテル採掘所は、研究「エーテル採掘」（ランクⅡ）をしてから建てられるように','<b>山場の前は準備が6日</b>：ブラッドムーンと大きな夜の前だけ、襲撃までの日数を4日から6日に','<b>上のお知らせ</b>：英雄の戦死・城への攻撃・城が危ないとき・大きな夜（ブラッドムーン、ゴブリンの王の軍勢、最後の夜）の知らせ（5日前と前の日）と、その夜の始まり']],
@@ -7643,10 +7644,11 @@ const MISSIONS=[
   {t:'鉱山を1つ建てる',b:'ironmine',n:1,d:'<b>鉄鉱脈</b>のマスに建てると鉄が採れます。'}],
   done:'いい調子です！ 建てたら「夜へ」で日を進めてください。毎日、資材が入ってきます。'},
  {id:'people',name:'人',
-  say:['施設を動かすには、働く人が必要です。住居を建てると、毎ターン住民が増えていきます。{ART:barracks}','ただし、1つの家に住める人数には限りがあるので気をつけてください。住居の研究で、住める人数を増やすこともできます。','人が増えると、食料も必要になります。畑や漁場を、人数に合わせて建てましょう。食べ物に余裕があると、みんなうれしいです！{ART:farm,fishery}'],
+  say:['施設を動かすには、働く人が必要です。住居を建てると、毎ターン住民が増えていきます。{ART:barracks}','ただし、1つの家に住める人数には限りがあるので気をつけてください。住居の研究で、住める人数を増やすこともできます。','人が増えると、食料も必要になります。畑や漁場を、人数に合わせて建てましょう。食べ物に余裕があると、みんなうれしいです！{ART:farm,fishery}','何がいくつ作られて、いくつ使われているかは、右の「<b>街</b>」のタブで見られます。金貨の収支（税と給金）も分かりますよ。右の数字が赤くなっていたら、足りなくなる合図です！{IMG:econ}'],
   steps:[
   {t:'住居を2つ建てる',b:'barracks',n:2,d:'住民がふえ、税で金貨が入ります。'},
-  {t:'農場を2つ建てる',b:'farm',n:2,d:'<b>平地</b>に建てると食料がとれます。水辺には漁場も建てられます。'}],
+  {t:'農場を2つ建てる',b:'farm',n:2,d:'<b>平地</b>に建てると食料がとれます。水辺には漁場も建てられます。'},
+  {t:'「街」のタブで生産と収支を見る',c:()=>S.econSeen||0,n:1,hi:'#rtabs button[data-rt="econ"]',d:'右の「街」のタブを押します。資源ごとに、1ターンで増える量と、どの施設が作っているか・使っているかが出ます。'}],
   done:'これで、人も食べ物も増えていきます！'},
  {id:'res',name:'研究',
   say:['研究を進めると、生産の効率を上げたり、兵士や防衛施設の力を上げたりできます。さっそく「伐採技術」の研究をしてみましょう。','研究室を建てると研究員が増えるので、余裕があったら建ててみてくださいね。{ART:lab}'],
@@ -7664,13 +7666,14 @@ const MISSIONS=[
  {id:'army',name:'兵士',
   say:['防衛施設のほかに、兵士でも街を守れます。城で農兵を招集しましょう。1部隊は5人です。{ART:farmer}','兵士たちには「迎撃」「固守」「補給」などの指示を出したり、立つ場所を指示したりできます。部隊を選んで、行き先を押すと移動します。{MOV:move}','「迎撃」は、近くに敵が来たら攻撃しに行ってくれます。「固守」は、その場からあまり離れずに守ってくれます。近接の部隊を壁の近くに固守で置いておけば、壁ごしに敵を攻撃してくれますよ。','兵舎を建てると、農兵のほかの兵士も招集できるようになります。{ART:train,pawn}'],
   steps:[
-  {t:'農兵を2部隊やとう',c:()=>S.squads.filter(q=>q.model==='farmer').length,n:2,ping:'hq',d:'城をクリックして、選択中パネルから農兵を招集します。'},
+  {t:'農兵を1部隊やとう',c:()=>S.squads.filter(q=>q.model==='farmer').length,n:1,ping:'hq',d:'城をクリックして、選択中パネルから農兵を招集します。'},
   {t:'部隊を移動させてみる',c:()=>S.movedN||0,n:1,mov:'move',d:'部隊をクリックして選び、地図の行きたい場所を押します。'},
   {t:'兵舎を建てる',b:'train',n:1,d:'剣士や弓兵など、農兵のほかの部隊を招集できる施設です。'}],
   done:'頼もしい兵たちです！'},
  {id:'hero',name:'英雄と熟練度',
-  say:['街には<b>英雄</b>がいます。英雄を部隊や施設に<b>配属</b>すると、その部隊や施設を強くしてくれます。{ART:h_guard,h_admin}','英雄には、それぞれ<b>スキル</b>があります。防衛施設の連射を上げる「速射」、生産を上げる「指導」など、英雄ごとに違います。英雄を選んで確かめてみてください。向いている配属先に置くと、もっと力を発揮しますよ。','それから、部隊には<b>熟練度</b>があります。戦いを経験するほど熟練度が上がって、強くなっていきます。熟練の部隊は大事にしてくださいね！'],
+  say:['街には<b>英雄</b>がいます。いま街にいる英雄は、右の「<b>軍事</b>」のタブの「<b>英雄</b>」で見られます。{IMG:hero}','英雄を部隊や施設に<b>配属</b>すると、その部隊や施設を強くしてくれます。配属のしかたは、施設か部隊をクリックして、選択中パネルの「<b>配属英雄</b>」から英雄を選ぶだけ。英雄の一覧からも配属できますよ。{ART:h_guard,h_admin}','英雄には、それぞれ<b>スキル</b>があります。防衛施設の連射を上げる「速射」、生産を上げる「指導」など、英雄ごとに違います。英雄を選んで確かめてみてください。向いている配属先に置くと、もっと力を発揮しますよ。','それから、部隊には<b>熟練度</b>があります。戦いを経験するほど熟練度が上がって、強くなっていきます。熟練の部隊は大事にしてくださいね！'],
   steps:[
+  {t:'「軍事」→「英雄」で、街にいる英雄を見る',c:()=>S.heroSeen||0,n:1,rt:'army',hi:'#armySubs [data-asub="hero"]',d:'右の「軍事」のタブを開いて、上の「英雄」を押します。英雄ごとの得意な配属先とスキルが見られます。'},
   {t:'英雄を部隊か施設に配属する',c:()=>S.assignN||0,n:1,hi:'#bArmy',d:'施設か部隊をクリックして、選択中パネルの「配属英雄」から英雄を選びます。下の「軍事」→「英雄」からも配属できます。英雄を選ぶと、スキルと向いている配属先が見られます。'}],
   done:'これで、英雄の力も借りられます！ 次は、戦うための武器です。'},
  {id:'arms',name:'軍需',
@@ -7719,7 +7722,7 @@ function misList(){const mid=S&&(S.ex||S.mapId);return STAGE_MIS[mid]||[];}
 const GUIDE={};for(const m of MISSIONS)GUIDE[m.id]=m;   /* 「場所を示す」（guideWhere）がミッションの id で手順を引く */
 function misSay(m){return m.say.filter(x=>typeof x!=='function'||x());}
 function townName(){return (S&&S.townName)||(MAPS[S&&S.mapId]?MAPS[S.mapId].name:'この街');}
-function lilTxt(t){if(typeof t==='function')t=t();return String(t||'').replace(/\$\{TOWN\}/g,townName()).replace(/\{ART:([a-z0-9_,]+)\}/g,(m,ks)=>lilArt(ks.split(','))).replace(/\{MOV:([a-z0-9_]+)\}/g,(m,k)=>lilMov(k));}
+function lilTxt(t){if(typeof t==='function')t=t();return String(t||'').replace(/\$\{TOWN\}/g,townName()).replace(/\{ART:([a-z0-9_,]+)\}/g,(m,ks)=>lilArt(ks.split(','))).replace(/\{MOV:([a-z0-9_]+)\}/g,(m,k)=>lilMov(k)).replace(/\{IMG:([a-z0-9_]+)\}/g,(m,k)=>`<div class="limg"><img src="tut/${k}.png" alt=""></div>`);}
 // 操作の短い動画（ゲームを録ったもの。くり返し再生。proto/tut/・本番は tut/）。2026-11-16
 const LIL_MOV={fence:'柵をドラッグして一列に置く',move:'部隊を選んで、行き先を押す'};
 function lilMov(k){return LIL_MOV[k]?`<div class="lmov"><video src="tut/${k}.mp4" autoplay muted loop playsinline preload="auto"></video><small>${LIL_MOV[k]}</small></div>`:'';}
@@ -7809,7 +7812,7 @@ function guideWhere(tr,i){const st=GUIDE[tr].steps[i];if(!st)return;
     if(sel&&st.hi&&gHi(st.hi)){toast('光っているボタンを押します');return;}
     const b=S.blds.find(b=>b.type===st.ping&&ready(b));if(b){gPingAt(b.x,b.y,`光っている${B[st.ping].name}をクリックしてください`);return;}
     toast(`まず${B[st.ping].name}を建てましょう`);gRt('build');gHi(`#build button[data-k="${st.ping}"]`);return;}
-  if(st.hi){gHi(st.hi);toast('光っているボタンです');}}
+  if(st.rt)gRt(st.rt);if(st.hi){setTimeout(()=>{gHi(st.hi);},st.rt?120:0);toast('光っているボタンです');}}
 function drawGuidePing(an){const g=S.guide;if(!g||!g.ping)return;const age=nowS()-g.ping.t;if(!(age>=0&&age<=8)){g.ping=null;return;}
   const cx=bcx(g.ping),cy=bcy(g.ping),k=(age*1.2)%1;
   ctx.save();ctx.strokeStyle=`rgba(255,208,96,${1-k})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,TU*(.5+k*1.2),0,7);ctx.stroke();
@@ -8043,7 +8046,7 @@ function renderArmyPanel(force){if(!S)return;const sub=S.armySub||'list';
   const sb=document.getElementById('armySubs');
   if(sb){const cnt={list:S.squads.length,hero:`${S.cmds.length}/${maxCmd()}`};
     sb.innerHTML=ASUBS.map(([k,n])=>`<button data-asub="${k}" class="${k===sub?'on':''}">${n}${cnt[k]!=null&&cnt[k]!==0?`<span class="tcnt">${cnt[k]}</span>`:''}</button>`).join('');
-    sb.querySelectorAll('[data-asub]').forEach(b=>b.onclick=()=>{S.armySub=b.dataset.asub;se('click');renderArmyPanel(true);});}
+    sb.querySelectorAll('[data-asub]').forEach(b=>b.onclick=()=>{S.armySub=b.dataset.asub;if(S.armySub==='hero')S.heroSeen=(S.heroSeen||0)+1;se('click');renderArmyPanel(true);});}
   const el=document.getElementById('armyBox');if(!el)return;
   if(sub==='list'){armyKey='';renderArmyBox(true);}
   else if(sub==='train')showArmy(el);
