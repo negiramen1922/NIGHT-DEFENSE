@@ -756,7 +756,7 @@ button.ghost:hover:not(:disabled){box-shadow:none;color:var(--amber)}
 #intel .ctag{font-size:10px;padding:0 4px;margin-left:2px;box-shadow:0 0 0 1px currentColor;color:var(--dim);white-space:nowrap}#intel .ctag.found{color:#ff9a86}#intel .ctag.gone{color:var(--green)}
 #viewSeg{position:absolute;z-index:4;top:10px;right:10px;display:flex;flex-wrap:wrap;justify-content:flex-end;max-width:60%;gap:0;background:rgba(18,26,20,.92);box-shadow:0 0 0 1px var(--frame)}
 #viewSeg button{box-shadow:none;border:none;padding:4px 10px;font-size:12px;background:transparent;color:var(--dim)}
-#viewSeg button kbd{margin-left:5px}
+#viewSeg button kbd{margin-left:5px}#viewSeg #vCyc{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;color:var(--text)}#viewSeg #vCyc small{font-size:10px;color:var(--dim)}#viewSeg #vCyc b{font-weight:400;min-width:5.5em;text-align:left}#viewSeg #vCyc .vnx{color:var(--dim);font-size:10px}#viewSeg #vCyc.on small,#viewSeg #vCyc.on .vnx{color:#111}
 #viewSeg button.on{background:var(--amber);color:#111}
 #viewSeg button.on kbd{color:#111;border-color:#111}
 #viewCap{flex-basis:100%;font-size:11px;color:var(--text);padding:3px 8px;text-align:right;border-top:1px solid var(--line)}
@@ -1607,7 +1607,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
     <div id="mapWrap">
     <div id="modeBar"><span id="modeTxt"></span><button id="mExit" class="ghost"><span class="xic"></span><span>解除</span><kbd>Esc</kbd></button></div>
     <canvas id="cv"></canvas>
-    <div id="viewSeg" title="マップの表示を切り替え"><button data-v="n">通常</button><button data-v="lv">土地Lv<kbd>T</kbd></button><button data-v="heat">狙われやすさ<kbd>H</kbd></button><button data-v="prod">生産</button><span id="viewCap"></span></div>
+    <div id="viewSeg" title="押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（土地Lv は T、狙われやすさ は H でも）"><button id="vCyc"><small>表示</small><b id="vCycN">通常</b><span class="vnx">▸</span></button><span id="viewCap"></span></div>
     <div id="pauseMsg"><b>一時停止中</b><small>指示はそのまま出せます・Space で再開</small></div>
     </div>
     <div id="toasts" style="position:fixed;z-index:40;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;transform:translateX(-50%)"></div>
@@ -1664,7 +1664,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
     <div id="infoSplit" title="上下にドラッグして、詳細と下のパネルの高さを変える（ダブルクリックで元に戻す）"><span class="grip"></span></div><button id="infoClose" title="詳細を閉じる">×</button>
     <div id="rtabs"><button data-rt="info" class="tabInfo">選択中</button><button data-rt="build" class="on">建設</button><button data-rt="res">研究</button><button data-rt="army">軍事</button><button data-rt="econ">街</button></div>
     <div class="box" data-rt="econ" style="display:none"><h3>街の状況</h3><div id="econ"></div></div>
-    <div class="box" data-rt="build"><h3>建設</h3><div id="facCapBox"></div><button id="bRepB" class="wide" style="width:100%;margin:0 0 8px">一括修理</button><div id="build"></div></div>
+    <div class="box" data-rt="build"><h3>建設</h3><div id="facCapBox"></div><div id="build"></div></div>
     <div class="box" data-rt="army" style="display:none"><h3>軍事</h3><div id="armySubs" class="asubs"></div><div id="armyBox"></div></div>
     <div class="box" data-rt="res" style="display:none"><h3>研究</h3><div id="resBox"></div></div>
   </div>
@@ -6607,10 +6607,12 @@ function renderPauseUI(){if(!S)return;const p=!!S.paused&&!S.over;const b=docume
 let viewKey='';
 function curView(){return S.showLv?'lv':S.heat?'heat':S.viewProd?'prod':'n';}
 function setView(v){S.showLv=v==='lv';S.heat=v==='heat';S.viewProd=v==='prod';syncView();}
-function syncView(){viewKey=curView();document.querySelectorAll('#viewSeg [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===viewKey));
+// 表示の切り替えはボタン1つ（押すたびに次へ。2026-11-16 ユーザーの希望）
+const VIEW_ORDER=['n','lv','heat','prod'],VIEW_NAME={n:'通常',lv:'土地Lv',heat:'狙われやすさ',prod:'生産'};
+function syncView(){viewKey=curView();{const b=document.getElementById('vCyc');if(b){b.classList.toggle('on',viewKey!=='n');const n=document.getElementById('vCycN');if(n)n.textContent=VIEW_NAME[viewKey];}}
   const c=document.getElementById('viewCap');c.textContent=viewKey==='prod'?'1ターンに作る物（緑）と使う物（赤）':viewKey==='lv'?'色が濃いほど Lv が高い　岩=黄・森=緑・沼=青・鉱脈=橙・泉=紫':viewKey==='heat'?'赤く広がるほど敵が先に狙う（壁・防衛施設は狙われにくい）':'';c.style.display=viewKey==='n'?'none':'';}
 function toggleHeat(){setView(S.heat?'n':'heat');}
-document.querySelectorAll('#viewSeg [data-v]').forEach(b=>b.onclick=()=>{setView(b.dataset.v);se&&se('click');});
+{const b=document.getElementById('vCyc');if(b)b.onclick=()=>{setView(VIEW_ORDER[(VIEW_ORDER.indexOf(curView())+1)%VIEW_ORDER.length]);se&&se('click');};}
 document.getElementById('bPause').onclick=togglePause;document.getElementById('bPauseSeg').onclick=togglePause;
 document.getElementById('bSave').onclick=()=>{if(!saveGame()){toast(S.waveActive?'襲撃中はセーブできません（朝に自動保存されます）':'今はセーブできません','warn');}};
 document.querySelector('#more .moreBody').addEventListener('click',e=>{if(e.target.closest('button'))document.getElementById('more').open=false;});
@@ -6695,7 +6697,7 @@ document.getElementById('bArmy').onclick=()=>openArmyTab('list',true);
 function setRT(t){if(t==='info'&&!isNarrow())t='build';if(S&&t==='econ')S.econSeen=(S.econSeen||0)+1;if(S&&t==='army'&&S.armySub==='hero')S.heroSeen=(S.heroSeen||0)+1;document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
-document.getElementById('bRepAll').onclick=repairAll;document.getElementById('bRepB').onclick=repairAll;document.getElementById('bSupAll').onclick=supplyAll;
+document.getElementById('bRepAll').onclick=repairAll;document.getElementById('bSupAll').onclick=supplyAll;
 document.getElementById('bHelp').onclick=()=>{if(!S.overlay)showHelp(false);};
 document.getElementById('bNaval').onclick=toggleNaval;
 document.getElementById('bMute').onclick=auToggle;
@@ -7681,7 +7683,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に']],
+ ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）']],
  ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。生産は昼だけ、10秒ごとに少しずつ入る。時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める。残りは地図の上の横長のバーで（太陽・月が左から右へ進む）。昼の後半は夕方に。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
@@ -7859,7 +7861,7 @@ const LIL_NAME='書記官リリア';
 const MISSIONS=[
  {id:'prod',name:'生産施設の建設',
   say:['はじめまして、領主様！ 王都から参りました、領主様付きの書記官のリリアです。今日からお手伝いをします！','資材がないと、守りも街の発展もできません！ まずは木材と石材などの生産施設を建てましょう！{ART:miner,quarry}',
-   ()=>'ただし、<b>土地のレベル</b>で生産の効率が変わるので気をつけてください。たとえば森は、木が深いほど木材がたくさん採れます。'+lilForestImg()+'右上の「土地Lv」のボタンでも確かめられますよ。'],
+   ()=>'ただし、<b>土地のレベル</b>で生産の効率が変わるので気をつけてください。たとえば森は、木が深いほど木材がたくさん採れます。'+lilForestImg()+'右上の「表示」のボタンを押して「土地Lv」にすると、地図で確かめられますよ。'],
   steps:[
   {t:'伐採所を4つ建てる',b:'miner',n:4,d:'<b>森</b>のマスに建てると木材が採れます。森が深いほど多く採れます。'},
   {t:'石切り場を2つ建てる',b:'quarry',n:2,d:'<b>岩場</b>（灰色の岩があるマス）に建てると石材が採れます。'},
