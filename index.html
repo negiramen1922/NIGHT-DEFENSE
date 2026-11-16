@@ -317,6 +317,13 @@ body.fullmap #right.open{transform:none}
 #guide .grw{font-size:11px;color:#b8d898}
 #guide button{padding:2px 7px;font-size:11px}
 #guide .gtabs{display:flex;gap:4px;margin-bottom:3px}#guide .gtabs button{flex:1;padding:3px 4px;font-size:12px}#guide .gtabs button.on{background:#c8a070;color:#111;font-weight:bold}
+#guide{width:440px;font-size:13px}#guide .gb{max-height:64vh}#guide .gr .gtt{flex:1;min-width:0}#guide .gr button{flex-shrink:0;white-space:nowrap}#guide .gdet2{margin:2px 0 6px 18px;padding:6px 8px;background:#14110c;border-left:3px solid #c8a070;line-height:1.6;color:#e0d6bc}#guide .lart{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:6px;margin:8px 0 4px}#guide .lart .artpx{width:100%}
+#guide .lil{display:flex;gap:8px;align-items:flex-start;background:#1e1a12;border:1px solid #5a4a2a;padding:6px;margin:2px 0 6px}#guide .lil .lilf{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}#guide .lsay{flex:1;min-width:0;line-height:1.7;color:#f0e4c8;font-size:14px}#guide .lsay small{display:block;color:#e8c070;font-size:10.5px;letter-spacing:1px}#guide .lbtn{text-align:right;margin-top:4px}#guide .lbtn button{padding:3px 10px}#guide .lbtn #lDone{width:100%;white-space:normal}#guide .gh .lilf{flex-shrink:0}#guide .gh b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}#guide .gfoot button{font-size:11px;padding:2px 6px}
+#alertTop{position:fixed;left:50%;top:84px;transform:translate(-50%,-20px);z-index:60;display:flex;align-items:center;gap:10px;padding:8px 18px;background:rgba(14,10,10,.94);border:2px solid var(--ac,#ff8a3a);box-shadow:0 0 18px var(--ac,#ff8a3a),0 4px 14px #000c;color:#fff;font-size:16px;font-weight:bold;letter-spacing:1px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:calc(100vw - 24px);text-align:center}
+#alertTop.on{opacity:1;transform:translate(-50%,0)}#alertTop span b{display:block}#alertTop span small{display:block;font-size:12px;font-weight:normal;color:#e8dcc0;letter-spacing:0;margin-top:2px}#alertTop em{font-style:normal;line-height:0;background:#1e1a12;border:1px solid #6a5a3a;padding:3px}#alertTop i{font-style:normal;font-size:20px;color:var(--ac)}
+body.land #alertTop{top:44px;font-size:14px;padding:6px 12px}
+#ovCard .nlil{display:flex;gap:10px;align-items:flex-start;background:#1e1a12;border:1px solid #c8a070;padding:8px 10px;margin:4px 0 10px;line-height:1.7;font-size:13.5px;color:#f0e4c8}#ovCard .nlil small{display:block;color:#e8c070;font-size:11px}#ovCard .nlil ol{margin:4px 0;padding-left:20px}#ovCard .nlil img{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}
+#guide .gcur .gct button{margin-left:auto;flex-shrink:0;padding:2px 8px}
 #guide .gnote{font-size:10.5px;color:#8a8068;margin:2px 0 3px}
 #guide .gr{display:flex;align-items:center;gap:5px;padding:3px 4px;border-left:3px solid #8a6a3a;background:#17140e;margin:2px 0;cursor:pointer}
 #guide .gr:hover{background:#221d14}#guide .gr.op{background:#2a2216}
@@ -592,8 +599,8 @@ body.night #intel .lbl{background:#5a1a14;color:#ffb0a8}
 }
 
 /* ---------- 初心者タスク：たたんだ時は「今のタスク1つ」だけ ---------- */
-#guide{box-shadow:0 -2px 0 #8a6a3a,0 2px 0 #8a6a3a,-2px 0 0 #8a6a3a,2px 0 0 #8a6a3a,0 4px 16px #000a;border:none;width:290px}
-#guide .gb{max-height:28vh}
+#guide{box-shadow:0 -2px 0 #8a6a3a,0 2px 0 #8a6a3a,-2px 0 0 #8a6a3a,2px 0 0 #8a6a3a,0 4px 16px #000a;border:none;width:440px}   /* 2026-11-16：チュートリアルの説明が読めるように広く */
+#guide .gb{max-height:min(58vh,calc(100vh - 260px))}#guide .gdet2 .lart{max-width:260px}#guide .lmov{margin:8px 0 4px}#guide .lmov video{display:block;width:100%;border:1px solid #5a4a2a;background:#000}#guide .lmov small{display:block;color:#c8b890;font-size:11px;margin-top:2px}#guide .gdet2 .lmov{max-width:340px}
 #guide.min .gcur{display:block}   /* 【追加】.gcur = 現在のタスク1行＋バー */
 #guide .gcur{display:none;padding:8px 10px}
 
@@ -861,7 +868,7 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 #right .box[data-rt="build"]>#facCapBox,#right .box[data-rt="econ"]>#econ,#right .box[data-rt="army"]>#armyBox{margin-top:10px}
 
 /* 初心者タスク */
-#guide,#guide.min{width:290px;background:rgba(20,17,12,.95);font-size:12px}
+#guide,#guide.min{width:440px;background:rgba(20,17,12,.95);font-size:13px}   /* 2026-11-16：チュートリアル用に広く */
 #guide .gh{padding:6px 8px;gap:8px}
 #guide .gh b{font-size:12px;color:#e8c070}
 #guide .gh .gp{font-family:var(--px-font);font-size:12px;color:#c8b890}
@@ -1617,7 +1624,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <button id="bSave">セーブ（自動でも保存）</button>
       <button id="bTitle">タイトルへ</button>
       <button id="bHelp">遊び方</button>
-      <button id="bGuide">初心者タスクを表示</button>
+      <button id="bGuide">ミッション（リリアの案内）を表示</button>
       <button id="bRetry" class="danger">やり直す</button>
       <button id="bMute">♪ 音あり [M]</button>
       <label class="help">BGM <input type="range" id="vBgm" min="0" max="1" step="0.05" style="width:70px;vertical-align:middle"></label>
@@ -1713,7 +1720,19 @@ function happyIc(sz){const h=S.happy;const [k,c]=h>=75?['h_joy','green']:h>=55?[
 function happyName(){const h=S.happy;return h>=75?'上機嫌':h>=55?'ふつう':h>=35?'不満':'暴動寸前';}   // 住民1人あたりの食料消費（毎秒）
 const HQ_GOLD=12;   // 城館の収入（毎ターン）
 const WAVE_LEAD=3;   // 敵を全滅させてから次の波が来るまでの秒数
-const FINAL_WAVE_BASE=10, FIRST_PREP=10, NEXT_PREP=4, TURN_SEC=10;
+const FINAL_WAVE_BASE=10, FIRST_PREP=10, NEXT_PREP=4, BIG_PREP=6, TURN_SEC=10;
+// 山場（ブラッドムーン・ボスの夜）の前は準備の日を長く（2026-11-16 ユーザーの指定：山場の前に6日）
+function bigNight(n){if(!S)return false;return bloodNights().includes(n)||n===finalWave()||((S.mapId==='f'||S.mapId==='7')&&n===20);}
+function prepDays(n){return bigNight(n)?BIG_PREP:NEXT_PREP;}
+// 山場のお知らせの言葉（ゲームの中の言葉で。「ボス」などの言い方はしない。2026-11-16）
+const BIG_SAY={
+ king:{far:d=>`斥候の知らせ：ゴブリンの王が軍勢を集めている。${d}日後の夜に攻めてくる`,near:'明日の夜、ゴブリンの王の軍勢が来る。守りと補給の確認を',now:'ゴブリンの王が、軍勢を率いて押し寄せてきた！'},
+ grove:{far:d=>`森がざわめいている……${d}日後の夜、何かが来る`,near:'明日の夜、森そのものが動き出す。最後の守りを',now:'森が……動き出した！'},
+ blood:{far:d=>`月が赤くにじみはじめた。${d}日後の夜はブラッドムーン`,near:'明日の夜はブラッドムーン。守りと補給の確認を',now:'赤い月が昇った——ブラッドムーンの夜'}};
+function bigKind(w){if(!w)return null;const b=(w.q||[]).find(e=>E[e.type]&&E[e.type].boss);if(b&&BIG_SAY[b.type])return b.type;return w.blood?'blood':null;}
+// 山場の予告：準備の始めと、前の日に上に出す
+function bigAhead(){if(!S||S.mode!=='campaign'||S.backdrop)return;const n=S.wave+1;if(!bigNight(n))return;const L=S.turnsLeft;if(!(L===1||L===S.prepTotal-1))return;
+  const k=bigKind(S.next);if(!k)return;const T=BIG_SAY[k];alertTop(L===1?T.near:T.far(L),k==='blood'?'moon':'boss',6000);}
 function maxCmd(){return 2+2*((S&&S.baseLv)||1);}
 const BASE_MAX=7;
 // 施設の大きさ（マス）。古いセーブの施設は sz を持たないので、城2×2・その他1×1のまま扱う
@@ -1745,7 +1764,7 @@ function baseUpCost(){const l=S.baseLv;const c={gold:l===1?150:250*l,stone:120*l
 
 const SPECS={
   '守備':{color:'#f2b33d',stat:'def',desc:'防衛施設（バリスタ・投石機・大砲・物見櫓・壁・門・城館）を強化'},
-  '歩兵':{color:'#d86a5a',stat:'atk',desc:'農兵・兵士・重装歩兵の部隊を強化'},
+  '歩兵':{color:'#d86a5a',stat:'atk',desc:'農兵・剣士・重装歩兵の部隊を強化'},
   '弓兵':{color:'#9be06f',stat:'atk',desc:'弓兵隊（偵察もこなす）を強化'},
   '騎兵':{color:'#e0b060',stat:'atk',desc:'騎兵隊を強化'},
   '竜騎':{color:'#ff7a4a',stat:'atk',desc:'竜騎兵隊を強化'},
@@ -1798,7 +1817,7 @@ Object.assign(B,{
   aerie:  {name:'竜舎',glyph:'竜',hp:420,heat:4,cost:{steel:150,stone:80,gold:120},pop:4,power:0,spec:'騎兵',grp:'prod',cap:1,desc:'ドラゴンライダー（2騎）を1隊だけ育てる。非常に目立ち、魔物に狙われやすい',req:'dragon'},
   magic:  {name:'魔導院',glyph:'魔',hp:240,heat:3,cost:{steel:80,stone:40,elec:15},pop:3,power:0,spec:'魔導',grp:'prod',cap:2,desc:'魔術師隊（3人）を2隊まで育成・治療・補充',req:'magic'},
   outpost:{name:'前哨砦',glyph:'砦',hp:700,heat:2,cost:{steel:120,stone:40},pop:4,power:0,spec:'工兵',desc:'周囲21マスを領地にして建設できる範囲を広げ、視界と明かりも確保する'},
-  train:  {name:'兵舎',glyph:'兵',hp:320,heat:3,cost:{steel:90},pop:3,power:0,spec:'歩兵',grp:'prod',cap:2,desc:'兵士か弓兵の部隊（5人）を合わせて2隊まで編成・治療・補充（1棟で10人）'},
+  train:  {name:'兵舎',glyph:'兵',hp:320,heat:3,cost:{steel:90},pop:3,power:0,spec:'歩兵',grp:'prod',cap:2,desc:'剣士か弓兵の部隊（5人）を合わせて2隊まで編成・治療・補充（1棟で10人）'},
   spike:  {name:'トゲ床',glyph:'',hp:1,heat:0,cost:{steel:20,iron:10},pop:0,power:0,spec:'工兵',isMine:true,kind:'spike',desc:'1×1。踏んだ魔物に毎秒ダメージ（9）を与え、足を遅くする。踏まれ続けると壊れる（一括修理で直す）。領地の外にも置ける（空の敵には効かない）'},
   pit:    {name:'落とし穴',glyph:'',hp:1,heat:0,cost:{steel:25},pop:0,power:0,spec:'工兵',isMine:true,kind:'pit',desc:'1×1。落ちた魔物に大ダメージを与え、しばらく動けなくする。一晩に3回使うと埋まる。襲撃のあとに木材8で自動で掘り直す（一括修理でも）'},
   bomb:   {name:'爆弾罠',glyph:'',hp:1,heat:0,cost:{steel:15,powder:8},pop:0,power:0,spec:'工兵',isMine:true,kind:'bomb',req:'bombtrap',desc:'火薬を詰めた使い切りの罠。踏んだ魔物の周り4マスを吹き飛ばし、大きなダメージを与える（空の敵には効かない）。領地の外にも置ける'},
@@ -1812,7 +1831,7 @@ Object.assign(B,{
   how:    {name:'投石機',glyph:'投',hp:240,heat:1,cost:{steel:100,stone:20,gold:40},pop:4,power:0,spec:'守備',grp:'def',desc:'石材を撃ち出す曲射兵器。城壁の向こうへ範囲攻撃。最低射程4マス',req:'catapult',range:8,minRange:2,dmg:70,rate:3.0,splash:1.6,ammoUse:2,ammoKey:'stone'},
   tower:  {name:'物見櫓',glyph:'櫓',hp:900,heat:1,cost:{steel:80,stone:60,gold:20},pop:2,power:0,spec:'弓兵',grp:'def',desc:'石積みの見張り櫓（直射）。射手（人員）を配置すると、高所からとても長い射程で連射し、空の敵も撃てる。1発は軽い。城壁並みに頑丈で、壁の列に組み込める（柵・石の壁の上に建てると置き換わる）。壁の上には載せられない。周囲を少し照らす',range:9,towerWall:true,dmg:15,rate:0.5,ammoUse:0.25,direct:true,antiAir:true},
 });
-B.lab.pop=0;B.lab.desc='研究員の詰め所。1つにつき研究員の上限 +3人（Lv2で+5人・Lv3で+8人）。研究員は待機中の住民から研究のたびに就く';
+B.well.req='aethert';B.lab.pop=3;B.lab.desc='研究員の詰め所。建てると住民3人が研究員としてつく（バリスタの射手と同じ）。研究員 +3人（改築で+5人・+8人）。城にも初めから研究員が5人いる';   /* 2026-11-16：研究のたびに待機中の住民を使うのをやめ、研究室に決まった人数がつく形に */
 B.gate={name:'門',glyph:'門',hp:140,heat:0,cost:{steel:40,stone:20},pop:0,power:0,spec:'工兵',grp:'def',desc:'味方だけが通れる出入り口。壁は敵も味方も通れないので、部隊は門から出入りする。敵には壁と同じで、壊されるまで通れない。柵や壁の列の上に建てると置き換わる'};
 B.hisou={name:'風船爆弾',glyph:'風',hp:300,heat:1,cost:{steel:80,stone:30,iron:30,gold:40},pop:3,power:0,spec:'守備',grp:'def',desc:'風船をつけた爆弾を打ち上げる。爆弾はふわふわと魔物を追いかけ、近づくと爆発して周りを吹き飛ばす。空の敵にも地上の敵にも効く。壁や建物は越えて飛ぶ（山は越えられない）。1発ごとに火薬1',req:'hisousha',range:8,dmg:130,rate:3,splash:1.2,balloon:true,antiAir:true,ammoKey:'powder',ammoUse:1};
 B.magetower={name:'メイジの塔',glyph:'魔',hp:500,heat:1,cost:{steel:60,stone:60,elec:20},pop:3,power:0,spec:'守備',grp:'def',desc:'魔術師（人員）を配置して使う塔。高所から魔術の火の玉を撃ち、当たった所の周りを焼く（範囲攻撃）。空の敵も撃てる。エーテルを使う',req:'magetower',range:5,dmg:100,rate:2.5,splash:1.1,flat:true,direct:true,ammoUse:0.5,ammoKey:'elec',antiAir:true};
@@ -1896,7 +1915,7 @@ const UPG_EFF={
 const E={
   swarm:  {name:'ゴブリン',desc:'アビスの影響で凶暴化した小鬼。弱いが数が多く、兵士に群がる',hp:30,spd:40,dmg:5,rate:0.6,r:5,color:'#8ac060',xp:2,mat:0.15,vsS:1.6,hunt:4},
   charger:{name:'ゴブリンライダー',desc:'魔狼に乗ったゴブリン。足が速く、群れで真っ先に突っ込んでくる。狼を倒すと乗っていたゴブリンが降りて戦う',hp:80,spd:76,dmg:10,rate:0.6,r:7,color:'#9a9aa8',xp:4,mat:0.5,vsS:1.5,hunt:5,spill:{type:'swarm',n:1}},
-  grove:{name:'蠢く木陰',desc:'草原のラスボス。森の大木そのものが魔物になった怪物。周りに濃い木陰（宵闇の帳）を広げ、その中では明るい明かり（石炭の篝火・蒼い炎）でしか魔物が見えない。10秒ごとに「森の抱擁」：足元から根が突き出る（2秒前に影の円）。燃えている間は装甲がなくなる。体力が半分を切ると「森の胎動」で目覚め、足が増えて速くなり、立ち止まって周りの地面を揺らす波（当たると敵も味方も2秒動けない）を出す。火の攻撃で受けるダメージ200%',hp:30000,spd:14,dmg:150,rate:1.4,r:26,color:'#3a4a2a',xp:200,armor:0.4,bldMul:2,mat:120,boss:true,fireWeak:true,shade:7,roots:true,drawMul:1.6},
+  grove:{name:'蠢く木陰',desc:'草原の最後の夜に現れる、森の大木そのものが魔物になった怪物。周りに濃い木陰（宵闇の帳）を広げ、その中では明るい明かり（石炭の篝火・蒼い炎）でしか魔物が見えない。10秒ごとに「森の抱擁」：足元から根が突き出る（2秒前に影の円）。燃えている間は装甲がなくなる。体力が半分を切ると「森の胎動」で目覚め、足が増えて速くなり、立ち止まって周りの地面を揺らす波（当たると敵も味方も2秒動けない）を出す。火の攻撃で受けるダメージ200%',hp:30000,spd:14,dmg:150,rate:1.4,r:26,color:'#3a4a2a',xp:200,armor:0.4,bldMul:2,mat:120,boss:true,fireWeak:true,shade:7,roots:true,drawMul:1.6},
   eltreant:{name:'エルダートレント',desc:'年老いた大きなトレント。トレントより強く硬い。火に弱い（受けるダメージ200%。燃えている5秒の間は装甲がなくなる）',hp:4500,spd:20,dmg:96,rate:1.2,r:16,color:'#4a3a22',xp:40,armor:0.35,bldMul:2,mat:12,fireWeak:true,hunt:3},
   treant:{name:'トレント',desc:'歩く巨木の魔物。とても硬いが、火に弱い（ドラゴンブレス・竜騎兵・魔術師の火・メイジの塔で受けるダメージ200%。燃えている5秒の間は装甲がなくなる）',hp:1800,spd:24,dmg:45,rate:1.0,r:13,color:'#5a4a2a',xp:20,armor:0.3,bldMul:1.5,mat:6,fireWeak:true,hunt:3},
   shogre:{name:'盾持ちオーガ',desc:'大きな盾を構えたオーガ。正面からの矢・弾を70%防ぐ（横・後ろからと曲射・魔法の範囲はそのまま）',hp:1400,spd:34,dmg:66,rate:1.1,r:12,color:'#6a7a5a',xp:24,armor:0.2,bldMul:1.3,mat:6,vsS:1.3,hunt:4,frontShield:0.7},
@@ -1915,7 +1934,7 @@ const E={
   gobarcher:{name:'ゴブリンアーチャー',desc:'本隊の後ろから弓で部隊や防衛施設を撃ってくるゴブリン。打たれ弱いが、放っておくと前線がじわじわ削られる',hp:50,spd:30,dmg:4,rate:0.8,r:6,color:'#9ab060',xp:3,mat:0.3,hunt:3,archers:{range:5,dmg:7,rate:1.3}},
   harpy:  {name:'ハーピー',desc:'空から壁を飛び越え、街の奥の住居や生産施設を襲う。空を撃てる兵器でしか倒せない',hp:70,spd:62,dmg:9,rate:0.8,r:7,color:'#c080ff',xp:4,mat:0.4,fly:true},
   wyvern: {name:'ドラゴン',desc:'ゴブリンを乗せた竜。城壁や施設を飛び越えて住居の密集地を目指し、着くとゴブリンを落としてから炎で焼き払う。空を撃てる兵器でしか倒せない',hp:950,spd:46,dmg:34,rate:1.4,r:14,color:'#a83a2a',xp:30,mat:8,fly:true,armor:0.25,drop:{type:'swarm',n:8},breath:1.6},
-  king:   {name:'ゴブリンキング',desc:'ゴブリン軍の王（草原では20回目の中ボス）。15秒ごとに「王の号令」（2秒前に金の輪）で、周り8マスの魔物を6秒勢いづかせる。体力が75%・50%・25%になるたびに援軍（ゴブリンライダー6・オーガ2）を呼ぶ',hp:10000,spd:24,dmg:130,rate:1.6,r:22,color:'#d8a020',xp:120,mat:60,armor:0.45,bldMul:1.5,aura:8,boss:true},
+  king:   {name:'ゴブリンキング',desc:'ゴブリン軍の王。草原の20回目の夜に、軍勢を率いて現れる。15秒ごとに「王の号令」（2秒前に金の輪）で、周り8マスの魔物を6秒勢いづかせる。体力が75%・50%・25%になるたびに援軍（ゴブリンライダー6・オーガ2）を呼ぶ',hp:10000,spd:24,dmg:130,rate:1.6,r:22,color:'#d8a020',xp:120,mat:60,armor:0.45,bldMul:1.5,aura:8,boss:true},
   redcap: {name:'レッドキャップ',desc:'ブラッドムーンの夜にだけ現れる殺戮者。人を狙い、兵士や施設の人員を次々に手にかける',hp:160,spd:60,dmg:14,rate:0.4,r:7,color:'#d02020',xp:12,mat:3,vsS:4,hunt:8,crewKill:true},
   biter:{name:'（未使用）',desc:'',hp:30,spd:34,dmg:5,rate:0.5,r:5,color:'#999',xp:2,mat:0.1},
   laser:{name:'（未使用）',desc:'',hp:170,spd:24,dmg:20,rate:1.8,r:8,color:'#ffe14e',xp:10,mat:2.5,laser:6},
@@ -1940,7 +1959,7 @@ const MODEL={
   advSword:{ut:'adv',buy:true,name:'剣士の一団',role:'冒険者（近接）',color:'#e0c070',wage:8,desc:'腕利きの剣士4人。硬く強いが補充できない。毎ターン給金8'},
   advBow:{ut:'adv',buy:true,name:'狩人の一団',role:'冒険者（弓）',color:'#a0e070',wage:8,hpEach:90,dmg:14,rate:0.5,range:6,antiAir:true,arrow:true,shootAmmo:0,cost:{gold:250},desc:'凄腕の弓使い4人。空も撃てる。矢は自前。毎ターン給金8'},
   advMage:{ut:'adv',buy:true,name:'魔導士の一団',role:'冒険者（魔法）',color:'#b0a0ff',wage:12,hpEach:80,dmg:34,rate:1.5,range:5,splash:1.1,antiAir:true,shootAmmo:0,cost:{gold:350},desc:'流れの魔導士4人。範囲魔法で群れを焼く。毎ターン給金12'},
-  pawn:  {ut:'inf',name:'兵士',role:'歩兵（ポーン）',color:'#d8b48a',desc:'剣を持った基本の兵。数をそろえて敵を食い止める'},
+  pawn:  {ut:'inf',name:'剣士',role:'歩兵（ポーン）',color:'#d8b48a',desc:'剣を持った基本の兵。数をそろえて敵を食い止める'},
   archer:{ut:'arch',name:'弓兵',role:'弓兵（アーチャー）',color:'#9be06f',desc:'遠くから矢を射る。空の敵も狙える。高台に配置できる。打たれ弱い'},
   heavy: {ut:'inf',wage:3,name:'重装歩兵',role:'重装歩兵（タンク）',color:'#a8b8c8',req:'heavyinf',hpEach:120,dmg:10.5,spd:26,armor:0.35,cost:{gold:10,sword:5,iron:15,fuel:12},desc:'鎧と大盾で敵を止める壁役。遅いが非常に硬い'},
   rider: {ut:'cav',wage:4,name:'騎兵',role:'騎兵（ライダー）',color:'#e0b060',req:'cavalry',desc:'馬で素早く駆けつけ、突撃で群れを崩す'},
@@ -2063,7 +2082,7 @@ const TECH=[
   {id:'upg_def1',cat:'防衛',tier:2,name:'防衛施設の改築Ⅰ',t:2,cost:{steel:120,stone:60},key:1,eff:'防衛施設を Lv2 に改築可能に',pre:['shell']},
   {id:'upg_def2',cat:'防衛',tier:3,name:'防衛施設の改築Ⅱ',t:3,cost:{steel:250,stone:120,elec:15},key:1,eff:'防衛施設を Lv3 に改築可能に',pre:['upg_def1']},
   // 部隊
-  {id:'swordplay',cat:'部隊',tier:1,name:'剣術の鍛錬',t:2,cost:{sword:10,fuel:30},icon:'inf',eff:'兵士・重装歩兵・騎兵の火力 +20%'},
+  {id:'swordplay',cat:'部隊',tier:1,name:'剣術の鍛錬',t:2,cost:{sword:10,fuel:30},icon:'inf',eff:'剣士・重装歩兵・騎兵の火力 +20%'},
   {id:'archery',cat:'部隊',tier:1,name:'弓術の鍛錬',t:2,cost:{steel:40,ammo:30},icon:'archer',eff:'弓兵隊と物見櫓の火力 +20%'},
   {id:'cavalry',cat:'部隊',tier:2,name:'騎兵',t:3,cost:{gold:80,fuel:60,iron:30},key:1,icon:'rider',eff:'「馬小屋」を建設可能に。騎兵隊（5騎・速い）を編成できる',pre:['farming']},
   {id:'magic',cat:'部隊',tier:2,name:'魔術師の育成',t:3,cost:{gold:80,elec:20},key:1,icon:'wizard',eff:'「魔導院」を建設可能に。魔術師隊（3人・範囲魔法・エーテル結晶を使う）を育成できる',pre:['analysis']},
@@ -2112,7 +2131,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('trade',{cat:'内政',tier:3,name:'交易路',cost:{gold:150,steel:100},t:3,pre:['brewing'],eff:'魔核の買い取り値 +3金貨'});
  del('drill');
  // 部隊
- set('swordplay',{name:'剣術',eff:'農兵・兵士・重装歩兵・騎兵の火力 +20%'});
+ set('swordplay',{name:'剣術',eff:'農兵・剣士・重装歩兵・騎兵の火力 +20%'});
  set('archery',{name:'弓術',eff:'弓兵隊と物見櫓の火力 +20%'});
  set('doctrine',{name:'英雄教練',cost:{gold:40,fuel:30},eff:'英雄の獲得経験 +50%'});
  set('nighthunt',{cat:'部隊',tier:1,name:'夜狩り術',cost:{fuel:40,ammo:20},t:2,pre:[],icon:'archer',eff:'夜狩りで持ち帰る魔核 +50%、負傷・戦死の危険 −40%'});
@@ -2163,7 +2182,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('upg_def2',{gate:3,tier:3,pre:[],eff:'防衛タブのランクⅢの研究を解放。防衛施設をLv3まで改築できる'});
  set('thorn',{cat:'防衛',tier:2,pre:['masonry'],icon:'swall',eff:'石の壁・城壁を攻撃した魔物に、受けた被害の40%を返す'});
  // 部隊
- set('swordplay',{tier:1,max:3,pre:[],cost:{sword:10,fuel:30},icon:'pawn',eff:'近接部隊（農兵・兵士・重装歩兵・騎兵）の火力 +15%（Lvごと・最大3）'});
+ set('swordplay',{tier:1,max:3,pre:[],cost:{sword:10,fuel:30},icon:'pawn',eff:'近接部隊（農兵・剣士・重装歩兵・騎兵）の火力 +15%（Lvごと・最大3）'});
  set('archery',{tier:1,max:3,pre:[],cost:{steel:30,ammo:30},icon:'archer',eff:'弓兵隊（物見櫓に配置した弓兵も）の火力 +15%（Lvごと・最大3）'});
  set('formation',{tier:1,pre:[],cost:{fuel:40,sword:10},icon:'heavy',eff:'小隊（部隊）3つまでを「中隊」にまとめられる。一緒に動き、近くにいる間は火力 +15%・耐久 +10%'});
  set('armcare',{cat:'部隊',tier:1,name:'武具の手入れ',cost:{steel:30,iron:15},t:1,pre:[],icon:'pawn',eff:'近接部隊・竜騎兵の武具の傷み −40%'});
@@ -2177,7 +2196,8 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('highmagic',{cat:'部隊',tier:4,name:'高等魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard',eff:'魔術師の杖が「樫の杖」から「エーテルの杖」になる（攻撃 140%）。魔法の範囲 +30%、魔力の消費 −30%'});
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館・前哨砦・所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
- set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
+ set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'剣士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
+ set('aethert',{cat:'生産',tier:2,name:'エーテル採掘',cost:{steel:60,stone:30,gold:20},t:2,pre:[],icon:'well',eff:'「エーテル採掘所」を建設できる（龍脈の泉からエーテルを採る）'});   /* 2026-11-16：エーテル採掘所は初めからは建てられない */
  set('coalt',{cat:'生産',tier:2,name:'炭鉱',cost:{steel:60,stone:30},t:2,pre:[],icon:'coalmine',eff:'「炭鉱」を建設できる（石炭を掘る）'});
  set('goldt',{cat:'生産',tier:3,name:'金鉱',cost:{steel:80,stone:40,gold:40},t:3,pre:[],icon:'goldmine',eff:'「金鉱」を建設できる（素材の金を掘る。金貨ではない）'});
  set('smeltt',{cat:'生産',tier:3,name:'精錬所',cost:{steel:100,stone:60,iron:30,gold:60},t:3,pre:['goldt'],icon:'smelter',eff:'「精錬所」を建設できる（鉄・金・石炭から合金を作る）'});
@@ -2218,7 +2238,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('bonepick',{cat:'魔核',tier:1,name:'強化つるはし',cost:{mat:15,steel:30},t:2,pre:['analysis'],icon:'quarry',eff:'魔核の力を込めた採掘道具。石切り場・鉱山の産出 +25%'});
  set('boneaxe',{cat:'魔核',tier:1,name:'強化斧',cost:{mat:15,steel:30},t:2,pre:['analysis'],icon:'miner',eff:'魔核の力を込めた斧。伐採所の産出 +25%'});
  set('bonehoe',{cat:'魔核',tier:1,name:'強化農具',cost:{mat:15,steel:30},t:2,pre:['analysis'],icon:'farm',eff:'魔核の力を込めた鍬と鋤。農場・漁場の産出 +25%'});
- set('bonearmor',{cat:'魔核',tier:2,name:'骨鎧',cost:{mat:40,iron:30},t:2,pre:[],icon:'heavy',eff:'魔物の甲殻で作った鎧。農兵・兵士・重装歩兵・騎兵・近衛兵の耐久 +25%'});
+ set('bonearmor',{cat:'魔核',tier:2,name:'骨鎧',cost:{mat:40,iron:30},t:2,pre:[],icon:'heavy',eff:'魔物の甲殻で作った鎧。農兵・剣士・重装歩兵・騎兵・近衛兵の耐久 +25%'});
  set('poison',{cat:'魔核',tier:2,name:'毒の鏃',cost:{mat:40,ammo:40},t:2,pre:[],icon:'archer',eff:'魔物の毒腺を矢に塗る。弓兵隊・物見櫓・バリスタに撃たれた魔物は毒で3秒かけて追加の被害（与えた被害の30%・装甲無視）'});
  set('furnace',{cat:'魔核',tier:2,name:'精製炉',cost:{mat:30,stone:40},t:2,pre:[],icon:'furnace',eff:'「精製炉」を建設できる：魔核のエネルギーを取り出してエーテル結晶を精製（魔核 −2 → エーテル +4／T）'});
  set('carapace',{tier:2,pre:[],icon:'hq',eff:'生産施設と城館の耐久 +25%'});
@@ -2233,9 +2253,9 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  // 内政ランクⅡ：集合住宅
  set('apart',{cat:'内政',tier:2,name:'集合住宅',cost:{steel:80,stone:40},t:2,pre:['housing'],icon:'apart',eff:'「集合住宅」を建設できる（1棟に36名まで住める。改築でLv2:54名・Lv3:72名。毎ターン5名ずつ住民が増える）'});
  // 装備の解放
- set('polearm',{cat:'部隊',tier:1,name:'長柄の武器',cost:{steel:40,iron:10},t:1,pre:[],icon:'pawn_spear_shield',eff:'兵士・重装歩兵の武器が「槍」に、弓兵の弓が「長弓」に上がる（自動）'});
+ set('polearm',{cat:'部隊',tier:1,name:'長柄の武器',cost:{steel:40,iron:10},t:1,pre:[],icon:'pawn_spear_shield',eff:'剣士・重装歩兵の武器が「槍」に、弓兵の弓が「長弓」に上がる（自動）'});
  set('firecraft',{cat:'部隊',tier:1,name:'火の扱い',cost:{steel:40,fuel:20},t:1,pre:[],icon:'pawn_sword_torch',eff:'弓兵の矢が「火矢」に上がる（篝火の近くで燃やす）'});
- set('heavyarms',{cat:'部隊',tier:2,name:'重武器',cost:{iron:50,steel:40},t:2,pre:[],icon:'pawn_axe_shield',eff:'兵士・重装歩兵の武器が「戦斧」に、弓兵が「クロスボウ」に、騎兵が「鋼の騎槍」に上がる（自動）'});
+ set('heavyarms',{cat:'部隊',tier:2,name:'重武器',cost:{iron:50,steel:40},t:2,pre:[],icon:'pawn_axe_shield',eff:'剣士・重装歩兵の武器が「戦斧」に、弓兵が「クロスボウ」に、騎兵が「鋼の騎槍」に上がる（自動）'});
  set('heavyarms',{cat:'部隊',tier:2,name:'鋼の武具',cost:{iron:40,steel:30},t:2,pre:[],icon:'heavy',eff:'魔術師以外の武器が「鋼」になる（鉄の剣→鋼の剣、鉄の矢→鋼の矢など）：攻撃 140%（鉄の武器を100%として。補給で鉄も使う）'});
  set('horsearch',{cat:'部隊',tier:2,name:'騎射',cost:{steel:40,fuel:40},t:2,pre:['cavalry'],icon:'rider_hbow',eff:'騎兵の武器が「騎射の騎槍」に上がる（重武器も要る）：空の敵も射落とせる'});
  set('elemental',{cat:'部隊',tier:2,name:'属性魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard_tstaff',eff:'魔術師の杖が「属性の杖」に上がる（範囲＋雷の連鎖＋足止め）'});
@@ -2578,7 +2598,7 @@ let CUR_MAP='f';
 const MAPS={
   'm':{name:'山上の砦ハルデン',diff:'むずかしめ',desc:'山々に囲まれた高い盆地の砦。畑にできる平地と森が少なく、食料と木材が乏しい。石と鉄は豊富'},
   's':{name:'雪原の関所ヴィンター',diff:'むずかしい',desc:'凍てつく雪原の関所。川が天然の堀だが、冬が深まると凍りつく。吹雪の夜は明かりが届かない'},
-  't':{name:'廃村エルム',diff:'入門',desc:'昔ゴブリンに焼かれた村。壊れた柵やバリスタが残っていて、半額ですぐに建て直せる。襲撃は6回で、魔物も少なめ'},
+  't':{name:'廃村エルム',diff:'入門',desc:'昔ゴブリンに焼かれた村の跡。書記官リリアの案内で、街づくりと守りの基本を覚える。襲撃は6回で、魔物も少なめ'},
   'f':{name:'グレイヴェル平原',diff:'ふつう',desc:'森と丘に囲まれた辺境の街。北のアビスから魔物が来る'},
   'c':{name:'日本海沿岸 第1防衛区域',diff:'入門',desc:'海の向こうの島にアビス。魔物は海底を渡り、3つの浜から上陸してくる'},
   '7':{name:'辺境の街グレイヴェル',diff:'やさしめ',desc:'城館の近くに豊かな鉱脈・油田があり、遠くにも豊かな資源が眠る。まずはここから'},
@@ -2935,7 +2955,7 @@ function tLvName(t,n){return t.lvRank?(RNUM[n]||' Lv'+n):(tMax(t)>1?' Lv'+n:'');
 function tMax(t){return t.lvRank?Math.max(1,S.baseLv||1):(t.max||1);}
 /* 研究の費用に、そのランクの新しい素材を足す（2026-11-13）。素材を取れるようにする研究には足さない。金貨の上乗せは +40 → +20／ランク */
 const TECH_MAT={2:{coal:10},3:{coal:8,goldore:6,alloy:6},4:{coal:8,alloy:8},5:{coal:6,alloy:6,mmetal:6},6:{coal:6,mmetal:6,mithril:4},7:{coal:6,mmetal:4,mithril:8}};   /* 研究に足す素材（2026-11-13 増やした） */
-const TECH_MAT_FREE=new Set(['coalt','goldt','smeltt','mitht','kc_work_5','kc_mine_3']);
+const TECH_MAT_FREE=new Set(['aethert','coalt','goldt','smeltt','mitht','kc_work_5','kc_mine_3']);
 /* 石炭と関係のない研究（農業・魔法・訓練・偵察・石や木の工事など）には石炭を足さない（2026-11-14）。鍛冶・製錬・火薬・機械の研究だけ石炭を使う */
 const TECH_NO_COAL=new Set(['masonry','castle','tower','fcs','bighow','wallplus','thorn','hisousha','yariana','resetpit','magetower','aebombt','gravityt','meteort','barrierst','dragwall',
   'cavalry','magic','dragon','elite','scouting','shieldwall','charge','highmagic','fieldsup','snipert','golemt','griffont','battalion','division','dragonscale',
@@ -2967,7 +2987,7 @@ function rankSum(cat,r){return TECH.filter(t=>t.cat===cat&&(t.tier||1)===r&&!t.g
 function techRank(t){return t.gate?t.gate-1:(t.tier||1);}
 // ===== 研究員：住民の中から研究に就く人。城館に5人＋研究室1つにつき3／5／8人（Lv1／2／3） =====
 function resCap(){let n=5;for(const b of S.blds)if(b.type==='lab'&&ready(b))n+=[3,5,8][(b.lv||1)-1];return n;}
-function resBusy(){return S.research.reduce((a,r)=>a+(r.res||0),0);}
+function resBusy(){return S.research.reduce((a,r)=>a+(r.res||0)+(r.slots||0),0);}   /* r.res：前の版（待機中の住民を使っていた研究） */
 function techRes(t){return [0,2,4,7,10,13,16,20][t.tier||1]+(lvl(t.id)>0?1:0);}
 function resSlots(){return 99;}
 
@@ -3449,7 +3469,7 @@ function digPits(){let n=0;for(const m of pitsToDig()){if(S.steel<PIT_DIG)break;
 function repWhat(r){const b=r.n-(r.pits||0);return (b?`${b}棟`:'')+(r.pits?`${b?'・':''}罠${r.pits}`:'');}   // 「3棟・罠2」（埋まった落とし穴・壊れたトゲ床）
 function fixSpikes(){let n=0;for(const m of spikesBroken()){if(S.steel<SPIKE_FIX)break;S.steel-=SPIKE_FIX;m.armed=true;m.dur=SPIKE_DUR;n++;}return n;}
 function repairAllCost(){let n=0,c=0;for(const b of S.blds)if(damaged(b)){n++;c+=repairCost(b);}const p=pitsToDig().length,sp=spikesBroken().length;return{n:n+p+sp,c:c+p*PIT_DIG+sp*SPIKE_FIX,pits:p+sp};}
-function repairAll(){if(S.waveActive){se('error');toast('戦闘中は修理できない（昼に修理しよう）','warn');return;}
+function repairAll(){S.careN=(S.careN||0)+1;if(S.waveActive){se('error');toast('戦闘中は修理できない（昼に修理しよう）','warn');return;}
   const list=S.blds.filter(damaged).sort((a,b)=>(b.type==='hq')-(a.type==='hq')||(gunOf(b)?1:0)-(gunOf(a)?1:0)||a.hp/a.maxhp-b.hp/b.maxhp);
   let n=0,c=0;for(const b of list){const k=repairCost(b);if(repair(b,true)){n++;c+=k;}}
   {let miss=0;for(const b of S.blds)if(b.shMax>0)miss+=Math.max(0,b.shMax-(b.shield||0));if(miss>0){const ec=Math.ceil(miss/10);if((S.elec||0)>=ec){S.elec-=ec;for(const b of S.blds)if(b.shMax>0)b.shield=b.shMax;log(`バリアストーンのシールドを張り直した（エーテル−${ec}）`,'good');}else log(`シールドを張り直すにはエーテルが${ec}要る`,'warn');}}   /* バリアストーン：朝の修理で張り直す */
@@ -3565,7 +3585,7 @@ function gainXp(c,v){
 }
 function match(c,target){return specOfTarget(target)===c.spec?1:0.3;}
 // ===== 英雄の得意分野とスキル =====
-// 分類：歩兵（農兵・兵士・重装歩兵）／弓兵（弓兵・偵察）／騎兵／魔導／竜騎／守備（防衛施設）／内政（生産施設）
+// 分類：歩兵（農兵・剣士・重装歩兵）／弓兵（弓兵・偵察）／騎兵／魔導／竜騎／守備（防衛施設）／内政（生産施設）
 const SPEC_OF_UT={mil:'歩兵',inf:'歩兵',arch:'弓兵',cav:'騎兵',mage:'魔導',drake:'竜騎'};
 const DEF_BT=['hq','outpost','fence','gate','swall','wall','brazier','spike','pit','mg','how','cannon','tower'];
 const PROD_BT=['coalmine','goldmine','mithmine','smelter','miner','quarry','ironmine','farm','fishery','well','ammo','market','tavern','powder','barracks','apart','furnace','lab'];
@@ -3663,7 +3683,7 @@ function assign(c,target){
   if(c.assign){const o=findObj(c.assign);if(o)o.cmd=null;}
   if(target){
     const prev=cmdOf(target);if(prev)prev.assign=null;
-    target.cmd=c.id;c.assign=target.id;
+    target.cmd=c.id;c.assign=target.id;S.assignN=(S.assignN||0)+1;
     log(`${cmdName(c)}、${objName(target)}に着任${match(c,target)===1?'（適任）':''}`);
   }else c.assign=null;
 }
@@ -3684,7 +3704,7 @@ function killCmd(o,cause){
   }
   c.alive=false;c.assign=null;c.diedWave=S.wave;c.cause=cause;
   S.cmds=S.cmds.filter(x=>x!==c);S.fallen.push(c);
-  se('kia');log(`【戦死】${cmdName(c)}（${c.spec}・Lv${c.lv}）— ${cause}`,'kia');
+  se('kia');log(`【戦死】${cmdName(c)}（${c.spec}・Lv${c.lv}）— ${cause}`,'kia');alertTop(`英雄 ${cmdName(c)} が戦死しました`,'kia',5500);
   if(S.selCmd===c.id)S.selCmd=null;
 }
 // 強化の％はすべて足し算（基礎値 ×（1＋上乗せの合計））
@@ -3984,7 +4004,8 @@ function drawTents(c,an,burnt){
 function startWave(){phaseReset();clearUndo();S._barT=0;S.barrier=(S.baseLv||1)>=5?barrierMax():0;
   S.wave++;if(S.mapId==='s'&&S.wave>=8&&!S.frozen)freezeRivers();S.waveActive=true;S.waveKills=0;S.subShown=-1;S.wled={};for(const b of S.blds){b.wlast=b.wuse;b.wuse=null;}
   S.cur=S.next;S.qi=0;S.waveT=0;S._mmT=null;S.navalLeft=0;S.waveStart={kia:S.kia,mat:S.mat,fallen:S.fallen.length,bld:S.bldLost};
-  log(`第${S.wave}襲撃 接近！${S.wave===finalWave()?' — 最後の夜':''}`,'warn');
+  log(`第${S.wave}襲撃 接近！${S.wave===finalWave()?' — 最後の夜':''}`,'warn');S._hqLow=false;
+  {const k=bigKind(S.cur);if(k)alertTop(BIG_SAY[k].now,k==='blood'?'moon':'boss',6000);}
   {const bz=S.blds.filter(b=>b.type==='brazier'&&!(b.bt>0));let lit=0,un=0;const used={};for(const b of bz){const [k,n]=BRAZ_FUEL[(b.lv||1)-1]||BRAZ_FUEL[0];if((S[k]||0)>=n){useRes('篝火の燃料',k,n,b);used[k]=(used[k]||0)+n;b.unlit=false;lit++;}else{b.unlit=true;un++;}}   /* 篝火の燃料：木材2 → 石炭の篝火は石炭3 → 蒼い炎はエーテル2（2026-11-13） */
    if(lit)log(`篝火 ${lit}基に火を入れた（${Object.entries(used).map(([k,v])=>RES_NAME[k]+'−'+v).join('・')}）`);if(un)log(`燃料が足りず、篝火 ${un}基が灯らない`,'bad');}
   S.paused=false;S.porters=[];closeOverlay();se('alarm');auMusicFor();
@@ -4019,11 +4040,11 @@ function startResearch(id){
   const t=techOf(id);const c=techCost(t);
   const need=techRes(t);
   if(techState(t)!=='ready'||!canAfford(c)||S.waveActive)return;
-  if(resBusy()+need>resCap()){se('error');toast(`研究員が足りません（必要${need}人・空き${resCap()-resBusy()}人）。研究室を増やすか改築しよう`,'bad');return;}
-  if(S.pop<need){se('error');toast(`研究員になれる待機中の住民が足りません（必要${need}人）`,'bad');return;}
-  for(const k in c)S[k]-=c[k];S.pop-=need;
+  if(resBusy()+need>resCap()){se('error');toast(`研究員が足りません（必要${need}人・空き${resCap()-resBusy()}人）。研究室を建てると研究員が増えます`,'bad');return;}
+  /* 研究員は城と研究室の決まった人数（研究室を建てたときに住民がつく）。待機中の住民は使わない（2026-11-16） */
+  for(const k in c)S[k]-=c[k];
   const turns=techTurns(t);
-  S.research.push({id,left:turns,total:turns,paid:c,res:need});se('resStart');log(`研究開始：${t.name}${tLvName(t,lvl(id)+1)}（${turns}ターン）`);
+  S.research.push({id,left:turns,total:turns,paid:c,slots:need});se('resStart');log(`研究開始：${t.name}${tLvName(t,lvl(id)+1)}（${turns}ターン）`);
 }
 function cancelResearch(id){
   const r=S.research.find(x=>x.id===id);if(!r)return;
@@ -4035,7 +4056,7 @@ function advanceResearch(){
   for(const b of S.blds){if(b.type==='lab'){if(b.lv>=3)chance+=0.12;const c=cmdOf(b);if(c){chance+=c.tec*0.03*match(c,b)*(c.trait==='技術畑'?1.3:1);gainXp(c,3);}}}
   for(const r of S.research){r.left--;if(r.left>0&&Math.random()<chance){r.left--;log(`研究所より報告：${techOf(r.id).name} の進捗が前倒し`,'good');}}
   const done=S.research.filter(r=>r.left<=0);
-  if(done.length)se('research');for(const r of done){if(r.paid.pop){S.pop+=r.paid.pop;}S.pop+=r.res||0;S.tech[r.id]=lvl(r.id)+1;const t=techOf(r.id);log(`研究完了：${t.name}${tMax(t)>1||t.lvRank?' Lv'+lvl(r.id):''}`,'good');}
+  if(done.length)se('research');for(const r of done){if(r.paid.pop){S.pop+=r.paid.pop;}S.pop+=r.res||0;S.tech[r.id]=lvl(r.id)+1;const t=techOf(r.id);log(`研究完了：${t.name}${tMax(t)>1||t.lvRank?' Lv'+lvl(r.id):''}`,'good');unlockNews(t);}
   S.research=S.research.filter(r=>r.left>0);
   if(done.length)rescaleHp();
 }
@@ -4130,13 +4151,18 @@ function visitHTML(N){const v=VISIT[N.visit];if(!v)return '';
   else if(N.done)h+=`<div class="nvr">${N.done}</div>`;
   else h+=`<div class="nvops">${v.ops.map((o,i)=>{const c=visitCost(o);const ok=canAfford(c);return `<button data-vop="${i}" ${ok?'':'disabled'}>${o.l}${Object.keys(c).length?' <span class="cst2">'+useText(c)+'</span>':''}</button>`;}).join('')}</div>`;
   return h+`</div>`;}
+// はじめての夜に、リリアが昼と夜の流れを説明する（チュートリアルのとき。2026-11-16 ユーザーの希望）
+function nightLilia(){if(!S.guide||S.guide.hide||S.guide.fin||!(S.guide.list||[]).length)return '';if(S.nightTold&&S.nightTold!==S.turn)return '';S.nightTold=S.turn;
+  return `<div class="nlil">${lilFace(64)}<div><small>${LIL_NAME}</small><div>領主様、これが<b>夜</b>です。この街の毎日は、<b>昼</b>と<b>夜</b>のくり返しです。</div>
+   <ol><li><b>昼</b>：施設を建てる・研究する・兵をそろえる。終わったら「夜へ」</li><li><b>静かな夜</b>（今夜）：今夜の過ごし方を1つ選びます。部隊を夜狩りに出すこともできます。終わったら「朝へ」で次の日</li><li><b>襲撃の日の夜</b>：アビスから魔物が押し寄せてきます。守りきると朝になります</li></ol>
+   <div>襲撃の日までは、上の「第○襲撃まで」の日数で分かりますよ。今夜は、そのまま「朝へ」で大丈夫です！</div></div></div>`;}
 function showNight(){phaseReset();
   if(S.phase!=='night')return;
   // ボタンを押して描き直すとき、いちばん上に戻らないように（スクロール位置を覚えておく）
   const keepY=S.overlay==='night'?(document.getElementById('ovCard')||{}).scrollTop||0:0;
   if(!S.night)nightStart();const N=S.night;
   const list=S.squads.filter(q=>!q.gar);
-  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} ${N.plan==='fest'?'祭りの夜':'静かな夜'}</h2></div>
+  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} ${N.plan==='fest'?'祭りの夜':'静かな夜'}</h2></div>`+nightLilia()+`
   <div class="nres2">${['gold','fuel','steel','stone','iron','ammo','sword','elec','mat'].map(k=>`<span title="${RES_NAME[k]}">${ic(k,14)}<b>${Math.floor(S[k]||0)}</b></span>`).join('')}<span title="待機中の住民">${ic('pop',14)}<b>${S.pop}</b></span></div>
   <div class="row" style="align-items:center;margin:2px 0 6px"><span class="muted">街の機嫌</span><span style="display:inline-flex;align-items:center;gap:6px">${happyIc(24)}<b>${Math.round(S.happy)}</b> ${happyName()}</span></div>`;
   if(N.plan==='fest'&&!N.fwShown){N.fwShown=true;setTimeout(()=>fireworks(4500),250);}
@@ -4281,14 +4307,18 @@ function doEndTurn(){
   const ev=S.rep;S.rep=null;
   const dn=Object.entries(S.doneCnt);if(dn.length){const m='完成：'+dn.map(([k,v])=>k+(v>1?'×'+v:'')).join('、');ev.unshift({msg:m,cls:'good'});log(m,'good');}
   if(S.turnsLeft<=0)startWave();
-  else log(`ターン${S.turn}　第${S.wave+1}襲撃まで残り${S.turnsLeft}ターン`);
+  else{log(`ターン${S.turn}　第${S.wave+1}襲撃まで残り${S.turnsLeft}ターン`);bigAhead();}
   turnReport(t0,ev);
   if(S.overlay==='res')showResearch();
   renderAll();
 }
+// 研究で新しい施設が建てられるようになったら、施設のアイコンつきで知らせる（2026-11-16）
+function unlockNews(t){if(!S||S.backdrop||lvl(t.id)>1)return;const L=BUILD_GROUPS.flatMap(g=>g.list).filter(k=>B[k].req===t.id);
+  if(!L.length)return;for(const k of L)newsTop(`${t.name}の研究が完了しました`,`${B[k].name}を建てられます（建設のタブ）`,kcImg(k)?`<img src="${kcImg(k)}" width="36" height="36" style="image-rendering:pixelated">`:icSvg(k,36),()=>{gRt('build');gHi(`#build button[data-k="${k}"]`);});}
 function tickBaseUp(){if(!S.baseUp)return;S.baseUp.left--;if(S.baseUp.left>0)return;
   S.baseLv=Math.min(BASE_MAX,S.baseUp.to);S.baseUp=null;se('upgrade');
-  const m=`城がLv${S.baseLv}になった（英雄の上限${maxCmd()}名・領地拡大・施設の上限${facCap()}）`;log(m,'good');if(S.rep)S.rep.push({msg:m,cls:'good'});revealAll();}
+  const m=`城がLv${S.baseLv}になった（英雄の上限${maxCmd()}名・領地拡大・施設の上限${facCap()}）`;log(m,'good');
+  {const nR=TECH.filter(t=>techRank(t)===S.baseLv).length;const ck='castle'+Math.max(1,Math.min(7,S.baseLv));newsTop(`城のレベルが${S.baseLv}に上がりました`,nR?`新しい研究内容（ランク${['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'][S.baseLv]}）を確認してみましょう`:'新しい研究内容を確認してみましょう',ICIMG[ck]?sprImg(ck,36):icSvg('hq',36),()=>{const b=document.getElementById('bRes');if(b)b.click();});}if(S.rep)S.rep.push({msg:m,cls:'good'});revealAll();}
 function turnReport(t0,ev){
   const L=[];
   L.push(`<div class="grid">${['steel','fuel','ammo','elec','pop'].map(k=>{const d=Math.round(S[k]-S.before[k]);return `<span title="${RES_NAME[k]}">${ic(k)}${Math.floor(S[k])} <b class="${d<0?'bd':d>0?'gd':''}" style="font-size:11px">${d>=0?'+':''}${d}</b></span>`;}).join('')}</div>`);
@@ -4490,7 +4520,7 @@ function squadAI(s,dt,firing){
 
   }
 }
-function orderMove(s,x,y,noLink){s.tx=x;s.ty=y;s.ax=x;s.ay=y;if(s.mode==='return'){s.mode=(s.retBack&&s.retBack.mode)||'guard';}s.retBack=null;if(s.ut==='guard')s.stayOut=true;
+function orderMove(s,x,y,noLink){if(!noLink)S.movedN=(S.movedN||0)+1;s.tx=x;s.ty=y;s.ax=x;s.ay=y;if(s.mode==='return'){s.mode=(s.retBack&&s.retBack.mode)||'guard';}s.retBack=null;if(s.ut==='guard')s.stayOut=true;
   if(!noLink)coMates(s).forEach((p,i)=>orderMove(p,x+TU*0.9*(i?-1:1),y+TU*0.4*(i?1.6:1),true));}
 const NIGHT_STOP=new Set(['coalmine','goldmine','mithmine','smelter','miner','quarry','ironmine','farm','fishery','well','market','ammo','power','elecf','powder','barracks','apart','furnace','lab','tavern']);
 function update(dt,sim){
@@ -4551,7 +4581,7 @@ function update(dt,sim){
     else if(b.type==='smelter'){const m=um*bn.prod*dt/10;if(b.mode==='mmetal'&&b.lv>=2){if(S.alloy>=2*m&&S.elec>=2*m&&S.mat>=m){S.alloy-=2*m;S.elec-=2*m;S.mat-=m;S.mmetal=(S.mmetal||0)+3*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
       else{if(S.iron>=4*m&&(S.goldore||0)>=3*m&&(S.coal||0)>=2*m){S.iron-=4*m;S.goldore-=3*m;S.coal-=2*m;S.alloy=(S.alloy||0)+5*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}}
     else if(b.type==='farm'){S.fuel+=0.8*um*(techMul('farm')+bn.prod-1)*dt;tickProdXp(b,dt);}
-    else if(b.type==='ammo'){const m=um*(techMul('ammo')+bn.prod-1)*dt;const sw=b.mode==='sword',ar=b.mode==='armor';const kf=heroSk(b,'kenyaku')?0.6:1;const ns=(sw||ar?0.2:0.4)*m*kf,ni=(ar?0.6:sw?0.4:0.2)*m*kf;if(S.steel>=ns&&S.iron>=ni){S.steel-=ns;S.iron-=ni;if(ar)S.armor=(S.armor||0)+0.4*m;else if(sw)S.sword+=0.5*m;else S.ammo+=3.0*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
+    else if(b.type==='ammo'){const m=um*(techMul('ammo')+bn.prod-1)*dt;const sw=b.mode==='sword',ar=b.mode==='armor';const kf=heroSk(b,'kenyaku')?0.6:1;const ns=(sw||ar?0.2:0.4)*m*kf,ni=(ar?0.6:sw?0.4:0.2)*m*kf;if(S.steel>=ns&&S.iron>=ni){S.steel-=ns;S.iron-=ni;const MD=S.made=S.made||{};if(ar){S.armor=(S.armor||0)+0.4*m;MD.armor=(MD.armor||0)+0.4*m;}else if(sw){S.sword+=0.5*m;MD.sword=(MD.sword||0)+0.5*m;}else{S.ammo+=3.0*m;MD.ammo=(MD.ammo||0)+3.0*m;}b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
     else if(b.type==='powder'){const m=um*bn.prod*dt;const nw=0.6*m,nm=0.1*m;if(S.steel>=nw&&S.mat>=nm){S.steel-=nw;S.mat-=nm;S.powder=(S.powder||0)+0.6*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
     else if(b.type==='furnace'){b.fa=(b.fa||0)+0.2*um*bn.prod*dt;b.starved=S.mat<1;while(b.fa>=1&&S.mat>=1){b.fa-=1;S.mat-=1;S.elec+=2;}if(S.mat<1)b.fa=Math.min(b.fa,1);tickProdXp(b,dt);}
     else if(b.type==='well'){const v=0.5*um*RICH[richAt(b.x,b.y)]*bn.prod*dt;S.elec+=v;depleteTick(b,v);tickProdXp(b,dt);}
@@ -4727,11 +4757,11 @@ function update(dt,sim){
       log(`第${S.wave}襲撃 撃退（撃破${S.waveKills}）`,'good');
       const ws=S.waveStart||{};
       if(S.wave===finalWave()&&!S.endless){recordWave(ws,true);S.won=true;S.over=true;showEnd(true);return;}
-      S.turnsLeft=NEXT_PREP;S.prepTotal=NEXT_PREP;
+      S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;
       let rew=40+S.wave*15;if(has('recycle'))rew+=Math.round(S.waveKills*1.5);
       S.steel+=rew;
       S.next=genWave(S.wave+1);genCands();
-      log(`昼・準備に移行（補給 木材+${rew}）。第${S.wave+1}襲撃まで ${NEXT_PREP}ターン。雇用候補が更新されました`,'warn');
+      log(`昼・準備に移行（補給 木材+${rew}）。第${S.wave+1}襲撃まで ${S.turnsLeft}ターン${bigNight(S.wave+1)?'（山場の前なので長め）':''}。雇用候補が更新されました`,'warn');
       const pitN=digPits();for(const m of S.mines){if(m.kind==='pit'&&m.armed)m.uses=null;if(m.kind==='gravity'){m.uses=null;m.cd=0;}if(m.kind==='stake'){m.dur=20;m.armed=true;}}if(pitN)log(`落とし穴 ${pitN}個を掘り直した（木材−${pitN*PIT_DIG}）`);   // 襲撃が終わったらすぐ掘り直す（前はターン終わりまで埋まったままだった）
       const lostC=S.fallen.slice(ws.fallen||0);
       const newSide=S.next.sides.find(sd=>!S.cur.sides.includes(sd));
@@ -4962,6 +4992,7 @@ function beamTick(b,g,dt,ef){   // ミスリルレイ：同じ相手に当て続
 function damageB(b,dmg,attacker){
   const bn=bonus(b);dmg*=(1-bn.red)*(1-0.1*forestAt(b.x,b.y));
   if((b.shield||0)>0){const a=Math.min(b.shield,dmg);b.shield-=a;dmg-=a;if(dmg<=0)return;}   /* バリアストーンのシールド */
+  if(b.type==='hq'&&S.waveActive&&dmg>0){const t=nowS();if(t-(S._hqAT||-99)>20){S._hqAT=t;alertTop('城が攻撃されています！','castle',4000);}if(!S._hqLow&&b.hp-dmg<b.maxhp*0.3){S._hqLow=true;alertTop(`城が危ない！ 残りの耐久 ${Math.max(1,Math.round((b.hp-dmg)/b.maxhp*100))}%`,'castle',5000);}}
   if(b.type==='hq'&&(S.baseLv||1)>=5&&(S.barrier||0)>0){const a=Math.min(S.barrier,dmg);S.barrier-=a;dmg-=a;if(S.barrier<=0)log('城の結界が破られた！','warn');if(dmg<=0)return;}
   // 城壁の上の防衛施設：まず土台の城壁が被害を受ける（この間は人員に被害なし）
   if(b.wall){
@@ -5036,7 +5067,7 @@ function supplyPoint(s){let best=nearestHangar(s),bd=best?Math.hypot(bcx(best)-s
 function arriveHome(s){if(s.eqPend){s.eq=Object.assign({},EQ_DEF[s.ut],s.eq||{},s.eqPend);const ns=Object.values(s.eqPend).map(k=>EQ[k].n).join('・');s.eqPend=null;log(`${unitLabel(s)} 装備を ${ns} に替えた`,'good');}
   if(s.supPend){s.supPend=false;if(supplySquad(s,false,{})>0){se('upgrade');log(`${unitLabel(s)} 補給・補充・手当てを受けた`,'good');}}
   if(s.eqBack){const [bx,by]=s.eqBack;s.eqBack=null;s.mode=s.eqBackMode||'guard';s.eqBackMode=null;s.tx=bx;s.ty=by;s.ax=bx;s.ay=by;}}
-function supplyAll(){let n=0;const list=S.squads.filter(needsSupply);for(const x of list)if(orderSupply(x,true))n++;
+function supplyAll(){S.careN=(S.careN||0)+1;let n=0;const list=S.squads.filter(needsSupply);for(const x of list)if(orderSupply(x,true))n++;
   if(n){se('upgrade');log(`一括補給：${n}部隊（離れている部隊は近くの所属施設・前哨砦・城館で補給を受ける）`,'good');}else{se('error');if(list.length)log('補給する資材が足りない','warn');}renderInfo(true);if(S.overlay==='army')showArmy();}
 function supplyOne(id){const x=S.squads.find(q=>q.id==id);if(x)orderSupply(x,false);renderInfo(true);}
 function supText(s){const sp=supOf(s);if(!sp)return '';const r=s.sup/sp.max;return `${Math.round(r*100)}%${r<0.25?(sp.melee?'（消耗：火力低下）':'（残りわずか）'):''}`;}
@@ -5056,23 +5087,15 @@ function unitDmg(s){
 }
 function hqOf(){return S.blds.find(b=>b.type==='hq');}
 // ===== 入門マップ：廃墟を配置し、手引きを出す =====
-function tutorialSetup(){S.ruins=S.ruins||[];const used=new Set();
-  const add=(type,x,y)=>{const n=newSz(type);for(const [cx,cy] of bCells(x,y,n)){if(cx<0||cy<0||cx>=COLS||cy>=ROWS||S.grid[cy][cx]||used.has(cx+','+cy))return false;const t=S.ter[cy][cx];if(t!==0&&t!==1&&t!==8)return false;}if(B[type].req&&!['mg'].includes(type))return false;for(const [cx,cy] of bCells(x,y,n))used.add(cx+','+cy);S.ruins.push({type,x,y,lv:1,mat:0,sz:n});return true;};
-  // 北側の古い柵（門の跡つき）と、柵の内側のバリスタ跡
-  for(let dx=-7;dx<=8;dx++){if(dx===0||dx===1){add('gate',hqTX(dx),hqTY(-6));continue;}for(let k=0;k<U;k++)add('fence',hqTX(dx)+k,hqTY(-6));}
-  for(let dy=-5;dy<=-2;dy++)for(let k=0;k<U;k++){add('fence',hqTX(-7),hqTY(dy)+k);add('fence',hqTX(8)+U-1,hqTY(dy)+k);}
-  add('mg',hqTX(-3),hqTY(-4));add('mg',hqTX(4),hqTY(-4));add('brazier',hqTX(1),hqTY(-8));add('brazier',hqTX(-5),hqTY(-8));
-  // 村の跡（住居・畑・伐採所・石切り場）
-  const near=(type,n)=>{let c=0;for(let r=2;r<9&&c<n;r++)for(let dy=-r;dy<=r&&c<n;dy++)for(let dx=-r;dx<=r&&c<n;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=hqTX(dx),y=hqTY(dy);if(dy<-4)continue;if(placeOKraw(type,x,y)&&add(type,x,y))c++;}};
-  near('barracks',2);near('farm',2);near('miner',1);near('quarry',1);
-  S.steel+=100;S.gold+=100;S.tut={};
-  log('廃村エルム：焼け残った柵や施設の跡（廃墟）があちこちにある。マスをクリックすると半額ですぐに建て直せる','warn');}
+// 廃村エルム（チュートリアル）：廃墟はなし（2026-11-16 ユーザーの指定：最初の資材が廃墟の建て直しに使われてしまうため）。資材を少し多めに
+function tutorialSetup(){S.ruins=[];S.steel+=100;S.gold+=100;S.tut={};
+  log('廃村エルム：昔ゴブリンに焼かれた村の跡。ここで新しい街を作り直す','warn');}
 const TUT_STEPS=[
   ['廃墟をクリックして、柵やバリスタを建て直す',()=>S.blds.filter(b=>b.type==='fence'||b.type==='gate'||b.type==='mg').length>=6],
   ['伐採所か石切り場を建てる（建て直しでも可）',()=>S.blds.filter(b=>b.type==='miner'||b.type==='quarry').length>=2],
   ['篝火を置いて、柵の外を照らす',()=>S.blds.some(b=>b.type==='brazier')],
   ['研究を1つ始める（研究 [R]）',()=>S.research.length>0||Object.keys(S.tech).length>0],
-  ['兵舎で兵士か弓兵を訓練する（軍事 [K] の「訓練」）',()=>S.squads.some(q=>q.ut!=='mil'&&q.ut!=='guard')],
+  ['兵舎で剣士か弓兵を訓練する（軍事 [K] の「訓練」）',()=>S.squads.some(q=>q.ut!=='mil'&&q.ut!=='guard')],
   ['「夜へ」で準備を終え、最初の襲撃を迎え撃つ',()=>S.wave>=1],
 ];
 function tutHTML(){return '';let h='<div class="upg" style="border-color:#c8a070;margin-bottom:6px"><b style="color:#e8c070">手引き</b>';for(const [txt,f] of TUT_STEPS){let ok=false;try{ok=f();}catch(e){}h+=`<div style="font-size:12px;${ok?'color:var(--green)':''}">${ok?ui('check','green',12):'□'} ${txt}</div>`;}return h+'</div>';}
@@ -5122,11 +5145,11 @@ const A_MAT=['革','鉄','鋼','合金','魔金属','聖銀','竜晶'],A_REQ=[nu
 const A_PCT=[0,10,20,30,45,60,80];   // 鎧の段ごとに、1人あたりの体力が元の何%増えるか（決まった数を足すと体力の少ない兵科ほど伸びすぎるので割合に）                            // 鎧の段ごとに、1人あたり増える体力
 const A_SUP=[{},{armor:0.5},{armor:0.7,iron:0.2},{armor:0.9,alloy:0.4}];   // 鎧の段ごとの補給の資材
 const ARMORED=['inf','cav','guard','mil'];
-// 防具は2系統：鎧（兵士・重装歩兵・騎兵・近衛）とローブ（弓兵・砲兵・魔術師）
+// 防具は2系統：鎧（剣士・重装歩兵・騎兵・近衛）とローブ（弓兵・砲兵・魔術師）
 const AR={a:{n:['革の鎧','鉄の鎧','鋼の鎧','合金の鎧','魔金属の鎧','聖銀の鎧','竜晶の鎧'],get req(){return A_REQ;},get rank(){return A_RANK;},get pct(){return A_PCT;},get sup(){return A_SUP;},ut:ARMORED},
   r:{n:['皮のローブ','鎖帷子','エーテルローブ','銀のローブ','竜のローブ'],req:[null,'chainmail'],rank:['Ⅰ','Ⅱ','Ⅳ','Ⅵ','Ⅶ'],pct:[0,15,30,50,75],sup:[{},{armor:0.4}],ut:['arch','art','mage']}};
 const R_COL=['#9a6a3a','#9aa0a6','#62c6d9','#f6faff','#e05a4e'];
-function armK(ut){return ARMORED.includes(ut)?'a':AR.r.ut.includes(ut)?'r':null;}                   // 鎧を着る兵科：兵士・重装歩兵・騎兵（騎士）・近衛
+function armK(ut){return ARMORED.includes(ut)?'a':AR.r.ut.includes(ut)?'r':null;}                   // 鎧を着る兵科：剣士・重装歩兵・騎兵（騎士）・近衛
 const W_NOUN={pawn:'剣',heavy:'戦斧',guard:'剣',militia:'剣',farmer:'鍬',scout:'短剣',archer:'矢',rider:'騎槍',cannoneer:'砲弾',dragon:'竜具'};   // 部隊ごとの武器の呼び名
 const W_MAGE={req:[null,'highmagic'],pct:[100,140,190,260,350],names:['樫の杖','エーテルの杖','魔金属の杖','聖銀の杖','竜晶の杖'],rank:['Ⅰ','Ⅳ','Ⅴ','Ⅵ','Ⅶ']};   // 魔術師だけは材料ではなく魔法の杖の並び
 function wTrack(s){return s&&s.ut==='mage'?W_MAGE:{req:W_REQ,pct:W_PCT,rank:W_RANK};}
@@ -5329,7 +5352,7 @@ function econWarnings(e,f){
   need('steel',TL+2,'木材があと約Nターンで尽きます');
   if(S.hungry)w.push(['bd','食料が尽きています。農場か漁場を増やしてください']);
   if(S.happy<35)w.push(['bd','住民が不満を募らせています（住民が増えず、生産が大きく落ちます）']);
-  if(!c.train)w.push(['wn','兵舎がありません（兵士・弓兵を編成できません）']);
+  if(!c.train)w.push(['wn','兵舎がありません（剣士・弓兵を編成できません）']);
   if(c.how&&S.stone<10)w.push(['wn','石材が少なく、投石機が撃てません']);
   if(S.shortCrew)w.push(['wn',`欠員 ${S.shortCrew}名`]);
   return w;
@@ -5366,7 +5389,7 @@ function renderEcon(){
   h+=row('fuel',`農場${c.farm||0}棟 +${Math.round(R.fuelP)}／住民の食事 −${Math.round(R.foodUse)}`);
   h+=row('iron',`鉱山${c.ironmine||0}棟 +${Math.round(R.ironP)}／武器工房 −${Math.round(R.ironAmmo)}`);
   h+=row('ammo',`武器工房${c.ammo||0}棟 +${Math.round(R.ammoP)}（夜の戦闘で消費）`);
-  h+=row('sword',`武器工房（剣） +${Math.round(R.swordP)}（兵士・重装歩兵・騎兵の編成と補充）`);
+  h+=row('sword',`武器工房（剣） +${Math.round(R.swordP)}（剣士・重装歩兵・騎兵の編成と補充）`);
   if(has('gunpowder')||S.powder>0)h+=row('powder',`火薬工房 +${Math.round(R.powP)}（大砲・迫撃砲・砲兵隊）`);
   h+=row('elec',`エーテル採掘所${c.well||0}棟 +${Math.round(R.elecP)}（上位の研究・改修）`);
   h+=`<div class="rrow" title="住民の総数 / 住居の上限（待機中の住民は施設や部隊に回せる）">${ic('pop')}<span class="muted">住民</span><b>${popTotal()}<span class="muted" style="font-weight:normal">/${S.popCap}</span></b><span class="gd">${sg(n.pop)}/T <span class="muted" style="font-size:10px">待機${S.pop}</span></span></div>`;
@@ -6623,7 +6646,7 @@ function heroDetail(c){
   h+=`<div class="row" style="margin-top:8px"><span class="muted">特性</span><span>${c.trait?`<b>${c.trait}</b>`:'なし'}</span></div>${tr&&tr.d?`<div class="muted" style="font-size:11px;text-align:right">${tr.d}</div>`:''}`;
   h+=`<div class="row"><span class="muted">撃破</span><span>${c.kills||0}</span></div>`;
   h+=`<div class="row"><span class="muted">配属</span><span>${a?objName(a)+(match(c,a)===1?' <span style="color:var(--green)">★適任</span>':' <span class="muted">（不得意：効果40%・スキルなし）</span>'):'<span style="color:var(--amber)">待機中</span>'}</span></div>`;
-  h+=`<div class="muted" style="font-size:11px">向いている配属先：${{'歩兵':'農兵・兵士・重装歩兵の部隊','弓兵':'弓兵隊','騎兵':'騎兵隊','魔導':'魔術師隊','竜騎':'竜騎兵隊','守備':'防衛施設・壁・門・城館','内政':'生産施設'}[c.spec]||''}</div>`;
+  h+=`<div class="muted" style="font-size:11px">向いている配属先：${{'歩兵':'農兵・剣士・重装歩兵の部隊','弓兵':'弓兵隊','騎兵':'騎兵隊','魔導':'魔術師隊','竜騎':'竜騎兵隊','守備':'防衛施設・壁・門・城館','内政':'生産施設'}[c.spec]||''}</div>`;
   if(a)h+=`<button id="hvGo" style="margin-top:6px;width:100%">配属先を見る</button>`;
   return h;
 }
@@ -6863,7 +6886,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
       else if(o.wlast)h+=`<div class="row"><span class="muted">前回の夜の消費</span><span class="bd">${Object.entries(o.wlast).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;}}
     if(o.res!=null&&o.res!==Infinity&&o.dep)h+=`<div class="row"><span class="muted">残りの埋蔵量</span><span class="bd">枯渇（もう採れない）</span></div>`;}
   if(!isS&&o.type==='smelter'&&o.lv>=2){const mm=o.mode==='mmetal';h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-smode="alloy" class="${mm?'':'on'}">${ic('alloy',14)}合金</button><button data-smode="mmetal" class="${mm?'on':''}">${ic('mmetal',14)}魔金属</button></div></div>`;}
-  if(!isS&&o.type==='ammo'){const sw=o.mode==='sword',ar=o.mode==='armor';h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-wmode="arrow" class="${sw||ar?'':'on'}">${ic('ammo',14)} 矢</button><button data-wmode="sword" class="${sw?'on':''}">${ic('sword',14)} 剣</button><button data-wmode="armor" class="${ar?'on':''}">${ic('armor',14)} 鎧</button></div><div class="muted" style="font-size:11px;margin-top:3px">${ar?'鎧：兵士・重装歩兵・騎兵の鎧の補給に使う（木材 −2・鉄 −6 → 鎧 +4／T 相当）':sw?'剣：兵士・重装歩兵・騎兵の編成と補充に使う':'矢：バリスタ・物見櫓・弓兵が使う'}</div></div>`;}
+  if(!isS&&o.type==='ammo'){const sw=o.mode==='sword',ar=o.mode==='armor';h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-wmode="arrow" class="${sw||ar?'':'on'}">${ic('ammo',14)} 矢</button><button data-wmode="sword" class="${sw?'on':''}">${ic('sword',14)} 剣</button><button data-wmode="armor" class="${ar?'on':''}">${ic('armor',14)} 鎧</button></div><div class="muted" style="font-size:11px;margin-top:3px">${ar?'鎧：剣士・重装歩兵・騎兵の鎧の補給に使う（木材 −2・鉄 −6 → 鎧 +4／T 相当）':sw?'剣：剣士・重装歩兵・騎兵の編成と補充に使う':'矢：バリスタ・物見櫓・弓兵が使う'}</div></div>`;}
   if(false&&!isS&&canEnch(o)&&!(o.bt>0&&!o.upg)){   /* 魔核の強化はやめた（2026-11-13） */const e=o.ench||0;const what=B[o.type].range?'火力':PROD_BT.includes(o.type)?'生産量':'';
     h+=`<div class="upg"><b>魔核の強化</b><span><span class="star">${'★'.repeat(e)}${'☆'.repeat(3-e)}</span> ${e}/3</span>`;
     if(!has('enchant'))h+=`<div class="muted" style="font-size:11px">研究「魔核の強化」（魔核タブ）で使えるようになる</div>`;
@@ -7144,7 +7167,7 @@ function dexTraits(d){const L=[];
   if(d.magicWeak)L.push(['岩の拳','建物を強く壊す。魔法の攻撃で受けるダメージ150%']);
   if(d.vsS&&d.vsS>=4)L.push(['狩りの本能','兵士にとても強い']);
   if(d.hitDef&&d.hunt<0)L.push(['攻城の突進','部隊を相手にせず、建物（防衛施設も）を壊しに行く']);
-  if(d.boss)L.push(['ボス',d.roots?'草原の最後の夜に現れる':'草原では20回目の中ボス']);
+  if(d.boss)L.push([d.roots?'森の主':'軍勢の主',d.roots?'草原の最後の夜に現れる':'草原の20回目の夜に、軍勢を率いて現れる']);
   if(d.vsS&&d.vsS>=1.5)L.push([`対部隊 ${Math.round(d.vsS*100)}%`,'部隊にとくに強い']);
   if(d.bldMul&&d.bldMul>1)L.push([`対施設 ${Math.round(d.bldMul*100)}%`,'施設にとくに強い']);
   if(['swarm','charger','redcap','spitter','gobarcher'].includes(Object.keys(E).find(k=>E[k]===d)))L.push(['火が苦手','篝火の近くでは足が遅くなる']);
@@ -7261,8 +7284,8 @@ function showResearch(){
   let act='';
   if(st==='done')act=`<span style="color:var(--green);font-weight:bold">${ui('check','green',12)} ${t.lvRank&&(S.baseLv||1)<BASE_MAX?`${t.name}${RNUM[lvl(t.id)]}まで研究済み。${t.name}${RNUM[lvl(t.id)+1]}は城Lv${lvl(t.id)+1}で解放`:`最大レベル（Lv${tMax(t)}）・研究完了`}</span>`;
   else if(st==='active')act=`<span style="color:var(--cyan)">研究中 残り${r.left}ターン</span> <button data-cancel="${t.id}">中止（費用の半分を回収）</button>`;
-  else if(st==='ready'){const need=techRes(t),rok=resBusy()+need<=resCap()&&S.pop>=need;const ok=canAfford(c)&&rok&&!S.waveActive;
-    act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?(S.pop<need?'待機中の住民が足りません':'研究員が足りません（研究室を増やす・改築する）'):'資源が足りません'}</span>${rok?mktBtn(c):''}`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
+  else if(st==='ready'){const need=techRes(t),rok=resBusy()+need<=resCap();const ok=canAfford(c)&&rok&&!S.waveActive;
+    act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?'研究員が足りません（研究室を増やす・改築する）':'資源が足りません'}</span>${rok?mktBtn(c):''}`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
   else if(st==='excluded')act='<span class="muted">もう一方の分岐を選んだため研究できません</span>';
   else if(st==='maplock')act='<span class="muted">このマップでは第三段階の研究はできません（2マップ目以降で解禁）</span>';
   else if(t.gate&&!(rankOpen(cat,t.gate-1)&&rankSum(cat,t.gate-1)>=gateNeed(cat,t.gate)))act=`<span class="muted">条件：${!rankOpen(cat,t.gate-1)?`<span style="color:var(--red)">${gateOf(cat,t.gate-1).name}</span>・`:''}<span style="color:${rankSum(cat,t.gate-1)>=gateNeed(cat,t.gate)?'var(--green)':'var(--red)'}">ランク${RN[t.gate-1]}の研究を合計Lv${gateNeed(cat,t.gate)}以上（今 ${rankSum(cat,t.gate-1)}）</span></span>`;
@@ -7371,7 +7394,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const fallen=S.fallen.map(c=>`${cmdName(c)}（${c.spec} Lv${c.lv}・撃破${c.kills}・第${c.diedWave}襲撃 ${c.cause}）`).join('、')||'なし';
   const matSum=(S.hist||[]).reduce((a,r)=>a+Math.max(0,r.mat||0),0);
   const ck=(S.baseLv||1)===2?'castle':'castle'+Math.max(1,Math.min(5,S.baseLv||1));
-  openOverlay('end',`<div class="endhead ${win?'win':'lose'}"><div class="ecs">${sprImg(ICIMG[ck]?ck:'castle',76)}</div><div><div class="ekick">${win?'VICTORY':'DEFEAT'}</div><div class="etitle">${win?'防衛成功':'陥落'}</div><div class="esub">${win?`第${finalWave()}襲撃までの襲撃を退けました。`:`第${S.wave}襲撃にて城は陥落しました。`}</div></div></div>
+  openOverlay('end',`<div class="endhead ${win?'win':'lose'}"><div class="ecs">${sprImg(ICIMG[ck]?ck:'castle',76)}</div><div><div class="ekick">${win?'VICTORY':'DEFEAT'}</div><div class="etitle">${win?'防衛成功':'陥落'}</div><div class="esub">${win?`${townName()}は、第${finalWave()}襲撃までの襲撃を退けました。`:`第${S.wave}襲撃にて、${townName()}の城は陥落しました。`}</div></div></div>
   ${statGrid([['撃破数',S.kills],['戦死者（人員）',S.kia,'var(--red)'],['生存英雄',S.cmds.length,'var(--green)'],['獲得した魔核','+'+matSum,'var(--mat)']])}
   <div class="efallen"><span>戦没英雄</span>${fallen}</div>
   <div class="ehist"><span>襲撃ごとの記録</span></div>${histTable()}
@@ -7381,10 +7404,10 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   {const ck=document.getElementById('ovCk');if(ck)ck.onclick=()=>{withLoading('やり直しの準備をしています…',()=>{if(!loadCkpt())toast('やり直しのデータを読み込めませんでした','bad');});};}
   document.getElementById('ovTl').onclick=()=>{closeOverlay();playTimelapse(()=>showEnd(win));};document.getElementById('ovRec').onclick=()=>{closeOverlay();showHist();};
   document.getElementById('ovRestart').onclick=()=>{closeOverlay();document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState(S.mode);renderAll();auMusicFor();};
-  const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=NEXT_PREP;S.prepTotal=NEXT_PREP;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
+  const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.6',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.7',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7397,7 +7420,7 @@ function packG(g){if(!Array.isArray(g)||!Array.isArray(g[0]))return g;const w=g[
 function unpackG(o){if(!o||!o.pk)return o;const R=o.r.split(',').map(Number),out=[];let cur=!!o.f,row=[];for(const n of R){for(let i=0;i<n;i++){row.push(cur);if(row.length===o.w){out.push(row);row=[];}}cur=!cur;}return out;}
 function packSave(o){for(const k of ['ore','oil'])if(o[k])o[k]=packG(o[k]);return o;}
 function saveGame(quiet){if(!canSave())return false;try{const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}packSave(o);
-  o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:MAPS[CUR_MAP]?MAPS[CUR_MAP].name:''};
+  o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:(S.townName?S.townName+'（'+(MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'')+'）':MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'')};
   localStorage.setItem(SAVE_KEY,JSON.stringify({meta,S:o}));saveMark(true);return true;}catch(e){saveMark(false);if(!quiet)toast('セーブできませんでした（ブラウザの保存領域）','bad');return false;}}
 function saveInfo(){try{const r=localStorage.getItem(SAVE_KEY);if(!r)return null;return JSON.parse(r).meta;}catch(e){return null;}}
 function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catch(e){return false;}if(!d||!d.S)return false;
@@ -7421,7 +7444,7 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   return true;}
 // ===== 襲撃のあとの区切り（2026-11-15）：負けたら「第N襲撃のあと」からやり直せる。ゲームごとの番号 gid で、別のゲームの区切りは使わない =====
 function saveCkpt(){if(!S||S.mode!=='campaign')return;S.gid=S.gid||Date.now();const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}packSave(o);
-  o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'',gid:S.gid,ck:true};
+  o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:(S.townName?S.townName+'（'+(MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'')+'）':MAPS[CUR_MAP]?MAPS[CUR_MAP].name:''),gid:S.gid,ck:true};
   try{localStorage.setItem(SAVE_KEY+'_ck',JSON.stringify({meta,S:o}));}catch(e){}}
 function ckptInfo(){try{const d=JSON.parse(localStorage.getItem(SAVE_KEY+'_ck'));if(!d||!d.meta)return null;if(S&&S.gid&&d.meta.gid!==S.gid)return null;return d.meta;}catch(e){return null;}}
 function loadCkpt(){const r=localStorage.getItem(SAVE_KEY+'_ck');if(!r)return false;try{localStorage.setItem(SAVE_KEY,r);}catch(e){return false;}closeOverlay();const ok=loadGame();if(ok&&S.wave>=1)S.campHint=true;   /* やり直しで駐屯地の案内をもう一度出さない */
@@ -7459,6 +7482,7 @@ function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn()
   requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();}finally{b.classList.add('off');}}));}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.7','2026-11-16',['<b>チュートリアルを作り直し</b>（ステージ0 廃村エルム）：書記官リリアが「領主様」に話しかけて、9つのミッションで基本を案内する（生産施設の建設 → 人 → 研究 → 防衛 → 兵士 → 英雄と熟練度 → 軍需 → 夜と朝 → 城のレベル上げ）。実際に手を動かして進める','説明には動く絵を。柵の一列置きと部隊の移動は、実際の操作の短い動画で見られる','<b>番外編「偵察と駐屯地攻め」</b>：街が育ったところから始めて、斥候で駐屯地を見つけ、夜襲をかけるまでを覚える','兵科の「兵士」を<b>剣士</b>に（兵全体の「兵士」とまぎらわしいため）','廃村エルムの廃墟をなくした（最初の資材が建て直しに使われてしまうため）','<b>街の名前</b>を始めに決められるように。結果の画面・街の記録・タイムラプス（「○○の歴史」）に出る','<b>研究員</b>：研究のたびに待機中の住民を使うのをやめた。城に5人、研究室を建てると3人が研究員としてつく（バリスタの射手と同じ）','<b>新しくできるようになったことの知らせ</b>：城のレベルが上がったとき・研究で新しい施設が建てられるようになったとき、施設のアイコンつきで画面の上に出す（押すとその画面へ）','エーテル採掘所は、研究「エーテル採掘」（ランクⅡ）をしてから建てられるように','<b>山場の前は準備が6日</b>：ブラッドムーンと大きな夜の前だけ、襲撃までの日数を4日から6日に','<b>上のお知らせ</b>：英雄の戦死・城への攻撃・城が危ないとき・大きな夜（ブラッドムーン、ゴブリンの王の軍勢、最後の夜）の知らせ（5日前と前の日）と、その夜の始まり']],
  ['1.6','2026-11-16',['<b>前の襲撃のあとからやり直す</b>：負けたとき、ひとつ前の襲撃をしのいだあとから始め直せる。負けの画面に「この襲撃で起きたこと」（矢が尽きた回数など）も出る','<b>足りない資源の警告</b>：夜へ進む前に、襲撃で足りなくなりそうな資源を「夜へ」の横に出す','<b>序盤の敵を減らした</b>（第1〜第9襲撃。第10襲撃からは今までどおり）','<b>施設の流れ</b>：施設の詳しい画面に「使う物 → 作る物」の流れ。地図の表示切り替えに「生産」（施設ごとの作る量・使う量）。採集施設には埋蔵量のバー','上の帯の「推奨」の目安を外した（足りない資源の警告に置き換え）','ステージ選択に、ステージ2の解放の条件（ステージ1で第10襲撃をしのぐ）と、いまの記録','<b>ブラッドムーン</b>は5回ごとで、ボスの夜（第20・第40）は外した。ワーウルフは第25襲撃のブラッドムーンから。後半のブラッドムーンの敵の数を控えめにして、最後の夜がいちばんの山場になるように','言葉を「<b>駐屯地</b>」にそろえた（前は「駐留地」とまざっていた）','セーブを小さく（約4分の1）']],
  ['1.5.1','2026-11-16',['<b>効果音を選び直した</b>：建設（木はのこぎり、石は石を積む音、鉱山・精錬所・火薬工房・精製炉はつるはし、畑は耕して種まき）、襲撃の知らせは城の大鐘、英雄の戦死は鐘、研究の開始・完了、騎兵の突撃、敵を倒す音、襲撃をしのいだ・勝利・敗北、ボタンなど操作の音','<b>大事な音が聞こえやすく</b>：襲撃の知らせ・英雄の戦死・施設の破壊などが鳴っている間は、小さな音（発射・撃破・建設など）を少し下げる']],
  ['1.5','2026-11-15',['<b>街の記録</b>：「記録」ボタンで、襲撃ごとの結果と、施設の数・生産量・資源の移り変わりをグラフで見られる（5回ごとの襲撃の目印つき）。数字をまとめてコピーして表計算ソフトに貼れる','<b>街の成長のタイムラプス</b>：ゲームの終わり（勝っても負けても）や街の記録から、最初の日からの街の移り変わりを早送りで見られる','<b>iPad などタブレット</b>で指で遊びやすく：キーの案内を隠し、ボタンを大きく、範囲選択ボタンを出す。ダブルタップで画面が拡大されないように','不具合の修正：建設する施設を選んでも、上の帯に名前・費用・置き方が出ないことがあった']],
@@ -7501,11 +7525,41 @@ function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.a
   document.getElementById('tOld').onclick=()=>{location.href='v0.9/index.html';};
   {const ti=document.getElementById('tInstall');if(ti)ti.onclick=()=>doInstall(true);}
   document.getElementById('tCredit').onclick=()=>openOverlay('title',`<h2>クレジット</h2><div style="line-height:1.9">${GAME_TITLE} — ${GAME_SUB}　ver ${GAME_VER}<br>企画・ゲームデザイン：ねぎらーめん<br>プログラム・ドット絵・効果音・音楽：Claude と共同制作<br><span class="muted">すべてのドット絵と音はこのゲームのために作られたものです</span></div><div style="margin-top:12px"><button id="crBack">タイトルへ</button></div>`)&&(document.getElementById('crBack').onclick=showTitle);}
+// 画面の上のお知らせ（2026-11-16）：英雄の戦死・城への攻撃・山場（ブラッドムーン・ボス）の予告。通信ログに加えて、上に大きく出す
+const ALERT_K={kia:['#ff5a4e','†'],castle:['#ff8a3a','⚠'],moon:['#ff4a5e','☾'],boss:['#d8a0ff','★'],good:['#6fe08a','✔']};
+ALERT_K.news=['#f2c84a','✦'];
+// 新しくできるようになったことの知らせ（城のレベル・研究で建てられる施設）。アイコンつき・2行。続けて来たら順番に出す
+const NEWSQ=[];function newsTop(title,sub,icon,go){NEWSQ.push({title,sub,icon,go});if(NEWSQ.length===1)newsNext();}
+function newsNext(){const n=NEWSQ[0];if(!n)return;alertTop(`<b>${n.title}</b><small>${n.sub}</small>`,'news',5500,n.icon,()=>{if(n.go)n.go();});setTimeout(()=>{NEWSQ.shift();newsNext();},5800);}
+function alertTop(msg,kind,ms,icon,onclick){let el=document.getElementById('alertTop');if(!el){el=document.createElement('div');el.id='alertTop';document.body.appendChild(el);}
+  const [col,ico]=ALERT_K[kind]||ALERT_K.castle;el.style.setProperty('--ac',col);el.innerHTML=`${icon?`<em>${icon}</em>`:`<i>${ico}</i>`}<span>${msg}</span>`;el.style.pointerEvents=onclick?'auto':'none';el.style.cursor=onclick?'pointer':'';el.onclick=onclick?()=>{el.className='';onclick();}:null;try{const r=document.getElementById('cv').getBoundingClientRect();el.style.top=Math.max(8,Math.round(r.top+12))+'px';el.style.left=Math.round(r.left+r.width/2)+'px';}catch(e){}el.className='on';
+  clearTimeout(el._t);el._t=setTimeout(()=>{el.className='';},ms||4500);}
 function confirmNew(){return true;}
+// 番外編「偵察と駐屯地攻め」（2026-11-16）：廃村エルムの地図で、街が育ったところから始める
+function startScoutEx(){closeOverlay();withLoading('番外編を準備しています…',()=>{CUR_MAP='t';BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');
+  S.townName='エルム';S.ex='tx';S.siegeMode=true;S.baseLv=2;Object.assign(S,{gold:600,steel:600,stone:300,iron:200,fuel:300,ammo:300,sword:80,armor:60});S.pop+=30;S.popCap+=30;
+  const hq=S.blds.find(b=>b.type==='hq');const put=(t,n,r0)=>{let c=0;for(let r=r0||4;r<20&&c<n;r++)for(let dy=-r;dy<=r&&c<n;dy++)for(let dx=-r;dx<=r&&c<n;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=hq.x+dx,y=hq.y+dy;try{if(placeOKraw(t,x,y)&&placeB(t,x,y,true)){const b=S.blds[S.blds.length-1];b.bt=0;c++;}}catch(e){}}return S.blds.filter(b=>b.type===t).slice(-n);};
+  put('barracks',3);put('farm',2);put('miner',3);put('quarry',1);put('ammo',1);put('lab',1);const tr=put('train',1)[0];put('mg',3,6);put('brazier',2,7);
+  for(const id of ['mine','quarrying'])S.tech[id]=1;
+  if(tr){for(let i=0;i<2;i++)spawnUnit(tr,'inf','pawn');for(let i=0;i<2;i++)spawnUnit(tr,'arch','archer');}
+  S.wave=2;S.turn=19;S.next=genWave(3);S.turnsLeft=6;S.prepTotal=6;S.campHint=true;campSync();
+  log('番外編：偵察と駐屯地攻め。第3襲撃まで6日','good');S.guide=null;guideInit();S.guide.hide=false;renderAll();resizeView();});}
+// 街の名前を決める（2026-11-16）。結果画面・タイムラプス・街の記録・セーブの表示に使う
+const TOWN_IDEAS=['グレイヴェル','エルムウッド','アッシュフォード','ローデン','ミルブルック','ハーヴェン','セリオン','ウィンダミア','ブラックソーン','ルーメン','オークヘイヴン','フェンリス'];
+function askTown(mid,cb,inGame){const def=mid==='t'?'エルム':mid==='f'?'グレイヴェル':TOWN_IDEAS[0];
+  openOverlay('town',`<h2>街の名前を決める</h2><div class="help" style="line-height:1.8;display:flex;gap:10px;align-items:center">${lilFace(64)}<span><b style="color:#e8c070">${LIL_NAME}</b>「${inGame?'では、領主様。まずは、この街の名前を決めてください。街の記録や、最後の歴史に残ります':'はじめまして、領主様！ 書記官のリリアです。今日からお手伝いをします！ まずは、この街の名前を決めてください。街の記録や、最後の歴史に残ります'}」</span></div>
+    <div style="display:flex;gap:6px;margin:10px 0;flex-wrap:wrap"><input id="twName" maxlength="12" value="${def}" style="flex:1;min-width:160px;font-size:16px;padding:6px 8px;background:#0e1510;color:var(--text);border:1px solid var(--line)"><button id="twRand">おまかせ</button></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">${inGame?'':'<button id="twBack">戻る</button>'}<button id="twGo" class="primary">${inGame?'この名前にする':'この名前で始める'}</button></div>`,true);
+  const inp=document.getElementById('twName');try{inp.focus();inp.select();}catch(e){}
+  document.getElementById('twRand').onclick=()=>{inp.value=TOWN_IDEAS[Math.floor(Math.random()*TOWN_IDEAS.length)];se('click');};
+  {const bk=document.getElementById('twBack');if(bk)bk.onclick=showIntro;}
+  const ok=()=>{const v=(inp.value||'').replace(/[<>&"']/g,'').trim().slice(0,12)||def;cb(v);};
+  document.getElementById('twGo').onclick=ok;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ok();}e.stopPropagation();};}
 function showIntro(){
   /* ステージ（2026-11-13）：いま遊べるのはチュートリアルと草原だけ。ほかは Coming Soon で入れない */
   const stageBest=id=>{try{return Math.min(10,+localStorage.getItem('nd_best_'+id)||0);}catch(e){return 0;}};   /* ステージ2の解放：ステージ1で第10襲撃をしのぐ（2026-11-15 決定。ステージ2はまだ準備中） */
-  const MAPL=[['t','ステージ0　廃村エルム','チュートリアル','#8ad08a','入門','焼け落ちた村の跡。壊れた柵やバリスタが残っていて、半額ですぐに建て直せる。初心者タスクに沿って準備し、<b>6回の襲撃</b>を守り抜く。魔物は少なめ'],
+  const MAPL=[['t','ステージ0　廃村エルム','チュートリアル','#8ad08a','入門','焼け落ちた村の跡。書記官リリアの案内（ミッション）で、街づくりと守りの基本を実際に手を動かして覚える。<b>6回の襲撃</b>を守り抜く。魔物は少なめ'],
+    ['tx','番外編　偵察と駐屯地攻め','チュートリアル','#8ad08a','番外編','街が育ったところ（城Lv2・兵舎と部隊あり・第3襲撃の前）から始めて、斥候で駐屯地を見つけ、夜襲をかけるまでを覚える'],
     ['f','ステージ1　グレイヴェル平原','草原','#e8c070','ふつう','森と岩場に囲まれた草原の辺境の街。北のアビスから始まり、やがて3方向から魔物が押し寄せる。20回目にゴブリンキング、最後の夜には森の化け物「蠢く木陰」が現れる。<b>40回の襲撃</b>'],
     ['swamp','ステージ2','沼地','#7a9a6a','Coming Soon',''],
     ['m','ステージ3','山脈','#ff8a6a','Coming Soon',''],
@@ -7514,13 +7568,15 @@ function showIntro(){
   const soonImg=id=>(id==='m'||id==='s')?mapIcon(id):'';
   openOverlay('intro',`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>ステージを選ぶ</h2><button id="inBack">タイトルへ</button></div>${saveInfo()?'<div class="wn" style="font-size:12px;margin-bottom:6px">新しく始めると、今のセーブデータは上書きされます</div>':''}
   <div class="tskRow"><span><b>駐屯地襲撃モード <span style="color:#f2b33d">β</span></b><small>ON：見つけた駐屯地に近づくと、別の戦場で夜襲をかけて戦う（倒した分だけ次の襲撃が減る）。OFF：駐屯地には攻め込めない</small></span><span class="tskSw"><button data-sgm="1">ON</button><button data-sgm="0">OFF</button></span></div>
-  <div id="inTasks" class="tskRow"><span><b>初心者タスク</b><small>生産・防衛の目標と、やり方のヒントをマップに表示します（どのステージでも使えます）</small></span><span class="tskSw"><button data-tsk="1">ON</button><button data-tsk="0">OFF</button></span></div>
+  <div id="inTasks" class="tskRow"><span><b>チュートリアル（ミッション）</b><small>書記官リリアが、街づくりと守りの手順をミッションで案内します。実際に手を動かしながら覚えます（どのステージでも使えます）</small></span><span class="tskSw"><button data-tsk="1">ON</button><button data-tsk="0">OFF</button></span></div>
   <div style="display:flex;flex-direction:column;gap:8px;margin:4px 0 6px">`+MAPL.map(([id,nm,sub,col,diff,desc])=>diff==='Coming Soon'?`<button disabled style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px;opacity:.55;cursor:default">
     <span style="position:relative;width:144px;height:84px;flex-shrink:0;border:1px solid var(--line);background:#14161a;display:flex;align-items:center;justify-content:center">${soonImg(id)?`<img src="${soonImg(id)}" width="144" height="84" style="image-rendering:pixelated;position:absolute;inset:0;filter:grayscale(1) brightness(.45)" alt="">`:''}<b style="position:relative;color:#e8dcc0;font-size:13px;letter-spacing:1px">COMING SOON</b></span>
     <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">Coming Soon</small><br><small style="color:var(--dim)">準備中です${id==='swamp'?`<br>解放の条件：ステージ1で第10襲撃をしのぐ（いま ${stageBest('f')}／10）`:''}</small></span></button>`:`<button data-map="${id}" style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px">
-    <img src="${mapIcon(id)}" width="144" height="84" style="image-rendering:pixelated;border:1px solid var(--line);flex-shrink:0" alt="">
+    <img src="${mapIcon(id==='tx'?'t':id)}" width="144" height="84" style="image-rendering:pixelated;border:1px solid var(--line);flex-shrink:0" alt="">
     <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">${diff}</small><br><small style="color:var(--dim);line-height:1.6">${desc}</small></span></button>`).join('')+`</div>`,true);
-  const go=(mid)=>{closeOverlay();withLoading('マップを作っています…',()=>{CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');renderAll();resizeView();});};
+  const start=(mid,nm)=>{closeOverlay();withLoading('マップを作っています…',()=>{CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');if(nm){S.townName=nm;S.townNamed=true;log(`領主として「${nm}」に着任した。`,'good');}renderAll();resizeView();});};
+  /* チュートリアル（ステージ0）は、リリアのあいさつのあとで街の名前を決める（2026-11-16）。ほかは始める前に */
+  const go=(mid)=>mid==='tx'?startScoutEx():(mid==='t'&&tasksOn())?start(mid,null):askTown(mid,nm=>start(mid,nm));
   document.querySelectorAll('[data-map]').forEach(b=>b.onclick=()=>go(b.dataset.map));
   document.getElementById('inBack').onclick=showTitle;
   const upd=()=>document.querySelectorAll('[data-tsk]').forEach(b=>b.classList.toggle('on',(b.dataset.tsk==='1')===tasksOn()));upd();
@@ -7534,34 +7590,104 @@ function tasksOn(){try{return localStorage.getItem('nd_tasks')!=='0';}catch(e){r
 function setTasksOn(v){try{localStorage.setItem('nd_tasks',v?'1':'0');}catch(e){}}
 function gCnt(type,lv){return S.blds.filter(b=>b.type===type&&ready(b)&&(b.lv||1)>=(lv||1)).length;}
 function gTechDone(){return Object.keys(S.tech||{}).filter(k=>S.tech[k]>0&&!(S.guide&&S.guide.t0||[]).includes(k)).length;}
-const GUIDE={
- prod:{name:'生産',steps:[
-  {t:'伐採所を3つ建てる',b:'miner',n:3,d:'<b>森</b>のマスに建てると木材が採れます。森が深いほど多く採れます。',rw:{gold:30}},
-  {t:'伐採所を1つ Lv2 にする',c:()=>gCnt('miner',2),n:1,ping:'miner',hi:'#iUpg',castle:2,d:'施設のレベルは<b>城のレベルまで</b>上げられます。まず城をクリックして<b>城をLv2に強化</b>（2ターンかかります）。そのあと伐採所をクリックし、選択中パネルの「Lv2 に改修 [U]」を押します。生産量が上がります。',rw:{steel:40}},
-  {t:'石切り場を建てる',b:'quarry',n:1,d:'<b>岩場</b>（灰色の岩があるマス）に建てると石材が採れます。',rw:{gold:20}},
-  {t:'鉱山を建てる',b:'ironmine',n:1,d:'<b>鉄鉱脈</b>のマスに建てると鉄が採れます。バリスタや大砲に使います。',rw:{stone:30}},
-  {t:'住居を建てる',b:'barracks',n:1,d:'住民がふえ、税で金貨が入ります。住民は施設で働きます。',rw:{gold:30}},
-  {t:'農場を2つ建てる',b:'farm',n:2,d:'<b>平地</b>に建てると食料がとれます。食料が尽きると住民が増えなくなります。',rw:{steel:30}},
-  {t:'武器工房を建てる',b:'ammo',n:1,d:'矢や剣をつくります。工房をクリックすると作る物を切り替えられます。',rw:{gold:30}},
-  {t:'交易市場を建てる',b:'market',n:1,d:'外の商人と取引できます。余った資源を売ったり、足りない資源を買ったり。',rw:{iron:20}},
-  {t:'交易市場で取引する',c:()=>S.tradeN||0,n:1,ping:'market',hi:'#mkGo,.mkr',d:'交易市場をクリックし、選択中パネルの「交易」で資源を売り買いします。',rw:{gold:40}},
-  {t:'人口を100人にする',c:()=>popTotal(),n:100,ping:'barracks',d:'住居を増やし、食料を切らさないこと。住居は改修すると住める数が増えます。',rw:{gold:100}},
- ]},
- def:{name:'防衛',steps:[
-  {t:'木の柵を10建てる',b:'fence',n:10,d:()=>'敵の通り道をふさぐ壁です。敵も味方も通れません。'+(S.mapId==='t'?'<b>焼け残った柵の廃墟</b>をクリックすると半額ですぐ建て直せます。':'ドラッグでまとめて置けます。'),rw:{steel:40}},
-  {t:'門を建てる',b:'gate',n:1,d:'柵の切れ目に置きます。部隊は門からだけ出入りでき、敵にとっては壁と同じです。',rw:{gold:20}},
-  {t:'バリスタを建てる',b:'mg',n:1,d:'矢を撃つ防衛施設。空の敵も撃てます。柵の内側、敵が来る方向に。',rw:{ammo:40}},
-  {t:'篝火を置く',b:'brazier',n:1,d:'夜を照らします。暗いところの敵は狙いにくいので、柵の外を照らしましょう。耐久が低いので、通り道に置くと壊されます。',rw:{fuel:30}},
-  {t:'兵舎を建てる',b:'train',n:1,d:'兵士や弓兵などの部隊を編成する施設です。',rw:{sword:20}},
-  {t:'兵士か弓兵を2部隊つくる',c:()=>S.squads.filter(q=>q.ut==='inf'||q.ut==='arch').length,n:2,hi:'#bArmy',d:'「軍事 [K]」の「訓練」から編成します。兵士は剣、弓兵は矢を使います。',rw:{gold:40}},
-  {t:'研究を1つ完了する',c:()=>gTechDone(),n:1,hi:'#bRes',d:'下の「研究 [R]」で研究を選びます。研究員として住民が必要です。完了すると新しい施設や強化が使えます。',rw:{gold:40}},
-  {t:'投石機を建てる',b:'how',n:1,d:'研究「投石機」（防衛タブ）で解放。石を飛ばして、壁の向こうの敵をまとめて攻撃します。',rw:{stone:60}},
-  {t:'研究「斥候」で駐屯地の場所をつかむ',c:()=>lvl('scout'),n:1,hi:'#bRes',d:'次の襲撃の魔物は、街とアビスのあいだの<b>駐屯地</b>で待っています。研究「斥候」（部隊タブ）をすると、地図に<b>駐屯地のだいたいの場所</b>（赤い点線の円）が出ます。',rw:{fuel:40}},
-  {t:'斥候で駐屯地を見つける',c:()=>S.campFoundN||0,n:1,hi:'#bArmy',d:'研究「斥候隊」で<b>斥候</b>を編成し、赤い点線の円へ向かわせます。見つけた駐屯地へ<b>昼のうちに部隊で攻め込む</b>と、倒した分だけ次の襲撃の敵が減ります。',rw:{gold:60}},
- ]},
-};
+// ===== チュートリアル：書記官リリアのミッション（2026-11-16）=====
+// ミッションは順番に1つずつ。はじめにリリアが話し、手順（どの順でもよい）を実際にやると次へ進む。ごほうびはミッションを終えたとき
+const LIL_NAME='書記官リリア';
+const MISSIONS=[
+ {id:'prod',name:'生産施設の建設',
+  say:['はじめまして、領主様！ 書記官のリリアです。今日からお手伝いをします！','資材がないと、守りも街の発展もできません！ まずは木材と石材などの生産施設を建てましょう！{ART:miner,quarry}',
+   ()=>'ただし、<b>土地のレベル</b>で生産の効率が変わるので気をつけてください。たとえば森は、木が深いほど木材がたくさん採れます。'+lilForestImg()+'右上の「土地Lv」のボタンでも確かめられますよ。'],
+  steps:[
+  {t:'伐採所を4つ建てる',b:'miner',n:4,d:'<b>森</b>のマスに建てると木材が採れます。森が深いほど多く採れます。'},
+  {t:'石切り場を2つ建てる',b:'quarry',n:2,d:'<b>岩場</b>（灰色の岩があるマス）に建てると石材が採れます。'},
+  {t:'鉱山を1つ建てる',b:'ironmine',n:1,d:'<b>鉄鉱脈</b>のマスに建てると鉄が採れます。'}],
+  done:'いい調子です！ 建てたら「夜へ」で日を進めてください。毎日、資材が入ってきます。'},
+ {id:'people',name:'人',
+  say:['施設を動かすには、働く人が必要です。住居を建てると、毎ターン住民が増えていきます。{ART:barracks}','ただし、1つの家に住める人数には限りがあるので気をつけてください。住居の研究で、住める人数を増やすこともできます。','人が増えると、食料も必要になります。畑や漁場を、人数に合わせて建てましょう。食べ物に余裕があると、みんなうれしいです！{ART:farm,fishery}'],
+  steps:[
+  {t:'住居を2つ建てる',b:'barracks',n:2,d:'住民がふえ、税で金貨が入ります。'},
+  {t:'農場を2つ建てる',b:'farm',n:2,d:'<b>平地</b>に建てると食料がとれます。水辺には漁場も建てられます。'}],
+  done:'これで、人も食べ物も増えていきます！'},
+ {id:'res',name:'研究',
+  say:['研究を進めると、生産の効率を上げたり、兵士や防衛施設の力を上げたりできます。さっそく「伐採技術」の研究をしてみましょう。','研究室を建てると研究員が増えるので、余裕があったら建ててみてくださいね。{ART:lab}'],
+  steps:[
+  {t:'「伐採技術」の研究を完了する',c:()=>lvl('mine'),n:1,hi:'#bRes',d:'下の「研究」を押して、生産タブの「伐採技術」を選び「研究を開始」。'},
+  {t:'「石工技術」の研究を完了する',c:()=>lvl('quarrying'),n:1,hi:'#bRes',d:'同じく生産タブの「石工技術」です。石切り場の産出が増えます。'}],
+  done:'研究は、いちど終えればずっと効きます。研究員が空いていたら、どんどん進めましょう！'},
+ {id:'def',name:'防衛',
+  say:['資材もそろってきたので、いよいよ街を守るために動きましょう。最初はバリスタがおすすめです。{ART:mg}','ほかにも、物見櫓はバリスタより射程が長かったり、研究を進めると投石機が使えるようになったりしますよ。{ART:tower1,how}','敵が来る方角に壁を建てておけば、敵を足止めして、そのあいだにバリスタなどで攻撃できます。木の柵は、ドラッグすると一列にまとめて置けますよ。{MOV:fence}','敵は暗闇から攻めてきます。防衛施設がたくさんあっても、暗闇の敵には攻撃できないので気をつけてください。篝火で照らしましょう！{ART:brazier}'],
+  steps:[
+  {t:'バリスタを2つ建てる',b:'mg',n:2,d:'矢を撃つ防衛施設。空の敵も撃てます。壁の内側、敵が来る方角に。'},
+  {t:'木の柵（壁）を8つ建てる',b:'fence',n:8,mov:'fence',d:'敵の通り道をふさぎます。ドラッグすると一列に置けます。'},
+  {t:'篝火を2つ建てる',b:'brazier',n:2,d:'壁の外を照らします。耐久が低いので、敵の通り道には置かないこと。'}],
+  done:'りっぱな守りです！ 次は、守りの兵を集めましょう。'},
+ {id:'army',name:'兵士',
+  say:['防衛施設のほかに、兵士でも街を守れます。城で農兵を招集しましょう。1部隊は5人です。{ART:farmer}','兵士たちには「迎撃」「固守」「補給」などの指示を出したり、立つ場所を指示したりできます。部隊を選んで、行き先を押すと移動します。{MOV:move}','「迎撃」は、近くに敵が来たら攻撃しに行ってくれます。「固守」は、その場からあまり離れずに守ってくれます。近接の部隊を壁の近くに固守で置いておけば、壁ごしに敵を攻撃してくれますよ。','兵舎を建てると、農兵のほかの兵士も招集できるようになります。{ART:train,pawn}'],
+  steps:[
+  {t:'農兵を2部隊やとう',c:()=>S.squads.filter(q=>q.model==='farmer').length,n:2,ping:'hq',d:'城をクリックして、選択中パネルから農兵を招集します。'},
+  {t:'部隊を移動させてみる',c:()=>S.movedN||0,n:1,mov:'move',d:'部隊をクリックして選び、地図の行きたい場所を押します。'},
+  {t:'兵舎を建てる',b:'train',n:1,d:'剣士や弓兵など、農兵のほかの部隊を招集できる施設です。'}],
+  done:'頼もしい兵たちです！'},
+ {id:'hero',name:'英雄と熟練度',
+  say:['街には<b>英雄</b>がいます。英雄を部隊や施設に<b>配属</b>すると、その部隊や施設を強くしてくれます。{ART:h_guard,h_admin}','英雄には、それぞれ<b>スキル</b>があります。防衛施設の連射を上げる「速射」、生産を上げる「指導」など、英雄ごとに違います。英雄を選んで確かめてみてください。向いている配属先に置くと、もっと力を発揮しますよ。','それから、部隊には<b>熟練度</b>があります。戦いを経験するほど熟練度が上がって、強くなっていきます。熟練の部隊は大事にしてくださいね！'],
+  steps:[
+  {t:'英雄を部隊か施設に配属する',c:()=>S.assignN||0,n:1,hi:'#bArmy',d:'施設か部隊をクリックして、選択中パネルの「配属英雄」から英雄を選びます。下の「軍事」→「英雄」からも配属できます。英雄を選ぶと、スキルと向いている配属先が見られます。'}],
+  done:'これで、英雄の力も借りられます！ 次は、戦うための武器です。'},
+ {id:'arms',name:'軍需',
+  say:['街を守るには武器が必要です。防衛施設や弓兵は矢を、剣士たちは剣と防具を使います。','武器工房を建てると、矢・剣・防具を作れます。何を作るかは、武器工房に指示を出してあげてください。{ART:ammo}'],
+  steps:[
+  {t:'武器工房を建てる',b:'ammo',n:1,d:'矢・剣・防具を作る施設です。'},
+  {t:'矢を30作る',c:()=>Math.floor((S.made&&S.made.ammo)||0),n:30,ping:'ammo',d:'武器工房は、はじめは矢を作ります。「夜へ」で日を進めると、矢が増えていきます。'},
+  {t:'剣を5作る',c:()=>Math.floor((S.made&&S.made.sword)||0),n:5,ping:'ammo',d:'武器工房をクリックして、作る物を「剣」に切り替えます。'}],
+  done:'これで、最初の夜を迎える準備ができました！'},
+ {id:'night',name:'夜と朝',
+  say:['この街の毎日は、<b>昼</b>と<b>夜</b>のくり返しです。昼に建てて、研究して、兵をそろえたら「夜へ」。静かな夜は過ごし方を選んで「朝へ」。そして<b>襲撃の日の夜</b>には、魔物が押し寄せてきます。','夜へ進む前に、「夜へ」の横に足りない資源の札が出ていないか見てください。矢が足りないと、バリスタが止まってしまいます！','朝になったら、壊れた施設は「一括修理」、部隊の矢や武具は「一括補給」で整えましょう。','最初の襲撃のあとは、4日ごとに襲撃が来ます。ブラッドムーンなど大きな夜の前は6日あります。昼のうちに「資材を増やす → 守りを足す」をくり返すのが、この街の暮らしです。'],
+  steps:[
+  {t:'最初の襲撃をしのぐ',c:()=>S.wave,n:1,hi:'#bNext',d:'「夜へ」で日を進め、襲撃の夜を守りきります。襲撃のあいだは、部隊を選んで敵の来る所へ動かしましょう。'},
+  {t:'朝に一括修理か一括補給をする',c:()=>S.careN||0,n:1,hi:'#bRepAll,#bSupAll',d:'下の「一括修理」「一括補給」です。足りない資材は赤で出ます。'}],
+  done:'しのぎました、領主様！ この調子です。'},
+ {id:'castle',name:'城のレベル上げ',
+  say:['ここからが大事です、領主様！ 城のレベルを上げると、<b>新しいランク</b>の研究と施設が開きます。{ART:castle1,castle2}','城をクリックして「強化」を押しましょう。何日かかかりますが、そのあいだも城はふつうに働きます。','城が上がったら、まず新しいランクの研究を見てください。強い施設や新しい素材は、そこにあります。後回しにすると、魔物に追いつかれてしまいます！'],
+  steps:[
+  {t:'城をLv2にする',c:()=>S.baseLv||1,n:2,castle:2,d:'城をクリックして、選択中パネルの「強化」。'},
+  {t:'ランクⅡの研究を1つ完了する',c:()=>TECH.filter(t=>techRank(t)===2&&has(t.id)).length,n:1,hi:'#bRes',d:'研究画面の「ランクⅡ」の列です。新しい施設や素材が並んでいます。'}],
+  done:'これで、わたしからお教えする基本は全部です、領主様！ 城を上げる → 新しいランクの研究、が強くなる近道です。あとは6回の襲撃を守りきってください。……領主様なら、きっと大丈夫です！'},
+ // ===== 番外編：偵察と駐屯地攻め（直前の状態から始める） =====
+ {id:'scout',name:'偵察',
+  say:['番外編へようこそ、領主様！ ここでは、街がもう育ったところから始めます。','魔物たちは、街とアビスのあいだの<b>駐屯地</b>で、次の襲撃を待っています。','研究「斥候」をすると、駐屯地のだいたいの場所が地図に出ます。そのあと研究「斥候隊」で、斥候の部隊を作れるようになります。','斥候は足が速く、遠くまで見えます。赤い点線の円へ向かわせて、駐屯地を見つけましょう！{ART:archer}'],
+  steps:[
+  {t:'研究「斥候」をする',c:()=>lvl('scout'),n:1,hi:'#bRes',d:'部隊タブの研究です。地図に駐屯地のだいたいの場所（赤い点線の円）が出ます。'},
+  {t:'研究「斥候隊」をする',c:()=>lvl('scouting'),n:1,hi:'#bRes',d:'部隊タブの研究です。兵舎で「斥候」を編成できるようになります。'},
+  {t:'斥候を編成する',c:()=>S.squads.filter(q=>q.model==='scout').length,n:1,ping:'train',d:'兵舎をクリックして、斥候を編成します。'},
+  {t:'駐屯地を見つける',c:()=>S.campFoundN||0,n:1,d:'斥候を選んで、赤い点線の円の中へ動かします。近づくと駐屯地が見つかります。'}],
+  done:'見つけました！ 次は、こちらから攻め込みましょう。'},
+ {id:'raid',name:'駐屯地攻め',
+  say:['見つけた駐屯地に部隊を近づけると、夜襲をかけられます。連れて行く部隊を選んで、陣のまわりに置いて戦います。','陣の魔物は、ほとんどがテントで眠っています。見張りや物見櫓に見つかる前に近づいて、テントを焼くのが近道です。{ART:camp_tent,camp_boss}','倒した魔物と、焼いたテントの中の魔物の分だけ、次の襲撃が減ります。大きな夜の前に叩いておくと、ぐっと楽になりますよ！'],
+  steps:[
+  {t:'駐屯地に夜襲をかける',c:()=>S.siegeN||0,n:1,d:'部隊を選んで駐屯地へ動かすと「夜襲をかける？」と出ます。'}],
+  done:'お見事です、領主様！ これで、守るだけでなく攻めることもできます。'},
+];
+// 「土地のレベル」の説明の絵：森の3つの段（地図と同じ描き方）
+function lilForestImg(){const one=l=>{const k=document.createElement('canvas');k.width=TU;k.height=TU;const c=k.getContext('2d');c.fillStyle='#070a08';c.fillRect(0,0,TU,TU);try{drawTile(c,0,0,2,l,3+l,7,0,0,0);}catch(e){}
+  return `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:2px"><img src="${k.toDataURL()}" width="42" height="42" style="image-rendering:pixelated;border:1px solid #2a3a2c"><small style="font-size:10px;color:#c8b890">${FOREST_NAME[l]}<br>${['','少し','ふつう','たくさん'][l]}</small></span>`;};
+  return `<div style="display:flex;gap:10px;justify-content:center;margin:6px 0">${one(1)}${one(2)}${one(3)}</div>`;}
+// ステージごとのミッション（2026-11-16）：ステージ0は基本（城をLv2にするまで）、ステージ1は改築・駐屯地・街を広げる。
+// ステージ0をまだ守りきっていない人は、ステージ1でも基本から
+const STAGE_MIS={t:['prod','people','res','def','army','hero','arms','night','castle'],tx:['scout','raid'],f:[]};   /* チュートリアルはステージ0だけ（2026-11-16 ユーザーの指定） */
+function tutDone(){try{return (+localStorage.getItem('nd_best_t')||0)>=FINAL_BY_MAP.t;}catch(e){return false;}}
+function misList(){const mid=S&&(S.ex||S.mapId);return STAGE_MIS[mid]||[];}
+const GUIDE={};for(const m of MISSIONS)GUIDE[m.id]=m;   /* 「場所を示す」（guideWhere）がミッションの id で手順を引く */
+function misSay(m){return m.say.filter(x=>typeof x!=='function'||x());}
+function townName(){return (S&&S.townName)||(MAPS[S&&S.mapId]?MAPS[S.mapId].name:'この街');}
+function lilTxt(t){if(typeof t==='function')t=t();return String(t||'').replace(/\$\{TOWN\}/g,townName()).replace(/\{ART:([a-z0-9_,]+)\}/g,(m,ks)=>lilArt(ks.split(','))).replace(/\{MOV:([a-z0-9_]+)\}/g,(m,k)=>lilMov(k));}
+// 操作の短い動画（ゲームを録ったもの。くり返し再生。proto/tut/・本番は tut/）。2026-11-16
+const LIL_MOV={fence:'柵をドラッグして一列に置く',move:'部隊を選んで、行き先を押す'};
+function lilMov(k){return LIL_MOV[k]?`<div class="lmov"><video src="tut/${k}.mp4" autoplay muted loop playsinline preload="auto"></video><small>${LIL_MOV[k]}</small></div>`:'';}
+// 説明の絵：ゲームの立ち絵（4コマで動く）を並べる。2026-11-16 ユーザーの希望「説明には画像を・動いているとなおよい」
+const ART_NAME={camp_tent:'テント',camp_boss:'大将のテント',castle1:'城 Lv1',castle2:'城 Lv2',h_inf:'英雄（歩兵）',h_admin:'英雄（内政）',h_guard:'英雄（守備）',tower1:'物見櫓',pawn:'剣士',farmer:'農兵',archer:'弓兵'};
+function lilArt(keys){const L=keys.filter(k=>NDART[k]);if(!L.length)return '';return `<div class="lart" style="--n:${Math.min(2,L.length)}">${L.map(k=>artPx(k,ART_NAME[k]||(B[k]?B[k].name:''),'')).join('')}</div>`;}
 const COACH=[
- [null,'ようこそ','ここでは<b>初心者タスク</b>に沿って、街づくりと守りの基本を覚えます。まずは画面の見かたを説明します。'],
+ [null,'画面の説明','画面の見かたを順に説明します。'],
  ['#resbar','資源','金貨・木材・石材・鉄・食料・矢・剣など。横の小さな数字は<b>1日の増減</b>です。アイコンにマウスを乗せると名前が出ます。'],
  ['#wave','日付と襲撃までの日数','何日目か、昼か夜か、次の<b>襲撃まであと何日</b>かが出ます。'],
  ['#intel','敵情予測','次の襲撃の規模と、どの方角から来るか。研究「斥候」で詳しくなります。'],
@@ -7569,52 +7695,60 @@ const COACH=[
  ['#info','選択中','選んだ施設・部隊の情報と操作ボタン（改修・作る物の切り替え・行動など）がここに出ます。'],
  ['#rtabs','右のタブ','<b>建設</b>：施設を建てる／<b>研究</b>：研究の進み具合／<b>軍事</b>：部隊・訓練・英雄・冒険者／<b>街</b>：資源の出入り'],
  ['#controls','下のボタン','<b>夜へ [Enter]</b> で1日を進めます。研究 [R]・軍事 [K]・一括修理・一括補給などもここ。「表示・設定」からセーブや全画面。'],
- ['#guide','初心者タスク','生産と防衛の<b>目標</b>が出ます。<b>場所を示す</b>を押すと場所を教えてくれます。好きな順に進められます。'],
+ ['#guide','ミッション','書記官リリアが、次にやることを教えてくれます。<b>場所を示す</b>を押すと場所を教えてくれます。手順は好きな順に進められます。'],
 ];
-function guideInit(){if(S.guide)return;const on=tasksOn();S.guide={tab:'prod',open:-1,min:true,hide:!on,coach:on&&S.mapId==='t'?0:-1,t0:Object.keys(S.tech||{}),done:{prod:[],def:[]}};}
-function gFix(g){if(!g.done){g.done={prod:[],def:[]};for(const tr of ['prod','def'])for(let i=0;i<(g[tr]||0);i++)g.done[tr][i]=true;}if(!g.tab)g.tab='prod';if(g.open==null)g.open=-1;}
-function gProg(st){const c=st.c?st.c():gCnt(st.b);return Math.min(st.n,Math.floor(c));}
-function gDoneN(tr){return GUIDE[tr].steps.filter((x,i)=>S.guide.done[tr][i]).length;}
+function guideInit(){if(S.guide&&S.guide.v===3)return;const on=tasksOn();const old=S.guide;
+  S.guide={v:3,list:misList(),mi:0,line:0,open:-1,min:false,hide:!on,off:!on,coach:-1,t0:Object.keys(S.tech||{}),done:{},fin:false};
+  if(old&&old.done&&!old.v){/* 前のセーブ：もう終わっているミッションはとばす */const g=S.guide;while(g.mi<g.list.length&&GUIDE[g.list[g.mi]].steps.every(st=>{try{return gProg(st)>=st.n;}catch(e){return false;}}))g.mi++;g.line=0;}}
+function gFix(g){if(!g.done)g.done={};if(g.mi==null)g.mi=0;if(g.line==null)g.line=0;if(g.open==null)g.open=-1;}
+function gProg(st){const g=S.guide;const c=st.c?st.c():gCnt(st.b)-((g&&g.b0&&st.b&&g.b0[st.b])||0);return Math.max(0,Math.min(st.n,Math.floor(c)));}   /* 建物は、ミッションが始まってから建てた数 */
+function gMis(){const g=S.guide;if(!g)return null;if(!g.list)g.list=misList();return GUIDE[g.list[g.mi]];}
+function gStepOk(st){try{return gProg(st)>=st.n;}catch(e){return false;}}
 function rwTxt(rw){return Object.keys(rw).map(k=>`${ic(k,12)}+${rw[k]}`).join(' ');}
-function guideTick(){if(!S||S.over||!S.guide||S.backdrop)return;if(['title','intro','credit','help','dex'].includes(S.overlay))return;   /* タイトルの後ろのゲーム（S.backdrop）や図鑑を開いている間は数えない */const g=S.guide;gFix(g);
-  for(const tr of ['prod','def'])GUIDE[tr].steps.forEach((st,i)=>{if(g.done[tr][i])return;let ok=false;try{ok=gProg(st)>=st.n;}catch(e){}if(!ok)return;
-    g.done[tr][i]=true;if(g.hide)return;
-    toast(`初心者タスク達成：${st.t}`,'good');log(`初心者タスク達成：${st.t}`);se('research');
-    if(g.open===i&&g.tab===tr)g.open=-1;if(gDoneN(tr)===GUIDE[tr].steps.length)log(`初心者タスク「${GUIDE[tr].name}」をすべて達成した！`,'warn');});
+// リリアの顔（仮のドット絵。絵ができたら NDART['lilia'] などに差し替える）
+const LIL_PX=[".........oooooccccccoooooqqqo...", ".......oocccccccccccccccqqoo....", "......occccccccccccccggcccco....", ".....occcccccccccccccgcccccco...", ".....oCCCCCCCCCCCCCCCCCCCCCCo...", ".....ohCCCCCCCCCCCCCCCCCCCCo....", "....ohhhhhhhhlhhhhhhhhhhhhho....", "....ohhhhhhllhhhhhhllhhhhhho....", "...ohhhhhhlhhhhhhhhhhlhhhhhho...", "...ohhhhhhhhHhhhHhhhHhhhhhhho...", "...ohhhhhHhshhshhshhshhHhhhho...", "...ohhhhhhsshsshsshsshshhhhho...", "...ohhhhssEssssssssssEsshhhho...", "..ohhhhhssEEEEssssEEEEsshhhhho..", "..ohhhhhssswDDsssswDDssshhhhho..", "..ohhHhsssswwesssswwesssshHhho..", "..ohhhhsssseeesssseeesssshhhho..", "..ohhhhsssseewsssseewsssshhhho..", "..ohhHhhsSskkksssskkksSshhHhho..", "..ohhhhhsbbssssssssssbbshhhhho..", "..ohhhhhssbsssmssmsssbsshhhhho..", "..ohhHhhhssssssmmsssssshhhHhho..", "..ohhhhhhhSssssssssssShhhhhhho..", "..ohhhhhoohhsssssssshhoohhhhho..", "...ohHhhoccchhsssshhcccohhHho...", "...ohhhhccccccWWWWcccccchhhho...", "...ohhhhcccccgWWWWgccccchhhho...", "...ooccccccccgWrrWgccccccccoo...", "..occcccccccgWWRRWWgccccccccco..", ".occccccccccgWWWWWWgcccccccccco.", "occccccccccgWWWWWWWWgcccccccccco", "cccccccccccgWWWWWWWWgccccccccccc"];   /* 仮の顔 32×32（2026-11-16）。絵ができたら NDART.lilia_face へ */
+const LIL_PAL={"o": "#3a2430", "H": "#8a4a2a", "h": "#c0703a", "l": "#eaa868", "s": "#fbe0c6", "S": "#efc0a0", "w": "#ffffff", "e": "#4a7ae0", "E": "#1e2a6a", "k": "#8ac0ff", "D": "#2a48a8", "b": "#f6a0a8", "m": "#d0505e", "r": "#e8506e", "R": "#a83050", "c": "#3a5aa8", "C": "#263c78", "g": "#f0c050", "W": "#f6f0e0", "q": "#f8f8ff"};
+let LIL_URL='';function lilFace(sz){if(!LIL_URL){const c=document.createElement('canvas');c.width=c.height=32;const g=c.getContext('2d');LIL_PX.forEach((r,y)=>{for(let x=0;x<r.length;x++){const k=r[x];if(LIL_PAL[k]){g.fillStyle=LIL_PAL[k];g.fillRect(x,y,1,1);}}});LIL_URL=c.toDataURL();}
+  const art=typeof NDART!=='undefined'&&NDART.lilia_face;return `<img class="lilf" src="${art?art[0]:LIL_URL}" width="${sz}" height="${sz}" alt="" style="width:${sz}px;height:${sz}px;image-rendering:pixelated">`;}
+function guideTick(){if(!S||S.over||!S.guide||S.backdrop)return;if(['title','intro','credit','help','dex','town'].includes(S.overlay))return;const g=S.guide;gFix(g);if(g.fin||g.off)return;
+  const m=gMis();if(!m){g.fin=true;renderGuide();return;}
+  m.steps.forEach((st,i)=>{const k=m.id+':'+i;if(g.done[k])return;if(!gStepOk(st))return;g.done[k]=true;if(g.line<misSay(m).length)return;toast(`できました：${st.t}`,'good');se('click');if(g.open===i)g.open=-1;});
+  if(!g.cleared&&g.line>=misSay(m).length&&m.steps.every((st,i)=>g.done[m.id+':'+i])){g.cleared=true;g.min=false;g.hide=false;guideKey='';se('research');log(`ミッション「${m.name}」達成`,'good');toast(`ミッション「${m.name}」達成！`,'good');}   /* たたんでいても・隠していても、達成したら開いて「次のミッションへ」を見せる（2026-11-16） */
   renderGuide();}
+function gNextMission(){const g=S.guide,m=gMis();if(!m)return;
+  g.mi++;g.line=0;g.open=-1;g.cleared=false;g.min=false;g.hide=false;if(!gMis())g.fin=true;guideKey='';renderAll();renderGuide();}
 let guideKey='';
 function renderGuide(){const el=document.getElementById('guide');const g=S&&S.guide;
-  const ovOn=document.getElementById('overlay').style.display&&document.getElementById('overlay').style.display!=='none';const show=g&&!g.hide&&!S.over&&!S.review&&!S.waveActive&&!ovOn;
+  const ovOn=document.getElementById('overlay').style.display&&document.getElementById('overlay').style.display!=='none';const show=g&&!g.hide&&!g.fin&&!S.over&&!S.review&&!S.waveActive&&!ovOn&&!S.backdrop;
   el.style.display=show?'block':'none';if(!show)return;gFix(g);
   const cv=document.getElementById('cv').getBoundingClientRect();
   el.style.left=Math.max(6,cv.left+6)+'px';el.style.top='';{let bt=cv.bottom;if((isFull()||isNarrow())&&!isLand()){const ct=document.getElementById('controls').getBoundingClientRect();if(ct.height)bt=Math.min(bt,ct.top-4);}if(isNarrow()){const sh=document.getElementById('sheetHandle').getBoundingClientRect();if(sh.height)bt=Math.min(bt,sh.top-4);}el.style.bottom=Math.max(6,innerHeight-bt+6)+'px';}
-  const steps=GUIDE[g.tab].steps;let key=(g.min?'m':'')+g.tab+g.open+JSON.stringify(g.done);
-  for(const st of steps){try{key+=','+gProg(st);}catch(e){}}
+  const m=gMis();if(!m)return;
+  let key=(g.min?'m':'')+townName()+'|'+(g.list||[]).join(',')+'|'+g.mi+'|'+g.line+'|'+g.open+'|'+(g.cleared?1:0)+JSON.stringify(g.done);for(const st of m.steps){try{key+=','+gProg(st);}catch(e){}}
   if(key===guideKey)return;guideKey=key;
-  const tot=GUIDE.prod.steps.length+GUIDE.def.steps.length,done=gDoneN('prod')+gDoneN('def');
-  let h=`<div class="gh" id="gHead"><b>初心者タスク</b><span class="gp">${done} / ${tot}</span><button id="gMin" class="ghost" title="たたむ／ひらく">${g.min?'▾':'▴'}</button><button id="gClose" class="ghost" title="隠す（表示・設定から再表示）">${ui('close','dim',12)}</button></div>`;
-  {let cur=null,nxt=null;for(const tb of [g.tab,g.tab==='prod'?'def':'prod']){GUIDE[tb].steps.forEach((st,i)=>{if(g.done[tb][i])return;if(!cur)cur={tb,i,st};else if(!nxt&&cur.tb===tb)nxt=st;});if(cur)break;}
-   if(cur){let pg=0;try{pg=gProg(cur.st);}catch(e){}const n=cur.st.n||1;
-     h+=`<div class="gcur"><div class="gct"><span class="tr ${cur.tb==='def'?'def':''}">${GUIDE[cur.tb].name}</span><span class="gtt">${cur.st.t}</span><span class="gpg">${Math.min(pg,n)}/${n}</span></div><div class="gbar"><i style="width:${Math.round(Math.min(1,pg/n)*100)}%"></i></div><div class="gnx"><span>${nxt?'次：'+nxt.t:''}${cur.st.rw?`${nxt?' ／ ':''}報酬 ${Object.entries(cur.st.rw).map(([k,v])=>RES_NAME[k]+'+'+v).join('・')}`:''}</span><button data-gwhere2="${cur.tb}:${cur.i}">場所を示す</button></div></div>`;}
-   else h+=`<div class="gcur"><div class="gct"><span class="gtt">すべてのタスクを達成しました</span></div></div>`;}
+  const SAY=misSay(m),talking=g.line<SAY.length,doneN=m.steps.filter((st,i)=>g.done[m.id+':'+i]).length;
+  const say=talking?lilTxt(SAY[g.line]):g.cleared?lilTxt(m.done):null;
+  let h=`<div class="gh" id="gHead">${lilFace(32)}<b>ミッション${g.mi+1}　${m.name}</b><span class="gp">${doneN} / ${m.steps.length}</span><button id="gMin" class="ghost" title="たたむ／ひらく">${g.min?'▾':'▴'}</button><button id="gClose" class="ghost" title="隠す（表示・設定から戻せます）">×</button></div>`;
+  if(g.min){const cur=m.steps.findIndex((st,i)=>!g.done[m.id+':'+i]);h+=`<div class="gcur"><div class="gct"><span class="gtt">${talking?'リリアが話しています':g.cleared?'ミッション達成！':cur>=0?m.steps[cur].t:''}</span>${g.cleared?`<button id="lDone" class="primary">${g.mi+1<(g.list||[]).length?'次のミッションへ':'チュートリアルを終える'}</button>`:talking?'<button id="lOpen">聞く</button>':''}</div></div>`;}
   h+=`<div class="gb">`;
-  h+=`<div class="gtabs">${['prod','def'].map(tr=>`<button data-gtab="${tr}" class="${g.tab===tr?'on':''}">${GUIDE[tr].name} ${gDoneN(tr)}/${GUIDE[tr].steps.length}</button>`).join('')}</div>`;
-  h+=`<div class="gnote">好きな順に進められます。項目を押すと説明が出ます。</div>`;
-  steps.forEach((st,i)=>{const dn=!!g.done[g.tab][i];let pg=0;try{pg=gProg(st);}catch(e){}
-    const ico=st.b?icSvg(st.b,16):st.ping?icSvg(st.ping,16):'';
-    h+=`<div class="gr ${dn?'ok':''} ${g.open===i?'op':''}" data-gopen="${i}"><span class="gck">${dn?ui('check','green',12):'□'}</span>${ico}<span class="gtt">${st.t}</span><span class="gpg">${dn?'':st.n>1?pg+'/'+st.n:''}</span>${dn?'':`<button data-gwhere="${i}" title="場所を示す">場所</button>`}</div>`;
-    if(g.open===i){const d=typeof st.d==='function'?st.d():st.d;
-      h+=`<div class="gdet"><div class="gd">${d}</div>${st.n>1&&!dn?`<div class="gbar"><i style="width:${Math.round(pg/st.n*100)}%"></i></div>`:''}</div></div>`;}});
-  h+=`<div class="gfoot"><button id="gCoach">画面の説明</button><button data-gnext>「夜へ」はどこ？</button></div></div>`;
+  if(say)h+=`<div class="lil">${lilFace(64)}<div class="lsay"><small>${LIL_NAME}</small><div>${say}</div><div class="lbtn">${talking?`<button id="lNext" class="primary">${g.line+1<SAY.length?'次へ ▸':'やってみる'}</button>`:`<button id="lDone" class="primary">${g.mi+1<(g.list||[]).length?'次のミッションへ':'チュートリアルを終える'}</button>`}</div></div></div>`;
+  if(!talking&&!g.cleared){
+    m.steps.forEach((st,i)=>{const dn=!!g.done[m.id+':'+i];let pg=0;try{pg=gProg(st);}catch(e){}
+      const ico=st.b?icSvg(st.b,16):st.ping?icSvg(st.ping,16):'';
+      h+=`<div class="gr ${dn?'ok':''} ${g.open===i?'op':''}" data-gopen="${i}"><span class="gck">${dn?ui('check','green',12):'□'}</span>${ico}<span class="gtt">${st.t}</span><span class="gpg">${dn?'':st.n>1?pg+'/'+st.n:''}</span>${dn?'':`<button data-gwhere="${i}">場所を示す</button>`}</div>`;
+      if(g.open===i){const d=typeof st.d==='function'?st.d():st.d;const art=st.mov?lilMov(st.mov):lilArt([st.art||st.b].filter(Boolean));h+=`<div class="gdet2">${art}<div class="gd">${d}</div>${st.n>1&&!dn?`<div class="gbar"><i style="width:${Math.round(pg/st.n*100)}%"></i></div>`:''}</div>`;}});
+    h+=`<div class="gnote">好きな順に進められます。項目を押すと説明が出ます。</div>`;}
+  h+=`<div class="gfoot"><button id="gCoach">画面の説明</button><button id="gSay">もう一度聞く</button><button id="gSkip" class="ghost">このミッションをとばす</button></div></div>`;
   el.className=g.min?'min':'';el.innerHTML=h;
   el.querySelector('#gHead').onclick=e=>{if(e.target.id==='gClose'){g.hide=true;renderGuide();return;}g.min=!g.min;guideKey='';renderGuide();};
-  el.querySelectorAll('[data-gtab]').forEach(b=>b.onclick=()=>{g.tab=b.dataset.gtab;g.open=-1;guideKey='';renderGuide();});
+  {const b=el.querySelector('#lNext');if(b)b.onclick=()=>{if(m.id==='prod'&&g.line===0&&!S.townNamed){se('click');askTown(S.mapId,nm=>{S.townName=nm;S.townNamed=true;closeOverlay();log(`領主として「${nm}」に着任した。`,'good');g.line++;guideKey='';renderAll();renderGuide();},true);return;}g.line++;se('click');if(g.line>=SAY.length){g.b0={};for(const st of m.steps)if(st.b)g.b0[st.b]=gCnt(st.b);}guideKey='';guideTick();renderGuide();};}
+  {const b=el.querySelector('#lDone');if(b)b.onclick=e=>{e.stopPropagation();gNextMission();};}
+  {const b=el.querySelector('#lOpen');if(b)b.onclick=e=>{e.stopPropagation();g.min=false;guideKey='';renderGuide();};}
   el.querySelectorAll('[data-gopen]').forEach(r=>r.onclick=e=>{if(e.target.closest('[data-gwhere]'))return;const i=+r.dataset.gopen;g.open=g.open===i?-1:i;guideKey='';renderGuide();});
-  el.querySelectorAll('[data-gwhere2]').forEach(b=>b.onclick=e=>{e.stopPropagation();const [tb,i]=b.dataset.gwhere2.split(':');guideWhere(tb,+i);});
-  el.querySelectorAll('[data-gwhere]').forEach(b=>b.onclick=e=>{e.stopPropagation();const i=+b.dataset.gwhere;if(g.open!==i){g.open=i;guideKey='';renderGuide();}guideWhere(g.tab,i);});
-  {const cu=el.querySelector('.gcur');if(cu)cu.onclick=e=>{if(e.target.closest('button'))return;if(isNarrow()&&g.min){g.min=false;guideKey='';renderGuide();}};}
-  const gc=el.querySelector('#gCoach');if(gc)gc.onclick=()=>{g.coach=0;showCoach();};
-  const gn=el.querySelector('[data-gnext]');if(gn)gn.onclick=()=>gHi('#bNext');}
+  el.querySelectorAll('[data-gwhere]').forEach(b=>b.onclick=e=>{e.stopPropagation();const i=+b.dataset.gwhere;if(g.open!==i){g.open=i;guideKey='';renderGuide();}guideWhere(m.id,i);});
+  {const b=el.querySelector('#gSay');if(b)b.onclick=()=>{g.line=0;g.min=false;guideKey='';renderGuide();};}
+  {const b=el.querySelector('#gSkip');if(b)b.onclick=()=>{if(!confirm('このミッションをとばしますか？'))return;g.mi++;g.line=0;g.open=-1;g.cleared=false;if(!gMis())g.fin=true;guideKey='';renderGuide();};}
+  const gc=el.querySelector('#gCoach');if(gc)gc.onclick=()=>{g.coach=0;showCoach();};}
 function gHi(sel){document.querySelectorAll('.gHi').forEach(e=>e.classList.remove('gHi'));
   const els=[...document.querySelectorAll(sel)].filter(e=>e.offsetParent);if(!els.length)return false;
   els.forEach(e=>e.classList.add('gHi'));try{els[0].scrollIntoView({block:'nearest',behavior:'smooth'});}catch(e){}
@@ -7661,8 +7795,8 @@ function showCoach(){const g=S.guide;const box=document.getElementById('coach');
   document.getElementById('coNext').onclick=()=>{g.coach++;showCoach();};
   document.getElementById('coSkip').onclick=()=>{g.coach=COACH.length;showCoach();};
   const pv=document.getElementById('coPrev');if(pv)pv.onclick=()=>{g.coach--;showCoach();};}
-setInterval(()=>{try{if(S&&!S.guide&&S.blds)guideInit();guideTick();const g=S&&S.guide,ov=document.getElementById('overlay').style.display;if(g&&g.coach===0&&!g.coachAuto&&(!ov||ov==='none')&&!S.over){g.coachAuto=true;showCoach();}}catch(e){console.error(e);}},400);
-document.getElementById('bGuide').onclick=()=>{if(!S.guide)guideInit();S.guide.hide=false;S.guide.min=false;guideKey='';renderGuide();};
+setInterval(()=>{try{if(S&&S.blds&&(!S.guide||S.guide.v!==3))guideInit();guideTick();const g=S&&S.guide,ov=document.getElementById('overlay').style.display;if(g&&g.coach===0&&!g.coachAuto&&(!ov||ov==='none')&&!S.over){g.coachAuto=true;showCoach();}}catch(e){console.error(e);}},400);
+document.getElementById('bGuide').onclick=()=>{if(!S.guide||S.guide.v!==3)guideInit();S.guide.hide=false;S.guide.off=false;S.guide.min=false;if(S.guide.fin){S.guide.fin=false;S.guide.mi=Math.min(S.guide.mi,(S.guide.list||misList()).length-1);}guideKey='';renderGuide();};
 addEventListener('resize',()=>{guideKey='';});
 function renderReviewBar(){const r=document.getElementById('reviewBar');const ov=document.getElementById('overlay').style.display;r.style.display=S&&S.over&&S.review&&(!ov||ov==='none')?'flex':'none';}
 document.getElementById('rvBack').onclick=()=>{S.review=false;document.getElementById('reviewBar').style.display='none';showEnd(S.endWin!==undefined?S.endWin:!!S.won);};
@@ -7701,7 +7835,7 @@ function showHelp(fromTitle){
    <div>${B2('gate')} 部隊は門からだけ出入りできる</div>
    <div>${B2('mg')} 矢を撃つ防衛施設。空の敵も撃てる</div>
    <div>${B2('brazier')} 夜を照らす。暗いと狙いにくい</div>
-   <div>${B2('train')} 兵士・弓兵などの部隊を編成</div>
+   <div>${B2('train')} 剣士・弓兵などの部隊を編成</div>
    <div>${B2('lab')} ${K('研究')} で新しい施設や強化が解放</div>
   </div>
   <p>防衛施設は${R2('ammo')}などの弾を使います。<b>弾切れ</b>にならないよう昼のうちに蓄えましょう。壊れた施設は ${K('一括修理')}、部隊の弾や人数は ${K('一括補給')} で直せます。</p></section>
@@ -7784,7 +7918,7 @@ function histData(){const H=S.hist||[],TL=tlRows();const L=[];
   return L.join('\n');}
 function showHist(){const TL=tlRows(),xs=TL.map(r=>r.d+'日');
   const tabs=[['wave','襲撃'],['bld','施設'],['prod','生産'],['res','資源']];
-  let h=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">街の記録</h2><div style="display:flex;gap:6px;flex-wrap:wrap">${tabs.map(([k,n])=>`<button data-ht="${k}" class="${HIST_TAB===k?'on':''}">${n}</button>`).join('')}<button id="hsTl">▶ 街の成長（タイムラプス）</button><button id="hsCopy">数字をコピー</button><button id="ovClose">閉じる</button></div></div>`;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">${townName()}の記録</h2><div style="display:flex;gap:6px;flex-wrap:wrap">${tabs.map(([k,n])=>`<button data-ht="${k}" class="${HIST_TAB===k?'on':''}">${n}</button>`).join('')}<button id="hsTl">▶ 街の成長（タイムラプス）</button><button id="hsCopy">数字をコピー</button><button id="ovClose">閉じる</button></div></div>`;
   if(!TL.length&&HIST_TAB!=='wave')h+=`<div class="muted" style="margin:10px 0">記録はこの版から始まりました。次のターンから記録されます（前のセーブの続きでは、途中からの記録になります）。</div>`;
   if(HIST_TAB==='wave'){h+=`<div class="muted" style="margin:6px 0">襲撃ごとの結果です。</div>${histTable()}`;
     const H=S.hist||[];if(H.length>=2)h+=`<div class="ehist" style="margin-top:10px"><span>撃破と損失の推移</span></div>`+lineChart([{n:'撃破',c:'#6fe08a',v:H.map(r=>r.kills)},{n:'戦死',c:'#e8735c',v:H.map(r=>r.kia)},{n:'施設損失',c:'#f2b33d',v:H.map(r=>r.bld)}],H.map(r=>'第'+r.n));}
@@ -7816,7 +7950,7 @@ function playTimelapse(back){const F=tlFrames();if(F.length<2){toast('まだ記�
   TLP={F,i:0,play:true,speed:1,keep,back,acc:0,box:[x0-4,y0-4,x1+4,y1+4]};
   S.overlay='timelapse';S.enemies=[];S.squads=[];S.waveActive=false;S.phase='day';S.night=null;S.sel=null;document.body.classList.add('tlOn');try{toggleFull(true);}catch(e){}
   let hud=document.getElementById('tlHud');if(!hud){hud=document.createElement('div');hud.id='tlHud';document.body.appendChild(hud);}
-  hud.innerHTML=`<div class="tlTop"><b>街の成長</b><span id="tlDay"></span><span class="sp"></span><button id="tlPlay">一時停止</button><button id="tlSpd">速さ ×1</button><button id="tlX" class="primary">閉じる</button></div><input id="tlBar" type="range" min="0" max="${F.length-1}" value="0"><div id="tlInfo" class="tlInfo"></div>`;
+  hud.innerHTML=`<div class="tlTop"><b>${townName()}の歴史</b><span id="tlDay"></span><span class="sp"></span><button id="tlPlay">一時停止</button><button id="tlSpd">速さ ×1</button><button id="tlX" class="primary">閉じる</button></div><input id="tlBar" type="range" min="0" max="${F.length-1}" value="0"><div id="tlInfo" class="tlInfo"></div>`;
   document.getElementById('tlPlay').onclick=()=>{TLP.play=!TLP.play;if(TLP.play&&TLP.i>=F.length-1)TLP.i=0;tlUi();};
   document.getElementById('tlSpd').onclick=()=>{TLP.speed=TLP.speed>=4?1:TLP.speed*2;tlUi();};
   document.getElementById('tlBar').oninput=e=>{TLP.i=+e.target.value;TLP.play=false;tlShow();};
