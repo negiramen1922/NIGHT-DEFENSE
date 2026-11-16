@@ -137,7 +137,7 @@ select{background:#0e1510;color:var(--text);border:1px solid var(--line);font:in
 .ttl{text-align:center;padding:8px 4px 2px}.ttl .tlogo svg,.ttl .tlogo img,.ttl .tlogo canvas{max-height:118px;width:auto}
 .ttl .tsub{color:#c8a070;letter-spacing:.08em;margin:2px 0 10px;font-size:13px}
 .ttl .tmain{display:flex;gap:8px;max-width:440px;margin:0 auto 8px}.ttl .tmain button{flex:1;padding:10px;font-size:15px;display:flex;flex-direction:column;align-items:center;gap:2px}.ttl .tmain small{font-size:10.5px;color:#c8b890;font-weight:normal}
-.ttl .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:440px;margin:0 auto}.ttl .tgrid button,.ttl .tmoreL button{padding:7px 6px;font-size:13px}.ttl .tarr{margin-left:4px;font-size:10px}.ttl .tmoreL{display:flex;flex-wrap:wrap;gap:6px;max-width:440px;margin:6px auto 0;padding-top:6px;border-top:1px dashed #5a4a2a}.ttl .tmoreL button{flex:1 1 40%}   /* 数が奇数のときは最後の1つが横いっぱい */.ttl .tmoreL[hidden]{display:none}
+.ttl .tgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;max-width:440px;margin:0 auto}.ttl .tgrid button,.ttl .tmoreL button{padding:7px 6px;font-size:13px}.ttl .tarr{margin-left:4px;font-size:10px}.ttl .tmoreL{display:flex;flex-wrap:wrap;gap:6px;max-width:440px;margin:6px auto 0;padding-top:6px;border-top:1px dashed #5a4a2a}.ttl .tmoreL button{flex:1 1 40%}   /* 数が奇数のときは最後の1つが横いっぱい */.ttl .tmoreL[hidden]{display:none}
 .ttl .tfoot{font-size:11px;margin-top:10px}
 .tcorner{position:fixed;right:14px;bottom:14px;z-index:5;display:flex;gap:8px}.tcorner button{padding:8px 12px;font-size:14px;background:rgba(14,12,8,.9)}.tcorner #tSet{font-size:20px;line-height:1;padding:6px 11px}
 .tsetP{position:fixed;right:14px;bottom:62px;z-index:6;width:min(320px,calc(100vw - 28px));background:rgba(18,15,10,.97);box-shadow:0 0 0 2px #c8a070,0 8px 24px #000c;padding:10px 12px;text-align:left}.tsetP[hidden]{display:none}
@@ -335,9 +335,12 @@ body.fullmap #right.open{transform:none}
 #guide{width:440px;font-size:13px}#guide .gb{max-height:64vh}#guide .gr .gtt{flex:1;min-width:0}#guide .gr button{flex-shrink:0;white-space:nowrap}#guide .gdet2{margin:2px 0 6px 18px;padding:6px 8px;background:#14110c;border-left:3px solid #c8a070;line-height:1.6;color:#e0d6bc}#guide .lart{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:6px;margin:8px 0 4px}#guide .lart .artpx{width:100%}
 #guide .lil{display:flex;gap:8px;align-items:flex-start;background:#1e1a12;border:1px solid #5a4a2a;padding:6px;margin:2px 0 6px}#guide .lil .lilf{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}#guide .lsay{flex:1;min-width:0;line-height:1.7;color:#f0e4c8;font-size:14px}#guide .lsay small{display:block;color:#e8c070;font-size:10.5px;letter-spacing:1px}#guide .lbtn{text-align:right;margin-top:4px}#guide .lbtn button{padding:3px 10px}#guide .lbtn #lDone{width:100%;white-space:normal}#guide .gh .lilf{flex-shrink:0}#guide .gh b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}#guide .gfoot button{font-size:11px;padding:2px 6px}
 #alertTop{position:fixed;left:50%;top:84px;transform:translate(-50%,-20px);z-index:60;display:flex;align-items:center;gap:10px;padding:8px 18px;background:rgba(14,10,10,.94);border:2px solid var(--ac,#ff8a3a);box-shadow:0 0 18px var(--ac,#ff8a3a),0 4px 14px #000c;color:#fff;font-size:16px;font-weight:bold;letter-spacing:1px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:calc(100vw - 24px);text-align:center}
-#alertTop:not(.on){pointer-events:none!important}#alertTop.on{opacity:1;transform:translate(-50%,0)}#alertTop span b{display:block}#alertTop span small{display:block;font-size:12px;font-weight:normal;color:#e8dcc0;letter-spacing:0;margin-top:2px}#alertTop em{font-style:normal;line-height:0;background:#1e1a12;border:1px solid #6a5a3a;padding:3px}#alertTop i{font-style:normal;font-size:20px;color:var(--ac)}
+#alertTop:not(.on){pointer-events:none!important}#alertTop.on{opacity:1;transform:translate(-50%,0)}#lilLoad{position:fixed;inset:0;z-index:950;background:rgba(6,8,7,.9);display:none;align-items:center;justify-content:center}#lilLoad.on{display:flex}#lilLoad .llBox{width:min(340px,86vw);text-align:center}#lilLoad .artpx{border:1px solid #6a5a3a}#lilLoad .llMsg{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 8px;color:#f0e4c8;font-size:15px;letter-spacing:1px}#lilLoad .llMsg img{background:#2a3a5a;border:1px solid #8a7a5a}#lilLoad .llMsg i{font-style:normal;display:inline-block;animation:llDot 1s steps(4) infinite;overflow:hidden;vertical-align:bottom;width:1.2em;text-align:left}@keyframes llDot{0%{width:0}100%{width:1.2em}}#lilLoad .llBar{height:5px;background:#1a221c;box-shadow:0 0 0 1px #3f3a2a;overflow:hidden}#lilLoad .llBar b{display:block;height:100%;width:0;background:#e8c070;animation:llFill .9s ease-out forwards}@keyframes llFill{to{width:100%}}#alertTop span b{display:block}#alertTop span small{display:block;font-size:12px;font-weight:normal;color:#e8dcc0;letter-spacing:0;margin-top:2px}#alertTop em{font-style:normal;line-height:0;background:#1e1a12;border:1px solid #6a5a3a;padding:3px}#alertTop i{font-style:normal;font-size:20px;color:var(--ac)}
 body.land #alertTop{top:44px;font-size:14px;padding:6px 12px}
-#ovCard .nlil{display:flex;gap:10px;align-items:flex-start;background:#1e1a12;border:1px solid #c8a070;padding:8px 10px;margin:4px 0 10px;line-height:1.7;font-size:13.5px;color:#f0e4c8}#ovCard .nlil small{display:block;color:#e8c070;font-size:11px}#ovCard .nlil ol{margin:4px 0;padding-left:20px}#ovCard .nlil img{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}
+#ovCard .vpop{display:flex;gap:12px;align-items:center;padding:10px 12px;margin:0 0 8px;background:#141210;border:2px solid var(--vc);box-shadow:0 0 14px color-mix(in srgb,var(--vc) 35%,transparent)}#ovCard .vpi{flex-shrink:0;width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:#1e1a12;border:1px solid #4a4030}#ovCard .vpk{font-size:11px;color:var(--vc);letter-spacing:2px}#ovCard .vpop .nvt{margin-top:4px;line-height:1.7}
+#ovCard .vops{display:flex;flex-direction:column;gap:6px;margin:6px 0}#ovCard .vop{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;line-height:1.6}#ovCard button.vop{flex-direction:column;align-items:flex-start}#ovCard .nshop .vop{background:#15130e;border:1px solid #3a3428;margin:0 0 4px}
+#ovCard .vaf{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:#d8ccb0}#ovCard .aft{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}#ovCard .aft b{color:#f0e4c8}#ovCard .aft.lack b{color:var(--red)}.use small.hv{font-size:10px;color:#9a8e74;margin-left:1px}
+#ovCard .wdL{display:flex;flex-direction:column;gap:6px;max-height:48vh;overflow:auto}#ovCard .wd{display:block;width:100%;text-align:left;padding:8px 10px;background:#15130e;border:1px solid #4a4030;line-height:1.6;font-size:12px}#ovCard .wd.now{border-color:#3a6a7a}#ovCard .wdh{display:flex;justify-content:space-between;gap:8px;font-size:14px}#ovCard .wdr{font-size:12px;font-weight:bold}#ovCard .nlil{display:flex;gap:10px;align-items:flex-start;background:#1e1a12;border:1px solid #c8a070;padding:8px 10px;margin:4px 0 10px;line-height:1.7;font-size:13.5px;color:#f0e4c8}#ovCard .nlil small{display:block;color:#e8c070;font-size:11px}#ovCard .nlil ol{margin:4px 0;padding-left:20px}#ovCard .nlil img{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}
 #guide .gcur .gct button{margin-left:auto;flex-shrink:0;padding:2px 8px}
 #guide .gnote{font-size:10.5px;color:#8a8068;margin:2px 0 3px}
 #guide .gr{display:flex;align-items:center;gap:5px;padding:3px 4px;border-left:3px solid #8a6a3a;background:#17140e;margin:2px 0;cursor:pointer}
@@ -952,7 +955,7 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 .use{display:inline-flex;align-items:center;gap:2px;color:var(--amber);white-space:nowrap}.use.lack{color:var(--red)}
 .nplans{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
 .nplan{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:6px 8px;text-align:left;min-height:52px}
-.nplan.on{box-shadow:inset 0 0 0 2px var(--amber);background:#2a2210}.nph{display:flex;align-items:center;gap:5px}.nph b{font-weight:400}
+.nplan.on{box-shadow:inset 0 0 0 2px var(--amber);background:#2a2210}.nph{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.nph .cst2{flex-basis:100%;display:flex;flex-wrap:wrap;gap:2px 8px}.nph b{font-weight:400}
 .npd{font-size:11px;color:var(--dim);line-height:1.4}.nplan[disabled] .npd{color:var(--off)}
 .nres2{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 6px;padding:5px 8px;background:var(--inset,#0e1510);box-shadow:inset 0 0 0 1px var(--line);font-size:12px}
 .nres2 span{display:inline-flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}.nres2 b{font-weight:400}
@@ -978,7 +981,7 @@ body.land #saveMark{right:calc(var(--rail) + 8px);bottom:auto;top:44px}   /* ス
   body:not(.land) #controls>#bSpd .mic,body:not(.land) #controls>#bSpd .pi{display:none}
   body:not(.land) #controls>#bPause .pi{width:12px!important;height:12px!important}
 }
-#fwCv{position:fixed;inset:0;z-index:80;cursor:pointer;background:rgba(4,6,14,.45)}
+#fwSkip{position:fixed;right:16px;bottom:80px;z-index:80;padding:8px 14px;font-size:14px;border:1px solid #c8a070}
 .mkt{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .mkm,.mkr{display:flex;flex-wrap:wrap;gap:4px}.mkm button{flex:1;padding:4px}.mkr button{padding:3px 8px;font-size:12px;display:inline-flex;align-items:center;gap:3px}
 .mkm button.on,.mkr button.on{box-shadow:inset 0 0 0 2px var(--amber);color:var(--amber);background:#2a2210}
@@ -1025,7 +1028,7 @@ body.land #saveMark{right:calc(var(--rail) + 8px);bottom:auto;top:44px}   /* ス
 .ov-res .tnode .tm .cst{display:inline-flex;gap:8px;flex-wrap:wrap;row-gap:2px;min-width:0}.ov-res .tnode .tm{gap:6px}.ov-res .tnode .tm .tt2{flex-shrink:0;align-self:flex-end}   /* 材料が多い研究は折り返す */
 .ov-res .tnode .tm .tt2{color:var(--dim)}
 .ov-res .tnode .tbar{margin-top:3px}
-.ov-res .tnode.key{box-shadow:0 0 0 1px #6d8a72,inset 3px 0 0 var(--amber)}
+.ov-res .tnode.key{box-shadow:0 0 0 1px #6d8a72,inset 3px 0 0 var(--amber)}.ov-res .tnode.prio{box-shadow:0 0 0 2px #f2c84a,0 0 10px rgba(242,200,74,.35)}.ov-res .tnode.prio.sel{box-shadow:0 0 0 2px #f2c84a,0 0 0 4px rgba(255,255,255,.5)}.ov-res .tnode .tpr{font-size:10.5px;color:#f2c84a;font-weight:bold;letter-spacing:1px;margin-bottom:1px}
 .ov-res .tnode.done.key{box-shadow:0 0 0 1px #2f6a3d,inset 3px 0 0 var(--amber)}
 .ov-res .tnode.ready:hover{box-shadow:0 0 0 1px var(--amber)}
 .ov-res .tdet{margin:10px 24px 20px;flex-shrink:0;justify-content:space-between;flex-wrap:wrap}
@@ -4130,8 +4133,37 @@ const VISIT={
          {l:'そのままにする',f:()=>{addMood('赤い月におびえる',-5,2);return '住民はおびえている。幸福度 −5';}}]},
 };
 // 夜の画面の「使う量」：−5 のように書き、琥珀色。足りないときだけ赤（赤は「足りない」の意味なので、ふだんの消費には使わない）
-function useText(c){return Object.keys(c).filter(k=>c[k]).map(k=>{const lack=(S[k]||0)<c[k];return `<span class="use${lack?' lack':''}" title="${RES_NAME[k]||k} ${c[k]}を使う${lack?'（足りない）':''}">${ic(k,12)}−${c[k]}</span>`;}).join('');}
+function useText(c){return Object.keys(c).filter(k=>c[k]).map(k=>{const have=Math.floor(S[k]||0),lack=have<c[k];return `<span class="use${lack?' lack':''}" title="${RES_NAME[k]||k} ${c[k]}を使う（いま ${have}）${lack?'・足りない':''}">${ic(k,12)}−${c[k]}<small class="hv">（いま${have}）</small></span>`;}).join('');}
+// 使う前と後：「金貨 347 → 317」（夜の出来事のポップアップ。2026-11-16 ユーザーの希望：消費するとき今どれくらいあるか見えるように）
+function afterText(c){const ks=Object.keys(c).filter(k=>c[k]);if(!ks.length)return '<span class="muted">使う物はありません</span>';
+  return ks.map(k=>{const have=Math.floor(S[k]||0),lack=have<c[k];return `<span class="aft${lack?' lack':''}">${ic(k,14)}${RES_NAME[k]||k} <b>${have}</b> → <b>${lack?'足りない':have-c[k]}</b></span>`;}).join('');}
 function visitCost(o){return typeof o.cost==='function'?o.cost():(o.cost||{});}
+// 夜の出来事で、リリアが言うこと [表情, せりふ]
+const VISIT_LIL={trav:['normal','寒そうな一家です……。食料を少し分ければ、この街に残ってくれるかもしれません。'],fest:['smile','お祭りの相談です！ 開けば、街のみんなが元気になりますよ。'],shop:['smile','行商人さんです。珍しい品があるかもしれません。金貨の残りに気をつけてくださいね。'],
+  star:['smile','わあ、流れ星です！ 願いごとをしてみますか？'],moon:['panic','領主様……月が赤いです。明日の夜はブラッドムーン。魔物がいつもよりずっと多く来ます。']};
+const INC_LIL={fire:[['panic','領主様、火事です！ 夜警が足りなくて、消すのが遅れてしまいました……'],['relief','小火で済みました……。夜警のみなさんのおかげです！']],rat:[['panic','倉庫がネズミにやられました！ 食料が減っています。'],['relief','ネズミが出ましたけど、夜警さんが追い払ってくれました。']],
+  scout:[['panic','魔物の斥候が街をのぞいていました……。みんな不安がっています。'],['smile','夜警が魔物の斥候を仕留めました！ お手柄です。']],flee:[['panic','暮らしに不満な人が、夜のうちに街を出ていってしまいました……。幸福度を上げないと。'],['normal','街を出ようとした人がいましたが、夜警が引き止めてくれました。']]};
+function lilSay(ex,t){return `<div class="nlil">${lilFace(64,ex)}<div><small>${LIL_NAME}</small><div>${t}</div></div></div>`;}
+// 夜の訪問のポップアップ：夜の画面より先に、出来事だけを大きく出す。選んだら結果を見せて、夜の画面へ
+function showVisit(){const N=S.night;if(!N||!N.visit)return showNight();const v=VISIT[N.visit],L=VISIT_LIL[N.visit]||['normal',''];
+  let h=`<div class="vpop" style="--vc:${v.col}"><div class="vpi">${ui(v.ic,v.col,48)}</div><div><div class="vpk">夜の訪問</div><h2 style="margin:0">${v.name}</h2><div class="nvt">${v.t}</div></div></div>`;
+  h+=N.done?lilSay(N.visit==='moon'?'normal':'smile','わかりました。帳簿につけておきますね。'):lilSay(L[0],L[1]);
+  h+=`<div class="nres2">${['gold','fuel','steel','stone','mat'].map(k=>`<span title="${RES_NAME[k]}">${ic(k,14)}<b>${Math.floor(S[k]||0)}</b></span>`).join('')}<span title="住民">${ic('pop',14)}<b>${S.pop}</b></span><span title="幸福度">${happyIc(14)}<b>${Math.round(S.happy)}</b></span></div>`;
+  if(v.shop){h+=`<div class="nshop">${N.shop.map(id=>{const it=SHOP.find(x=>x.id===id),got=N.bought.includes(id),w=it.ok?it.ok():'';const c={gold:it.g};
+      return `<div class="vop"><div><b>${ui(it.ic,'amber',14)} ${it.n}</b> <span class="muted" style="font-size:12px">${it.d}</span><div class="vaf">${got?'':afterText(c)}</div></div>${got?'<span style="color:var(--green)">買った</span>':`<button data-vbuy="${id}" ${w||!canAfford(c)?'disabled':''} title="${w}">買う</button>`}</div>`;}).join('')}</div>`;
+    if(N.done)h+=`<div class="nvr">${N.done}</div>`;h+=`<div class="nfoot"><button id="vpGo" class="on">夜の画面へ [Enter]</button></div>`;}
+  else if(N.done)h+=`<div class="nvr">${N.done}</div><div class="nfoot"><button id="vpGo" class="on">夜の画面へ [Enter]</button></div>`;
+  else h+=`<div class="vops">${v.ops.map((o,i)=>{const c=visitCost(o),ok=canAfford(c);return `<button class="vop" data-vp="${i}" ${ok?'':'disabled'}><b>${o.l}</b><span class="vaf">${afterText(c)}</span></button>`;}).join('')}</div><div class="nfoot"><button id="vpGo" class="ghost">あとで決める（夜の画面へ）</button></div>`;
+  const card=openOverlay('visit',h,true);
+  document.getElementById('vpGo').onclick=()=>{closeOverlay();};
+  card.querySelectorAll('[data-vp]').forEach(b=>b.onclick=()=>{const o=v.ops[+b.dataset.vp],c=visitCost(o);if(!canAfford(c))return;for(const k in c)S[k]-=c[k];N.done=o.f();log(`${v.name}：${N.done}`,'good');se('click');renderAll();showVisit();});
+  card.querySelectorAll('[data-vbuy]').forEach(b=>b.onclick=()=>{const it=SHOP.find(x=>x.id===b.dataset.vbuy);if(!it||(it.ok&&it.ok())||S.gold<it.g)return;S.gold-=it.g;N.bought.push(it.id);N.done=it.f();log(`行商人から「${it.n}」を買った：${N.done}`,'good');se('upgrade');renderAll();showVisit();});}
+// 夜中の事件のポップアップ（朝の報告の前に出す）。何がどれだけ変わったかを「前 → 後」で
+function showIncident(inc,next){const L=(INC_LIL[inc.k]||[['normal','']])[inc.bad?0:1]||INC_LIL[inc.k][0];
+  const ch=(inc.chg||[]).map(([lab,icon,a,b])=>`<span class="aft${b<a?' lack':''}">${icon}${lab} <b>${a}</b> → <b>${b}</b></span>`).join('');
+  const card=openOverlay('incident',`<div class="vpop" style="--vc:${inc.col}"><div class="vpi">${ui(inc.ic,inc.col,48)}</div><div><div class="vpk">夜中の事件</div><h2 style="margin:0">${inc.n}</h2><div class="nvt">${inc.t}</div></div></div>${lilSay(L[0],L[1])}${ch?`<div class="vaf" style="margin:6px 0">${ch}</div>`:''}<div class="nfoot"><button id="icGo" class="on">朝の報告へ [Enter]</button></div>`,true);
+  S._incNext=next;document.getElementById('icGo').onclick=incNext;}
+function incNext(){const f=S._incNext;S._incNext=null;closeOverlay();if(f)f();}
 // 行商人の品（毎回この中から3つ）
 const SHOP=[
   {id:'book',n:'古い研究書',ic:'research',g:60,d:'研究中のもの1つ、残り −1ターン',ok:()=>S.research.some(r=>r.left>1)?'':'研究中のもの（残り2ターン以上）がない',f:()=>{const r=S.research.filter(x=>x.left>1).sort((a,b)=>b.left-a.left)[0];r.left--;return `「${techOf(r.id).name}」が1ターン早まった`;}},
@@ -4177,6 +4209,7 @@ function showNight(){phaseReset();
   // ボタンを押して描き直すとき、いちばん上に戻らないように（スクロール位置を覚えておく）
   const keepY=S.overlay==='night'?(document.getElementById('ovCard')||{}).scrollTop||0:0;
   if(!S.night)nightStart();const N=S.night;
+  if(N.visit&&!N.done&&!N.popped){N.popped=true;se('bell');showVisit();return;}   /* 夜の訪問は、まずポップアップで（2026-11-16） */
   const list=S.squads.filter(q=>!q.gar);
   let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} ${N.plan==='fest'?'祭りの夜':'静かな夜'}</h2></div>`+nightLilia()+`
   <div class="nres2">${['gold','fuel','steel','stone','iron','ammo','sword','elec','mat'].map(k=>`<span title="${RES_NAME[k]}">${ic(k,14)}<b>${Math.floor(S[k]||0)}</b></span>`).join('')}<span title="待機中の住民">${ic('pop',14)}<b>${S.pop}</b></span></div>
@@ -4249,7 +4282,11 @@ function morning(){
   }
   if(party.length)log(`夜狩りの一団（${party.length}部隊）が戻った：魔核+${tot}`,'good');
   // 事件は、狩りの部隊が戻る前（夜警の数で決まる）
+  const b4={fuel:Math.floor(S.fuel),pop:S.pop,mat:Math.floor(S.mat),happy:Math.round(S.happy)};
   const inc=nightIncident(N);
+  if(inc){inc.k=inc.k||Object.keys(INC_LIL).find(k=>({fire:'ev_fire',rat:'ev_rat',scout:'ev_scout',flee:'ev_flee'})[k]===inc.ic);
+    const af={fuel:Math.floor(S.fuel),pop:S.pop,mat:Math.floor(S.mat),happy:Math.round(S.happy)};
+    inc.chg=[['fuel',RES_NAME.fuel,ic('fuel',14)],['pop','住民',ic('pop',14)],['mat',RES_NAME.mat,ic('mat',14)],['happy','幸福度',happyIc(14)]].filter(([k])=>af[k]!==b4[k]).map(([k,lab,icn])=>[lab,icn,b4[k],af[k]]);}
   for(const q of S.squads)q.hunt=false;
   // 過ごし方の結果
   const p=N.plan;
@@ -4270,7 +4307,8 @@ function morning(){
   if(res.length){h+=`<h3 style="margin:10px 0 4px">夜狩り</h3>`+res.map(r=>`<div class="row" style="align-items:center"><span>${icSvg(r.m,20)} <b>${r.q}</b></span><span>${r.vi}経験 +${r.xp}${r.up?` <b style="color:var(--amber)">「${r.up}」に！</b>`:''}　体力 ${r.hp}%${r.dead?`　<b style="color:var(--red)">戦死 ${r.dead}人</b>`:r.loss>0.25?'　<span style="color:var(--amber)">負傷</span>':'　<span style="color:var(--green)">無事</span>'}</span></div>`).join('')+`<div class="row" style="margin-top:4px"><span class="muted">合計</span><b style="color:#c08aff">魔核 +${tot}</b></div>`;}
   h+=`<div class="row" style="align-items:center;margin-top:8px"><span class="muted">街の機嫌</span><span style="display:inline-flex;align-items:center;gap:6px">${happyIc(24)}<b>${Math.round(S.happy)}</b> ${happyName()}</span></div>`;
   h+=`<div style="text-align:right;margin-top:10px"><button id="mnOk" class="on">閉じる [Enter]</button></div>`;
-  openOverlay('report',h,true);document.getElementById('mnOk').onclick=closeOverlay;
+  const rep=()=>{openOverlay('report',h,true);document.getElementById('mnOk').onclick=closeOverlay;};
+  if(inc)showIncident(inc,rep);else rep();   /* 夜中の事件は、まずポップアップで（2026-11-16） */
 }
 // 試作版だけ：夜の出来事を呼び出して試す（設定メニュー）
 function dbgNight(){
@@ -4282,23 +4320,51 @@ function dbgNight(){
     <h3>今夜の過ごし方</h3><div class="nvops"><button data-df="1">今夜を祭りにする（花火）</button></div>
     <div style="text-align:right;margin-top:10px"><button id="dbgBack">夜の画面に戻る</button></div>`,true);
   const card=document.getElementById('ovCard');
-  card.querySelectorAll('[data-dv]').forEach(b=>b.onclick=()=>{const N=S.night||(nightStart(),S.night);N.visit=b.dataset.dv;N.done=null;N.bought=[];if(N.visit==='shop')N.shop=SHOP.map(x=>x.id).sort(()=>Math.random()-0.5).slice(0,3);se('bell');showNight();});
+  card.querySelectorAll('[data-dv]').forEach(b=>b.onclick=()=>{const N=S.night||(nightStart(),S.night);N.visit=b.dataset.dv;N.done=null;N.popped=false;N.bought=[];if(N.visit==='shop')N.shop=SHOP.map(x=>x.id).sort(()=>Math.random()-0.5).slice(0,3);se('bell');showNight();});
   card.querySelectorAll('[data-di]').forEach(b=>b.onclick=()=>{const N=S.night||(nightStart(),S.night);N.forceInc=b.dataset.di;toast(`「朝へ」を押すと「${b.textContent}」が起きます`,'good');showNight();});
   card.querySelector('[data-df]').onclick=()=>{const N=S.night||(nightStart(),S.night);N.plan='fest';N.fwShown=false;N.visit=null;showNight();};
   document.getElementById('dbgBack').onclick=()=>showNight();}
 setTimeout(()=>{if(GAME_VER.includes('試作版')){const b=document.getElementById('bDbgNight');if(b){b.style.display='';b.onclick=()=>{document.getElementById('more').open=false;dbgNight();};}}},0);   // GAME_VER は後ろで決まるので、読み込み後に見る
-// 祭りの花火（画面いっぱい。タップで終わる）
-function fireworks(ms){const cv=document.createElement('canvas');cv.id='fwCv';document.body.appendChild(cv);const g=cv.getContext('2d');
-  const fit=()=>{cv.width=innerWidth;cv.height=innerHeight;};fit();
-  const COLS=['#ffd060','#ff5a4e','#6fe08a','#62c6d9','#d48cff','#fff2b0'];const P=[],R=[];let t0=performance.now(),last=t0,nextR=0,stop=false;
-  const end=()=>{stop=true;cv.remove();document.body.classList.remove('fwOn');};cv.onclick=end;document.body.classList.add('fwOn');
-  (function loop(now){if(stop)return;const dt=Math.min(0.05,(now-last)/1000);last=now;const el=now-t0;
-    if(el<ms-1200&&now>nextR){R.push({x:cv.width*(0.15+Math.random()*0.7),y:cv.height,vy:-(cv.height*(0.9+Math.random()*0.35)),ty:cv.height*(0.15+Math.random()*0.3),c:COLS[Math.floor(Math.random()*COLS.length)]});nextR=now+280+Math.random()*420;}
-    g.clearRect(0,0,cv.width,cv.height);
-    for(let i=R.length-1;i>=0;i--){const r=R[i];r.y+=r.vy*dt;g.fillStyle='#fff2b0';g.fillRect(r.x-1,r.y,3,6);g.globalAlpha=.35;g.fillRect(r.x-1,r.y+6,3,22);g.globalAlpha=1;
-      if(r.y<=r.ty){R.splice(i,1);se('pop');const n=36+Math.floor(Math.random()*20),sp=120+Math.random()*120;for(let k=0;k<n;k++){const a=k/n*Math.PI*2;P.push({x:r.x,y:r.y,vx:Math.cos(a)*sp*(0.6+Math.random()*0.5),vy:Math.sin(a)*sp*(0.6+Math.random()*0.5),l:1,c:r.c});}}}
-    for(let i=P.length-1;i>=0;i--){const q=P[i];q.vy+=90*dt;q.vx*=0.985;q.x+=q.vx*dt;q.y+=q.vy*dt;q.l-=dt*0.7;if(q.l<=0){P.splice(i,1);continue;}g.fillStyle=q.c;g.globalAlpha=q.l*0.35;g.fillRect(Math.round((q.x-q.vx*0.05)/3)*3,Math.round((q.y-q.vy*0.05)/3)*3,3,3);g.globalAlpha=q.l;g.fillRect(Math.round(q.x/3)*3,Math.round(q.y/3)*3,3,3);}
-    g.globalAlpha=1;if(el>ms&&!P.length&&!R.length){end();return;}requestAnimationFrame(loop);})(t0);}
+// 祭りの花火（2026-11-16 ユーザーの希望）：画面いっぱいではなく、地図の上の街で打ち上げる。城のまわりに住民が集まって、跳ねたり手を振ったりする
+// FW：打ち上げ中の花火（ワールド座標）。FEST_CROWD：祭りの夜に城のまわりに集まる人（その夜のあいだ地図に出る）
+let FW=null,FEST_CROWD=null,FEST_CK='';
+function festOn(){return S&&S.phase==='night'&&!S.waveActive&&S.night&&S.night.plan==='fest';}
+function festCrowd(){const hq=hqOf();if(!hq)return [];const ck=S.turn+'|'+hq.x+'|'+hq.y;if(FEST_CROWD&&FEST_CK===ck)return FEST_CROWD;FEST_CK=ck;
+  const L=[],n=newSz('hq'),cx=hq.x+n/2,cy=hq.y+n/2,CL=['#c84a3a','#3a6ac8','#d8a030','#5a9a4a','#a04ab0','#e0e0d0','#c86a9a'];
+  for(let r=Math.ceil(n/2)+1;r<=Math.ceil(n/2)+5&&L.length<36;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=Math.floor(cx+dx),y=Math.floor(cy+dy);
+    if(x<0||y<0||x>=COLS||y>=ROWS||isBlock(S.ter[y][x])||S.grid[y][x])continue;if(Math.random()<0.45)continue;
+    for(let k=0;k<1+(Math.random()<0.4?1:0)&&L.length<36;k++)L.push({x:(x+0.2+Math.random()*0.6)*T,y:(y+0.3+Math.random()*0.6)*T,c:CL[Math.floor(Math.random()*CL.length)],ph:Math.random()*6,sp:3+Math.random()*4,wave:Math.random()<0.5,kid:Math.random()<0.25,dx:(Math.random()-0.5)*T*0.6});}
+  return FEST_CROWD=L;}
+function drawFestCrowd(an){if(!festOn())return;for(const p of festCrowd()){const j=Math.max(0,Math.sin(an*p.sp+p.ph))*(p.kid?4:3),sx=Math.sin(an*0.8+p.ph)*p.dx,x=Math.round(p.x+sx),y=Math.round(p.y-j),s=p.kid?0.75:1,w=Math.floor(an*5+p.ph)%2;
+    ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(Math.round(p.x+sx)-3,Math.round(p.y)+4,6,2);
+    ctx.fillStyle='#2a2420';ctx.fillRect(x-2,y+1,2,Math.round(3*s));ctx.fillRect(x,y+1,2,Math.round(3*s));
+    ctx.fillStyle=p.c;ctx.fillRect(x-2,y-Math.round(4*s),4,Math.round(5*s));
+    ctx.fillStyle='#f6cfa6';ctx.fillRect(x-1,y-Math.round(4*s)-3,3,3);
+    if(p.wave){ctx.fillStyle='#f6cfa6';if(w)ctx.fillRect(x+2,y-Math.round(4*s)-3,1,3);else ctx.fillRect(x-3,y-Math.round(4*s)-3,1,3);}}}
+// 花火を描く（闇の上に、光を足して）。ワールド座標 → 画面
+function drawFW(){if(!FW)return;const now=performance.now(),dt=Math.min(0.05,(now-FW.last)/1000);FW.last=now;const el=now-FW.t0;
+  const z=cam.z,sx=x=>(x-cam.x)*z,sy=y=>(y-cam.y)*z;
+  if(el<FW.ms-1400&&now>FW.next){const a=FW.ax+(Math.random()-0.5)*FW.span;FW.R.push({x:a,y:FW.ay,vy:-(TU*12+Math.random()*TU*4),ty:FW.ay-TU*(5+Math.random()*3),c:FW.C[Math.floor(Math.random()*FW.C.length)]});FW.next=now+220+Math.random()*380;}
+  ctx.globalCompositeOperation='lighter';
+  for(let i=FW.R.length-1;i>=0;i--){const r=FW.R[i];r.y+=r.vy*dt;ctx.fillStyle='#fff2b0';ctx.fillRect(sx(r.x)-1,sy(r.y),2*Math.max(1,z),5*z);ctx.globalAlpha=.3;ctx.fillRect(sx(r.x)-1,sy(r.y)+5*z,2*Math.max(1,z),16*z);ctx.globalAlpha=1;
+    if(r.y<=r.ty){FW.R.splice(i,1);se('pop');FW.flash=1;FW.G.push({x:r.x,y:r.y,c:r.c,l:1});const n=48+Math.floor(Math.random()*24),sp=TU*(4+Math.random()*2.5);for(let k=0;k<n;k++){const a=k/n*Math.PI*2,m=0.55+Math.random()*0.5;FW.P.push({x:r.x,y:r.y,vx:Math.cos(a)*sp*m,vy:Math.sin(a)*sp*m,l:1,c:Math.random()<0.2?'#fff6d0':r.c});}}}
+  for(let i=FW.G.length-1;i>=0;i--){const q=FW.G[i],x=sx(q.x),y=sy(q.y),r=TU*5*z,g=ctx.createRadialGradient(x,y,2,x,y,r);g.addColorStop(0,q.c);g.addColorStop(1,'rgba(0,0,0,0)');ctx.globalAlpha=q.l*0.45;ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();q.l-=dt*2.2;if(q.l<=0)FW.G.splice(i,1);}
+  ctx.globalAlpha=1;
+  const ps=Math.max(3,Math.round(2.6*z));
+  for(let i=FW.P.length-1;i>=0;i--){const q=FW.P[i];q.vy+=TU*1.6*dt;q.vx*=0.985;q.x+=q.vx*dt;q.y+=q.vy*dt;q.l-=dt*0.7;if(q.l<=0){FW.P.splice(i,1);continue;}
+    ctx.fillStyle=q.c;ctx.globalAlpha=q.l*0.35;ctx.fillRect(sx(q.x-q.vx*0.06),sy(q.y-q.vy*0.06),ps,ps);ctx.globalAlpha=q.l;ctx.fillRect(sx(q.x),sy(q.y),ps,ps);}
+  // 花火が開いた瞬間、街がほんのり明るくなる
+  if(FW.flash>0){const x=sx(FW.ax),y=sy(FW.ay),r=TU*9*z,g=ctx.createRadialGradient(x,y,4,x,y,r);g.addColorStop(0,`rgba(255,220,160,${0.22*FW.flash})`);g.addColorStop(1,'rgba(255,200,120,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();FW.flash=Math.max(0,FW.flash-dt*2.5);}
+  ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+  if(el>FW.ms&&!FW.P.length&&!FW.R.length)festEnd();}
+function festEnd(){if(!FW)return;const back=FW.back,c0=FW.cam0;FW=null;if(c0){cam.x=c0.x;cam.y=c0.y;cam.z=c0.z;try{clampCam();}catch(e){}}const b=document.getElementById('fwSkip');if(b)b.remove();if(S.lights&&S._fwL){S.lights=S.lights.filter(l=>l!==S._fwL);S._fwL=null;}if(back&&S.phase==='night'&&!S.overlay)showNight();}
+// 祭りの夜：夜の画面をいったん閉じて、街の上で花火を打ち上げる。終わったら夜の画面に戻る
+function fireworks(ms){const hq=hqOf();if(!hq||!S)return;if(FW)festEnd();const back=S.overlay==='night';if(back)closeOverlay();
+  const cam0={x:cam.x,y:cam.y,z:cam.z};cam.z=Math.max(cam.z,1.6);cam.x=bcx(hq)-VW/cam.z/2;cam.y=bcy(hq)-VH/cam.z/2-TU*2;try{clampCam();}catch(e){}
+  FW={t0:performance.now(),last:performance.now(),next:0,ms:Math.max(5000,ms||0)+2500,R:[],P:[],G:[],ax:bcx(hq),ay:bcy(hq)-TU,span:TU*10,C:['#ffd060','#ff5a4e','#6fe08a','#62c6d9','#d48cff','#fff2b0'],flash:0,back,cam0};
+  S._fwL=[bcx(hq),bcy(hq)+TU,TU*6];(S.lights=S.lights||[]).push(S._fwL);
+  const b=document.createElement('button');b.id='fwSkip';b.textContent=back?'夜の画面へ戻る':'閉じる';b.onclick=festEnd;document.body.appendChild(b);
+  alertTop('<b>祭りの夜！</b><small>街じゅうの人が城の前に集まって、花火を見上げている</small>','good',2500);}
 function doEndTurn(){
   {const n=digPits();for(const m of S.mines)if(m.kind==='pit'&&m.armed)m.uses=null;if(n)log(`落とし穴 ${n}個を掘り直した（木材−${n*PIT_DIG}）`);}
   if(!S.waveActive&&S.recentLoss)S.recentLoss=Math.max(0,S.recentLoss-1);
@@ -5499,7 +5565,7 @@ function draw(){
   if(S.heat){ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
     for(const b of S.blds){const h=heatOf(b);if(h<=0)continue;const cx=bcx(b),cy=b.y*T+bsz(b)*T-6,lab=heatName(b);
       const w=14;ctx.fillStyle='rgba(0,0,0,.8)';ctx.fillRect(cx-w/2,cy-6,w,12);ctx.fillStyle=h<=0?'#9fb59f':h<=1?'#ffd27a':h<=2?'#ff9a5a':'#ff5a4e';ctx.fillText(lab,cx,cy+.5);}}
-  drawPorters(an);drawLilia(an);
+  drawPorters(an);drawLilia(an);drawFestCrowd(an);
   drawGuidePing(an);
   for(const s of S.squads){
     if(s.gar)continue;
@@ -5669,6 +5735,7 @@ function draw(){
   // ===== 画面座標での表示 =====
   ctx.setTransform(1,0,0,1,0,0);
   if(S.waveActive||S.phase==='night')drawNight(an);
+  drawFW();
   if(S.mapId==='s')drawSnow(an);
   // 襲撃方面の警告（画面の端に固定表示）
   {const w2=S.waveActive?S.cur:S.next;
@@ -6454,6 +6521,8 @@ document.addEventListener('keydown',ev=>{
   if(S.overlay==='report'&&(ev.key==='Enter'||ev.key==='Escape'||ev.code==='Space')){ev.preventDefault();closeOverlay();return;}
   if(S.overlay==='confirm'&&ev.key==='Escape'){closeOverlay();return;}
   if(S.overlay==='night'&&ev.key==='Enter'){ev.preventDefault();closeOverlay();morning();return;}
+  if(S.overlay==='visit'&&(ev.key==='Enter'||ev.key==='Escape')){ev.preventDefault();closeOverlay();return;}
+  if(S.overlay==='incident'&&(ev.key==='Enter'||ev.key==='Escape'||ev.code==='Space')){ev.preventDefault();incNext();return;}
   if(!S.overlay&&ev.key==='Escape'&&S.aimNaval){S.aimNaval=false;return;}
   if(!S.overlay&&(ev.key==='v'||ev.key==='V')){toggleNaval();return;}
   if(!S.overlay&&(ev.key==='z'||ev.key==='Z')){toggleFull();return;}
@@ -6491,7 +6560,7 @@ document.getElementById('bSave').onclick=()=>{if(!saveGame()){toast(S.waveActive
 document.querySelector('#more .moreBody').addEventListener('click',e=>{if(e.target.closest('button'))document.getElementById('more').open=false;});
 document.getElementById('bTitle').onclick=()=>{if(canSave())saveGame(true);showTitle();};
 
-document.getElementById('bHist').onclick=()=>{if(S.overlay==='hist')closeOverlay();else showHist();};
+document.getElementById('bHist').onclick=()=>{if(S.overlay==='hist')closeOverlay();else lilLoad('記録をまとめています',showHist);};
 function toggleLv(){setView(S.showLv?'n':'lv');}
 document.getElementById('bLegend').onclick=()=>showLegend();
 document.getElementById('bRetry').onclick=()=>showRetry();
@@ -7161,7 +7230,7 @@ function openOverlay(kind,html,wide){
 // 中のスクロールする箱を、描き直したあとでも見つけられるように「クラス名と、同じクラスの何番目か」で覚える
 function innerKey(e,root){const c=e.className&&typeof e.className==='string'?e.className.split(' ')[0]:e.tagName;const all=[...root.querySelectorAll(e.className&&typeof e.className==='string'?'.'+c:c)];return [c,all.indexOf(e)];}
 function findInner(k,root){const [c,i]=k;try{return root.querySelectorAll(/^[A-Z]+$/.test(c)?c:'.'+c)[i]||null;}catch(e){return null;}}
-function closeOverlay(){const was=S&&S.overlay;if(S)S.overlay=null;if(was==='res'&&S.resFromNight){S.resFromNight=false;if(S.phase==='night'&&!S.waveActive)setTimeout(()=>{if(!S.overlay)showNight();},0);}if(was==='report'&&S.phase==='night'&&S.nightPending){S.nightPending=false;setTimeout(showNight,0);}document.getElementById('overlay').style.display='none';document.body.classList.remove('ov');}
+function closeOverlay(){const was=S&&S.overlay;if(S)S.overlay=null;if(was==='res'&&S.resFromNight){S.resFromNight=false;if(S.phase==='night'&&!S.waveActive)setTimeout(()=>{if(!S.overlay)showNight();},0);}if(was==='visit'&&S.phase==='night'&&!S.waveActive)setTimeout(()=>{if(!S.overlay)showNight();},0);if(was==='report'&&S.phase==='night'&&S.nightPending){S.nightPending=false;setTimeout(showNight,0);}document.getElementById('overlay').style.display='none';document.body.classList.remove('ov');}
 // ===== モンスター図鑑 =====
 const DEX_ORDER=['swarm','charger','gobarcher','spitter','grappler','troll','harpy','heavy','wyvern','treant','eltreant','shogre','maneater','vampire','ghoul','golem','wolf','tiger','mammoth','redcap','werewolf','king','grove'];
 function dexFirst(){// このマップで初めて出てくる襲撃（genWave の決まりから）
@@ -7263,6 +7332,8 @@ function resOrder(list){// 同じランク内で前提→派生の順に並べ�
   for(const t of list)if(!(t.pre||[]).some(p=>ids.has(p)))walk(t,0);
   for(const t of list)if(!seen.has(t.id)){seen.add(t.id);out.push([t,1]);}
   return out;}
+// 優先して進めたい研究（2026-11-16 ユーザーの希望）：新しい素材を集める施設を解放する研究と、斥候（偵察）。各ランクの列のいちばん上に、黄色の枠で出す（完了したら普通に戻す）
+const RES_PRIO={coalt:'新しい素材：石炭',aethert:'新しい素材：エーテル',goldt:'新しい素材：金',smeltt:'新しい素材：合金',mitht:'新しい素材：聖銀',scout:'偵察：敵の数と種類が分かる',scouting:'斥候：駐屯地を探せる'};
 function showResearch(){
   if(S&&S.waveActive){if(S.overlay==='res')closeOverlay();se('error');toast('襲撃中は研究できません。朝になったら研究しましょう','warn');return;}
   // 開いたまま描き直すときは、カードと各列のスクロール位置を保つ（押すたびに一番上へ戻らないように）
@@ -7288,14 +7359,14 @@ function showResearch(){
     const mapLock=rk>mapMaxTier();
     const cond=rk<=1?`<span class="cond ok">${ui('check','green',12)}解放済</span>`:open&&!mapLock?`<span class="cond ok">${ui('check','green',12)}城Lv${rk} で解放</span>`:mapLock?`<span class="cond">${ui('lock','dim',12)}次のマップから</span>`:`<span class="cond">${ui('lock','dim',12)}城Lv${rk} で解放</span>`;
     h+=`<div class="rankcol${open&&!mapLock?'':' locked'}"><div class="rankhead">ランク ${RN[rk]}${cond}</div><div class="rcards">`;
-    const isKc=x=>x.gate||/改築/.test(x.name);
-    for(const [t,dep] of inR.filter(isKc).map(x=>[x,0]).concat(resOrder(inR.filter(x=>!isKc(x))))){   /* 改築・ランク解放の研究は列のいちばん上に（気づきやすく。2026-11-14） */
+    const isPr=x=>!!RES_PRIO[x.id]&&techState(x)!=='done',isKc=x=>!isPr(x)&&(x.gate||/改築/.test(x.name));
+    for(const [t,dep] of inR.filter(isPr).map(x=>[x,0]).concat(inR.filter(isKc).map(x=>[x,0]),resOrder(inR.filter(x=>!isKc(x)&&!isPr(x))))){   /* 優先する研究（新しい素材・斥候。2026-11-16）→ 改築・ランク解放 → ほか の順。優先する研究は黄色の枠 */
       const st=techState(t),r=S.research.find(x=>x.id===t.id),Lv=lvl(t.id),mx=tMax(t);
       const stTxt=st==='done'?'<span class="s done">完了</span>':st==='active'?`<span class="s act">研究中 ${r.total-r.left}/${r.total}T</span>`:st==='excluded'?'<span class="s">選択不可</span>':st==='locked'?'<span class="s">要 前提</span>':st==='maplock'?'<span class="s">次のマップから</span>':'';
       if(t.gate&&st==='locked')t.line=`ランク${RN[t.gate-1]}の研究 合計Lv${rankSum(cat,t.gate-1)}/${gateNeed(cat,t.gate)}`;else if(t.gate)t.line='';
       const outside=(t.pre||[]).filter(x=>!L.inTab(x));
-      h+=`<div class="tnode ${st} ${t.excl?'excl':''} ${t.id===S.resSel?'sel':''} ${t.key||t.gate?'key':''}" data-node="${t.id}" style="margin-left:${dep*18}px">
-        <div class="tt"><b>${t.icon?`<span class="tic">${icSvg(t.icon,16)}</span>`:''}${t.name}</b>${stTxt}${mx>1?`<span class="lv">Lv ${Lv}/${mx}</span>`:''}</div>
+      h+=`<div class="tnode ${st} ${t.excl?'excl':''} ${t.id===S.resSel?'sel':''} ${t.key||t.gate?'key':''} ${isPr(t)?'prio':''}" data-node="${t.id}" style="margin-left:${dep*18}px">
+        ${isPr(t)?`<div class="tpr">★ ${RES_PRIO[t.id]}</div>`:''}<div class="tt"><b>${t.icon?`<span class="tic">${icSvg(t.icon,16)}</span>`:''}${t.name}</b>${stTxt}${mx>1?`<span class="lv">Lv ${Lv}/${mx}</span>`:''}</div>
         <div class="te">${t.eff||''}</div>
         ${t.line||t.excl||outside.length?`<div class="tl">${t.line?t.line:''}${t.excl?' <span style="color:var(--amber)">分岐</span>':''}${outside.length?' 要：'+outside.map(x=>techOf(x).name).join('・'):''}</div>`:''}
         <div class="tm"><span class="cst">${st==='done'?'':costText(techCost(t))}</span><span class="tt2">${techTurns(t)}T</span></div>
@@ -7415,7 +7486,7 @@ function statGrid(L){return `<div class="statgrid">${L.map(([lab,v,col])=>`<div>
 function histTable(){const H=S.hist||[];if(!H.length)return '<div class="muted">記録なし</div>';
   const c=(lab,v,col)=>`<div><small>${lab}</small><span style="${col?'color:'+col:''}">${v}</span></div>`;
   return `<div class="rtable">`+H.map(r=>`<div class="rw${r.ok?'':' lost'}"><div><span>第${r.n}襲撃${r.blood?' <span class="bm" title="ブラッドムーン">血月</span>':''}${r.ok?'':' <span style="color:var(--red)">陥落</span>'}</span><small>${r.day}日目</small></div>${c('撃破',r.kills)}${c('戦死',r.kia+(r.heroes?`<small style="color:var(--red)"> 英雄${r.heroes}</small>`:''),r.kia?'var(--red)':'var(--off)')}${c('施設損失',r.bld,r.bld?'var(--amber)':'var(--off)')}${c('魔核','+'+r.mat,'var(--mat)')}${c('住民',r.pop)}</div>`).join('')+`</div>`;}
-function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':'lose');auMusicFor();delSave();if(!win)recordWave(S.waveStart,false);}
+function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':'lose');auMusicFor();delSave();if(!win)recordWave(S.waveStart,false);try{worldAdd(win);}catch(e){}}
   const fallen=S.fallen.map(c=>`${cmdName(c)}（${c.spec} Lv${c.lv}・撃破${c.kills}・第${c.diedWave}襲撃 ${c.cause}）`).join('、')||'なし';
   const matSum=(S.hist||[]).reduce((a,r)=>a+Math.max(0,r.mat||0),0);
   const ck=(S.baseLv||1)===2?'castle':'castle'+Math.max(1,Math.min(5,S.baseLv||1));
@@ -7427,12 +7498,12 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   <div class="ebtns">${!win&&ckptInfo()?`<button id="ovCk" class="primary" title="${ckptInfo().turn}日目・第${ckptInfo().wave}襲撃をしのいだあとから。次の襲撃に備え直せます">第${ckptInfo().wave}襲撃のあとからやり直す</button>`:''}<button id="ovTl" class="${!win&&ckptInfo()?'':'primary'}">▶ 街の成長を見る</button><button id="ovRec">街の記録</button><button id="ovReview">街と研究を振り返る</button>${win?'<button id="ovEndless">防衛を続行（エンドレス）</button>':''}<button id="ovRestart" class="ghost">最初から</button></div>`);
   document.getElementById('ovReview').onclick=()=>{S.review=true;closeOverlay();renderAll();renderReviewBar();};
   {const ck=document.getElementById('ovCk');if(ck)ck.onclick=()=>{withLoading('やり直しの準備をしています…',()=>{if(!loadCkpt())toast('やり直しのデータを読み込めませんでした','bad');});};}
-  document.getElementById('ovTl').onclick=()=>{closeOverlay();playTimelapse(()=>showEnd(win));};document.getElementById('ovRec').onclick=()=>{closeOverlay();showHist();};
+  document.getElementById('ovTl').onclick=()=>{closeOverlay();playTimelapse(()=>showEnd(win));};document.getElementById('ovRec').onclick=()=>{closeOverlay();lilLoad('記録をまとめています',showHist);};
   document.getElementById('ovRestart').onclick=()=>{closeOverlay();document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState(S.mode);renderAll();auMusicFor();};
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.8.4 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.9 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7505,8 +7576,45 @@ function pixelLogo(){const lines=['NIGHT','DEFENSE'],P=7,GAP=1,LG=3;const px=[];
 // 重い処理の前に読み込み画面を出す（画面が描かれてから処理する）
 function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn();return;}document.getElementById('bootMsg').textContent=msg||'読み込み中…';b.classList.remove('off');
   requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();}finally{b.classList.add('off');}}));}
+// リリアの読み込み画面（2026-11-16 ユーザーの希望）：記録・歴史を開くとき、書斎で帳簿をつけるリリアと「記録をまとめています…」
+function lilLoad(msg,fn,ms){let el=document.getElementById('lilLoad');if(!el){el=document.createElement('div');el.id='lilLoad';document.body.appendChild(el);}
+  el.innerHTML=`<div class="llBox"><div class="lslow">${artPx('lilia_art','','')}</div><div class="llMsg">${lilFace(32,'normal')}<span>${msg}<i>…</i></span></div><div class="llBar"><b></b></div></div>`;el.className='on';
+  setTimeout(()=>{try{fn();}finally{el.className='';}},ms||900);}
+// ===== 世界の歴史（2026-11-16）：これまでに治めた街の記録。ゲームの終わり（勝ち・負け）に1つずつ残す。セーブとは別に残る =====
+const WORLD_KEY=SAVE_KEY+'_world';
+function worldList(){try{return JSON.parse(localStorage.getItem(WORLD_KEY)||'[]');}catch(e){return [];}}
+function worldAdd(win){if(!S||S.mode!=='campaign'||S.ex)return;if(!S.gid)S.gid=Date.now();
+  const r={id:S.gid,town:townName(),map:S.mapId,date:Date.now(),win:!!win,wave:S.wave,fin:finalWave(),day:S.turn,kills:S.kills,kia:S.kia,pop:popTotal(),bl:S.baseLv||1,tech:TECH.filter(t=>has(t.id)).length,nb:S.blds.filter(b=>!(b.bt>0)).length,
+    heroes:S.cmds.map(c=>cmdName(c)),fallen:S.fallen.map(c=>({n:cmdName(c),w:c.diedWave,lv:c.lv})),h:(S.hist||[]).map(x=>[x.n,x.ok?1:0,x.kills||0,x.kia||0,x.blood?1:0,x.bld||0])};
+  const L=worldList().filter(x=>x.id!==r.id);L.unshift(r);try{localStorage.setItem(WORLD_KEY,JSON.stringify(L.slice(0,60)));}catch(e){}}
+function worldDate(t){const d=new Date(t);return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;}
+function worldSay(L,sv){if(!L.length&&!sv)return ['normal','まだ、この世界の歴史は白紙です。領主様の最初の街の物語を、これから一緒に書きましょう！'];
+  const w=L.filter(x=>x.win).length;if(!L.length)return ['smile','領主様が今治めている街のことも、毎日ちゃんと帳簿につけていますよ。'];
+  return w?['smile',`これまでに${L.length}つの街を治めて、${w}つの街を守りきりました。どの街のことも、ちゃんと書き残してあります！`]:['normal',`これまでに${L.length}つの街を治めました。守りきれなかった街のことも、忘れないように書き残してあります。`];}
+function showWorld(){const L=worldList(),sv=saveInfo();const [ex,say]=worldSay(L,sv);
+  const mn=k=>MAPS[k]?MAPS[k].name:'';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>世界の歴史</h2><button id="wdBack">タイトルへ</button></div>
+  <div class="nlil">${lilFace(64,ex)}<div><small>${LIL_NAME}</small><div>${say}</div></div></div><div class="wdL">`;
+  if(sv&&sv.name)h+=`<div class="wd now"><div class="wdh"><b>${sv.name}</b><span class="wdr" style="color:#62c6d9">治めている途中</span></div><div class="muted">第${(sv.wave||0)+1}襲撃の前　・「つづきから」で続きを書けます</div></div>`;
+  h+=L.map((r,i)=>`<button class="wd" data-wd="${i}"><div class="wdh"><b>${r.town}</b><span class="wdr" style="color:${r.win?'var(--green)':'var(--red)'}">${r.win?`第${r.fin}襲撃まで守りきった`:`第${r.wave}襲撃で陥落`}</span></div><div class="muted">${mn(r.map)}　・　${r.day}日　・　撃破 ${r.kills}　・　人口 ${r.pop}　・　城Lv${r.bl}　・　${worldDate(r.date)}</div></button>`).join('')+`</div>`;
+  openOverlay('title',h,true);
+  document.getElementById('wdBack').onclick=showTitle;
+  document.querySelectorAll('[data-wd]').forEach(b=>b.onclick=()=>{se('click');showWorldOne(L[+b.dataset.wd]);});}
+function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
+  const say=r.win?['smile',`${r.town}は、${r.day}日のあいだ魔物の夜をしのいで、第${r.fin}襲撃まで守りきりました。立派な街でした！`]:['normal',`${r.town}は、第${r.wave}襲撃の夜に城が落ちました。${r.day}日のあいだ、みんなでよく戦いました。`];
+  const c=(lab,v,col)=>`<div><small>${lab}</small><span style="${col?'color:'+col:''}">${v}</span></div>`;
+  const tb=(r.h||[]).length?`<div class="rtable">`+r.h.map(([n,ok,k,d,bl,lb])=>`<div class="rw${ok?'':' lost'}"><div><span>第${n}襲撃${bl?' <span class="bm" title="ブラッドムーン">血月</span>':''}${ok?'':' <span style="color:var(--red)">陥落</span>'}</span></div>${c('撃破',k)}${c('戦死',d,d?'var(--red)':'var(--off)')}${c('施設損失',lb,lb?'var(--amber)':'var(--off)')}</div>`).join('')+`</div>`:'<div class="muted">襲撃の記録なし</div>';
+  const fl=(r.fallen||[]).map(f=>`${f.n}（Lv${f.lv}・第${f.w}襲撃）`).join('、')||'なし';
+  openOverlay('title',`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>${r.town}の歴史</h2><button id="wdBack">一覧へ</button></div>
+   <div class="nlil">${lilFace(64,say[0])}<div><small>${LIL_NAME}</small><div>${say[1]}</div></div></div>
+   <div class="muted" style="margin:0 0 6px">${mn}　・　${worldDate(r.date)}</div>
+   ${statGrid([['日数',r.day],['撃破数',r.kills],['戦死者',r.kia,'var(--red)'],['人口',r.pop],['城Lv',r.bl],['研究',r.tech],['施設',r.nb]])}
+   <div class="efallen"><span>最後まで仕えた英雄</span>${(r.heroes||[]).join('、')||'なし'}</div><div class="efallen"><span>戦没英雄</span>${fl}</div>
+   <div class="ehist"><span>襲撃ごとの記録</span></div><div style="max-height:40vh;overflow:auto">${tb}</div>`,true);
+  document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で（★ 何が増えるかつき）','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
  ['1.8.4','2026-11-16',['上に出るお知らせが消えたあとも、その場所が押せたままになっていて、複数の部隊をまとめて「固守」などに切り替えるボタンが効かないことがあったのを直した（そのとき、お知らせの行き先の施設が光っていた）']],
  ['1.8.3','2026-11-16',['<b>書記官リリアの絵</b>ができた：話す内容に合わせて表情が変わる（ふつう・笑顔・あせり・ほっとした顔）。街の名前を決める画面に、ろうそくの書斎で帳簿をつけるリリア。チュートリアルのあいだ、昼は城のそばをリリアが歩く']],
  ['1.8.2','2026-11-16',['チュートリアル：「人」のミッションで、右の「街」のタブで生産と収支（税・給金）を見られることを案内（画面の絵つき）','チュートリアル：「英雄と熟練度」のミッションで、街にいる英雄の見かた（軍事 → 英雄）と配属のしかたを案内（画面の絵つき）','チュートリアル：「兵士」のミッションの農兵を2部隊から1部隊に（最初の襲撃までに武器工房が間に合うように）','「街」のタブなどの数字を小数なしに']],
@@ -7543,6 +7651,7 @@ function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.a
     <div class="tgrid">
       <button id="tDex">モンスター図鑑</button>
       <button id="tUpd">アップデート情報${updSeen()?'':' <b style="color:#f2b33d">NEW</b>'}</button>
+      <button id="tWorld">世界の歴史</button>
     </div>
     <div class="tcorner"><button id="tHelp" title="遊び方">？ 遊び方</button><button id="tSet" title="設定">⚙</button></div>
     <div class="tsetP" hidden>
@@ -7571,6 +7680,7 @@ function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.a
    const ms=document.getElementById('tMusic');if(ms)ms.onclick=()=>{if(typeof window.openMusic==='function')window.openMusic();else toast('音楽室を読み込めませんでした','bad');};}
   document.getElementById('tDex').onclick=()=>{se('click');showDex(true);};
   document.getElementById('tUpd').onclick=()=>{se('click');showUpdates();};
+  document.getElementById('tWorld').onclick=()=>{se('click');lilLoad('歴史の帳簿をひらいています',showWorld);};
   {const ti=document.getElementById('tInstall');if(ti)ti.onclick=()=>doInstall(true);}
   document.getElementById('tCredit').onclick=()=>openOverlay('title',`<h2>クレジット</h2><div style="line-height:1.9">${GAME_TITLE} — ${GAME_SUB}　ver ${GAME_VER}<br>企画・ゲームデザイン：ねぎらーめん<br>プログラム・ドット絵・効果音・音楽：Claude と共同制作<br><span class="muted">すべてのドット絵と音はこのゲームのために作られたものです</span></div><div style="margin-top:12px"><button id="crBack">タイトルへ</button></div>`)&&(document.getElementById('crBack').onclick=showTitle);}
 // 画面の上のお知らせ（2026-11-16）：英雄の戦死・城への攻撃・山場（ブラッドムーン・ボス）の予告。通信ログに加えて、上に大きく出す
@@ -7580,7 +7690,7 @@ ALERT_K.news=['#f2c84a','✦'];
 const NEWSQ=[];function newsTop(title,sub,icon,go){NEWSQ.push({title,sub,icon,go});if(NEWSQ.length===1)newsNext();}
 function newsNext(){const n=NEWSQ[0];if(!n)return;alertTop(`<b>${n.title}</b><small>${n.sub}</small>`,'news',5500,n.icon,()=>{if(n.go)n.go();});setTimeout(()=>{NEWSQ.shift();newsNext();},5800);}
 function alertTop(msg,kind,ms,icon,onclick){let el=document.getElementById('alertTop');if(!el){el=document.createElement('div');el.id='alertTop';document.body.appendChild(el);}
-  const [col,ico]=ALERT_K[kind]||ALERT_K.castle;el.style.setProperty('--ac',col);el.innerHTML=`${icon?`<em>${icon}</em>`:`<i>${ico}</i>`}<span>${msg}</span>`;el.style.pointerEvents=onclick?'auto':'none';el.style.cursor=onclick?'pointer':'';el.onclick=onclick?()=>{el.className='';onclick();}:null;try{const r=document.getElementById('cv').getBoundingClientRect();el.style.top=Math.max(8,Math.round(r.top+12))+'px';el.style.left=Math.round(r.left+r.width/2)+'px';}catch(e){}el.className='on';
+  const [col,ico]=ALERT_K[kind]||ALERT_K.castle;el.style.setProperty('--ac',col);el.innerHTML=`${icon?`<em>${icon}</em>`:`<i>${ico}</i>`}<span>${msg}</span>`;el.style.pointerEvents=onclick?'auto':'none';el.style.cursor=onclick?'pointer':'';el.onclick=onclick?()=>{el.className='';onclick();}:null;try{const r=document.getElementById('cv').getBoundingClientRect();el.style.top=Math.max(8,Math.round(r.top+12))+'px';el.style.left='50%';}catch(e){}el.className='on';
   clearTimeout(el._t);el._t=setTimeout(()=>{el.className='';},ms||4500);}
 function confirmNew(){return true;}
 // 番外編「偵察と駐屯地攻め」（2026-11-16）：廃村エルムの地図で、街が育ったところから始める
@@ -7701,7 +7811,7 @@ const MISSIONS=[
   steps:[
   {t:'城をLv2にする',c:()=>S.baseLv||1,n:2,castle:2,d:'城をクリックして、選択中パネルの「強化」。'},
   {t:'ランクⅡの研究を1つ完了する',c:()=>TECH.filter(t=>techRank(t)===2&&has(t.id)).length,n:1,hi:'#bRes',d:'研究画面の「ランクⅡ」の列です。新しい施設や素材が並んでいます。'}],
-  done:'これで、わたしからお教えする基本は全部です、領主様！ 城を上げる → 新しいランクの研究、が強くなる近道です。あとは6回の襲撃を守りきってください。……領主様なら、きっと大丈夫です！'},
+  done:()=>`これで、わたしからお教えする基本は全部です、領主様！ 城を上げる → 新しいランクの研究、が強くなる近道です。あとは第${finalWave()}襲撃まで、${Math.max(1,finalWave()-(S.wave||0))}回の襲撃を守りきってください。……領主様なら、きっと大丈夫です！`},
  // ===== 番外編：偵察と駐屯地攻め（直前の状態から始める） =====
  {id:'scout',name:'偵察',
   say:['番外編へようこそ、領主様！ ここでは、街がもう育ったところから始めます。','魔物たちは、街とアビスのあいだの<b>駐屯地</b>で、次の襲撃を待っています。','研究「斥候」をすると、駐屯地のだいたいの場所が地図に出ます。そのあと研究「斥候隊」で、斥候の部隊を作れるようになります。','斥候は足が速く、遠くまで見えます。赤い点線の円へ向かわせて、駐屯地を見つけましょう！{ART:archer}'],
