@@ -7,7 +7,6 @@ s=open(src+'/index.html',encoding='utf-8').read()
 ver=re.search(r"GAME_VER='([^']*) 試作版'",s).group(1)
 for a,b in [("const SAVE_KEY='abyss_save_v3_proto',","const SAVE_KEY='abyss_save_v3',"),
             (f"GAME_VER='{ver} 試作版'",f"GAME_VER='{ver}'"),
-            ("location.href='../v0.9/index.html';","location.href='v0.9/index.html';"),
             ('<meta name="apple-mobile-web-app-title" content="ND試作版">','<meta name="apple-mobile-web-app-title" content="ナイトディフェンス">'),
             ('<title>ナイトディフェンス（試作版）</title>\n<meta name="robots" content="noindex">','<title>ナイトディフェンス — シミュレーション型ディフェンスゲーム</title>')]:
     assert s.count(a)==1,a; s=s.replace(a,b)
