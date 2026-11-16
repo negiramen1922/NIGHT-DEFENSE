@@ -320,7 +320,7 @@ body.fullmap #right.open{transform:none}
 #guide .gtabs{display:flex;gap:4px;margin-bottom:3px}#guide .gtabs button{flex:1;padding:3px 4px;font-size:12px}#guide .gtabs button.on{background:#c8a070;color:#111;font-weight:bold}
 #guide .lil{display:flex;gap:8px;align-items:flex-start;background:#1e1a12;border:1px solid #5a4a2a;padding:6px;margin:2px 0 6px}#guide .lil .lilf{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}#guide .lsay{flex:1;line-height:1.6;color:#f0e4c8;font-size:12.5px}#guide .lsay small{display:block;color:#e8c070;font-size:10.5px;letter-spacing:1px}#guide .lbtn{text-align:right;margin-top:4px}#guide .lbtn button{padding:3px 10px}#guide .lbtn #lDone{width:100%;white-space:normal}#guide .gh .lilf{flex-shrink:0}#guide .gfoot button{font-size:11px;padding:2px 6px}
 #alertTop{position:fixed;left:50%;top:84px;transform:translate(-50%,-20px);z-index:60;display:flex;align-items:center;gap:10px;padding:8px 18px;background:rgba(14,10,10,.94);border:2px solid var(--ac,#ff8a3a);box-shadow:0 0 18px var(--ac,#ff8a3a),0 4px 14px #000c;color:#fff;font-size:16px;font-weight:bold;letter-spacing:1px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:calc(100vw - 24px);text-align:center}
-#alertTop.on{opacity:1;transform:translate(-50%,0)}#alertTop i{font-style:normal;font-size:20px;color:var(--ac)}
+#alertTop.on{opacity:1;transform:translate(-50%,0)}#alertTop span b{display:block}#alertTop span small{display:block;font-size:12px;font-weight:normal;color:#e8dcc0;letter-spacing:0;margin-top:2px}#alertTop em{font-style:normal;line-height:0;background:#1e1a12;border:1px solid #6a5a3a;padding:3px}#alertTop i{font-style:normal;font-size:20px;color:var(--ac)}
 body.land #alertTop{top:44px;font-size:14px;padding:6px 12px}
 #guide .gnote{font-size:10.5px;color:#8a8068;margin:2px 0 3px}
 #guide .gr{display:flex;align-items:center;gap:5px;padding:3px 4px;border-left:3px solid #8a6a3a;background:#17140e;margin:2px 0;cursor:pointer}
@@ -1829,7 +1829,7 @@ Object.assign(B,{
   how:    {name:'投石機',glyph:'投',hp:240,heat:1,cost:{steel:100,stone:20,gold:40},pop:4,power:0,spec:'守備',grp:'def',desc:'石材を撃ち出す曲射兵器。城壁の向こうへ範囲攻撃。最低射程4マス',req:'catapult',range:8,minRange:2,dmg:70,rate:3.0,splash:1.6,ammoUse:2,ammoKey:'stone'},
   tower:  {name:'物見櫓',glyph:'櫓',hp:900,heat:1,cost:{steel:80,stone:60,gold:20},pop:2,power:0,spec:'弓兵',grp:'def',desc:'石積みの見張り櫓（直射）。射手（人員）を配置すると、高所からとても長い射程で連射し、空の敵も撃てる。1発は軽い。城壁並みに頑丈で、壁の列に組み込める（柵・石の壁の上に建てると置き換わる）。壁の上には載せられない。周囲を少し照らす',range:9,towerWall:true,dmg:15,rate:0.5,ammoUse:0.25,direct:true,antiAir:true},
 });
-B.lab.pop=0;B.lab.desc='研究員の詰め所。1つにつき研究員の上限 +3人（Lv2で+5人・Lv3で+8人）。研究員は待機中の住民から研究のたびに就く';
+B.well.req='aethert';B.lab.pop=3;B.lab.desc='研究員の詰め所。建てると住民3人が研究員としてつく（バリスタの射手と同じ）。研究員 +3人（改築で+5人・+8人）。城にも初めから研究員が5人いる';   /* 2026-11-16：研究のたびに待機中の住民を使うのをやめ、研究室に決まった人数がつく形に */
 B.gate={name:'門',glyph:'門',hp:140,heat:0,cost:{steel:40,stone:20},pop:0,power:0,spec:'工兵',grp:'def',desc:'味方だけが通れる出入り口。壁は敵も味方も通れないので、部隊は門から出入りする。敵には壁と同じで、壊されるまで通れない。柵や壁の列の上に建てると置き換わる'};
 B.hisou={name:'風船爆弾',glyph:'風',hp:300,heat:1,cost:{steel:80,stone:30,iron:30,gold:40},pop:3,power:0,spec:'守備',grp:'def',desc:'風船をつけた爆弾を打ち上げる。爆弾はふわふわと魔物を追いかけ、近づくと爆発して周りを吹き飛ばす。空の敵にも地上の敵にも効く。壁や建物は越えて飛ぶ（山は越えられない）。1発ごとに火薬1',req:'hisousha',range:8,dmg:130,rate:3,splash:1.2,balloon:true,antiAir:true,ammoKey:'powder',ammoUse:1};
 B.magetower={name:'メイジの塔',glyph:'魔',hp:500,heat:1,cost:{steel:60,stone:60,elec:20},pop:3,power:0,spec:'守備',grp:'def',desc:'魔術師（人員）を配置して使う塔。高所から魔術の火の玉を撃ち、当たった所の周りを焼く（範囲攻撃）。空の敵も撃てる。エーテルを使う',req:'magetower',range:5,dmg:100,rate:2.5,splash:1.1,flat:true,direct:true,ammoUse:0.5,ammoKey:'elec',antiAir:true};
@@ -2195,6 +2195,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館・前哨砦・所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
  set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'兵士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
+ set('aethert',{cat:'生産',tier:2,name:'エーテル採掘',cost:{steel:60,stone:30,gold:20},t:2,pre:[],icon:'well',eff:'「エーテル採掘所」を建設できる（龍脈の泉からエーテルを採る）'});   /* 2026-11-16：エーテル採掘所は初めからは建てられない */
  set('coalt',{cat:'生産',tier:2,name:'炭鉱',cost:{steel:60,stone:30},t:2,pre:[],icon:'coalmine',eff:'「炭鉱」を建設できる（石炭を掘る）'});
  set('goldt',{cat:'生産',tier:3,name:'金鉱',cost:{steel:80,stone:40,gold:40},t:3,pre:[],icon:'goldmine',eff:'「金鉱」を建設できる（素材の金を掘る。金貨ではない）'});
  set('smeltt',{cat:'生産',tier:3,name:'精錬所',cost:{steel:100,stone:60,iron:30,gold:60},t:3,pre:['goldt'],icon:'smelter',eff:'「精錬所」を建設できる（鉄・金・石炭から合金を作る）'});
@@ -2595,7 +2596,7 @@ let CUR_MAP='f';
 const MAPS={
   'm':{name:'山上の砦ハルデン',diff:'むずかしめ',desc:'山々に囲まれた高い盆地の砦。畑にできる平地と森が少なく、食料と木材が乏しい。石と鉄は豊富'},
   's':{name:'雪原の関所ヴィンター',diff:'むずかしい',desc:'凍てつく雪原の関所。川が天然の堀だが、冬が深まると凍りつく。吹雪の夜は明かりが届かない'},
-  't':{name:'廃村エルム',diff:'入門',desc:'昔ゴブリンに焼かれた村。壊れた柵やバリスタが残っていて、半額ですぐに建て直せる。襲撃は6回で、魔物も少なめ'},
+  't':{name:'廃村エルム',diff:'入門',desc:'昔ゴブリンに焼かれた村の跡。書記官リリアの案内で、街づくりと守りの基本を覚える。襲撃は6回で、魔物も少なめ'},
   'f':{name:'グレイヴェル平原',diff:'ふつう',desc:'森と丘に囲まれた辺境の街。北のアビスから魔物が来る'},
   'c':{name:'日本海沿岸 第1防衛区域',diff:'入門',desc:'海の向こうの島にアビス。魔物は海底を渡り、3つの浜から上陸してくる'},
   '7':{name:'辺境の街グレイヴェル',diff:'やさしめ',desc:'城館の近くに豊かな鉱脈・油田があり、遠くにも豊かな資源が眠る。まずはここから'},
@@ -2952,7 +2953,7 @@ function tLvName(t,n){return t.lvRank?(RNUM[n]||' Lv'+n):(tMax(t)>1?' Lv'+n:'');
 function tMax(t){return t.lvRank?Math.max(1,S.baseLv||1):(t.max||1);}
 /* 研究の費用に、そのランクの新しい素材を足す（2026-11-13）。素材を取れるようにする研究には足さない。金貨の上乗せは +40 → +20／ランク */
 const TECH_MAT={2:{coal:10},3:{coal:8,goldore:6,alloy:6},4:{coal:8,alloy:8},5:{coal:6,alloy:6,mmetal:6},6:{coal:6,mmetal:6,mithril:4},7:{coal:6,mmetal:4,mithril:8}};   /* 研究に足す素材（2026-11-13 増やした） */
-const TECH_MAT_FREE=new Set(['coalt','goldt','smeltt','mitht','kc_work_5','kc_mine_3']);
+const TECH_MAT_FREE=new Set(['aethert','coalt','goldt','smeltt','mitht','kc_work_5','kc_mine_3']);
 /* 石炭と関係のない研究（農業・魔法・訓練・偵察・石や木の工事など）には石炭を足さない（2026-11-14）。鍛冶・製錬・火薬・機械の研究だけ石炭を使う */
 const TECH_NO_COAL=new Set(['masonry','castle','tower','fcs','bighow','wallplus','thorn','hisousha','yariana','resetpit','magetower','aebombt','gravityt','meteort','barrierst','dragwall',
   'cavalry','magic','dragon','elite','scouting','shieldwall','charge','highmagic','fieldsup','snipert','golemt','griffont','battalion','division','dragonscale',
@@ -2984,7 +2985,7 @@ function rankSum(cat,r){return TECH.filter(t=>t.cat===cat&&(t.tier||1)===r&&!t.g
 function techRank(t){return t.gate?t.gate-1:(t.tier||1);}
 // ===== 研究員：住民の中から研究に就く人。城館に5人＋研究室1つにつき3／5／8人（Lv1／2／3） =====
 function resCap(){let n=5;for(const b of S.blds)if(b.type==='lab'&&ready(b))n+=[3,5,8][(b.lv||1)-1];return n;}
-function resBusy(){return S.research.reduce((a,r)=>a+(r.res||0),0);}
+function resBusy(){return S.research.reduce((a,r)=>a+(r.res||0)+(r.slots||0),0);}   /* r.res：前の版（待機中の住民を使っていた研究） */
 function techRes(t){return [0,2,4,7,10,13,16,20][t.tier||1]+(lvl(t.id)>0?1:0);}
 function resSlots(){return 99;}
 
@@ -4037,11 +4038,11 @@ function startResearch(id){
   const t=techOf(id);const c=techCost(t);
   const need=techRes(t);
   if(techState(t)!=='ready'||!canAfford(c)||S.waveActive)return;
-  if(resBusy()+need>resCap()){se('error');toast(`研究員が足りません（必要${need}人・空き${resCap()-resBusy()}人）。研究室を増やすか改築しよう`,'bad');return;}
-  if(S.pop<need){se('error');toast(`研究員になれる待機中の住民が足りません（必要${need}人）`,'bad');return;}
-  for(const k in c)S[k]-=c[k];S.pop-=need;
+  if(resBusy()+need>resCap()){se('error');toast(`研究員が足りません（必要${need}人・空き${resCap()-resBusy()}人）。研究室を建てると研究員が増えます`,'bad');return;}
+  /* 研究員は城と研究室の決まった人数（研究室を建てたときに住民がつく）。待機中の住民は使わない（2026-11-16） */
+  for(const k in c)S[k]-=c[k];
   const turns=techTurns(t);
-  S.research.push({id,left:turns,total:turns,paid:c,res:need});se('resStart');log(`研究開始：${t.name}${tLvName(t,lvl(id)+1)}（${turns}ターン）`);
+  S.research.push({id,left:turns,total:turns,paid:c,slots:need});se('resStart');log(`研究開始：${t.name}${tLvName(t,lvl(id)+1)}（${turns}ターン）`);
 }
 function cancelResearch(id){
   const r=S.research.find(x=>x.id===id);if(!r)return;
@@ -4053,7 +4054,7 @@ function advanceResearch(){
   for(const b of S.blds){if(b.type==='lab'){if(b.lv>=3)chance+=0.12;const c=cmdOf(b);if(c){chance+=c.tec*0.03*match(c,b)*(c.trait==='技術畑'?1.3:1);gainXp(c,3);}}}
   for(const r of S.research){r.left--;if(r.left>0&&Math.random()<chance){r.left--;log(`研究所より報告：${techOf(r.id).name} の進捗が前倒し`,'good');}}
   const done=S.research.filter(r=>r.left<=0);
-  if(done.length)se('research');for(const r of done){if(r.paid.pop){S.pop+=r.paid.pop;}S.pop+=r.res||0;S.tech[r.id]=lvl(r.id)+1;const t=techOf(r.id);log(`研究完了：${t.name}${tMax(t)>1||t.lvRank?' Lv'+lvl(r.id):''}`,'good');}
+  if(done.length)se('research');for(const r of done){if(r.paid.pop){S.pop+=r.paid.pop;}S.pop+=r.res||0;S.tech[r.id]=lvl(r.id)+1;const t=techOf(r.id);log(`研究完了：${t.name}${tMax(t)>1||t.lvRank?' Lv'+lvl(r.id):''}`,'good');unlockNews(t);}
   S.research=S.research.filter(r=>r.left>0);
   if(done.length)rescaleHp();
 }
@@ -4304,9 +4305,13 @@ function doEndTurn(){
   if(S.overlay==='res')showResearch();
   renderAll();
 }
+// 研究で新しい施設が建てられるようになったら、施設のアイコンつきで知らせる（2026-11-16）
+function unlockNews(t){if(!S||S.backdrop||lvl(t.id)>1)return;const L=BUILD_GROUPS.flatMap(g=>g.list).filter(k=>B[k].req===t.id);
+  if(!L.length)return;for(const k of L)newsTop(`${t.name}の研究が完了しました`,`${B[k].name}を建てられます（建設のタブ）`,kcImg(k)?`<img src="${kcImg(k)}" width="36" height="36" style="image-rendering:pixelated">`:icSvg(k,36),()=>{gRt('build');gHi(`#build button[data-k="${k}"]`);});}
 function tickBaseUp(){if(!S.baseUp)return;S.baseUp.left--;if(S.baseUp.left>0)return;
   S.baseLv=Math.min(BASE_MAX,S.baseUp.to);S.baseUp=null;se('upgrade');
-  const m=`城がLv${S.baseLv}になった（英雄の上限${maxCmd()}名・領地拡大・施設の上限${facCap()}）`;log(m,'good');if(S.rep)S.rep.push({msg:m,cls:'good'});revealAll();}
+  const m=`城がLv${S.baseLv}になった（英雄の上限${maxCmd()}名・領地拡大・施設の上限${facCap()}）`;log(m,'good');
+  {const nR=TECH.filter(t=>techRank(t)===S.baseLv).length;const ck='castle'+Math.max(1,Math.min(7,S.baseLv));newsTop(`城のレベルが${S.baseLv}に上がりました`,nR?`新しい研究内容（ランク${['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'][S.baseLv]}）を確認してみましょう`:'新しい研究内容を確認してみましょう',ICIMG[ck]?sprImg(ck,36):icSvg('hq',36),()=>{const b=document.getElementById('bRes');if(b)b.click();});}if(S.rep)S.rep.push({msg:m,cls:'good'});revealAll();}
 function turnReport(t0,ev){
   const L=[];
   L.push(`<div class="grid">${['steel','fuel','ammo','elec','pop'].map(k=>{const d=Math.round(S[k]-S.before[k]);return `<span title="${RES_NAME[k]}">${ic(k)}${Math.floor(S[k])} <b class="${d<0?'bd':d>0?'gd':''}" style="font-size:11px">${d>=0?'+':''}${d}</b></span>`;}).join('')}</div>`);
@@ -4508,7 +4513,7 @@ function squadAI(s,dt,firing){
 
   }
 }
-function orderMove(s,x,y,noLink){s.tx=x;s.ty=y;s.ax=x;s.ay=y;if(s.mode==='return'){s.mode=(s.retBack&&s.retBack.mode)||'guard';}s.retBack=null;if(s.ut==='guard')s.stayOut=true;
+function orderMove(s,x,y,noLink){if(!noLink)S.movedN=(S.movedN||0)+1;s.tx=x;s.ty=y;s.ax=x;s.ay=y;if(s.mode==='return'){s.mode=(s.retBack&&s.retBack.mode)||'guard';}s.retBack=null;if(s.ut==='guard')s.stayOut=true;
   if(!noLink)coMates(s).forEach((p,i)=>orderMove(p,x+TU*0.9*(i?-1:1),y+TU*0.4*(i?1.6:1),true));}
 const NIGHT_STOP=new Set(['coalmine','goldmine','mithmine','smelter','miner','quarry','ironmine','farm','fishery','well','market','ammo','power','elecf','powder','barracks','apart','furnace','lab','tavern']);
 function update(dt,sim){
@@ -4569,7 +4574,7 @@ function update(dt,sim){
     else if(b.type==='smelter'){const m=um*bn.prod*dt/10;if(b.mode==='mmetal'&&b.lv>=2){if(S.alloy>=2*m&&S.elec>=2*m&&S.mat>=m){S.alloy-=2*m;S.elec-=2*m;S.mat-=m;S.mmetal=(S.mmetal||0)+3*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
       else{if(S.iron>=4*m&&(S.goldore||0)>=3*m&&(S.coal||0)>=2*m){S.iron-=4*m;S.goldore-=3*m;S.coal-=2*m;S.alloy=(S.alloy||0)+5*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}}
     else if(b.type==='farm'){S.fuel+=0.8*um*(techMul('farm')+bn.prod-1)*dt;tickProdXp(b,dt);}
-    else if(b.type==='ammo'){const m=um*(techMul('ammo')+bn.prod-1)*dt;const sw=b.mode==='sword',ar=b.mode==='armor';const kf=heroSk(b,'kenyaku')?0.6:1;const ns=(sw||ar?0.2:0.4)*m*kf,ni=(ar?0.6:sw?0.4:0.2)*m*kf;if(S.steel>=ns&&S.iron>=ni){S.steel-=ns;S.iron-=ni;if(ar)S.armor=(S.armor||0)+0.4*m;else if(sw)S.sword+=0.5*m;else S.ammo+=3.0*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
+    else if(b.type==='ammo'){const m=um*(techMul('ammo')+bn.prod-1)*dt;const sw=b.mode==='sword',ar=b.mode==='armor';const kf=heroSk(b,'kenyaku')?0.6:1;const ns=(sw||ar?0.2:0.4)*m*kf,ni=(ar?0.6:sw?0.4:0.2)*m*kf;if(S.steel>=ns&&S.iron>=ni){S.steel-=ns;S.iron-=ni;const MD=S.made=S.made||{};if(ar){S.armor=(S.armor||0)+0.4*m;MD.armor=(MD.armor||0)+0.4*m;}else if(sw){S.sword+=0.5*m;MD.sword=(MD.sword||0)+0.5*m;}else{S.ammo+=3.0*m;MD.ammo=(MD.ammo||0)+3.0*m;}b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
     else if(b.type==='powder'){const m=um*bn.prod*dt;const nw=0.6*m,nm=0.1*m;if(S.steel>=nw&&S.mat>=nm){S.steel-=nw;S.mat-=nm;S.powder=(S.powder||0)+0.6*m;b.starved=false;tickProdXp(b,dt);}else b.starved=true;}
     else if(b.type==='furnace'){b.fa=(b.fa||0)+0.2*um*bn.prod*dt;b.starved=S.mat<1;while(b.fa>=1&&S.mat>=1){b.fa-=1;S.mat-=1;S.elec+=2;}if(S.mat<1)b.fa=Math.min(b.fa,1);tickProdXp(b,dt);}
     else if(b.type==='well'){const v=0.5*um*RICH[richAt(b.x,b.y)]*bn.prod*dt;S.elec+=v;depleteTick(b,v);tickProdXp(b,dt);}
@@ -5075,17 +5080,9 @@ function unitDmg(s){
 }
 function hqOf(){return S.blds.find(b=>b.type==='hq');}
 // ===== 入門マップ：廃墟を配置し、手引きを出す =====
-function tutorialSetup(){S.ruins=S.ruins||[];const used=new Set();
-  const add=(type,x,y)=>{const n=newSz(type);for(const [cx,cy] of bCells(x,y,n)){if(cx<0||cy<0||cx>=COLS||cy>=ROWS||S.grid[cy][cx]||used.has(cx+','+cy))return false;const t=S.ter[cy][cx];if(t!==0&&t!==1&&t!==8)return false;}if(B[type].req&&!['mg'].includes(type))return false;for(const [cx,cy] of bCells(x,y,n))used.add(cx+','+cy);S.ruins.push({type,x,y,lv:1,mat:0,sz:n});return true;};
-  // 北側の古い柵（門の跡つき）と、柵の内側のバリスタ跡
-  for(let dx=-7;dx<=8;dx++){if(dx===0||dx===1){add('gate',hqTX(dx),hqTY(-6));continue;}for(let k=0;k<U;k++)add('fence',hqTX(dx)+k,hqTY(-6));}
-  for(let dy=-5;dy<=-2;dy++)for(let k=0;k<U;k++){add('fence',hqTX(-7),hqTY(dy)+k);add('fence',hqTX(8)+U-1,hqTY(dy)+k);}
-  add('mg',hqTX(-3),hqTY(-4));add('mg',hqTX(4),hqTY(-4));add('brazier',hqTX(1),hqTY(-8));add('brazier',hqTX(-5),hqTY(-8));
-  // 村の跡（住居・畑・伐採所・石切り場）
-  const near=(type,n)=>{let c=0;for(let r=2;r<9&&c<n;r++)for(let dy=-r;dy<=r&&c<n;dy++)for(let dx=-r;dx<=r&&c<n;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=hqTX(dx),y=hqTY(dy);if(dy<-4)continue;if(placeOKraw(type,x,y)&&add(type,x,y))c++;}};
-  near('barracks',2);near('farm',2);near('miner',1);near('quarry',1);
-  S.steel+=100;S.gold+=100;S.tut={};
-  log('廃村エルム：焼け残った柵や施設の跡（廃墟）があちこちにある。マスをクリックすると半額ですぐに建て直せる','warn');}
+// 廃村エルム（チュートリアル）：廃墟はなし（2026-11-16 ユーザーの指定：最初の資材が廃墟の建て直しに使われてしまうため）。資材を少し多めに
+function tutorialSetup(){S.ruins=[];S.steel+=100;S.gold+=100;S.tut={};
+  log('廃村エルム：昔ゴブリンに焼かれた村の跡。ここで新しい街を作り直す','warn');}
 const TUT_STEPS=[
   ['廃墟をクリックして、柵やバリスタを建て直す',()=>S.blds.filter(b=>b.type==='fence'||b.type==='gate'||b.type==='mg').length>=6],
   ['伐採所か石切り場を建てる（建て直しでも可）',()=>S.blds.filter(b=>b.type==='miner'||b.type==='quarry').length>=2],
@@ -7280,8 +7277,8 @@ function showResearch(){
   let act='';
   if(st==='done')act=`<span style="color:var(--green);font-weight:bold">${ui('check','green',12)} ${t.lvRank&&(S.baseLv||1)<BASE_MAX?`${t.name}${RNUM[lvl(t.id)]}まで研究済み。${t.name}${RNUM[lvl(t.id)+1]}は城Lv${lvl(t.id)+1}で解放`:`最大レベル（Lv${tMax(t)}）・研究完了`}</span>`;
   else if(st==='active')act=`<span style="color:var(--cyan)">研究中 残り${r.left}ターン</span> <button data-cancel="${t.id}">中止（費用の半分を回収）</button>`;
-  else if(st==='ready'){const need=techRes(t),rok=resBusy()+need<=resCap()&&S.pop>=need;const ok=canAfford(c)&&rok&&!S.waveActive;
-    act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?(S.pop<need?'待機中の住民が足りません':'研究員が足りません（研究室を増やす・改築する）'):'資源が足りません'}</span>${rok?mktBtn(c):''}`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
+  else if(st==='ready'){const need=techRes(t),rok=resBusy()+need<=resCap();const ok=canAfford(c)&&rok&&!S.waveActive;
+    act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?'研究員が足りません（研究室を増やす・改築する）':'資源が足りません'}</span>${rok?mktBtn(c):''}`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
   else if(st==='excluded')act='<span class="muted">もう一方の分岐を選んだため研究できません</span>';
   else if(st==='maplock')act='<span class="muted">このマップでは第三段階の研究はできません（2マップ目以降で解禁）</span>';
   else if(t.gate&&!(rankOpen(cat,t.gate-1)&&rankSum(cat,t.gate-1)>=gateNeed(cat,t.gate)))act=`<span class="muted">条件：${!rankOpen(cat,t.gate-1)?`<span style="color:var(--red)">${gateOf(cat,t.gate-1).name}</span>・`:''}<span style="color:${rankSum(cat,t.gate-1)>=gateNeed(cat,t.gate)?'var(--green)':'var(--red)'}">ランク${RN[t.gate-1]}の研究を合計Lv${gateNeed(cat,t.gate)}以上（今 ${rankSum(cat,t.gate-1)}）</span></span>`;
@@ -7478,7 +7475,7 @@ function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn()
   requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();}finally{b.classList.add('off');}}));}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.7','2026-11-16',['<b>チュートリアルを作り直し</b>：書記官リリアが「領主様」に話しかけて、ミッションごとに街づくりと守りの手順を案内する。ステージ0（廃村エルム）は基本（街の土台 → 最初の守り → 兵と矢 → 最初の夜 → 研究 → 城を育てる）、ステージ1は続き（改築 → 駐屯地 → 街を広げる）。実際に手を動かして進める。ミッションを終えるとごほうび（金貨・資材）','<b>街の名前</b>を始めに決められるように。結果の画面・街の記録・タイムラプス（「○○の歴史」）に出る','<b>山場の前は準備が6日</b>：ブラッドムーンとボスの夜の前だけ、襲撃までの日数を4日から6日に','<b>上のお知らせ</b>：英雄の戦死・城への攻撃・城が危ないとき・大きな夜（ブラッドムーン、ゴブリンの王の軍勢、最後の夜）の知らせ（5日前と前の日）と、その夜の始まりを、画面の上に大きく出す']],
+ ['1.7','2026-11-16',['<b>チュートリアルを作り直し</b>（ステージ0 廃村エルム）：書記官リリアが「領主様」に話しかけて、6つのミッションで基本を案内する（生産施設の建設 → 人 → 研究 → 防衛 → 兵士 → 軍需）。実際に手を動かして進める','廃村エルムの廃墟をなくした（最初の資材が建て直しに使われてしまうため）','<b>街の名前</b>を始めに決められるように。結果の画面・街の記録・タイムラプス（「○○の歴史」）に出る','<b>研究員</b>：研究のたびに待機中の住民を使うのをやめた。城に5人、研究室を建てると3人が研究員としてつく（バリスタの射手と同じ）','<b>新しくできるようになったことの知らせ</b>：城のレベルが上がったとき・研究で新しい施設が建てられるようになったとき、施設のアイコンつきで画面の上に出す（押すとその画面へ）','エーテル採掘所は、研究「エーテル採掘」（ランクⅡ）をしてから建てられるように','<b>山場の前は準備が6日</b>：ブラッドムーンと大きな夜の前だけ、襲撃までの日数を4日から6日に','<b>上のお知らせ</b>：英雄の戦死・城への攻撃・城が危ないとき・大きな夜（ブラッドムーン、ゴブリンの王の軍勢、最後の夜）の知らせ（5日前と前の日）と、その夜の始まり']],
  ['1.6','2026-11-16',['<b>前の襲撃のあとからやり直す</b>：負けたとき、ひとつ前の襲撃をしのいだあとから始め直せる。負けの画面に「この襲撃で起きたこと」（矢が尽きた回数など）も出る','<b>足りない資源の警告</b>：夜へ進む前に、襲撃で足りなくなりそうな資源を「夜へ」の横に出す','<b>序盤の敵を減らした</b>（第1〜第9襲撃。第10襲撃からは今までどおり）','<b>施設の流れ</b>：施設の詳しい画面に「使う物 → 作る物」の流れ。地図の表示切り替えに「生産」（施設ごとの作る量・使う量）。採集施設には埋蔵量のバー','上の帯の「推奨」の目安を外した（足りない資源の警告に置き換え）','ステージ選択に、ステージ2の解放の条件（ステージ1で第10襲撃をしのぐ）と、いまの記録','<b>ブラッドムーン</b>は5回ごとで、ボスの夜（第20・第40）は外した。ワーウルフは第25襲撃のブラッドムーンから。後半のブラッドムーンの敵の数を控えめにして、最後の夜がいちばんの山場になるように','言葉を「<b>駐屯地</b>」にそろえた（前は「駐留地」とまざっていた）','セーブを小さく（約4分の1）']],
  ['1.5.1','2026-11-16',['<b>効果音を選び直した</b>：建設（木はのこぎり、石は石を積む音、鉱山・精錬所・火薬工房・精製炉はつるはし、畑は耕して種まき）、襲撃の知らせは城の大鐘、英雄の戦死は鐘、研究の開始・完了、騎兵の突撃、敵を倒す音、襲撃をしのいだ・勝利・敗北、ボタンなど操作の音','<b>大事な音が聞こえやすく</b>：襲撃の知らせ・英雄の戦死・施設の破壊などが鳴っている間は、小さな音（発射・撃破・建設など）を少し下げる']],
  ['1.5','2026-11-15',['<b>街の記録</b>：「記録」ボタンで、襲撃ごとの結果と、施設の数・生産量・資源の移り変わりをグラフで見られる（5回ごとの襲撃の目印つき）。数字をまとめてコピーして表計算ソフトに貼れる','<b>街の成長のタイムラプス</b>：ゲームの終わり（勝っても負けても）や街の記録から、最初の日からの街の移り変わりを早送りで見られる','<b>iPad などタブレット</b>で指で遊びやすく：キーの案内を隠し、ボタンを大きく、範囲選択ボタンを出す。ダブルタップで画面が拡大されないように','不具合の修正：建設する施設を選んでも、上の帯に名前・費用・置き方が出ないことがあった']],
@@ -7523,8 +7520,12 @@ function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.a
   document.getElementById('tCredit').onclick=()=>openOverlay('title',`<h2>クレジット</h2><div style="line-height:1.9">${GAME_TITLE} — ${GAME_SUB}　ver ${GAME_VER}<br>企画・ゲームデザイン：ねぎらーめん<br>プログラム・ドット絵・効果音・音楽：Claude と共同制作<br><span class="muted">すべてのドット絵と音はこのゲームのために作られたものです</span></div><div style="margin-top:12px"><button id="crBack">タイトルへ</button></div>`)&&(document.getElementById('crBack').onclick=showTitle);}
 // 画面の上のお知らせ（2026-11-16）：英雄の戦死・城への攻撃・山場（ブラッドムーン・ボス）の予告。通信ログに加えて、上に大きく出す
 const ALERT_K={kia:['#ff5a4e','†'],castle:['#ff8a3a','⚠'],moon:['#ff4a5e','☾'],boss:['#d8a0ff','★'],good:['#6fe08a','✔']};
-function alertTop(msg,kind,ms){let el=document.getElementById('alertTop');if(!el){el=document.createElement('div');el.id='alertTop';document.body.appendChild(el);}
-  const [col,ico]=ALERT_K[kind]||ALERT_K.castle;el.style.setProperty('--ac',col);el.innerHTML=`<i>${ico}</i><span>${msg}</span>`;try{const r=document.getElementById('cv').getBoundingClientRect();el.style.top=Math.max(8,Math.round(r.top+12))+'px';el.style.left=Math.round(r.left+r.width/2)+'px';}catch(e){}el.className='on';
+ALERT_K.news=['#f2c84a','✦'];
+// 新しくできるようになったことの知らせ（城のレベル・研究で建てられる施設）。アイコンつき・2行。続けて来たら順番に出す
+const NEWSQ=[];function newsTop(title,sub,icon,go){NEWSQ.push({title,sub,icon,go});if(NEWSQ.length===1)newsNext();}
+function newsNext(){const n=NEWSQ[0];if(!n)return;alertTop(`<b>${n.title}</b><small>${n.sub}</small>`,'news',5500,n.icon,()=>{if(n.go)n.go();});setTimeout(()=>{NEWSQ.shift();newsNext();},5800);}
+function alertTop(msg,kind,ms,icon,onclick){let el=document.getElementById('alertTop');if(!el){el=document.createElement('div');el.id='alertTop';document.body.appendChild(el);}
+  const [col,ico]=ALERT_K[kind]||ALERT_K.castle;el.style.setProperty('--ac',col);el.innerHTML=`${icon?`<em>${icon}</em>`:`<i>${ico}</i>`}<span>${msg}</span>`;el.style.pointerEvents=onclick?'auto':'none';el.style.cursor=onclick?'pointer':'';el.onclick=onclick?()=>{el.className='';onclick();}:null;try{const r=document.getElementById('cv').getBoundingClientRect();el.style.top=Math.max(8,Math.round(r.top+12))+'px';el.style.left=Math.round(r.left+r.width/2)+'px';}catch(e){}el.className='on';
   clearTimeout(el._t);el._t=setTimeout(()=>{el.className='';},ms||4500);}
 function confirmNew(){return true;}
 // 街の名前を決める（2026-11-16）。結果画面・タイムラプス・街の記録・セーブの表示に使う
@@ -7541,7 +7542,7 @@ function askTown(mid,cb){const def=mid==='t'?'エルム':mid==='f'?'グレイヴ
 function showIntro(){
   /* ステージ（2026-11-13）：いま遊べるのはチュートリアルと草原だけ。ほかは Coming Soon で入れない */
   const stageBest=id=>{try{return Math.min(10,+localStorage.getItem('nd_best_'+id)||0);}catch(e){return 0;}};   /* ステージ2の解放：ステージ1で第10襲撃をしのぐ（2026-11-15 決定。ステージ2はまだ準備中） */
-  const MAPL=[['t','ステージ0　廃村エルム','チュートリアル','#8ad08a','入門','焼け落ちた村の跡。壊れた柵やバリスタが残っていて、半額ですぐに建て直せる。書記官リリアの案内（ミッション）に沿って準備し、<b>6回の襲撃</b>を守り抜く。魔物は少なめ'],
+  const MAPL=[['t','ステージ0　廃村エルム','チュートリアル','#8ad08a','入門','焼け落ちた村の跡。書記官リリアの案内（ミッション）で、街づくりと守りの基本を実際に手を動かして覚える。<b>6回の襲撃</b>を守り抜く。魔物は少なめ'],
     ['f','ステージ1　グレイヴェル平原','草原','#e8c070','ふつう','森と岩場に囲まれた草原の辺境の街。北のアビスから始まり、やがて3方向から魔物が押し寄せる。20回目にゴブリンキング、最後の夜には森の化け物「蠢く木陰」が現れる。<b>40回の襲撃</b>'],
     ['swamp','ステージ2','沼地','#7a9a6a','Coming Soon',''],
     ['m','ステージ3','山脈','#ff8a6a','Coming Soon',''],
@@ -7574,70 +7575,57 @@ function gTechDone(){return Object.keys(S.tech||{}).filter(k=>S.tech[k]>0&&!(S.g
 // ミッションは順番に1つずつ。はじめにリリアが話し、手順（どの順でもよい）を実際にやると次へ進む。ごほうびはミッションを終えたとき
 const LIL_NAME='書記官リリア';
 const MISSIONS=[
- {id:'base',name:'街の土台',rw:{gold:80,steel:40},
-  say:['はじめまして、領主様！ 書記官のリリアです。今日から${TOWN}のお手伝いをします！','夜になると、アビスから魔物が攻めてきます。最初の襲撃まではあと10日。まずは街の土台、資材を集めましょう！','下の手順を、好きな順にやってみてください。「場所を示す」を押すと、わたしが場所をお教えします。'],
+ {id:'prod',name:'生産施設の建設',
+  say:['はじめまして、領主様！ 書記官のリリアです。今日から${TOWN}のお手伝いをします！','資材がないと、守りも街の発展もできません！ まずは木材と石材などの生産施設を建てましょう！',
+   ()=>'ただし、<b>土地のレベル</b>で生産の効率が変わるので気をつけてください。たとえば森は、木が深いほど木材がたくさん採れます。'+lilForestImg()+'右上の「土地Lv」のボタンでも確かめられますよ。'],
   steps:[
-  {t:'伐採所を3つ建てる',b:'miner',n:3,d:'<b>森</b>のマスに建てると木材が採れます。森が深いほど多く採れます。木材はほとんどの建物に使います。'},
-  {t:'石切り場を建てる',b:'quarry',n:1,d:'<b>岩場</b>（灰色の岩があるマス）に建てると石材が採れます。'},
-  {t:'住居を建てる',b:'barracks',n:1,d:'住民がふえ、税で金貨が入ります。施設で働くのも、部隊になるのも住民です。'},
-  {t:'農場を2つ建てる',b:'farm',n:2,d:'<b>平地</b>に建てると食料がとれます。食料が尽きると住民が増えません。'}],
-  done:'いい調子です、領主様！ これで毎日、資材が入ってきます。資材は「街」のタブで出入りが見られますよ。'},
- {id:'wall',name:'最初の守り',rw:{steel:60,stone:30},
-  say:['次は守りです！ 上の「敵情予測」に、魔物が来る方角が出ています。','その方角に柵を張って、バリスタで迎え撃ちましょう。柵はドラッグすると一列に置けます。夜は暗いので、篝火で柵の外を照らすのも忘れずに！'],
+  {t:'伐採所を4つ建てる',b:'miner',n:4,d:'<b>森</b>のマスに建てると木材が採れます。森が深いほど多く採れます。'},
+  {t:'石切り場を2つ建てる',b:'quarry',n:2,d:'<b>岩場</b>（灰色の岩があるマス）に建てると石材が採れます。'},
+  {t:'鉱山を1つ建てる',b:'ironmine',n:1,d:'<b>鉄鉱脈</b>のマスに建てると鉄が採れます。'}],
+  done:'いい調子です！ 建てたら「夜へ」で日を進めてください。毎日、資材が入ってきます。'},
+ {id:'people',name:'人',
+  say:['施設を動かすには、働く人が必要です。住居を建てると、毎ターン住民が増えていきます。','ただし、1つの家に住める人数には限りがあるので気をつけてください。住居の研究で、住める人数を増やすこともできます。','人が増えると、食料も必要になります。畑や漁場を、人数に合わせて建てましょう。食べ物に余裕があると、みんなうれしいです！'],
   steps:[
-  {t:'木の柵を10建てる',b:'fence',n:10,d:()=>'敵の通り道をふさぎます。敵も味方も通れません。'+(S.mapId==='t'?'<b>焼け残った柵の廃墟</b>をクリックすると、半額ですぐ建て直せます。':'ドラッグでまとめて置けます。')},
-  {t:'門を建てる',b:'gate',n:1,d:'柵の切れ目に置きます。部隊は門からだけ出入りでき、敵にとっては壁と同じです。'},
-  {t:'バリスタを建てる',b:'mg',n:1,d:'矢を撃つ防衛施設。空の敵も撃てます。柵の内側、敵が来る方角に。'},
-  {t:'篝火を置く',b:'brazier',n:1,d:'暗い所の敵は狙いにくいので、柵の外を照らします。耐久が低いので、敵の通り道には置かないこと。'}],
-  done:'りっぱな守りです！ でも、バリスタは矢がないと撃てません。次は矢と兵を用意しましょう。'},
- {id:'army',name:'兵と矢',rw:{gold:60,ammo:60},
-  say:['防衛施設は矢を使って撃ちます。矢は武器工房で作ります。','それから兵舎で部隊を作りましょう。柵を破られたとき、駆けつけてくれるのは兵士たちです！'],
+  {t:'住居を2つ建てる',b:'barracks',n:2,d:'住民がふえ、税で金貨が入ります。'},
+  {t:'農場を2つ建てる',b:'farm',n:2,d:'<b>平地</b>に建てると食料がとれます。水辺には漁場も建てられます。'}],
+  done:'これで、人も食べ物も増えていきます！'},
+ {id:'res',name:'研究',
+  say:['研究を進めると、生産の効率を上げたり、兵士や防衛施設の力を上げたりできます。さっそく「伐採技術」の研究をしてみましょう。','研究室を建てると研究員が増えるので、余裕があったら建ててみてくださいね。'],
   steps:[
-  {t:'武器工房を建てる',b:'ammo',n:1,d:'矢や剣を作ります。工房をクリックすると、作る物を切り替えられます。矢が尽きると、防衛施設が止まってしまいます。'},
-  {t:'兵舎を建てる',b:'train',n:1,d:'兵士や弓兵の部隊を編成する施設です。'},
-  {t:'兵士か弓兵を2部隊つくる',c:()=>S.squads.filter(q=>q.ut==='inf'||q.ut==='arch').length,n:2,hi:'#bArmy',d:'「軍事」の「訓練」から編成します。兵士は剣、弓兵は矢を使います。'}],
-  done:'これで最初の夜を迎える準備ができました！'},
- {id:'night',name:'最初の夜',rw:{gold:100},
-  say:['準備ができたら、下の「夜へ」で1日を進めます。襲撃の日の夜に、魔物がやってきます。','夜の前に、「夜へ」の横に足りない資源の札が出ていないか見てください。矢が足りないと危ないです！','襲撃が始まったら、部隊を選んで、敵の来る所へ動かしましょう。……領主様なら大丈夫です！'],
+  {t:'「伐採技術」の研究を完了する',c:()=>lvl('mine'),n:1,hi:'#bRes',d:'下の「研究」を押して、生産タブの「伐採技術」を選び「研究を開始」。'},
+  {t:'「石工技術」の研究を完了する',c:()=>lvl('quarrying'),n:1,hi:'#bRes',d:'同じく生産タブの「石工技術」です。石切り場の産出が増えます。'}],
+  done:'研究は、いちど終えればずっと効きます。研究員が空いていたら、どんどん進めましょう！'},
+ {id:'def',name:'防衛',
+  say:['資材もそろってきたので、いよいよ街を守るために動きましょう。最初はバリスタがおすすめです。','ほかにも、物見櫓はバリスタより射程が長かったり、研究を進めると投石機が使えるようになったりしますよ。','敵が来る方角に壁を建てておけば、敵を足止めして、そのあいだにバリスタなどで攻撃できます。','敵は暗闇から攻めてきます。防衛施設がたくさんあっても、暗闇の敵には攻撃できないので気をつけてください。篝火で照らしましょう！'],
   steps:[
-  {t:'最初の襲撃をしのぐ',c:()=>S.wave,n:1,hi:'#bNext',d:'「夜へ」で日を進め、襲撃の夜を守りきります。壊れた施設は、朝に「一括修理」で直せます。'}],
-  done:'しのぎました、領主様！ ここからは<b>4日ごと</b>に襲撃が来ます（ブラッドムーンなど大きな夜の前は6日）。昼のうちに「資材を増やす → 守りを足す」をくり返すのが、この街の暮らしです。'},
- {id:'res',name:'研究',rw:{gold:80},
-  say:['研究で、新しい施設や強化が手に入ります。研究には住民（研究員）が要ります。','下の「研究」で、気になるものを選んでみてください。研究員が空いていると、もったいないですよ！'],
+  {t:'バリスタを2つ建てる',b:'mg',n:2,d:'矢を撃つ防衛施設。空の敵も撃てます。壁の内側、敵が来る方角に。'},
+  {t:'木の柵（壁）を8つ建てる',b:'fence',n:8,d:'敵の通り道をふさぎます。ドラッグすると一列に置けます。'},
+  {t:'篝火を2つ建てる',b:'brazier',n:2,d:'壁の外を照らします。耐久が低いので、敵の通り道には置かないこと。'}],
+  done:'りっぱな守りです！ 次は、守りの兵を集めましょう。'},
+ {id:'army',name:'兵士',
+  say:['防衛施設のほかに、兵士でも街を守れます。城で農兵を招集しましょう。1部隊は5人です。','兵士たちには「迎撃」「固守」「補給」などの指示を出したり、立つ場所を指示したりできます。','「迎撃」は、近くに敵が来たら攻撃しに行ってくれます。「固守」は、その場からあまり離れずに守ってくれます。近接の部隊を壁の近くに固守で置いておけば、壁ごしに敵を攻撃してくれますよ。','兵舎を建てると、農兵のほかの兵士も招集できるようになります。'],
   steps:[
-  {t:'研究を2つ完了する',c:()=>gTechDone(),n:2,hi:'#bRes',d:'研究画面で研究を選んで「研究を開始」。研究員の数だけ同時に進められます。'}],
-  done:'研究は、いちど終えれば、ずっと効きます。研究員は空けないようにしましょう！'},
- {id:'castle',name:'城を育てる',rw:{gold:120,stone:60},
-  say:['ここからが大事です、領主様！ 城のレベルを上げると、<b>新しいランク</b>の研究と施設が開きます。','城を上げたら、まず新しいランクの研究を見てください。強い施設や新しい素材は、そこにあります。後回しにすると、あとで魔物に追いつかれてしまいます！'],
+  {t:'農兵を2部隊やとう',c:()=>S.squads.filter(q=>q.model==='farmer').length,n:2,ping:'hq',d:'城をクリックして、選択中パネルから農兵を招集します。'},
+  {t:'部隊を移動させてみる',c:()=>S.movedN||0,n:1,d:'部隊をクリックして選び、地図の行きたい場所を押します。'},
+  {t:'兵舎を建てる',b:'train',n:1,d:'兵士や弓兵など、農兵のほかの部隊を招集できる施設です。'}],
+  done:'頼もしい兵たちです！ でも、戦うには武器が要ります。'},
+ {id:'arms',name:'軍需',
+  say:['街を守るには武器が必要です。防衛施設や弓兵は矢を、兵士は剣と防具を使います。','武器工房を建てると、矢・剣・防具を作れます。何を作るかは、武器工房に指示を出してあげてください。'],
   steps:[
-  {t:'城をLv2にする',c:()=>S.baseLv||1,n:2,castle:2,d:'城をクリックして「強化」。何日かかかりますが、そのあいだも城はふつうに働きます。'},
-  {t:'ランクⅡの研究を1つ完了する',c:()=>TECH.filter(t=>techRank(t)===2&&has(t.id)).length,n:1,hi:'#bRes',d:'研究画面の「ランクⅡ」の列です。石炭や新しい施設、強化が並んでいます。'}],
-  done:'これで街が一段強くなりました！ 城を上げる → 新しいランクの研究、が強くなる近道です。'},
- {id:'kc',name:'改築',rw:{gold:120},
-  say:[()=>tutDone()&&S.wave<1&&S.turn<=3?'領主様、新しい土地へようこそ！ ${TOWN}でも、リリアがお手伝いします。廃村エルムで覚えたことを思い出して、まずは資材と守りを整えましょう。':null,'もう一つ、知っておいてほしいことがあります。施設は<b>改築</b>で、材料を良いものに変えられます。','木の施設を鉄に、鉄を鋼に……。改築の研究をしてから、施設を選んで「改築」です。生産も守りも、ぐっと強くなりますよ！'],
-  steps:[
-  {t:'改築の研究を1つ完了する',c:()=>Object.keys(S.tech||{}).filter(k=>k.startsWith('kc_')&&S.tech[k]>0).length,n:1,hi:'#bRes',d:'研究画面で、名前に「改築」とある研究です。各ランクの列のいちばん上にあります。'},
-  {t:'施設を1つ改築する',c:()=>S.blds.filter(b=>KC[b.type]&&(b.lv||1)>=2).length,n:1,d:'施設をクリックして、選択中パネルの「改築」。材料が変わると、見た目も変わります。'}],
-  done:'見違えました！ ランクが上がるたびに、改築できる段も増えていきます。'},
- {id:'camp',name:'駐屯地',rw:{gold:150},
-  say:['魔物たちは、街とアビスのあいだの<b>駐屯地</b>で、次の襲撃を待っています。','研究「斥候」で場所の目安が分かります。斥候の部隊で見つけて、こちらから攻め込めば、次の襲撃を減らせますよ！'],
-  steps:[
-  {t:'研究「斥候」をする',c:()=>lvl('scout'),n:1,hi:'#bRes',d:'部隊タブの研究です。地図に駐屯地のだいたいの場所（赤い点線の円）が出ます。'},
-  {t:'駐屯地を見つける',c:()=>S.campFoundN||0,n:1,hi:'#bArmy',d:'研究「斥候隊」で斥候を編成し、赤い点線の円へ向かわせます。見つけた駐屯地に部隊を近づけると、夜襲をかけられます。'}],
-  done:'これで、守るだけでなく攻めることもできます。大きな夜の前に、駐屯地を叩いておくと楽になりますよ！'},
- {id:'grow',name:'街を広げる',rw:{gold:200},
-  say:['最後です、領主様。足りない資源は交易市場で買えます。余った資源は売ってしまいましょう。','そして住民を増やすこと。人が増えれば、働き手も兵も研究員も増えます！'],
-  steps:[
-  {t:'交易市場を建てる',b:'market',n:1,d:'外の商人と取引できる施設です。'},
-  {t:'交易市場で取引する',c:()=>S.tradeN||0,n:1,ping:'market',hi:'#mkGo,.mkr',d:'交易市場をクリックし、選択中パネルの「交易」で売り買いします。'},
-  {t:'人口を100人にする',c:()=>popTotal(),n:100,ping:'barracks',d:'住居を増やし、食料を切らさないこと。'}],
-  done:'これで、わたしからお教えすることは全部です。あとは領主様の思うままに！ 困ったら、いつでも「画面の説明」を押してくださいね。'},
+  {t:'武器工房を建てる',b:'ammo',n:1,d:'矢・剣・防具を作る施設です。'},
+  {t:'矢を30作る',c:()=>Math.floor((S.made&&S.made.ammo)||0),n:30,ping:'ammo',d:'武器工房は、はじめは矢を作ります。「夜へ」で日を進めると、矢が増えていきます。'},
+  {t:'剣を5作る',c:()=>Math.floor((S.made&&S.made.sword)||0),n:5,ping:'ammo',d:'武器工房をクリックして、作る物を「剣」に切り替えます。'}],
+  done:'これで基本はばっちりです、領主様！ あとは「夜へ」で日を進めて、襲撃をしのいでいきましょう。……領主様なら、きっと大丈夫です！'},
 ];
+// 「土地のレベル」の説明の絵：森の3つの段（地図と同じ描き方）
+function lilForestImg(){const one=l=>{const k=document.createElement('canvas');k.width=TU;k.height=TU;const c=k.getContext('2d');c.fillStyle='#070a08';c.fillRect(0,0,TU,TU);try{drawTile(c,0,0,2,l,3+l,7,0,0,0);}catch(e){}
+  return `<span style="display:inline-flex;flex-direction:column;align-items:center;gap:2px"><img src="${k.toDataURL()}" width="42" height="42" style="image-rendering:pixelated;border:1px solid #2a3a2c"><small style="font-size:10px;color:#c8b890">${FOREST_NAME[l]}<br>${['','少し','ふつう','たくさん'][l]}</small></span>`;};
+  return `<div style="display:flex;gap:10px;justify-content:center;margin:6px 0">${one(1)}${one(2)}${one(3)}</div>`;}
 // ステージごとのミッション（2026-11-16）：ステージ0は基本（城をLv2にするまで）、ステージ1は改築・駐屯地・街を広げる。
 // ステージ0をまだ守りきっていない人は、ステージ1でも基本から
-const STAGE_MIS={t:['base','wall','army','night','res','castle'],f:['kc','camp','grow']};
+const STAGE_MIS={t:['prod','people','res','def','army','arms'],f:[]};   /* チュートリアルはステージ0だけ（2026-11-16 ユーザーの指定） */
 function tutDone(){try{return (+localStorage.getItem('nd_best_t')||0)>=FINAL_BY_MAP.t;}catch(e){return false;}}
-function misList(){const mid=S&&S.mapId;let L=STAGE_MIS[mid]||STAGE_MIS.f;if(mid!=='t'&&!tutDone())L=STAGE_MIS.t.concat(L);return L;}
+function misList(){const mid=S&&S.mapId;return STAGE_MIS[mid]||[];}
 const GUIDE={};for(const m of MISSIONS)GUIDE[m.id]=m;   /* 「場所を示す」（guideWhere）がミッションの id で手順を引く */
 function misSay(m){return m.say.filter(x=>typeof x!=='function'||x());}
 function townName(){return (S&&S.townName)||(MAPS[S&&S.mapId]?MAPS[S.mapId].name:'この街');}
@@ -7653,11 +7641,11 @@ const COACH=[
  ['#controls','下のボタン','<b>夜へ [Enter]</b> で1日を進めます。研究 [R]・軍事 [K]・一括修理・一括補給などもここ。「表示・設定」からセーブや全画面。'],
  ['#guide','ミッション','書記官リリアが、次にやることを教えてくれます。<b>場所を示す</b>を押すと場所を教えてくれます。手順は好きな順に進められます。'],
 ];
-function guideInit(){if(S.guide&&S.guide.v===2)return;const on=tasksOn();const old=S.guide;
-  S.guide={v:2,list:misList(),mi:0,line:0,open:-1,min:false,hide:!on,coach:-1,t0:Object.keys(S.tech||{}),done:{},fin:false};
+function guideInit(){if(S.guide&&S.guide.v===3)return;const on=tasksOn();const old=S.guide;
+  S.guide={v:3,list:misList(),mi:0,line:0,open:-1,min:false,hide:!on,coach:-1,t0:Object.keys(S.tech||{}),done:{},fin:false};
   if(old&&old.done&&!old.v){/* 前のセーブ：もう終わっているミッションはとばす */const g=S.guide;while(g.mi<g.list.length&&GUIDE[g.list[g.mi]].steps.every(st=>{try{return gProg(st)>=st.n;}catch(e){return false;}}))g.mi++;g.line=0;}}
 function gFix(g){if(!g.done)g.done={};if(g.mi==null)g.mi=0;if(g.line==null)g.line=0;if(g.open==null)g.open=-1;}
-function gProg(st){const c=st.c?st.c():gCnt(st.b);return Math.min(st.n,Math.floor(c));}
+function gProg(st){const g=S.guide;const c=st.c?st.c():gCnt(st.b)-((g&&g.b0&&st.b&&g.b0[st.b])||0);return Math.max(0,Math.min(st.n,Math.floor(c)));}   /* 建物は、ミッションが始まってから建てた数 */
 function gMis(){const g=S.guide;if(!g)return null;if(!g.list)g.list=misList();return GUIDE[g.list[g.mi]];}
 function gStepOk(st){try{return gProg(st)>=st.n;}catch(e){return false;}}
 function rwTxt(rw){return Object.keys(rw).map(k=>`${ic(k,12)}+${rw[k]}`).join(' ');}
@@ -7671,7 +7659,7 @@ function guideTick(){if(!S||S.over||!S.guide||S.backdrop)return;if(['title','int
   m.steps.forEach((st,i)=>{const k=m.id+':'+i;if(g.done[k])return;if(!gStepOk(st))return;g.done[k]=true;if(g.line<misSay(m).length)return;toast(`できました：${st.t}`,'good');se('click');if(g.open===i)g.open=-1;});
   if(!g.cleared&&g.line>=misSay(m).length&&m.steps.every((st,i)=>g.done[m.id+':'+i])){g.cleared=true;se('research');log(`ミッション「${m.name}」達成`,'good');}
   renderGuide();}
-function gNextMission(){const g=S.guide,m=gMis();if(!m)return;for(const k in m.rw)S[k]=(S[k]||0)+m.rw[k];toast(`ミッション「${m.name}」のごほうび：${Object.keys(m.rw).map(k=>(RES_NAME[k]||k)+'+'+m.rw[k]).join('・')}`,'good');
+function gNextMission(){const g=S.guide,m=gMis();if(!m)return;
   g.mi++;g.line=0;g.open=-1;g.cleared=false;g.min=false;if(!gMis())g.fin=true;guideKey='';renderAll();renderGuide();}
 let guideKey='';
 function renderGuide(){const el=document.getElementById('guide');const g=S&&S.guide;
@@ -7687,23 +7675,23 @@ function renderGuide(){const el=document.getElementById('guide');const g=S&&S.gu
   let h=`<div class="gh" id="gHead">${lilFace(18)}<b>ミッション${g.mi+1}　${m.name}</b><span class="gp">${doneN} / ${m.steps.length}</span><button id="gMin" class="ghost" title="たたむ／ひらく">${g.min?'▾':'▴'}</button><button id="gClose" class="ghost" title="隠す（表示・設定から戻せます）">×</button></div>`;
   if(g.min){const cur=m.steps.findIndex((st,i)=>!g.done[m.id+':'+i]);h+=`<div class="gcur"><div class="gct"><span class="gtt">${talking?'リリアが話しています':g.cleared?'ミッション達成！':cur>=0?m.steps[cur].t:''}</span></div></div>`;}
   h+=`<div class="gb">`;
-  if(say)h+=`<div class="lil">${lilFace(44)}<div class="lsay"><small>${LIL_NAME}</small><div>${say}</div><div class="lbtn">${talking?`<button id="lNext" class="primary">${g.line+1<SAY.length?'次へ ▸':'やってみる'}</button>`:`<button id="lDone" class="primary">ごほうびを受け取って次へ　${rwTxt(m.rw)}</button>`}</div></div></div>`;
+  if(say)h+=`<div class="lil">${lilFace(44)}<div class="lsay"><small>${LIL_NAME}</small><div>${say}</div><div class="lbtn">${talking?`<button id="lNext" class="primary">${g.line+1<SAY.length?'次へ ▸':'やってみる'}</button>`:`<button id="lDone" class="primary">${g.mi+1<(g.list||[]).length?'次のミッションへ':'チュートリアルを終える'}</button>`}</div></div></div>`;
   if(!talking&&!g.cleared){
     m.steps.forEach((st,i)=>{const dn=!!g.done[m.id+':'+i];let pg=0;try{pg=gProg(st);}catch(e){}
       const ico=st.b?icSvg(st.b,16):st.ping?icSvg(st.ping,16):'';
       h+=`<div class="gr ${dn?'ok':''} ${g.open===i?'op':''}" data-gopen="${i}"><span class="gck">${dn?ui('check','green',12):'□'}</span>${ico}<span class="gtt">${st.t}</span><span class="gpg">${dn?'':st.n>1?pg+'/'+st.n:''}</span>${dn?'':`<button data-gwhere="${i}">場所を示す</button>`}`;
       if(g.open===i){const d=typeof st.d==='function'?st.d():st.d;h+=`<div class="gdet"><div class="gd">${d}</div>${st.n>1&&!dn?`<div class="gbar"><i style="width:${Math.round(pg/st.n*100)}%"></i></div>`:''}</div>`;}
       h+=`</div>`;});
-    h+=`<div class="grw" style="margin:4px 0 2px">ミッションのごほうび：${Object.keys(m.rw).map(k=>`${ic(k,12)} ${RES_NAME[k]||k} +${m.rw[k]}`).join('　')}</div><div class="gnote">好きな順に進められます。項目を押すと説明が出ます。</div>`;}
+    h+=`<div class="gnote">好きな順に進められます。項目を押すと説明が出ます。</div>`;}
   h+=`<div class="gfoot"><button id="gCoach">画面の説明</button><button id="gSay">もう一度聞く</button><button id="gSkip" class="ghost">このミッションをとばす</button></div></div>`;
   el.className=g.min?'min':'';el.innerHTML=h;
   el.querySelector('#gHead').onclick=e=>{if(e.target.id==='gClose'){g.hide=true;renderGuide();return;}g.min=!g.min;guideKey='';renderGuide();};
-  {const b=el.querySelector('#lNext');if(b)b.onclick=()=>{g.line++;se('click');guideKey='';guideTick();renderGuide();};}
+  {const b=el.querySelector('#lNext');if(b)b.onclick=()=>{g.line++;se('click');if(g.line>=SAY.length){g.b0={};for(const st of m.steps)if(st.b)g.b0[st.b]=gCnt(st.b);}guideKey='';guideTick();renderGuide();};}
   {const b=el.querySelector('#lDone');if(b)b.onclick=()=>gNextMission();}
   el.querySelectorAll('[data-gopen]').forEach(r=>r.onclick=e=>{if(e.target.closest('[data-gwhere]'))return;const i=+r.dataset.gopen;g.open=g.open===i?-1:i;guideKey='';renderGuide();});
   el.querySelectorAll('[data-gwhere]').forEach(b=>b.onclick=e=>{e.stopPropagation();const i=+b.dataset.gwhere;if(g.open!==i){g.open=i;guideKey='';renderGuide();}guideWhere(m.id,i);});
   {const b=el.querySelector('#gSay');if(b)b.onclick=()=>{g.line=0;g.min=false;guideKey='';renderGuide();};}
-  {const b=el.querySelector('#gSkip');if(b)b.onclick=()=>{if(!confirm('このミッションをとばしますか？（ごほうびはもらえません）'))return;g.mi++;g.line=0;g.open=-1;g.cleared=false;if(!gMis())g.fin=true;guideKey='';renderGuide();};}
+  {const b=el.querySelector('#gSkip');if(b)b.onclick=()=>{if(!confirm('このミッションをとばしますか？'))return;g.mi++;g.line=0;g.open=-1;g.cleared=false;if(!gMis())g.fin=true;guideKey='';renderGuide();};}
   const gc=el.querySelector('#gCoach');if(gc)gc.onclick=()=>{g.coach=0;showCoach();};}
 function gHi(sel){document.querySelectorAll('.gHi').forEach(e=>e.classList.remove('gHi'));
   const els=[...document.querySelectorAll(sel)].filter(e=>e.offsetParent);if(!els.length)return false;
@@ -7751,8 +7739,8 @@ function showCoach(){const g=S.guide;const box=document.getElementById('coach');
   document.getElementById('coNext').onclick=()=>{g.coach++;showCoach();};
   document.getElementById('coSkip').onclick=()=>{g.coach=COACH.length;showCoach();};
   const pv=document.getElementById('coPrev');if(pv)pv.onclick=()=>{g.coach--;showCoach();};}
-setInterval(()=>{try{if(S&&S.blds&&(!S.guide||S.guide.v!==2))guideInit();guideTick();const g=S&&S.guide,ov=document.getElementById('overlay').style.display;if(g&&g.coach===0&&!g.coachAuto&&(!ov||ov==='none')&&!S.over){g.coachAuto=true;showCoach();}}catch(e){console.error(e);}},400);
-document.getElementById('bGuide').onclick=()=>{if(!S.guide||S.guide.v!==2)guideInit();S.guide.hide=false;S.guide.min=false;if(S.guide.fin){S.guide.fin=false;S.guide.mi=Math.min(S.guide.mi,(S.guide.list||misList()).length-1);}guideKey='';renderGuide();};
+setInterval(()=>{try{if(S&&S.blds&&(!S.guide||S.guide.v!==3))guideInit();guideTick();const g=S&&S.guide,ov=document.getElementById('overlay').style.display;if(g&&g.coach===0&&!g.coachAuto&&(!ov||ov==='none')&&!S.over){g.coachAuto=true;showCoach();}}catch(e){console.error(e);}},400);
+document.getElementById('bGuide').onclick=()=>{if(!S.guide||S.guide.v!==3)guideInit();S.guide.hide=false;S.guide.min=false;if(S.guide.fin){S.guide.fin=false;S.guide.mi=Math.min(S.guide.mi,(S.guide.list||misList()).length-1);}guideKey='';renderGuide();};
 addEventListener('resize',()=>{guideKey='';});
 function renderReviewBar(){const r=document.getElementById('reviewBar');const ov=document.getElementById('overlay').style.display;r.style.display=S&&S.over&&S.review&&(!ov||ov==='none')?'flex':'none';}
 document.getElementById('rvBack').onclick=()=>{S.review=false;document.getElementById('reviewBar').style.display='none';showEnd(S.endWin!==undefined?S.endWin:!!S.won);};
