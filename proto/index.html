@@ -340,6 +340,7 @@ body.land #alertTop{top:44px;font-size:14px;padding:6px 12px}
 #ovCard .vpop{display:flex;gap:12px;align-items:center;padding:10px 12px;margin:0 0 8px;background:#141210;border:2px solid var(--vc);box-shadow:0 0 14px color-mix(in srgb,var(--vc) 35%,transparent)}#ovCard .vpi{flex-shrink:0;width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:#1e1a12;border:1px solid #4a4030}#ovCard .vpk{font-size:11px;color:var(--vc);letter-spacing:2px}#ovCard .vpop .nvt{margin-top:4px;line-height:1.7}
 #ovCard .vops{display:flex;flex-direction:column;gap:6px;margin:6px 0}#ovCard .vop{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;line-height:1.6}#ovCard button.vop{flex-direction:column;align-items:flex-start}#ovCard .nshop .vop{background:#15130e;border:1px solid #3a3428;margin:0 0 4px}
 #ovCard .vaf{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:#d8ccb0}#ovCard .aft{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}#ovCard .aft b{color:#f0e4c8}#ovCard .aft.lack b{color:var(--red)}.use small.hv{font-size:10px;color:#9a8e74;margin-left:1px}
+#ovCard .stk{text-align:center;font-size:11px;letter-spacing:3px;color:#c8a070;margin:2px 0}
 #ovCard .wdL{display:flex;flex-direction:column;gap:6px;max-height:48vh;overflow:auto}#ovCard .wd{display:block;width:100%;text-align:left;padding:8px 10px;background:#15130e;border:1px solid #4a4030;line-height:1.6;font-size:12px}#ovCard .wd.now{border-color:#3a6a7a}#ovCard .wdh{display:flex;justify-content:space-between;gap:8px;font-size:14px}#ovCard .wdr{font-size:12px;font-weight:bold}#ovCard .nlil{display:flex;gap:10px;align-items:flex-start;background:#1e1a12;border:1px solid #c8a070;padding:8px 10px;margin:4px 0 10px;line-height:1.7;font-size:13.5px;color:#f0e4c8}#ovCard .nlil small{display:block;color:#e8c070;font-size:11px}#ovCard .nlil ol{margin:4px 0;padding-left:20px}#ovCard .nlil img{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}
 #guide .gcur .gct button{margin-left:auto;flex-shrink:0;padding:2px 8px}
 #guide .gnote{font-size:10.5px;color:#8a8068;margin:2px 0 3px}
@@ -4398,7 +4399,7 @@ function doEndTurn(){
 function unlockNews(t){if(!S||S.backdrop||lvl(t.id)>1)return;const L=BUILD_GROUPS.flatMap(g=>g.list).filter(k=>B[k].req===t.id);
   if(!L.length)return;for(const k of L)newsTop(`${t.name}の研究が完了しました`,`${B[k].name}を建てられます（建設のタブ）`,kcImg(k)?`<img src="${kcImg(k)}" width="36" height="36" style="image-rendering:pixelated">`:icSvg(k,36),()=>{gRt('build');gHi(`#build button[data-k="${k}"]`);});}
 function tickBaseUp(){if(!S.baseUp)return;S.baseUp.left--;if(S.baseUp.left>0)return;
-  S.baseLv=Math.min(BASE_MAX,S.baseUp.to);S.baseUp=null;se('upgrade');
+  S.baseLv=Math.min(BASE_MAX,S.baseUp.to);S.baseUp=null;se('upgrade');storyQueue(S.baseLv);
   const m=`城がLv${S.baseLv}になった（英雄の上限${maxCmd()}名・領地拡大・施設の上限${facCap()}）`;log(m,'good');
   {const nR=TECH.filter(t=>techRank(t)===S.baseLv).length;const ck='castle'+Math.max(1,Math.min(7,S.baseLv));newsTop(`城のレベルが${S.baseLv}に上がりました`,nR?`新しい研究内容（ランク${['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'][S.baseLv]}）を確認してみましょう`:'新しい研究内容を確認してみましょう',ICIMG[ck]?sprImg(ck,36):icSvg('hq',36),()=>{const b=document.getElementById('bRes');if(b)b.click();});}if(S.rep)S.rep.push({msg:m,cls:'good'});revealAll();}
 function turnReport(t0,ev){
@@ -6522,6 +6523,7 @@ document.addEventListener('keydown',ev=>{
   if(S.overlay==='confirm'&&ev.key==='Escape'){closeOverlay();return;}
   if(S.overlay==='night'&&ev.key==='Enter'){ev.preventDefault();closeOverlay();morning();return;}
   if(S.overlay==='visit'&&(ev.key==='Enter'||ev.key==='Escape')){ev.preventDefault();closeOverlay();return;}
+  if(S.overlay==='story'&&(ev.key==='Enter'||ev.key==='Escape'||ev.code==='Space')){ev.preventDefault();closeOverlay();return;}
   if(S.overlay==='incident'&&(ev.key==='Enter'||ev.key==='Escape'||ev.code==='Space')){ev.preventDefault();incNext();return;}
   if(!S.overlay&&ev.key==='Escape'&&S.aimNaval){S.aimNaval=false;return;}
   if(!S.overlay&&(ev.key==='v'||ev.key==='V')){toggleNaval();return;}
@@ -7491,6 +7493,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const matSum=(S.hist||[]).reduce((a,r)=>a+Math.max(0,r.mat||0),0);
   const ck=(S.baseLv||1)===2?'castle':'castle'+Math.max(1,Math.min(5,S.baseLv||1));
   openOverlay('end',`<div class="endhead ${win?'win':'lose'}"><div class="ecs">${sprImg(ICIMG[ck]?ck:'castle',76)}</div><div><div class="ekick">${win?'VICTORY':'DEFEAT'}</div><div class="etitle">${win?'防衛成功':'陥落'}</div><div class="esub">${win?`${townName()}は、第${finalWave()}襲撃までの襲撃を退けました。`:`第${S.wave}襲撃にて、${townName()}の城は陥落しました。`}</div></div></div>
+  ${storyOn()?lilSay(win?'smile':'normal',storyEnd(win,townName())):''}
   ${statGrid([['撃破数',S.kills],['戦死者（人員）',S.kia,'var(--red)'],['生存英雄',S.cmds.length,'var(--green)'],['獲得した魔核','+'+matSum,'var(--mat)']])}
   <div class="efallen"><span>戦没英雄</span>${fallen}</div>
   <div class="ehist"><span>襲撃ごとの記録</span></div>${histTable()}
@@ -7503,7 +7506,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.9 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.10 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7601,7 +7604,7 @@ function showWorld(){const L=worldList(),sv=saveInfo();const [ex,say]=worldSay(L
   document.getElementById('wdBack').onclick=showTitle;
   document.querySelectorAll('[data-wd]').forEach(b=>b.onclick=()=>{se('click');showWorldOne(L[+b.dataset.wd]);});}
 function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
-  const say=r.win?['smile',`${r.town}は、${r.day}日のあいだ魔物の夜をしのいで、第${r.fin}襲撃まで守りきりました。立派な街でした！`]:['normal',`${r.town}は、第${r.wave}襲撃の夜に城が落ちました。${r.day}日のあいだ、みんなでよく戦いました。`];
+  const say=(r.map==='f'||r.map==='7')?[r.win?'smile':'normal',storyEnd(r.win,r.town)]:r.win?['smile',`${r.town}は、${r.day}日のあいだ魔物の夜をしのいで、第${r.fin}襲撃まで守りきりました。立派な街でした！`]:['normal',`${r.town}は、第${r.wave}襲撃の夜に城が落ちました。${r.day}日のあいだ、みんなでよく戦いました。`];
   const c=(lab,v,col)=>`<div><small>${lab}</small><span style="${col?'color:'+col:''}">${v}</span></div>`;
   const tb=(r.h||[]).length?`<div class="rtable">`+r.h.map(([n,ok,k,d,bl,lb])=>`<div class="rw${ok?'':' lost'}"><div><span>第${n}襲撃${bl?' <span class="bm" title="ブラッドムーン">血月</span>':''}${ok?'':' <span style="color:var(--red)">陥落</span>'}</span></div>${c('撃破',k)}${c('戦死',d,d?'var(--red)':'var(--off)')}${c('施設損失',lb,lb?'var(--amber)':'var(--off)')}</div>`).join('')+`</div>`:'<div class="muted">襲撃の記録なし</div>';
   const fl=(r.fallen||[]).map(f=>`${f.n}（Lv${f.lv}・第${f.w}襲撃）`).join('、')||'なし';
@@ -7614,6 +7617,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','城のレベルが上がるたびに、リリアが帳簿から短い話を伝える（広がる裂け目・ゴブリンの王のうわさ・アビスの主・赤い月の獣・近づく森）','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
  ['1.8.4','2026-11-16',['上に出るお知らせが消えたあとも、その場所が押せたままになっていて、複数の部隊をまとめて「固守」などに切り替えるボタンが効かないことがあったのを直した（そのとき、お知らせの行き先の施設が光っていた）']],
  ['1.8.3','2026-11-16',['<b>書記官リリアの絵</b>ができた：話す内容に合わせて表情が変わる（ふつう・笑顔・あせり・ほっとした顔）。街の名前を決める画面に、ろうそくの書斎で帳簿をつけるリリア。チュートリアルのあいだ、昼は城のそばをリリアが歩く']],
@@ -7732,7 +7736,7 @@ function showIntro(){
     <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">Coming Soon</small><br><small style="color:var(--dim)">準備中です${id==='swamp'?`<br>解放の条件：ステージ1で第10襲撃をしのぐ（いま ${stageBest('f')}／10）`:''}</small></span></button>`:`<button data-map="${id}" style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px">
     <img src="${mapIcon(id==='tx'?'t':id)}" width="144" height="84" style="image-rendering:pixelated;border:1px solid var(--line);flex-shrink:0" alt="">
     <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">${diff}</small><br><small style="color:var(--dim);line-height:1.6">${desc}</small></span></button>`).join('')+`</div>`,true);
-  const start=(mid,nm)=>{closeOverlay();withLoading('マップを作っています…',()=>{CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');if(nm){S.townName=nm;S.townNamed=true;log(`領主として「${nm}」に着任した。`,'good');}renderAll();resizeView();});};
+  const start=(mid,nm)=>{closeOverlay();withLoading('マップを作っています…',()=>{CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');if(nm){S.townName=nm;S.townNamed=true;log(`領主として「${nm}」に着任した。`,'good');}storyQueue(0);renderAll();resizeView();});};
   /* チュートリアル（ステージ0）は、リリアのあいさつのあとで街の名前を決める（2026-11-16）。ほかは始める前に */
   const go=(mid)=>mid==='tx'?startScoutEx():(mid==='t'&&tasksOn())?start(mid,null):askTown(mid,nm=>start(mid,nm));
   document.querySelectorAll('[data-map]').forEach(b=>b.onclick=()=>go(b.dataset.map));
@@ -7742,6 +7746,27 @@ function showIntro(){
   const upd2=()=>document.querySelectorAll('[data-sgm]').forEach(b=>b.classList.toggle('on',(b.dataset.sgm==='1')===siegeModeDefault()));upd2();
   document.querySelectorAll('[data-sgm]').forEach(b=>b.onclick=()=>{try{localStorage.setItem('nd_siege_mode',b.dataset.sgm);}catch(e){}upd2();se('click');});
 }
+// ===== 軽いストーリー（2026-11-16 ユーザーが方向性を了承）：ステージ1（草原）だけ =====
+// 王都から辺境の街を任された領主。森の奥のアビスの裂け目から夜ごと魔物。城のレベルが上がるたびに、リリアが帳簿から2〜3行で伝える。第40襲撃で森の主を倒すと裂け目が閉じる
+const STORY={
+ 0:['帳簿のはじめに','領主様、ようこそ${TOWN}へ。ここは王国のいちばん東のはずれです。森の奥には「アビス」と呼ばれる裂け目があって、夜になると魔物が湧き出してきます。','この街が落ちれば、魔物は王都へ続く街道をまっすぐ進んでしまいます。昼は街を育てて、夜は守る——それが、これからの毎日です。','あらためまして、書記官のリリアです。${TOWN}のことは、ぜんぶ帳簿につけておきますね！'],
+ 2:['広がる裂け目','城が大きくなって、王都にも${TOWN}の名前が届きはじめました。','でも斥候さんの話では、アビスの裂け目は少しずつ広がっているそうです。魔物の数も、これから増えていきます。'],
+ 3:['群れを率いる者','魔物の中に、群れを率いる者が出てきました。','北の森では、ゴブリンの王が軍勢を集めているといううわさです。いつか、その王が自分で攻めてくるかもしれません。'],
+ 4:['アビスの主','古い書物を調べました。アビスの奥には「主」がいて、裂け目はその主の息づかいで開いたり閉じたりするそうです。','主を倒せば、裂け目は閉じるかもしれません。……そのときまで、${TOWN}を守りきらないと。'],
+ 5:['赤い月の獣','赤い月の夜に、人の形をした獣を見たという話があります。','狼のような爪と、ものすごい速さだったそうです。領主様、ブラッドムーンの夜は、どうか気をつけて。'],
+ 6:['近づく森','森の木々が、夜ごとに街のほうへ少しずつ寄ってきている気がします。','毎朝、森の端の位置も帳簿につけています。……やっぱり、近づいています。アビスの主は、森そのものなのかもしれません。'],
+ 7:['最後の夜にむけて','ここまで大きな城は、王国の辺境にはほかにありません。','あと少しです、領主様。森の主が出てくるのは、きっともうすぐです。${TOWN}のみんなと一緒に、最後の夜を迎えましょう！']};
+function storyOn(){return S&&S.mode==='campaign'&&!S.ex&&(S.mapId==='f'||S.mapId==='7');}
+function storyQueue(k){if(!storyOn()||!STORY[k])return;S.storySeen=S.storySeen||[];if(S.storySeen.includes(k))return;S.storySeen.push(k);(S.storyQ=S.storyQ||[]).push(k);}
+// 画面が空いたとき（ほかの画面・襲撃中でないとき）に1つずつ出す（ゲームのループから呼ぶ）
+function storyTick(){if(!S||!S.storyQ||!S.storyQ.length||S.overlay||S.waveActive||S.over||TLP||FW)return;const k=S.storyQ.shift();showStory(k);}
+function showStory(k){const [ttl,...L]=STORY[k];const ex=k===5||k===6?'panic':k===0||k===7?'smile':'normal';
+  openOverlay('story',`<div class="lslow" style="max-width:320px;margin:0 auto 8px">${artPx('lilia_art','','')}</div><div class="stk">${k?`${TOWN_CH(k)}`:'序'}</div><h2 style="margin:0 0 6px;text-align:center">${ttl}</h2>
+   <div class="nlil">${lilFace(64,ex)}<div><small>${LIL_NAME}</small>${L.map(t=>`<div style="margin:0 0 6px">${lilTxt(t)}</div>`).join('')}</div></div><div class="nfoot"><button id="stOk" class="on">閉じる [Enter]</button></div>`,true);
+  document.getElementById('stOk').onclick=closeOverlay;}
+function TOWN_CH(k){return `${townName()}の帳簿より`;}
+// 終わりのことば（結果の画面と世界の歴史）
+function storyEnd(win,town){return win?`森の主が倒れて、アビスの裂け目が静かに閉じていきます……。${town}は、最後まで落ちませんでした。この日のことは、世界の歴史に書き残しておきます！`:`${town}の城は落ちてしまいました。でも、ここで食い止めた魔物の数だけ、王都の人たちは無事です。この街のことも、ちゃんと書き残しておきます。`;}
 // ===== 初心者タスク（生産・防衛の目標）と画面の説明 =====
 (function(){const tg=document.getElementById('resTg');const ap=v=>{document.body.classList.toggle('resMin',v);tg.textContent=v?'全13 ▾':'▴ たたむ';};let v=true;try{const q=localStorage.getItem('nd_resmin');if(q!=null)v=q==='1';}catch(e){}ap(v);tg.onclick=()=>{v=!document.body.classList.contains('resMin');ap(v);setTimeout(()=>{try{resizeView();}catch(e){}},0);try{localStorage.setItem('nd_resmin',v?'1':'0');}catch(e){}setTimeout(()=>{try{resizeView();}catch(e){}},0);};})();
 function tasksOn(){try{return localStorage.getItem('nd_tasks')!=='0';}catch(e){return true;}}
@@ -8908,7 +8933,7 @@ function loop(now){
   }
   try{draw();}catch(e){if(!drawErr++)console.error(e);}
   S.fogT=(S.fogT||0)+dt;if(S.fogT>0.5){S.fogT=0;revealAll();}
-  uiT+=dt;if(uiT>0.2){uiT=0;stripKeyHints();renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
+  uiT+=dt;if(uiT>0.2){uiT=0;try{storyTick();}catch(e){}stripKeyHints();renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
 }
 auUi();newState();S.backdrop=true;renderAll();resizeView();setTimeout(resizeView,300);showTitle();requestAnimationFrame(loop);
 </script>
