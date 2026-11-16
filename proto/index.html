@@ -494,7 +494,10 @@ button.danger{background:#2a1210;color:#ff8a80;box-shadow:0 0 0 1px var(--red-li
 
 .res .dl.zero{color:var(--off)}
 #wave{display:flex;align-items:center;gap:12px;padding:0 14px;background:var(--head);color:var(--amber);flex-shrink:0}
-.rtc{color:#d8c89a;font-size:11px}.rtbar{display:block;height:3px;background:#2a2418;max-width:140px}.rtbar>i{display:block;height:100%;background:#d8a85a}
+.rtc{color:#d8c89a;font-size:11px}
+.rtdial{--f:0;position:relative;width:46px;height:46px;border-radius:50%;flex-shrink:0;cursor:pointer;background:conic-gradient(var(--rc) calc(var(--f)*1turn),#1c1a14 0);box-shadow:0 0 0 2px #050705,inset 0 0 0 2px #050705}
+.rtdial::after{content:'';position:absolute;inset:6px;border-radius:50%;background:#0e100c}
+.rtdial img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1}
 .daypips{display:flex;gap:2px}.daypips i{width:6px;height:4px;background:#3a3220}.daypips i.on{background:var(--amber)}   /* 【追加】襲撃までの日数 */
 body.night #wave{background:#2a1210;color:var(--red)}   /* 【追加】夜は body.night */
 
@@ -4268,7 +4271,7 @@ function nightIncidentOf(k,g){
     return {ic:'ev_flee',col:'#8aa48d',n:'住民の脱走',t:`暮らしに不満な住民が夜のうちに街を出ていった。住民 −${m}${g>=3?'（夜警が引き止めて1人で済んだ）':''}`,bad:true};}
   return null;}
 function morning(){
-  if(S.phase!=='night')return;rtRest(1);phaseReset();S.buyToday={};
+  if(S.phase!=='night')return;rtRest('night');phaseReset();S.buyToday={};
   const N=S.night||{plan:'rest'};S.night=null;
   // 気分（何日か続く幸福度）の日数を減らす
   S.moods=(S.moods||[]).map(m=>({...m,d:m.d-1})).filter(m=>m.d>0);
@@ -4373,12 +4376,12 @@ function fireworks(ms){const hq=hqOf();if(!hq||!S)return;if(FW)festEnd();const b
   const b=document.createElement('button');b.id='fwSkip';b.textContent=back?'夜の画面へ戻る':'閉じる';b.onclick=festEnd;document.body.appendChild(b);
   alertTop('<b>祭りの夜！</b><small>街じゅうの人が城の前に集まって、花火を見上げている</small>','good',2500);}
 // ===== 昼と夜をリアルタイムで進める（2026-11-16）=====
-// 1ターンの生産（TURN_SEC 秒ぶんの計算）を、昼6分・夜6分に半分ずつ分けて、10秒ごとに少しずつ受け取る。
+// 1ターンの生産（TURN_SEC 秒ぶんの計算）を、昼の6分に分けて10秒ごとに少しずつ受け取る。夜（6分）は生産しない（今までどおり）。
 // 「夜へ」「朝へ」はスキップ：その時間の残りの分をまとめて受け取って、すぐ次へ。時間切れでも自動で次へ進む。
 // 画面（研究・人事など）を開いているあいだ・一時停止中・襲撃中・駐屯地の戦い中は止まる（静かな夜の画面は進む）
-const RT_PHASE=360,RT_TICK=10,RT_HALF=TURN_SEC/2;
+const RT_PHASE=360,RT_TICK=10;
 function rtStep(n){for(let i=0;i<n;i++)update(0.1,true);}
-function rtRest(k){const r=S.rt;const g=r?r.g:0;rtStep(Math.max(0,Math.round((RT_HALF*k-g)*10)));S.rt=null;}
+function rtRest(ph){const r=S.rt;if(ph==='day'){const g=r&&r.ph==='day'?r.g:0;rtStep(Math.max(0,Math.round((TURN_SEC-g)*10)));}S.rt=null;}
 // 朝の報告の「増えた・減った」は、前の「夜へ」からの分（夜＋昼）で数える
 function rtWindow(){S.before={};for(const k of ['steel','fuel','ammo','elec','pop'])S.before[k]=S[k];S.gross={steel:0,ammo:0,pop:0,used:0};}
 function rtTick(dt){
@@ -4386,10 +4389,37 @@ function rtTick(dt){
   const ph=S.phase==='night'?'night':'day';if(S.overlay&&!(ph==='night'&&S.overlay==='night'))return;
   if(!S.rt||S.rt.ph!==ph)S.rt={ph,t:0,g:0};const r=S.rt;
   r.t=Math.min(RT_PHASE,r.t+dt*(S.speed||1));
-  const want=Math.floor(r.t/RT_TICK)*RT_HALF*RT_TICK/RT_PHASE,n=Math.floor((want-r.g)*10+1e-6);
-  if(n>0){rtStep(n);r.g+=n*0.1;}
+  if(ph==='day'){const want=Math.floor(r.t/RT_TICK)*TURN_SEC*RT_TICK/RT_PHASE,n=Math.floor((want-r.g)*10+1e-6);
+  if(n>0){rtStep(n);r.g+=n*0.1;}}
   if(r.t>=RT_PHASE&&!r.auto){r.auto=true;if(ph==='day')endTurn();else{if(S.overlay==='night')closeOverlay();morning();}}
 }
+// 時間の表示：丸いゲージ（dial：上の日付の太陽・月が時計のように埋まる）か、地図の上の横長のバー（bar：太陽・月が左から右へ進む）。試作版で比べる（localStorage nd_rtg、ゲージを押すと切り替え）
+function rtGaugeStyle(){try{return localStorage.getItem('nd_rtg')||'bar';}catch(e){return 'bar';}}
+function rtGaugeToggle(){try{localStorage.setItem('nd_rtg',rtGaugeStyle()==='bar'?'dial':'bar');}catch(e){}renderTop();toast(rtGaugeStyle()==='bar'?'時間の表示：地図の上の横長のバー':'時間の表示：日付の横の丸いゲージ','good');}
+function rtCol(f,ph){if(ph==='night')return '#7a8cff';return f<0.6?'#f2c94c':f<0.85?'#f29a3a':'#e0603a';}   // 昼は黄色→夕方のだいだい→赤
+function rtDial(){const ph=S.phase==='night'?'night':'day',f=rtFrac();return `<i class="rtdial" id="rtDial" title="${ph==='night'?'夜':'昼'}の残り（押すと横長のバーに切り替え）" style="--f:${f.toFixed(3)};--rc:${rtCol(f,ph)}">${ui(ph==='night'?'moon':'sun',ph==='night'?'light':'amber',24)}</i>`;}
+const RT_IMG={};function rtIcon(k){if(!RT_IMG[k]){const im=new Image();im.src=piURL(k,k==='moon'?'light':'amber');RT_IMG[k]=im;}return RT_IMG[k];}
+let rtBarBox=null;
+function drawRtBar(){rtBarBox=null;if(rtGaugeStyle()!=='bar'||!S||S.backdrop||S.over||S.waveActive||S.tlOn||!S.turnsLeft)return;
+  const ph=S.phase==='night'?'night':'day',f=rtFrac();const vs=document.getElementById('viewSeg'),cv=document.getElementById('cv')||ctx.canvas;let right=VW-12;try{if(vs&&vs.offsetParent){const r=vs.getBoundingClientRect(),c=cv.getBoundingClientRect();right=Math.min(right,r.left-c.left-16);}}catch(e){}
+  let top=16;try{const c=cv.getBoundingClientRect();for(const id of ['modeBar','modeTxt']){const e=document.getElementById(id);if(e&&e.offsetParent&&e.offsetHeight){const r=e.getBoundingClientRect();if(r.top-c.top<60)top=Math.max(top,r.bottom-c.top+14);}}if(top>16&&vs&&vs.offsetParent){const r=vs.getBoundingClientRect();if(r.top-c.top<top+20)right=VW-12;}}catch(e){}   // スマホは上の操作の帯の下に
+  const x0=30,w=Math.max(120,Math.min(520,right-x0-30)),y=top,h=8;   // 右上の表示切り替えと重ならないように
+  ctx.save();ctx.fillStyle='rgba(5,7,5,.75)';ctx.fillRect(x0-14,y-12,w+28,h+24);
+  // 道のり（昼は黄色→だいだい→赤、夜は青）
+  if(ph==='day'){const g=ctx.createLinearGradient(x0,0,x0+w,0);g.addColorStop(0,'#5a4a1c');g.addColorStop(0.6,'#5a3e1c');g.addColorStop(1,'#4a2418');ctx.fillStyle=g;}else ctx.fillStyle='#1c2240';
+  ctx.fillRect(x0,y,w,h);
+  if(ph==='day'){const g=ctx.createLinearGradient(x0,0,x0+w,0);g.addColorStop(0,'#f2c94c');g.addColorStop(0.6,'#f2a03a');g.addColorStop(1,'#e0603a');ctx.fillStyle=g;}else ctx.fillStyle='#7a8cff';
+  ctx.fillRect(x0,y,w*f,h);
+  // 目盛り（1分ごと）
+  ctx.fillStyle='rgba(0,0,0,.45)';for(let i=1;i<6;i++)ctx.fillRect(x0+w*i/6-1,y,2,h);
+  // 終わりの印：昼は月（夜が来る）、夜は太陽（朝が来る）
+  const ie=rtIcon(ph==='day'?'moon':'sun');if(ie.complete&&ie.naturalWidth){ctx.globalAlpha=0.7;ctx.imageSmoothingEnabled=false;ctx.drawImage(ie,x0+w+2,y+h/2-9,18,18);ctx.globalAlpha=1;}
+  const im=rtIcon(ph==='day'?'sun':'moon');if(im.complete&&im.naturalWidth){ctx.imageSmoothingEnabled=false;ctx.drawImage(im,x0+w*f-14,y+h/2-14,28,28);}
+  if(S.paused){ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillStyle='#ffe08a';ctx.fillText('一時停止中',x0+w/2,y+h+11);}
+  ctx.restore();rtBarBox=[x0-14,y-12,w+28,h+24];}
+// 昼の後半は夕方に（地図をだいだい色にして少し暗く）
+function drawDusk(){if(!S||S.backdrop||S.waveActive||S.phase==='night')return;const f=rtFrac();if(f<0.55)return;const a=Math.min(1,(f-0.55)/0.45);
+  ctx.save();ctx.globalCompositeOperation='multiply';ctx.fillStyle=`rgb(255,${Math.round(255-105*a)},${Math.round(255-165*a)})`;ctx.fillRect(0,0,VW,VH);ctx.restore();}
 function rtLeft(){const r=S.rt;const t=r&&r.ph===(S.phase==='night'?'night':'day')?r.t:0;const s=Math.max(0,Math.ceil(RT_PHASE-t));return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
 function rtFrac(){const r=S.rt;return r&&r.ph===(S.phase==='night'?'night':'day')?r.t/RT_PHASE:0;}
 function doEndTurn(){
@@ -4402,7 +4432,7 @@ function doEndTurn(){
   }
   S.skipConfirm=false;
   se('turn');const t0=S.turn;S.rep=[];if(!S.before)rtWindow();S.doneCnt={};if(!S.gross)S.gross={steel:0,ammo:0,pop:0,used:0};
-  rtRest(S.turnsLeft===1?2:1);   // 昼の残りの時間の分をまとめて（襲撃の日は夜の分も）
+  rtRest('day');   // 昼の残りの時間の分をまとめて受け取る
   advanceResearch();
   tickBaseUp();
   // 欠員補充（防衛施設を優先）
@@ -5761,7 +5791,7 @@ function draw(){
   ctx.strokeStyle='rgba(255,90,78,.25)';ctx.lineWidth=2;ctx.strokeRect(0,0,W,H);ctx.lineWidth=1;
   // ===== 画面座標での表示 =====
   ctx.setTransform(1,0,0,1,0,0);
-  if(S.waveActive||S.phase==='night')drawNight(an);
+  if(S.waveActive||S.phase==='night')drawNight(an);else drawDusk();
   drawFW();drawTlRip();
   if(S.mapId==='s')drawSnow(an);
   // 襲撃方面の警告（画面の端に固定表示）
@@ -5822,6 +5852,7 @@ function draw(){
     ctx.font='bold 12px sans-serif';ctx.textAlign='center';const w=ctx.measureText(tx).width+20;ctx.fillStyle='rgba(40,6,4,.85)';ctx.fillRect(VW/2-w/2,VH-58,w,22);ctx.fillStyle='#ff9a86';ctx.fillText(tx,VW/2,VH-43);}}
   if(S.over&&S.review){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,VW,40);ctx.fillStyle='#f2b33d';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText('振り返り中 — 研究 [R]・軍事 [K] などで最後の状態を見られます。襲撃ごとの記録は「記録」ボタン',VW/2,25);}
   if(S.paused&&!S.over){ctx.fillStyle='rgba(0,0,0,.22)';ctx.fillRect(0,0,VW,VH);}
+  drawRtBar();
 }
 // 施設の描画（稼働アニメーション付き）
 
@@ -7226,7 +7257,7 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   document.body.classList.toggle('qnight',!S.waveActive&&S.phase==='night');
   if(S.waveActive)wv=`${ui('moon','red',24)}<div class="wvm"><b>${S.turn}日目・夜</b><small>第${S.wave}襲撃 交戦中${S.cur&&S.cur.blood?'・ブラッドムーン':''}</small></div><i class="rmoon"></i>`;
   else if(!S.over){const tot=Math.max(S.prepTotal||S.turnsLeft,S.turnsLeft),past=tot-S.turnsLeft+1;let pips='';for(let i=0;i<tot;i++)pips+=`<i class="${i<past?'on':''}"></i>`;
-    wv=`${S.phase==='night'?ui('moon','amber',24):ui('sun','amber',24)}<div class="wvm"><b>${S.turn}日目・${S.phase==='night'?'夜':'昼'} <span class="rtc" title="${S.phase==='night'?'夜':'昼'}の残り時間。0になると自動で${S.phase==='night'?'朝':'夜'}へ進む（「${S.phase==='night'?'朝へ':'夜へ'}」で、残りの生産をまとめて受け取ってすぐ進める）">${S.paused?'停止中':rtLeft()}</span></b><i class="rtbar"><i style="width:${(rtFrac()*100).toFixed(1)}%"></i></i><div class="daypips">${pips}</div></div><div class="wvc"><small>第${S.wave+1}襲撃まで${S.wave+1===finalWave()?'（最後の夜）':''}</small><b>${S.turnsLeft}日</b></div>`;}
+    wv=`${rtGaugeStyle()==='dial'?rtDial():(S.phase==='night'?ui('moon','amber',24):ui('sun','amber',24))}<div class="wvm"><b>${S.turn}日目・${S.phase==='night'?'夜':'昼'}${S.paused?' <span class="rtc">停止中</span>':''}</b><div class="daypips">${pips}</div></div><div class="wvc"><small>第${S.wave+1}襲撃まで${S.wave+1===finalWave()?'（最後の夜）':''}</small><b>${S.turnsLeft}日</b></div>`;}
   setHTML(document.getElementById('wave'),wv);
   nightShortChip();
   renderSheetHandle();
@@ -7646,7 +7677,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。10秒ごとに少しずつ生産が入り、時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める（上の日付の横に残り時間）。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
+ ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。生産は昼だけ、10秒ごとに少しずつ入る。時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める。残りは地図の上のバー（太陽・月が進む）か日付の横の丸いゲージで（日付を押すと切り替え）。昼の後半は夕方に。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
  ['1.8.4','2026-11-16',['上に出るお知らせが消えたあとも、その場所が押せたままになっていて、複数の部隊をまとめて「固守」などに切り替えるボタンが効かないことがあったのを直した（そのとき、お知らせの行き先の施設が光っていた）']],
@@ -8980,6 +9011,7 @@ function loop(now){
   S.fogT=(S.fogT||0)+dt;if(S.fogT>0.5){S.fogT=0;revealAll();}
   uiT+=dt;if(uiT>0.2){uiT=0;try{storyTick();}catch(e){}stripKeyHints();renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
 }
+document.getElementById('wave').addEventListener('click',()=>{if(S&&!S.backdrop&&!S.waveActive)rtGaugeToggle();});   // 試作版：時間の表示の切り替え（丸いゲージ⇔横長のバー）
 auUi();newState();S.backdrop=true;renderAll();resizeView();setTimeout(resizeView,300);showTitle();requestAnimationFrame(loop);
 </script>
 <script>
