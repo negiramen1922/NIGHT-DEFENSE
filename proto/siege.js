@@ -13,7 +13,7 @@ const FOE_SPD=1;                                 // 魔物の足の速さ（本�
 const AWAKE_SHARE=0.3;                           // 陣で起きている（戦いに出てくる）のは、駐屯している魔物の3割
 // こちらの部隊（攻め）。m：人数、hp：1人の体力、dmg：1人の1回の攻撃、rate：攻撃の間隔（秒）、rng：射程、spd：速さ、bld：建物へのダメージ倍率
 const SU={
-  sword: {n:'兵士',  spr:'pawn',   m:5,hp:40, dmg:8, rate:0.8,rng:16, spd:42,bld:1,  role:'melee', d:'いちばん近い魔物・建物を狙う'},
+  sword: {n:'剣士',  spr:'pawn',   m:5,hp:40, dmg:8, rate:0.8,rng:16, spd:42,bld:1,  role:'melee', d:'いちばん近い魔物・建物を狙う'},
   heavy: {n:'重装歩兵',spr:'heavy',m:4,hp:150,dmg:7, rate:1.0,rng:16, spd:30,bld:0.8,role:'shield',d:'重い鎧の歩兵。体力が高く、近くの魔物を引きつける。まわり48の味方をかばう（矢・物見櫓・岩のダメージ−35%）＝本編の研究「盾陣」'},
   archer:{n:'弓兵',  spr:'archer', m:5,hp:24, dmg:6, rate:1.1,rng:130,spd:38,bld:0.5,role:'ranged',d:'いちばん近い相手を撃つ。柵の向こうにも届く。空の魔物を撃てる'},
   mage:  {n:'魔術師',spr:'wizard', m:3,hp:30, dmg:20,rate:1.6,rng:140,spd:30,bld:0.6,role:'ranged',magic:true,splash:30,d:'いちばん近い相手に火の玉（まわりにも当たる）。空の魔物も撃てる。打たれ弱い'},
@@ -51,7 +51,7 @@ const $=id=>document.getElementById(id);
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const alive=o=>o&&o.hp>0;
 const isTent=b=>b.kind==='tent'||b.kind==='chief'||b.kind==='hut'||b.kind==='nest';   // 魔物が眠っている建物（テント・小屋・竜の巣・大将のテント）
-const FLY=['harpy','wyvern'];   // 空を飛ぶ魔物は竜の巣で眠る。地上の近接の部隊（兵士・重装歩兵・騎兵・工兵・破城槌）は手が出せない
+const FLY=['harpy','wyvern'];   // 空を飛ぶ魔物は竜の巣で眠る。地上の近接の部隊（剣士・重装歩兵・騎兵・工兵・破城槌）は手が出せない
 const flyF=f=>!!(E[f.k]&&E[f.k].fly);
 const hitsAir=d=>d.role==='ranged'||d.role==='drake';   // 空の魔物を攻撃できる部隊：弓兵・魔術師・竜騎兵
 function nearF(u,max,filt){const d=SU[u.t];return nearest(u,G.foes,max,f=>(hitsAir(d)||!flyF(f))&&(!filt||filt(f)));}
@@ -121,7 +121,7 @@ function renderCampSetup(){const root=$('siege'),c=campById(G.camp);const st=sta
   $('sgGo').onclick=()=>{G.pool={};G.queue={};for(const q of L)if(G.pick[q.id]){const k=suOf(q);G.pool[k]=(G.pool[k]||0)+1;(G.queue[k]=G.queue[k]||[]).push(q.id);}c.raidDay=S.turn;startDeploy();};}
 // 夜襲の結果を本編へ：倒した魔物の分だけ次の襲撃を減らし、部隊の被害を戻す
 function killsByType(){const kd={};for(const f of G.foes)if(!f.def&&!alive(f))kd[f.k]=(kd[f.k]||0)+1;for(const b of G.blds)if(b.burnBy)for(const k in b.burnBy)kd[k]=(kd[k]||0)+b.burnBy[k];return kd;}
-function campApply(why){const c=campById(G.camp);if(!c||G.applied)return null;G.applied=true;const kd=killsByType();let n=0;
+function campApply(why){const c=campById(G.camp);if(!c||G.applied)return null;G.applied=true;S.siegeN=(S.siegeN||0)+1;const kd=killsByType();let n=0;
   for(const k in kd)for(let i=0;i<kd[k];i++){const before=S.next&&S.next.q.length;campLoss({camp:c.id,type:k});if(S.next&&S.next.q.length<before){n++;try{dexMark(k,true);}catch(e){}}}
   for(const k in G.st)try{dexMark(k);}catch(e){}
   let lost=0;for(const u of G.units){if(!u.sq)continue;const sq=S.squads.find(q=>q.id===u.sq);if(!sq)continue;const end=u.out?(u.keepHp||0):(alive(u)&&!G.retreat?u.hp:0);const r=u.hp0>0?end/u.hp0:1;if(r<=0)lost++;sqLoss(sq,r);}
