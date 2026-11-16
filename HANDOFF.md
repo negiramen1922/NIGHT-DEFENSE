@@ -1,12 +1,12 @@
 # 引き継ぎメモ（ナイトディフェンス）
 
-最終更新：2026-11-16　／　公開中：**ver 1.7**（チュートリアル＝書記官リリアのミッション・番外編・街の名前・研究員・知らせ・山場の前6日などを本番へ。本番と試作版は同じ中身で、違いは試作版だけのテスト用のボタン・攻城戦・音楽室・効果音ラボ）
+最終更新：2026-11-16　／　公開中：**ver 1.8**（本番と試作版は同じ中身。違いは試作版だけのテスト用のボタン・単独の攻城戦・効果音ラボ。どちらも試作版のタイトルの ⚙ の中）
 
 | | URL |
 |---|---|
 | 本番（公開版） | https://negiramen1922.github.io/NIGHT-DEFENSE/ |
 | 試作版（次の更新を試す場所） | https://negiramen1922.github.io/NIGHT-DEFENSE/proto/ |
-| 旧版 ver 0.9 | https://negiramen1922.github.io/NIGHT-DEFENSE/v0.9/ |
+| 旧版 ver 0.9 | https://negiramen1922.github.io/NIGHT-DEFENSE/v0.9/ （ver 1.8 でタイトルからのボタンはなくした。URLを直接開けば遊べる） |
 
 - リポジトリ：`negiramen1922/NIGHT-DEFENSE`（GitHub Pages は `main` ブランチの一番上を公開）
 - 今の作業ブランチ：`claude/epic-franklin-cqzn8h`（main と同じ。毎回 main にも入れている＝そのまま本番に公開される）
@@ -24,7 +24,7 @@
   2. **防衛施設**のランクⅠ〜Ⅶの成長段階と強さ → 済（`docs/RANKS.md`）
   3. **施設の生産性** → 済（`docs/ECONOMY.md`）
   4. 各施設・研究の**費用** → ひとまず済（`docs/ECONOMY.md` の第7版。遊びながら直す）
-  5. **立ち絵**を作りながら、**敵・ステージ・各襲撃**の調整 ← 今ここ（`docs/ENEMIES.md`・`docs/MONSTERS.md`）。草原（ステージ1・グレイヴェル平原）を40回目まで遊べるようにして本番へ（ver 1.3〜1.4）。中ボス・ラスボスの技も入れた。ver 1.5〜1.6 で、桜井流の見直し（`docs/SAKURAI_REVIEW.md`）から、やり直し・足りない資源の警告・序盤の敵を減らす・ブラッドムーンの並びの見直しを入れた。**次の候補**：遊んでもらった感想で草原を調整／`SAKURAI_REVIEW.md` の残り（手応え＝ヒットストップ・画面の揺れ・爆発の段階、同じ所で負け続けたときの救済、敵情予測で相性を一言、作業を楽にする研究）／沼地・山脈・雪原・荒野の魔物と中ボス・ボス／モウラー・巨大コウモリ（山脈）
+  5. **立ち絵**を作りながら、**敵・ステージ・各襲撃**の調整 ← 今ここ（`docs/ENEMIES.md`・`docs/MONSTERS.md`）。草原（ステージ1・グレイヴェル平原）を40回目まで遊べるようにして本番へ（ver 1.3〜1.4）。中ボス・ラスボスの技も入れた。ver 1.5〜1.6 で、桜井流の見直し（`docs/SAKURAI_REVIEW.md`）から、やり直し・足りない資源の警告・序盤の敵を減らす・ブラッドムーンの並びの見直しを入れた。ver 1.7〜1.8 で、チュートリアル（書記官リリアのミッション・番外編）、タイトル画面の作り直しを入れた。**次の候補**：リリアの本物の絵（`docs/ART_BRIEF_LILIA.md`）／チュートリアルの言い回しの調整（遊んでもらった感想で）／遊んでもらった感想で草原を調整／`SAKURAI_REVIEW.md` の残り（手応え＝ヒットストップ・画面の揺れ・爆発の段階、同じ所で負け続けたときの救済、敵情予測で相性を一言、作業を楽にする研究）／沼地・山脈・雪原・荒野の魔物と中ボス・ボス／モウラー・巨大コウモリ（山脈）
 - **資料**：`docs/RANKS.md`（ランクごとのまとめ・部隊・防衛施設・罠・改築の案）、`docs/ECONOMY.md`（収支表）、`docs/ENEMIES.md`（ステージ×ランクの魔物）、`docs/MONSTERS.md`（魔物の数字）、絵の依頼書 `docs/ART_BRIEF.md`・`ART_BRIEF_UNITS.md`・`ART_BRIEF_DEFENSE.md`・`ART_BRIEF_ENEMIES.md`
 - **ステージの予定**：0 チュートリアル（草原）→ 1 草原（40回）→ 2 沼地（？）→ 3 山脈 → 4 雪原 → 5 荒野
 - **ver 1.3（2026-11-13）**：ステージ選択は「ステージ0 廃村エルム（`t`）」「ステージ1 グレイヴェル平原（`f`・草原・40回。1.3 では「辺境の街グレイヴェル」）」だけ遊べる。沼地・山脈・雪原・荒野は Coming Soon（押せない。`showIntro()` の `MAPL`）。草原の40回の出方（`genWave` の `GL`）・ブラッドムーン・`FINAL_BY_MAP` は `f` と `7` の両方に効く（`7` はテスト用の古いマップ）。本番への入れ方：`proto/index.html` からセーブキー・バージョン・タイトルを戻し、`siege.js` の読み込みを外して `index.html` にする（`tools/mkproto.py` の逆）
@@ -106,7 +106,7 @@
 
 - **数字に小数を使わない**（2026-11-12 ユーザーの強い希望）。画面・説明・資料・チャットの返事でも、倍率は「140%」のような百分率、値は整数で出す
 
-1. **2026-11-13 からのやり方**：`proto/index.html`・`proto/siege.js` を直す → 確かめる → `python3 tools/mkprod.py . proto` で本番（トップの `index.html`・`siege.js`）を作り直す → コミットして作業ブランチと `main` の両方へ push。ユーザーの希望で、今は試作版と本番を毎回そろえている
+1. **2026-11-13 からのやり方**（作業の前に `git fetch origin` と最新の main の取り込みを忘れずに）：`proto/index.html`・`proto/siege.js` を直す → 確かめる → `python3 tools/mkprod.py . proto` で本番（トップの `index.html`・`siege.js`）を作り直す → コミットして作業ブランチと `main` の両方へ push。ユーザーの希望で、今は試作版と本番を毎回そろえている
    - 前のやり方（まず試作版で試してもらい、OK が出たら本番へ）に戻すときは、`mkprod.py` を走らせずに proto だけ push する
 2. 試作版は本番と**セーブ・アプリ名・キャッシュを分けてある**（試作版の不具合で本番のセーブを壊さないため）。
    - 試作版のセーブキー：`abyss_save_v3_proto`／本番：`abyss_save_v3`
@@ -115,12 +115,12 @@
    ```
    python3 tools/mkprod.py . proto
    ```
-   試作版 → 本番。`GAME_VER='1.4 試作版'` → `'1.4'`
+   試作版 → 本番。`GAME_VER='1.8 試作版'` → `'1.8'`。`siege.js` と `tut/`（動画）も写す
    ```
    python3 tools/mkproto.py . proto
    ```
    本番 → 試作版（逆向き）。2つは行って戻って同じになることを確かめてある
-4. 版を上げるときは、`GAME_VER`（`proto/index.html` の `'1.4 試作版'`）・タイトルの「アップデート情報」（`UPDATES` の先頭に足す）・`README.md` の3つを直す
+4. 版を上げるときは、`GAME_VER`（`proto/index.html` の `'1.8 試作版'`）・タイトルの「アップデート情報」（`UPDATES` の先頭に足す）・`README.md` の3つを直す
 5. 変更したら `README.md`（公開向けの変更点）とこのメモを更新する。
 6. 確認は Playwright（スマホ表示は `devices['iPhone 13 landscape']` など）で、スクショを撮って目で見る。
    - スマホ縦向きで試すときは、先に `localStorage.setItem('nd_orient','free')`（しないと「横にしてください」画面が出る）。
@@ -133,20 +133,25 @@
 - 昼に建設・生産・研究・編成し、夜ごとにアビスから来る魔物（襲撃）をしのぐ。決められた回数を守りきれば勝ち、城が壊されると負け。
 - ステージ：0 廃村エルム（チュートリアル・6回）→ 1 グレイヴェル平原（草原・40回）。2 沼地・3 山脈・4 雪原・5 荒野は Coming Soon（山上の砦ハルデン `m`・雪原の関所ヴィンター `s` のマップはコードに残っているが、選べない）。
 - 敵は**駐屯地**（街とアビスのあいだ）で次の襲撃を待ち、襲撃の夜はそこから出発する。斥候で見つけ、昼に部隊が近づくと**駐屯地襲撃モード β**（別の戦場で夜襲）になる。倒した分だけ次の襲撃が減る。モードを OFF にしたゲームでは攻め込めない。
-- タイトル：はじめから／つづきから／遊び方／**モンスター図鑑**（セーブをまたいで記録）／**アップデート情報**／クレジット。
+- タイトル（ver 1.8）：後ろで夜の襲撃の動画が動く。真ん中に つづきから／はじめから／**モンスター図鑑**（セーブをまたいで記録）／**アップデート情報**。右下に「？ 遊び方」と「⚙ 設定」（音量・消音・**音楽室**・クレジット・ホーム画面に追加）。
+- チュートリアル（ver 1.7）：ステージ0 廃村エルムで、書記官リリアが「領主様」に9つのミッションで基本を案内する。番外編「偵察と駐屯地攻め」は育った街から始める。
 - 静かな夜（襲撃のない夜）は、夜狩り・深夜残業（研究「延長シフト」）ができる。
 
 ### ファイル
 
 | ファイル | 中身 |
 |---|---|
-| `index.html` | 本番（ver 1.6） |
+| `index.html` | 本番（ver 1.8） |
 | `siege.js` | 夜襲の戦場（駐屯地襲撃モード β）。`proto/siege.js` を `mkprod.py` が写す |
-| `proto/` | 試作版（ここを直す）。`index.html`・`siege.js`・`soundlab.js`（効果音・BGM ラボ。試作版だけ） |
-| `v0.9/index.html` | 旧版 |
+| `tut/` | 動画：チュートリアルの操作（`fence.mp4`・`move.mp4`）とタイトルの後ろ（`title.mp4`）。`proto/tut/` を `mkprod.py` が写す |
+| `proto/` | 試作版（ここを直す）。`index.html`・`siege.js`・`tut/`・`soundlab.js`（効果音・BGM ラボ。試作版だけ） |
+| `v0.9/index.html` | 旧版（タイトルからのボタンはなし） |
 | `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` | アプリ化（ホーム画面に追加）用 |
 | `tools/mkprod.py` | 試作版 → 本番 |
 | `tools/mkproto.py` | 本番 → 試作版 |
+| `tools/rec_tut.js`・`tools/rec_title.js` | 動画の作り直し（チュートリアルの操作・タイトルの後ろ）。使い方はそれぞれの先頭に |
+| `docs/ART_BRIEF_LILIA.md`・`docs/lilia_placeholder.png` | 書記官リリアの絵の依頼書と、今の仮の顔 |
+| `docs/SAKURAI_REVIEW.md` | 桜井流の原則で見た改善案（進み具合つき） |
 | `keyvisual.jpg`・`ogp.jpg` | キービジュアル・リンクを貼ったときの画像 |
 
 ---
@@ -222,7 +227,10 @@
 | 襲撃・波・早送り | `startWave()`・`WAVE_LEAD`・`farE()` / `marchMap()` |
 | ターン送り・夜 | `endTurn()` / `showNight()` / `morning()` |
 | 上の資源バー・敵情予測・選択中 | `renderTop()` / `renderIntel()` / `renderInfo()` |
-| タイトル・遊び方・セーブ | `showTitle()` / `showHelp()` / `saveGame()` / `loadGame()` |
+| タイトル・遊び方・セーブ | `showTitle()`（後ろの動画は `openOverlay` の `#ovBg`、右下の設定は `.tcorner`/`.tsetP`）/ `showHelp()` / `saveGame()` / `loadGame()`（鉱脈・油田は `packG`/`unpackG`）/ やり直し `saveCkpt()`/`loadCkpt()` |
+| チュートリアル（リリア） | `MISSIONS` / `STAGE_MIS` / `guideInit()` / `guideTick()` / `renderGuide()` / `guideWhere()` / `lilTxt()`（`{ART:}`・`{MOV:}`）/ `askTown()` / `nightLilia()` / 番外編 `startScoutEx()` |
+| 画面の上のお知らせ | `alertTop()`（戦死・城・大きな夜 `bigAhead()`・`BIG_SAY`）/ `newsTop()`（城のレベル・研究で建てられる施設 `unlockNews()`）|
+| 音量・音楽室 | `auSetBgm()` / `auSetSe()` / `auToggle()`（localStorage `bd_audio`）／ siege.js の `openMusic()`・`TRACKS` |
 | ドット絵 | 地図・アイコン：`NDSPR.buildings`（28×28・4コマ）／選択中の絵：`NDART`（100×40の夜景・4コマ）／操作アイコン：`PXICON.ui.icons` |
 | 初心者タスク | `GUIDE`（防衛タスクの末尾に駐屯地2つ。進み具合は番号で保存されるので**途中に足さず末尾に足す**） |
 
