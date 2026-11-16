@@ -872,8 +872,8 @@ function renderMusic(){const r=document.getElementById('sgMusic');if(!r)return;c
   document.getElementById('sgMClose').onclick=closeMusic;}
 // 効果音・BGM ラボ（soundlab.js）：試作版だけ。押したときに読み込む。ラボで BGM を選んであれば、起動時にも読み込む（ゲームの曲を差し替えるため）
 function loadLab(cb){if(window.openSoundLab){cb&&cb();return;}const sc=document.createElement('script');sc.src='soundlab.js';sc.onload=()=>{cb&&cb();};document.head.appendChild(sc);}
-// タイトルのボタンは2列の並び（.ttl .tgrid）に足す（2026-11-16）
-const tAdd=(after,el)=>{const g=document.querySelector('.ttl .tgrid');if(g)g.appendChild(el);else after.insertAdjacentElement('afterend',el);};
+// タイトルのボタンは「その他」の中（.ttl .tmoreL）に足す（2026-11-16）
+const tAdd=(after,el)=>{const g=document.querySelector('.ttl .tmoreL')||document.querySelector('.ttl .tgrid');if(g)g.appendChild(el);else after.insertAdjacentElement('afterend',el);};
 function hook(){if(typeof showTitle!=='function'||typeof E==='undefined'||typeof SPR==='undefined'){setTimeout(hook,200);return;}
   const orig=showTitle;window.showTitle=showTitle=function(){const r=orig.apply(this,arguments);if(!String(typeof GAME_VER!=='undefined'?GAME_VER:'').includes('試作'))return r;   /* 単独の攻城戦・音楽室は試作版だけ */try{const nb=document.getElementById('tNew');if(nb&&!document.getElementById('tSiege')){const b=document.createElement('button');b.id='tSiege';b.textContent='攻城戦（試作）';b.style.padding='8px';b.onclick=openSiege;tAdd(nb,b);}if(nb&&!document.getElementById('tMusic')){const m=document.createElement('button');m.id='tMusic';m.textContent='♪ 音楽室・音量';m.style.padding='8px';m.onclick=openMusic;tAdd(document.getElementById('tSiege')||nb,m);}if(nb&&!document.getElementById('tLab')){const l=document.createElement('button');l.id='tLab';l.textContent='♪ 効果音・BGM ラボ';l.style.padding='8px';l.onclick=()=>loadLab(()=>window.openSoundLab());tAdd(document.getElementById('tMusic')||nb,l);}}catch(e){}return r;};
   if(typeof S!=='undefined'&&S&&S.overlay==='title')showTitle();
