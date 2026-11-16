@@ -339,6 +339,7 @@ body.fullmap #right.open{transform:none}
 body.land #alertTop{top:44px;font-size:14px;padding:6px 12px}
 #ovCard .vpop{display:flex;gap:12px;align-items:center;padding:10px 12px;margin:0 0 8px;background:#141210;border:2px solid var(--vc);box-shadow:0 0 14px color-mix(in srgb,var(--vc) 35%,transparent)}#ovCard .vpi{flex-shrink:0;width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:#1e1a12;border:1px solid #4a4030}#ovCard .vpk{font-size:11px;color:var(--vc);letter-spacing:2px}#ovCard .vpop .nvt{margin-top:4px;line-height:1.7}
 #ovCard .vops{display:flex;flex-direction:column;gap:6px;margin:6px 0}#ovCard .vop{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;line-height:1.6}#ovCard button.vop{flex-direction:column;align-items:flex-start}#ovCard .nshop .vop{background:#15130e;border:1px solid #3a3428;margin:0 0 4px}
+#ovCard .bkl{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:4px;max-height:30vh;overflow:auto}#ovCard .bki{font-size:12px;padding:2px 8px;background:#15130e;box-shadow:0 0 0 1px #3a3428}#ovCard .bki b{color:var(--amber);font-weight:400}.bkn{display:inline-block;min-width:16px;margin-left:6px;padding:0 4px;font-size:11px;line-height:16px;background:var(--amber);color:#111;text-align:center}
 #ovCard .vaf{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:#d8ccb0}#ovCard .aft{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}#ovCard .aft b{color:#f0e4c8}#ovCard .aft.lack b{color:var(--red)}.use small.hv{font-size:10px;color:#9a8e74;margin-left:1px}
 #ovCard .stk{text-align:center;font-size:11px;letter-spacing:3px;color:#c8a070;margin:2px 0}
 #ovCard .wdL{display:flex;flex-direction:column;gap:6px;max-height:48vh;overflow:auto}#ovCard .wd{display:block;width:100%;text-align:left;padding:8px 10px;background:#15130e;border:1px solid #4a4030;line-height:1.6;font-size:12px}#ovCard .wd.now{border-color:#3a6a7a}#ovCard .wdh{display:flex;justify-content:space-between;gap:8px;font-size:14px}#ovCard .wdr{font-size:12px;font-weight:bold}#ovCard .nlil{display:flex;gap:10px;align-items:flex-start;background:#1e1a12;border:1px solid #c8a070;padding:8px 10px;margin:4px 0 10px;line-height:1.7;font-size:13.5px;color:#f0e4c8}#ovCard .nlil small{display:block;color:#e8c070;font-size:11px}#ovCard .nlil ol{margin:4px 0;padding-left:20px}#ovCard .nlil img{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}
@@ -1294,7 +1295,7 @@ body.land #build .bchips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}b
 body.resMin:not(.land) #wrap #resbar .res.key{grid-template-columns:auto 2.4em}}
 body.land #wrap #resbar .res .dl{display:inline-block!important;min-width:3em}
 /* PCの下のボタン：一括修理・一括補給は文字が変わっても幅を固定 */
-@media (min-width:901px){#bRepAll,#bSupAll{width:170px;justify-content:flex-start}}
+@media (min-width:901px){#bRepAll,#bSupAll{width:124px;justify-content:center}}   /* 費用はボタンに書かない（押すと確認が出る）ので短く。2026-11-16 */
 #controls>#bHire,#controls>#bHero{display:none!important}
 .asubs{display:flex;gap:0;margin:0 0 8px;box-shadow:0 0 0 1px var(--line)}
 .asubs button{flex:1;padding:6px 2px;font-size:12px;border:none;box-shadow:none;border-right:1px solid var(--line);background:transparent}
@@ -3859,7 +3860,7 @@ function genWave(n){
   });
   q.sort((a,b)=>a.t-b.t);
   const perSide={},sideComp={};for(const e of q){perSide[e.side]=(perSide[e.side]||0)+1;const c=sideComp[e.side]=sideComp[e.side]||{};c[e.type]=(c[e.type]||0)+1;}
-  return{n,q,sides,main:sides[0],tactic,blood,blizzard:S&&S.mapId==='s'&&[8,13,20].includes(n),hpMul:1+Math.max(0,n-10)*(GL?0.04:0.12),king:n===finalWave(),subs:subs.map((c,i)=>Object.values(c).reduce((a,b)=>a+b,0)+(n===finalWave()&&i===subs.length-1?1:0)),perSide,sideComp,noise0:0.6+Math.random()*0.8,noise1:0.85+Math.random()*0.3};
+  return{n,q,sides,main:sides[0],tactic,blood,blizzard:S&&S.mapId==='s'&&[8,13,20].includes(n),hpMul:1,   /* 襲撃が進んでも魔物の体力は上げない。強さは魔物の種類と数だけで（2026-11-16 ユーザーの指定） */king:n===finalWave(),subs:subs.map((c,i)=>Object.values(c).reduce((a,b)=>a+b,0)+(n===finalWave()&&i===subs.length-1?1:0)),perSide,sideComp,noise0:0.6+Math.random()*0.8,noise1:0.85+Math.random()*0.3};
 }
 function phaseReset(){try{if(S.buildMode||S.buildPick){S.buildMode=null;S.buildPick=false;renderBuild();}S.aimNaval=false;if(S.sel&&S.sel.kind!=='s')S.sel=null;S.selTile=null;renderInfo(true);renderMode();}catch(e){}}
 // ===== 行軍：街から遠く、まだ見えていない敵は少し速く進む（駐屯地からの道のりの待ち時間を少し短くする） =====
@@ -3927,7 +3928,7 @@ function campSpot(c){const a=Math.random()*6.283,r=Math.sqrt(Math.random())*2.6*
 function startSkirm(c){
   const {u,n}=campUnits(c);if(!n){c.state='gone';return;}
   if(!c.found)S.campFoundN=(S.campFoundN||0)+1;c.found=true;c.state='fight';S.skirm={id:c.id,away:0,t:0,n0:n};
-  const hm=(S.next.blood?1.25:1)*(S.next.hpMul||1);
+  const hm=S.next.blood?1.25:1;
   for(const ty in u)for(let i=0;i<u[ty];i++){const d=E[ty];if(!d)continue;const [x,y]=campSpot(c);const hp=Math.round(d.hp*hm);
     S.enemies.push({type:ty,x,y,hp,maxhp:hp,cd:0.5+Math.random(),target:null,retarget:0,camp:c.id,hx:x-c.x,hy:y-c.y});dexMark(ty);}
   // 速度は×1に戻して、いったん止める（襲撃の×3がそのまま残っていて、いきなり3倍で始まらないように）
@@ -4050,7 +4051,7 @@ function gdexMark(t,kill){const G=gdex();const o=G[t]||(G[t]={seen:0,kills:0});o
 function gdexFlush(){if(!GDEX_DIRTY)return;GDEX_DIRTY=false;try{localStorage.setItem(gdexKey(),JSON.stringify(GDEX));}catch(e){}}
 setInterval(gdexFlush,4000);addEventListener('pagehide',gdexFlush);
 function spawnEnemy(ent){dexMark(ent.type);
-  const d=Object.assign({},E[ent.type]);if(S.cur&&S.cur.blood)d.hp=Math.round(d.hp*1.25);if(S.cur&&S.cur.hpMul)d.hp=Math.round(d.hp*S.cur.hpMul);let x,y;const j=(Math.random()-.5)*0.35;
+  const d=Object.assign({},E[ent.type]);if(S.cur&&S.cur.blood)d.hp=Math.round(d.hp*1.25);let x,y;const j=(Math.random()-.5)*0.35;
   if(S.island&&S.hives[ent.side]){const h=S.island,bch=S.hives[ent.side],a=Math.random()*Math.PI*2,r=Math.random()*1.8*TU;
     S.enemies.push({type:ent.type,x:bcx(h)+Math.cos(a)*r,y:bcy(h)+Math.sin(a)*r,hp:d.hp,maxhp:d.hp,cd:0,target:null,retarget:0,wp0:[bch.x*T-1.5*TU,bcy(bch)+(Math.random()-.5)*6*TU]});return;}
   {const cp=campFor(ent.side);if(cp){const [x,y]=campSpot(cp);S.enemies.push({type:ent.type,x,y,hp:d.hp,maxhp:d.hp,cd:0,target:null,retarget:0});return;}}   // 駐屯地から出発
@@ -5212,6 +5213,29 @@ function supplyAll(){S.careN=(S.careN||0)+1;let n=0;const list=S.squads.filter(n
   if(n){se('upgrade');log(`一括補給：${n}部隊（離れている部隊は近くの所属施設・前哨砦・城館で補給を受ける）`,'good');}else{se('error');if(list.length)log('補給する資材が足りない','warn');}renderInfo(true);if(S.overlay==='army')showArmy();}
 function supplyOne(id){const x=S.squads.find(q=>q.id==id);if(x)orderSupply(x,false);renderInfo(true);}
 function supText(s){const sp=supOf(s);if(!sp)return '';const r=s.sup/sp.max;return `${Math.round(r*100)}%${r<0.25?(sp.melee?'（消耗：火力低下）':'（残りわずか）'):''}`;}
+// 一括修理・一括補給の確認（2026-11-16 ユーザーの希望）：ボタンには費用を書かず、押したら「何を直す・何に補給するか」と「使う物（今 → 後）」を並べて、はい／いいえ
+let BULK=null;
+function bulkAsk(title,items,cost,note,doIt,back){const cnt=items.reduce((a,x)=>a+x[1],0);
+  const L=items.map(([n,k])=>`<span class="bki">${n}${k>1?` <b>×${k}</b>`:''}</span>`).join('');
+  BULK={doIt,back};
+  openOverlay('bulk',`<h2 style="margin:0 0 6px">${title}</h2><div class="muted" style="font-size:12px">${title==='一括修理'?'直すもの':'補給するもの'}（${cnt}）</div><div class="bkl">${L}</div>
+   <div class="muted" style="font-size:12px;margin-top:8px">使うもの</div><div class="vaf" style="margin:4px 0 6px">${afterText(cost)}</div>${note?`<div class="wn" style="font-size:12px">${note}</div>`:''}
+   <div style="margin:10px 0 2px">これを消費して${title}しますか？</div><div class="nfoot"><button id="bkNo">いいえ</button><button id="bkYes" class="on">はい [Enter]</button></div>`,true);
+  document.getElementById('bkYes').onclick=bulkYes;document.getElementById('bkNo').onclick=bulkNo;}
+function bulkYes(){const b=BULK;BULK=null;closeOverlay();if(b){b.doIt();if(b.back)b.back();}}
+function bulkNo(){const b=BULK;BULK=null;closeOverlay();if(b&&b.back)b.back();}
+function cntBy(list,f){const m=new Map();for(const x of list){const k=f(x);m.set(k,(m.get(k)||0)+1);}return [...m.entries()];}
+function askRepairAll(back){if(S.waveActive){se('error');toast('戦闘中は修理できない（昼に修理しよう）','warn');return;}
+  const ra=repairAllCost(),bl=S.blds.filter(damaged);let miss=0;for(const b of S.blds)if(b.shMax>0)miss+=Math.max(0,b.shMax-(b.shield||0));
+  const items=cntBy(bl,b=>B[b.type].name);const pd=pitsToDig().length,sb=spikesBroken().length;if(pd)items.push(['埋まった落とし穴',pd]);if(sb)items.push(['壊れたトゲ床',sb]);
+  const ec=miss>0?Math.ceil(miss/10):0;if(ec)items.push(['バリアストーンのシールド',1]);
+  if(!items.length){se('error');toast('修理が必要な施設はありません','warn');return;}
+  const cost={steel:ra.c};if(ec)cost.elec=ec;
+  bulkAsk('一括修理',items,cost,S.steel<ra.c?'木材が足りないので、大事な施設（城・防衛施設・傷みのひどいもの）から、直せる分だけ直します':'',repairAll,back);}
+function askSupplyAll(back){const list=S.squads.filter(needsSupply);if(!list.length){se('error');toast('補給が必要な部隊はありません','warn');return;}
+  const c=supCost(list),cost={};for(const k in c)if(c[k]>0)cost[k]=Math.ceil(c[k]);
+  const lack=Object.keys(cost).some(k=>(S[k]||0)<cost[k]);
+  bulkAsk('一括補給',list.map(q=>[unitLabel(q),1]),cost,lack?'足りない物があるので、補給しきれない部隊があります':'',supplyAll,back);}
 function supCostHTML(list){const c=supCost(list),pop=Math.ceil(c.pop||0);delete c.pop;for(const k in c)c[k]=Math.ceil(c[k]);return costText(c,pop);}
 function supCostText(c){return Object.keys(c).map(k=>`${k==='pop'?'人員':RES_NAME[k]}${Math.round(c[k]*10)/10}`).join('・')||'なし';}
 // 火力の重なり方：研究どうしは足し算 → 研究・英雄・その場の効果はそれぞれ掛け算
@@ -6575,6 +6599,7 @@ document.addEventListener('keydown',ev=>{
   if(ev.key==='j'||ev.key==='J'){if(!S.overlay)openArmyTab('hero');return;}
   if(S.overlay==='report'&&(ev.key==='Enter'||ev.key==='Escape'||ev.code==='Space')){ev.preventDefault();closeOverlay();return;}
   if(S.overlay==='confirm'&&ev.key==='Escape'){closeOverlay();return;}
+  if(S.overlay==='bulk'&&(ev.key==='Enter'||ev.key==='Escape')){ev.preventDefault();if(ev.key==='Enter')bulkYes();else bulkNo();return;}
   if(S.overlay==='night'&&ev.key==='Enter'){ev.preventDefault();closeOverlay();morning();return;}
   if(S.overlay==='visit'&&(ev.key==='Enter'||ev.key==='Escape')){ev.preventDefault();closeOverlay();return;}
   if(S.overlay==='story'&&(ev.key==='Enter'||ev.key==='Escape'||ev.code==='Space')){ev.preventDefault();closeOverlay();return;}
@@ -6588,8 +6613,8 @@ document.addEventListener('keydown',ev=>{
   if(ev.code==='Space'){ev.preventDefault();togglePause();}
   if(ev.key==='Enter'){ev.preventDefault();endTurn();}
   if(ev.key==='h'||ev.key==='H')toggleHeat();
-  if(ev.key==='x'||ev.key==='X')repairAll();
-  if(!S.overlay&&(ev.key==='n'||ev.key==='N'))supplyAll();
+  if(!S.overlay&&(ev.key==='x'||ev.key==='X'))askRepairAll();
+  if(!S.overlay&&(ev.key==='n'||ev.key==='N'))askSupplyAll();
   if(ev.key==='m'||ev.key==='M')auToggle();
   if((ev.key==='u'||ev.key==='U')&&S.sel&&S.sel.kind==='b'){upgrade(S.sel);renderInfo(true);}
   if((ev.key==='q'||ev.key==='Q')&&S.squads.length){const i=S.sel&&S.sel.kind==='s'?S.squads.indexOf(S.sel):-1;S.sel=S.squads[(i+1)%S.squads.length];S.buildMode=null;renderInfo(true);}
@@ -6697,7 +6722,7 @@ document.getElementById('bArmy').onclick=()=>openArmyTab('list',true);
 function setRT(t){if(t==='info'&&!isNarrow())t='build';if(S&&t==='econ')S.econSeen=(S.econSeen||0)+1;if(S&&t==='army'&&S.armySub==='hero')S.heroSeen=(S.heroSeen||0)+1;document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
-document.getElementById('bRepAll').onclick=repairAll;document.getElementById('bSupAll').onclick=supplyAll;
+document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bSupAll').onclick=()=>askSupplyAll();
 document.getElementById('bHelp').onclick=()=>{if(!S.overlay)showHelp(false);};
 document.getElementById('bNaval').onclick=toggleNaval;
 document.getElementById('bMute').onclick=auToggle;
@@ -7271,11 +7296,10 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   if(bn.disabled!==S.waveActive)bn.disabled=S.waveActive;
   setHTML(bn,S.waveActive?`${ui('moon','red',24)}<span>襲撃中</span>`:S.phase==='night'?`${ui('sun','dark',24)}<span>朝へ</span><kbd>Enter</kbd>`:`${ui('moon','dark',24)}<span>${S.turnsLeft===1?'夜へ・襲撃':'夜へ'}</span><kbd>Enter</kbd>`);
   bn.classList.toggle('last',!S.waveActive&&S.phase!=='night'&&S.turnsLeft===1);renderPauseUI();
-  {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,sq.length?`一括補給 <span class="supc">${supCostHTML(sq)}</span><kbd>N</kbd>`:'一括補給');
-  {const ms=document.getElementById('mSup');if(ms)setHTML(ms,sq.length?`一括補給（${sq.length}部隊）<span class="supc">${supCostHTML(sq)}</span>`:'一括補給（必要なし）');}const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
-  const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${repWhat(ra2)}（${ic('steel',12)}${ra2.c}）<kbd>X</kbd>`:'一括修理');const dA=!ra2.n||S.steel<1||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
-  {const rb=document.getElementById('bRepB');if(rb){const l=S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${repWhat(ra2)}（木材${ra2.c}）`:'一括修理（壊れた施設なし）';if(rb.dataset.l!==l){rb.dataset.l=l;rb.textContent=l;}if(rb.disabled!==dA)rb.disabled=dA;}}
-  {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${repWhat(ra2)}（木材${ra2.c}）`:'一括修理');mr.classList.toggle('dim',dA);}}
+  {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,`一括補給${sq.length?`<span class="bkn">${sq.length}</span>`:''}<kbd>N</kbd>`);
+  {const ms=document.getElementById('mSup');if(ms)setHTML(ms,sq.length?`一括補給（${sq.length}部隊）`:'一括補給（必要なし）');}const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
+  const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中）':`一括修理${ra2.n?`<span class="bkn">${ra2.n}</span>`:''}<kbd>X</kbd>`);const dA=!ra2.n||S.steel<1||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
+  {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中）':ra2.n?`一括修理（${repWhat(ra2)}）`:'一括修理');mr.classList.toggle('dim',dA);}}
   const bnv=document.getElementById('bNaval');bnv.style.display=has('naval')?'':'none';setText(bnv,S.aimNaval?'目標を指定…（Escで取消）':`艦砲射撃 残り${S.waveActive?S.navalLeft:(has('navalre')?2:1)} [V]`);
   {const dn=!S.waveActive||S.navalLeft<=0;if(bnv.disabled!==dn)bnv.disabled=dn;bnv.classList.toggle('on',!!S.aimNaval);}
 
@@ -7488,7 +7512,7 @@ function showArmy(target){
   if(!target&&S.squads.length){const uts=[...new Set(S.squads.filter(u=>W_NAME[u.ut]&&u.ut!=='adv').map(u=>u.ut))];   // 装備をまとめて変える（兵科ごと）
     if(uts.length){h+=`<h3 style="margin:10px 0 4px">装備をまとめて変える</h3><div class="help" style="margin-bottom:4px">兵科ごとに、全部隊の武器・鎧の段を変えます。「最新（自動）」なら研究するたびに上がる。古い段にすると補給の資材を節約できる</div>`;
       for(const ut of uts){const r=S.squads.find(u=>u.ut===ut);h+=`<div class="row" style="align-items:center"><span>${icSvg(r.model||defModel(ut),18)} <b>${UT[ut].name}</b> <span class="muted" style="font-size:11px">${S.squads.filter(u=>u.ut===ut).length}部隊</span></span><span style="font-size:11px;display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">${eqIcon('w',wMat(r),14)}<select data-eqall="w:${ut}" style="font-size:11px;width:auto;max-width:170px">${eqOpts(Object.assign({},r,{wT:undefined}),'w').replace(/ selected/g,'').replace('<option value="auto"','<option value="" selected>まとめて変える…</option><option value="auto"')}</select>${armK(ut)?`${eqIcon(armK(ut),aMat(armK(ut)),14)}<select data-eqall="a:${ut}" style="font-size:11px;width:auto;max-width:170px">${eqOpts(Object.assign({},r,{aT:undefined}),'a').replace(/ selected/g,'').replace('<option value="auto"','<option value="" selected>まとめて変える…</option><option value="auto"')}</select>`:''}</span></div>`;}}}
-  if(!target){  h+=`<h3 style="margin:10px 0 4px">全部隊（${S.squads.length}）</h3><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px"><button data-all="sel">全部隊を選択</button><button data-all="sup">一括補給（${supCostText(supCost(S.squads))}）</button>${['guard','hold','return'].map(m=>`<button data-all="${m}">全部隊：${MODE_NAME[m]}</button>`).join('')}</div>`;
+  if(!target){  h+=`<h3 style="margin:10px 0 4px">全部隊（${S.squads.length}）</h3><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px"><button data-all="sel">全部隊を選択</button><button data-all="sup">一括補給</button>${['guard','hold','return'].map(m=>`<button data-all="${m}">全部隊：${MODE_NAME[m]}</button>`).join('')}</div>`;
   h+=S.squads.length?S.squads.map(u=>`<div class="row" style="align-items:center"><span>${icSvg(u.model||defModel(u.ut),18)} <b>${unitLabel(u)}</b> <span class="muted" style="font-size:11px">${u.members}/${MT(u).members}${UT[u.ut].unit}・体力${Math.round(u.hp/u.maxhp*100)}%${supT(u)?`・<span style="color:${u.sup/supT(u).max<0.25?'var(--red)':'inherit'}">${supT(u).name}${Math.round(supOf(u)&&u.sup/supT(u).max*100)}%</span>`:''}・${u.gar?'物見櫓':MODE_NAME[u.mode]}</span></span><span>${W_NAME[u.ut]&&u.ut!=='adv'?`<span style="margin-right:6px;font-size:11px">${eqSel(u,'w')}${armK(u.ut)?' '+eqSel(u,'a'):''}</span>`:''}<button data-pick="${u.id}" style="padding:2px 8px">選ぶ</button></span></div>`).join(''):'<div class="muted">部隊がいません</div>';
   }
   let card;if(target){target.innerHTML=h;card=target;}else{card=openOverlay('army',h,true);document.getElementById('ovClose').onclick=closeOverlay;}
@@ -7497,7 +7521,7 @@ function showArmy(target){
   card.querySelectorAll('[data-eqs]').forEach(b=>b.onchange=()=>{const [k,id]=b.dataset.eqs.split(':');const u=S.squads.find(x=>x.id==id);if(u)eqSet([u],k,b.value);showArmy(target);});
   card.querySelectorAll('[data-eqall]').forEach(b=>b.onchange=()=>{if(!b.value)return;const [k,ut]=b.dataset.eqall.split(':');eqSet(S.squads.filter(x=>x.ut===ut),k,b.value);log(`${UT[ut].name}の全部隊の${k==='w'?'武器':'鎧'}を変えた`);showArmy(target);});
   card.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{const u=S.squads.find(x=>x.id==b.dataset.pick);if(!u)return;closeOverlay();S.multi=[];S.sel=u.gar?S.blds.find(x=>x.id===u.gar)||u:u;cam.x=u.x-VW/cam.z/2;cam.y=u.y-VH/cam.z/2;clampCam();renderInfo(true);renderMode();});
-  card.querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{const m=b.dataset.all;if(m==='sup'){supplyAll();return;}if(m==='sel'){S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;closeOverlay();renderInfo(true);renderMode();return;}for(const u of S.squads)if(!u.gar)setMode(u,m,true);showArmy(target);});
+  card.querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{const m=b.dataset.all;if(m==='sup'){askSupplyAll(()=>showArmy(target));return;}if(m==='sel'){S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;closeOverlay();renderInfo(true);renderMode();return;}for(const u of S.squads)if(!u.gar)setMode(u,m,true);showArmy(target);});
 }
 function showHire(target,mode){
   const full=S.cmds.length>=maxCmd();const showH=mode!=='adv',showA=mode!=='hero';
@@ -7683,7 +7707,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）']],
+ ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊と、使う物（「木材 250 → 202」）を並べて「これを消費して一括○○しますか？」と聞く','<b>襲撃が進んでも魔物の体力が上がらないように</b>：後半の強さは、魔物の種類と数だけで（ブラッドムーンの夜は今までどおり少し強い）']],
  ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。生産は昼だけ、10秒ごとに少しずつ入る。時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める。残りは地図の上の横長のバーで（太陽・月が左から右へ進む）。昼の後半は夕方に。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
@@ -8304,7 +8328,7 @@ function renderArmyPanel(force){if(!S)return;const sub=S.armySub||'list';
 function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el)return;if((S.armySub||'list')!=='list')return;const box=el.closest('.box');if(box&&box.style.display==='none'&&!force)return;
   const sq=S.squads.filter(needsSupply);
   const key=S.squads.map(s=>s.id+':'+vetLv(s)+':'+Math.round(s.hp/s.maxhp*20)+':'+(supOf(s)?Math.round(s.sup/supOf(s).max*20):'')+':'+s.members+(s.gar?'g':'')+(s.mode||'')+(s.supPend?'s':'')).join()+'|'+sq.length+'|'+S.waveActive+'|'+(S.sel&&S.sel.kind==='s'?S.sel.id:'')+'|'+['sword','ammo','elec','powder','iron','fuel','pop'].map(k=>Math.floor(S[k]||0)).join(',')+'|'+S.blds.filter(b=>b.type==='ammo').map(b=>(b.mode||'a')+(b.bt>0?'b':'')).join('');if(key===armyKey&&!force)return;armyKey=key;
-  let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length&&!S.waveActive?'':'disabled'}>${sq.length?`一括補給（${sq.length}部隊）<span class="supc">${supCostHTML(sq)}</span>`:'一括補給（必要なし）'}</button></div>`;
+  let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length&&!S.waveActive?'':'disabled'}>${sq.length?`一括補給（${sq.length}部隊）`:'一括補給（必要なし）'}</button></div>`;
   // 武器工房：何を作っているか・切り替え（建物を探さなくても変えられるように）
   {const ws=S.blds.filter(b=>b.type==='ammo');
    h+=`<div class="wsum"><div class="row" style="align-items:center"><b>武器工房</b><span class="muted" style="font-size:11px">在庫 ${ic('ammo',12)}矢 ${Math.floor(S.ammo||0)}　${ic('sword',12)}剣 ${Math.floor(S.sword||0)}</span></div>`+
@@ -8316,7 +8340,7 @@ function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el
   el.innerHTML=h;el.querySelectorAll('[data-wsw]').forEach(b=>b.onclick=()=>{const w=S.blds.find(x=>x.id==b.dataset.wsw);if(!w)return;w.mode=w.mode==='sword'?null:'sword';se('click');renderArmyBox(true);if(S.sel===w)renderInfo(true);});
   el.querySelectorAll('[data-sq]').forEach(b=>b.onclick=()=>{const q0=S.squads.find(s=>s.id==b.dataset.sq);if(S.sel===q0){deselect();return;}S.sel=q0;S.multi=[];renderInfo(true);const q=S.sel;if(q&&!q.gar){cam.x=q.x-VW/2/cam.z;cam.y=q.y-VH/2/cam.z;clampCam();}});
   document.getElementById('abSel').onclick=()=>{S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;renderInfo(true);renderMode();};
-  document.getElementById('abSup').onclick=()=>{supplyAll();renderArmyBox(true);};
+  document.getElementById('abSup').onclick=()=>askSupplyAll(()=>renderArmyBox(true));
 }
 function tabBadges(){const t=document.querySelector('#rtabs button[data-rt="econ"]');if(!t)return;let n=0;try{n=econWarnings(econ(),ammoForecast()).filter(w=>w[0]==='bd').length;}catch(e){}const lab='街'+(n?'<i class="ndot red"></i>':'');if(t.dataset.l!==lab){t.dataset.l=lab;t.innerHTML=lab;}
   const a=document.querySelector('#rtabs button[data-rt="army"]');const w=S.squads.filter(q=>q.hp/q.maxhp<0.4).length;const la='軍事'+(S.squads.length?`<span class="tcnt">${S.squads.length}</span>`:'')+(w?'<i class="ndot amber"></i>':'');if(a.dataset.l!==la){a.dataset.l=la;a.innerHTML=la;}}

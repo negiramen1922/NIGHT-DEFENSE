@@ -104,7 +104,7 @@ const MODEL_SU={pawn:'sword',silver:'sword',guard:'sword',farmer:'sword',advSwor
 function suOf(sq){return MODEL_SU[sq.model]||({inf:'sword',arch:'archer',cav:'cav',drake:'drake',mage:'mage',art:'gun',mil:'sword',guard:'sword',adv:'sword'})[sq.ut]||null;}
 function campSquads(){return (S.squads||[]).filter(q=>q.hp>0&&!q.gar&&suOf(q));}
 function openSiegeCamp(c){const n=S.wave+1,w=S.next||{};
-  G={phase:'setup',camp:c.id,raid:n,layout:c.lay||'ring',speed:1,paused:false,pool:{},pick:{},fhm:(w.blood?1.25:1)*(w.hpMul||1)};
+  G={phase:'setup',camp:c.id,raid:n,layout:c.lay||'ring',speed:1,paused:false,pool:{},pick:{},fhm:w.blood?1.25:1};
   for(const q of campSquads())if(Math.hypot(q.x-c.x,q.y-c.y)<14*TU)G.pick[q.id]=true;   /* 駐屯地の近くにいる部隊は最初から選んでおく */
   S.overlay='siege';S.paused=true;
   let root=$('siege');if(!root){root=document.createElement('div');root.id='siege';document.body.appendChild(root);}
