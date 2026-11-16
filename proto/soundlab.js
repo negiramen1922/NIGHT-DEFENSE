@@ -48,7 +48,7 @@ const SE_LIST=[
  ]],
  ['知らせ・結果',[
   ['alarm','襲撃が来た','夜の襲撃が始まったとき・第二波／第三波の接近'],
-  ['clear','襲撃をしのいだ','襲撃の敵を全部倒したとき・駐留地を片付けたとき'],
+  ['clear','襲撃をしのいだ','襲撃の敵を全部倒したとき・駐屯地を片付けたとき'],
   ['bell','夜の訪問者','静かな夜に旅人・行商人などが来たとき'],
   ['pop','花火','祭りの花火'],
   ['win','勝利','ステージをクリアしたとき'],
@@ -223,7 +223,7 @@ const BGM=[
  ]},
  {scene:'res_win',n:'勝利の結果画面',orig:'今の曲＝凱旋（Cメジャー・行進）',list:[{id:'res_win_b',n:'案B：夜明けの街',d:'Fメジャー・ゆったり、あたたかい',t:TRACK.res_win_b}]},
  {scene:'res_lose',n:'敗北の結果画面',orig:'今の曲＝鎮魂（Aマイナー・ゆっくり、こだまする細い音）',list:[{id:'res_lose_b',n:'案B：灰の朝',d:'Dマイナー・少し動きのある悲しい旋律',t:TRACK.res_lose_b}]},
- {scene:'siege',n:'駐留地への夜襲',orig:'今の曲（忍び寄る→戦太鼓）',list:[
+ {scene:'siege',n:'駐屯地への夜襲',orig:'今の曲（忍び寄る→戦太鼓）',list:[
   {id:'c_siege_a',n:'8bit A：忍び足',d:'Eマイナー・低く静か。ぽつぽつ鳴る旋律',t:mkTrack({bpm:112,prog:['Em','Em','C','B'],bass:'walk',arp:'none',drums:DR.sneak,lstep:2,lw:0.125,lv:0.04,echo:true,
     lead:'E4 - . . G4 - . . F#4 - . . E4 - - - . . . . B4 - . . A4 - G4 - F#4 - - - . . . . . . . . . . . . . . . .'})},
   {id:'c_siege_b',n:'8bit B：突入',d:'Aマイナー・速い。見つかったあと向け',t:mkTrack({bpm:152,prog:['Am','Am','F','E'],bass:'gallop',arp:'stab',drums:DR.rock,lstep:2,lw:0.5,lv:0.045,av:0.018,
