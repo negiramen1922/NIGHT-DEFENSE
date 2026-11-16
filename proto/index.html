@@ -7540,13 +7540,13 @@ function startScoutEx(){closeOverlay();withLoading('番外編を準備してい�
   log('番外編：偵察と駐屯地攻め。第3襲撃まで6日','good');S.guide=null;guideInit();S.guide.hide=false;renderAll();resizeView();});}
 // 街の名前を決める（2026-11-16）。結果画面・タイムラプス・街の記録・セーブの表示に使う
 const TOWN_IDEAS=['グレイヴェル','エルムウッド','アッシュフォード','ローデン','ミルブルック','ハーヴェン','セリオン','ウィンダミア','ブラックソーン','ルーメン','オークヘイヴン','フェンリス'];
-function askTown(mid,cb){const def=mid==='t'?'エルム':mid==='f'?'グレイヴェル':TOWN_IDEAS[0];
-  openOverlay('town',`<h2>街の名前を決める</h2><div class="help" style="line-height:1.8;display:flex;gap:10px;align-items:center">${lilFace(64)}<span><b style="color:#e8c070">${LIL_NAME}</b>「領主様、ようこそ！ この街の名前を決めてください。街の記録や、最後の歴史に残ります」</span></div>
+function askTown(mid,cb,inGame){const def=mid==='t'?'エルム':mid==='f'?'グレイヴェル':TOWN_IDEAS[0];
+  openOverlay('town',`<h2>街の名前を決める</h2><div class="help" style="line-height:1.8;display:flex;gap:10px;align-items:center">${lilFace(64)}<span><b style="color:#e8c070">${LIL_NAME}</b>「${inGame?'では、領主様。まずは、この街の名前を決めてください。街の記録や、最後の歴史に残ります':'はじめまして、領主様！ 書記官のリリアです。今日からお手伝いをします！ まずは、この街の名前を決めてください。街の記録や、最後の歴史に残ります'}」</span></div>
     <div style="display:flex;gap:6px;margin:10px 0;flex-wrap:wrap"><input id="twName" maxlength="12" value="${def}" style="flex:1;min-width:160px;font-size:16px;padding:6px 8px;background:#0e1510;color:var(--text);border:1px solid var(--line)"><button id="twRand">おまかせ</button></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end"><button id="twBack">戻る</button><button id="twGo" class="primary">この名前で始める</button></div>`,true);
+    <div style="display:flex;gap:8px;justify-content:flex-end">${inGame?'':'<button id="twBack">戻る</button>'}<button id="twGo" class="primary">${inGame?'この名前にする':'この名前で始める'}</button></div>`,true);
   const inp=document.getElementById('twName');try{inp.focus();inp.select();}catch(e){}
   document.getElementById('twRand').onclick=()=>{inp.value=TOWN_IDEAS[Math.floor(Math.random()*TOWN_IDEAS.length)];se('click');};
-  document.getElementById('twBack').onclick=showIntro;
+  {const bk=document.getElementById('twBack');if(bk)bk.onclick=showIntro;}
   const ok=()=>{const v=(inp.value||'').replace(/[<>&"']/g,'').trim().slice(0,12)||def;cb(v);};
   document.getElementById('twGo').onclick=ok;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ok();}e.stopPropagation();};}
 function showIntro(){
@@ -7568,7 +7568,9 @@ function showIntro(){
     <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">Coming Soon</small><br><small style="color:var(--dim)">準備中です${id==='swamp'?`<br>解放の条件：ステージ1で第10襲撃をしのぐ（いま ${stageBest('f')}／10）`:''}</small></span></button>`:`<button data-map="${id}" style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px">
     <img src="${mapIcon(id==='tx'?'t':id)}" width="144" height="84" style="image-rendering:pixelated;border:1px solid var(--line);flex-shrink:0" alt="">
     <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">${diff}</small><br><small style="color:var(--dim);line-height:1.6">${desc}</small></span></button>`).join('')+`</div>`,true);
-  const go=(mid)=>mid==='tx'?startScoutEx():askTown(mid,nm=>{closeOverlay();withLoading('マップを作っています…',()=>{CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');S.townName=nm;log(`領主として「${nm}」に着任した。`,'good');renderAll();resizeView();});});
+  const start=(mid,nm)=>{closeOverlay();withLoading('マップを作っています…',()=>{CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');if(nm){S.townName=nm;S.townNamed=true;log(`領主として「${nm}」に着任した。`,'good');}renderAll();resizeView();});};
+  /* チュートリアル（ステージ0）は、リリアのあいさつのあとで街の名前を決める（2026-11-16）。ほかは始める前に */
+  const go=(mid)=>mid==='tx'?startScoutEx():(mid==='t'&&tasksOn())?start(mid,null):askTown(mid,nm=>start(mid,nm));
   document.querySelectorAll('[data-map]').forEach(b=>b.onclick=()=>go(b.dataset.map));
   document.getElementById('inBack').onclick=showTitle;
   const upd=()=>document.querySelectorAll('[data-tsk]').forEach(b=>b.classList.toggle('on',(b.dataset.tsk==='1')===tasksOn()));upd();
@@ -7587,7 +7589,7 @@ function gTechDone(){return Object.keys(S.tech||{}).filter(k=>S.tech[k]>0&&!(S.g
 const LIL_NAME='書記官リリア';
 const MISSIONS=[
  {id:'prod',name:'生産施設の建設',
-  say:['はじめまして、領主様！ 書記官のリリアです。今日から${TOWN}のお手伝いをします！','資材がないと、守りも街の発展もできません！ まずは木材と石材などの生産施設を建てましょう！{ART:miner,quarry}',
+  say:['はじめまして、領主様！ 書記官のリリアです。今日からお手伝いをします！','資材がないと、守りも街の発展もできません！ まずは木材と石材などの生産施設を建てましょう！{ART:miner,quarry}',
    ()=>'ただし、<b>土地のレベル</b>で生産の効率が変わるので気をつけてください。たとえば森は、木が深いほど木材がたくさん採れます。'+lilForestImg()+'右上の「土地Lv」のボタンでも確かめられますよ。'],
   steps:[
   {t:'伐採所を4つ建てる',b:'miner',n:4,d:'<b>森</b>のマスに建てると木材が採れます。森が深いほど多く採れます。'},
@@ -7733,7 +7735,7 @@ function renderGuide(){const el=document.getElementById('guide');const g=S&&S.gu
   h+=`<div class="gfoot"><button id="gCoach">画面の説明</button><button id="gSay">もう一度聞く</button><button id="gSkip" class="ghost">このミッションをとばす</button></div></div>`;
   el.className=g.min?'min':'';el.innerHTML=h;
   el.querySelector('#gHead').onclick=e=>{if(e.target.id==='gClose'){g.hide=true;renderGuide();return;}g.min=!g.min;guideKey='';renderGuide();};
-  {const b=el.querySelector('#lNext');if(b)b.onclick=()=>{g.line++;se('click');if(g.line>=SAY.length){g.b0={};for(const st of m.steps)if(st.b)g.b0[st.b]=gCnt(st.b);}guideKey='';guideTick();renderGuide();};}
+  {const b=el.querySelector('#lNext');if(b)b.onclick=()=>{if(m.id==='prod'&&g.line===0&&!S.townNamed){se('click');askTown(S.mapId,nm=>{S.townName=nm;S.townNamed=true;closeOverlay();log(`領主として「${nm}」に着任した。`,'good');g.line++;guideKey='';renderAll();renderGuide();},true);return;}g.line++;se('click');if(g.line>=SAY.length){g.b0={};for(const st of m.steps)if(st.b)g.b0[st.b]=gCnt(st.b);}guideKey='';guideTick();renderGuide();};}
   {const b=el.querySelector('#lDone');if(b)b.onclick=()=>gNextMission();}
   el.querySelectorAll('[data-gopen]').forEach(r=>r.onclick=e=>{if(e.target.closest('[data-gwhere]'))return;const i=+r.dataset.gopen;g.open=g.open===i?-1:i;guideKey='';renderGuide();});
   el.querySelectorAll('[data-gwhere]').forEach(b=>b.onclick=e=>{e.stopPropagation();const i=+b.dataset.gwhere;if(g.open!==i){g.open=i;guideKey='';renderGuide();}guideWhere(m.id,i);});
