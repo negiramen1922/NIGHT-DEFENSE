@@ -323,6 +323,8 @@ body.fullmap #right.open{transform:none}
 #alertTop{position:fixed;left:50%;top:84px;transform:translate(-50%,-20px);z-index:60;display:flex;align-items:center;gap:10px;padding:8px 18px;background:rgba(14,10,10,.94);border:2px solid var(--ac,#ff8a3a);box-shadow:0 0 18px var(--ac,#ff8a3a),0 4px 14px #000c;color:#fff;font-size:16px;font-weight:bold;letter-spacing:1px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:calc(100vw - 24px);text-align:center}
 #alertTop.on{opacity:1;transform:translate(-50%,0)}#alertTop span b{display:block}#alertTop span small{display:block;font-size:12px;font-weight:normal;color:#e8dcc0;letter-spacing:0;margin-top:2px}#alertTop em{font-style:normal;line-height:0;background:#1e1a12;border:1px solid #6a5a3a;padding:3px}#alertTop i{font-style:normal;font-size:20px;color:var(--ac)}
 body.land #alertTop{top:44px;font-size:14px;padding:6px 12px}
+#ovCard .nlil{display:flex;gap:10px;align-items:flex-start;background:#1e1a12;border:1px solid #c8a070;padding:8px 10px;margin:4px 0 10px;line-height:1.7;font-size:13.5px;color:#f0e4c8}#ovCard .nlil small{display:block;color:#e8c070;font-size:11px}#ovCard .nlil ol{margin:4px 0;padding-left:20px}#ovCard .nlil img{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}
+#guide .gcur .gct button{margin-left:auto;flex-shrink:0;padding:2px 8px}
 #guide .gnote{font-size:10.5px;color:#8a8068;margin:2px 0 3px}
 #guide .gr{display:flex;align-items:center;gap:5px;padding:3px 4px;border-left:3px solid #8a6a3a;background:#17140e;margin:2px 0;cursor:pointer}
 #guide .gr:hover{background:#221d14}#guide .gr.op{background:#2a2216}
@@ -4150,13 +4152,18 @@ function visitHTML(N){const v=VISIT[N.visit];if(!v)return '';
   else if(N.done)h+=`<div class="nvr">${N.done}</div>`;
   else h+=`<div class="nvops">${v.ops.map((o,i)=>{const c=visitCost(o);const ok=canAfford(c);return `<button data-vop="${i}" ${ok?'':'disabled'}>${o.l}${Object.keys(c).length?' <span class="cst2">'+useText(c)+'</span>':''}</button>`;}).join('')}</div>`;
   return h+`</div>`;}
+// はじめての夜に、リリアが昼と夜の流れを説明する（チュートリアルのとき。2026-11-16 ユーザーの希望）
+function nightLilia(){if(!S.guide||S.guide.hide||S.guide.fin||!(S.guide.list||[]).length)return '';if(S.nightTold&&S.nightTold!==S.turn)return '';S.nightTold=S.turn;
+  return `<div class="nlil">${lilFace(64)}<div><small>${LIL_NAME}</small><div>領主様、これが<b>夜</b>です。この街の毎日は、<b>昼</b>と<b>夜</b>のくり返しです。</div>
+   <ol><li><b>昼</b>：施設を建てる・研究する・兵をそろえる。終わったら「夜へ」</li><li><b>静かな夜</b>（今夜）：今夜の過ごし方を1つ選びます。部隊を夜狩りに出すこともできます。終わったら「朝へ」で次の日</li><li><b>襲撃の日の夜</b>：アビスから魔物が押し寄せてきます。守りきると朝になります</li></ol>
+   <div>襲撃の日までは、上の「第○襲撃まで」の日数で分かりますよ。今夜は、そのまま「朝へ」で大丈夫です！</div></div></div>`;}
 function showNight(){phaseReset();
   if(S.phase!=='night')return;
   // ボタンを押して描き直すとき、いちばん上に戻らないように（スクロール位置を覚えておく）
   const keepY=S.overlay==='night'?(document.getElementById('ovCard')||{}).scrollTop||0:0;
   if(!S.night)nightStart();const N=S.night;
   const list=S.squads.filter(q=>!q.gar);
-  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} ${N.plan==='fest'?'祭りの夜':'静かな夜'}</h2></div>
+  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">${ui('moon','amber',24)} ${N.plan==='fest'?'祭りの夜':'静かな夜'}</h2></div>`+nightLilia()+`
   <div class="nres2">${['gold','fuel','steel','stone','iron','ammo','sword','elec','mat'].map(k=>`<span title="${RES_NAME[k]}">${ic(k,14)}<b>${Math.floor(S[k]||0)}</b></span>`).join('')}<span title="待機中の住民">${ic('pop',14)}<b>${S.pop}</b></span></div>
   <div class="row" style="align-items:center;margin:2px 0 6px"><span class="muted">街の機嫌</span><span style="display:inline-flex;align-items:center;gap:6px">${happyIc(24)}<b>${Math.round(S.happy)}</b> ${happyName()}</span></div>`;
   if(N.plan==='fest'&&!N.fwShown){N.fwShown=true;setTimeout(()=>fireworks(4500),250);}
@@ -7635,7 +7642,7 @@ const MISSIONS=[
   {t:'剣を5作る',c:()=>Math.floor((S.made&&S.made.sword)||0),n:5,ping:'ammo',d:'武器工房をクリックして、作る物を「剣」に切り替えます。'}],
   done:'これで、最初の夜を迎える準備ができました！'},
  {id:'night',name:'夜と朝',
-  say:['準備ができたら、下の「夜へ」で日を進めます。襲撃の日の夜に、魔物が押し寄せてきます。','夜へ進む前に、「夜へ」の横に足りない資源の札が出ていないか見てください。矢が足りないと、バリスタが止まってしまいます！','朝になったら、壊れた施設は「一括修理」、部隊の矢や武具は「一括補給」で整えましょう。','最初の襲撃のあとは、4日ごとに襲撃が来ます。ブラッドムーンなど大きな夜の前は6日あります。昼のうちに「資材を増やす → 守りを足す」をくり返すのが、この街の暮らしです。'],
+  say:['この街の毎日は、<b>昼</b>と<b>夜</b>のくり返しです。昼に建てて、研究して、兵をそろえたら「夜へ」。静かな夜は過ごし方を選んで「朝へ」。そして<b>襲撃の日の夜</b>には、魔物が押し寄せてきます。','夜へ進む前に、「夜へ」の横に足りない資源の札が出ていないか見てください。矢が足りないと、バリスタが止まってしまいます！','朝になったら、壊れた施設は「一括修理」、部隊の矢や武具は「一括補給」で整えましょう。','最初の襲撃のあとは、4日ごとに襲撃が来ます。ブラッドムーンなど大きな夜の前は6日あります。昼のうちに「資材を増やす → 守りを足す」をくり返すのが、この街の暮らしです。'],
   steps:[
   {t:'最初の襲撃をしのぐ',c:()=>S.wave,n:1,hi:'#bNext',d:'「夜へ」で日を進め、襲撃の夜を守りきります。襲撃のあいだは、部隊を選んで敵の来る所へ動かしましょう。'},
   {t:'朝に一括修理か一括補給をする',c:()=>S.careN||0,n:1,hi:'#bRepAll,#bSupAll',d:'下の「一括修理」「一括補給」です。足りない資材は赤で出ます。'}],
@@ -7692,7 +7699,7 @@ const COACH=[
  ['#guide','ミッション','書記官リリアが、次にやることを教えてくれます。<b>場所を示す</b>を押すと場所を教えてくれます。手順は好きな順に進められます。'],
 ];
 function guideInit(){if(S.guide&&S.guide.v===3)return;const on=tasksOn();const old=S.guide;
-  S.guide={v:3,list:misList(),mi:0,line:0,open:-1,min:false,hide:!on,coach:-1,t0:Object.keys(S.tech||{}),done:{},fin:false};
+  S.guide={v:3,list:misList(),mi:0,line:0,open:-1,min:false,hide:!on,off:!on,coach:-1,t0:Object.keys(S.tech||{}),done:{},fin:false};
   if(old&&old.done&&!old.v){/* 前のセーブ：もう終わっているミッションはとばす */const g=S.guide;while(g.mi<g.list.length&&GUIDE[g.list[g.mi]].steps.every(st=>{try{return gProg(st)>=st.n;}catch(e){return false;}}))g.mi++;g.line=0;}}
 function gFix(g){if(!g.done)g.done={};if(g.mi==null)g.mi=0;if(g.line==null)g.line=0;if(g.open==null)g.open=-1;}
 function gProg(st){const g=S.guide;const c=st.c?st.c():gCnt(st.b)-((g&&g.b0&&st.b&&g.b0[st.b])||0);return Math.max(0,Math.min(st.n,Math.floor(c)));}   /* 建物は、ミッションが始まってから建てた数 */
@@ -7704,13 +7711,13 @@ const LIL_PX=[".........oooooccccccoooooqqqo...", ".......oocccccccccccccccqqoo.
 const LIL_PAL={"o": "#3a2430", "H": "#8a4a2a", "h": "#c0703a", "l": "#eaa868", "s": "#fbe0c6", "S": "#efc0a0", "w": "#ffffff", "e": "#4a7ae0", "E": "#1e2a6a", "k": "#8ac0ff", "D": "#2a48a8", "b": "#f6a0a8", "m": "#d0505e", "r": "#e8506e", "R": "#a83050", "c": "#3a5aa8", "C": "#263c78", "g": "#f0c050", "W": "#f6f0e0", "q": "#f8f8ff"};
 let LIL_URL='';function lilFace(sz){if(!LIL_URL){const c=document.createElement('canvas');c.width=c.height=32;const g=c.getContext('2d');LIL_PX.forEach((r,y)=>{for(let x=0;x<r.length;x++){const k=r[x];if(LIL_PAL[k]){g.fillStyle=LIL_PAL[k];g.fillRect(x,y,1,1);}}});LIL_URL=c.toDataURL();}
   const art=typeof NDART!=='undefined'&&NDART.lilia_face;return `<img class="lilf" src="${art?art[0]:LIL_URL}" width="${sz}" height="${sz}" alt="" style="width:${sz}px;height:${sz}px;image-rendering:pixelated">`;}
-function guideTick(){if(!S||S.over||!S.guide||S.backdrop)return;if(['title','intro','credit','help','dex','town'].includes(S.overlay))return;const g=S.guide;gFix(g);if(g.hide||g.fin)return;
+function guideTick(){if(!S||S.over||!S.guide||S.backdrop)return;if(['title','intro','credit','help','dex','town'].includes(S.overlay))return;const g=S.guide;gFix(g);if(g.fin||g.off)return;
   const m=gMis();if(!m){g.fin=true;renderGuide();return;}
   m.steps.forEach((st,i)=>{const k=m.id+':'+i;if(g.done[k])return;if(!gStepOk(st))return;g.done[k]=true;if(g.line<misSay(m).length)return;toast(`できました：${st.t}`,'good');se('click');if(g.open===i)g.open=-1;});
-  if(!g.cleared&&g.line>=misSay(m).length&&m.steps.every((st,i)=>g.done[m.id+':'+i])){g.cleared=true;se('research');log(`ミッション「${m.name}」達成`,'good');}
+  if(!g.cleared&&g.line>=misSay(m).length&&m.steps.every((st,i)=>g.done[m.id+':'+i])){g.cleared=true;g.min=false;g.hide=false;guideKey='';se('research');log(`ミッション「${m.name}」達成`,'good');toast(`ミッション「${m.name}」達成！`,'good');}   /* たたんでいても・隠していても、達成したら開いて「次のミッションへ」を見せる（2026-11-16） */
   renderGuide();}
 function gNextMission(){const g=S.guide,m=gMis();if(!m)return;
-  g.mi++;g.line=0;g.open=-1;g.cleared=false;g.min=false;if(!gMis())g.fin=true;guideKey='';renderAll();renderGuide();}
+  g.mi++;g.line=0;g.open=-1;g.cleared=false;g.min=false;g.hide=false;if(!gMis())g.fin=true;guideKey='';renderAll();renderGuide();}
 let guideKey='';
 function renderGuide(){const el=document.getElementById('guide');const g=S&&S.guide;
   const ovOn=document.getElementById('overlay').style.display&&document.getElementById('overlay').style.display!=='none';const show=g&&!g.hide&&!g.fin&&!S.over&&!S.review&&!S.waveActive&&!ovOn&&!S.backdrop;
@@ -7723,7 +7730,7 @@ function renderGuide(){const el=document.getElementById('guide');const g=S&&S.gu
   const SAY=misSay(m),talking=g.line<SAY.length,doneN=m.steps.filter((st,i)=>g.done[m.id+':'+i]).length;
   const say=talking?lilTxt(SAY[g.line]):g.cleared?lilTxt(m.done):null;
   let h=`<div class="gh" id="gHead">${lilFace(32)}<b>ミッション${g.mi+1}　${m.name}</b><span class="gp">${doneN} / ${m.steps.length}</span><button id="gMin" class="ghost" title="たたむ／ひらく">${g.min?'▾':'▴'}</button><button id="gClose" class="ghost" title="隠す（表示・設定から戻せます）">×</button></div>`;
-  if(g.min){const cur=m.steps.findIndex((st,i)=>!g.done[m.id+':'+i]);h+=`<div class="gcur"><div class="gct"><span class="gtt">${talking?'リリアが話しています':g.cleared?'ミッション達成！':cur>=0?m.steps[cur].t:''}</span></div></div>`;}
+  if(g.min){const cur=m.steps.findIndex((st,i)=>!g.done[m.id+':'+i]);h+=`<div class="gcur"><div class="gct"><span class="gtt">${talking?'リリアが話しています':g.cleared?'ミッション達成！':cur>=0?m.steps[cur].t:''}</span>${g.cleared?`<button id="lDone" class="primary">${g.mi+1<(g.list||[]).length?'次のミッションへ':'チュートリアルを終える'}</button>`:talking?'<button id="lOpen">聞く</button>':''}</div></div>`;}
   h+=`<div class="gb">`;
   if(say)h+=`<div class="lil">${lilFace(64)}<div class="lsay"><small>${LIL_NAME}</small><div>${say}</div><div class="lbtn">${talking?`<button id="lNext" class="primary">${g.line+1<SAY.length?'次へ ▸':'やってみる'}</button>`:`<button id="lDone" class="primary">${g.mi+1<(g.list||[]).length?'次のミッションへ':'チュートリアルを終える'}</button>`}</div></div></div>`;
   if(!talking&&!g.cleared){
@@ -7736,7 +7743,8 @@ function renderGuide(){const el=document.getElementById('guide');const g=S&&S.gu
   el.className=g.min?'min':'';el.innerHTML=h;
   el.querySelector('#gHead').onclick=e=>{if(e.target.id==='gClose'){g.hide=true;renderGuide();return;}g.min=!g.min;guideKey='';renderGuide();};
   {const b=el.querySelector('#lNext');if(b)b.onclick=()=>{if(m.id==='prod'&&g.line===0&&!S.townNamed){se('click');askTown(S.mapId,nm=>{S.townName=nm;S.townNamed=true;closeOverlay();log(`領主として「${nm}」に着任した。`,'good');g.line++;guideKey='';renderAll();renderGuide();},true);return;}g.line++;se('click');if(g.line>=SAY.length){g.b0={};for(const st of m.steps)if(st.b)g.b0[st.b]=gCnt(st.b);}guideKey='';guideTick();renderGuide();};}
-  {const b=el.querySelector('#lDone');if(b)b.onclick=()=>gNextMission();}
+  {const b=el.querySelector('#lDone');if(b)b.onclick=e=>{e.stopPropagation();gNextMission();};}
+  {const b=el.querySelector('#lOpen');if(b)b.onclick=e=>{e.stopPropagation();g.min=false;guideKey='';renderGuide();};}
   el.querySelectorAll('[data-gopen]').forEach(r=>r.onclick=e=>{if(e.target.closest('[data-gwhere]'))return;const i=+r.dataset.gopen;g.open=g.open===i?-1:i;guideKey='';renderGuide();});
   el.querySelectorAll('[data-gwhere]').forEach(b=>b.onclick=e=>{e.stopPropagation();const i=+b.dataset.gwhere;if(g.open!==i){g.open=i;guideKey='';renderGuide();}guideWhere(m.id,i);});
   {const b=el.querySelector('#gSay');if(b)b.onclick=()=>{g.line=0;g.min=false;guideKey='';renderGuide();};}
@@ -7789,7 +7797,7 @@ function showCoach(){const g=S.guide;const box=document.getElementById('coach');
   document.getElementById('coSkip').onclick=()=>{g.coach=COACH.length;showCoach();};
   const pv=document.getElementById('coPrev');if(pv)pv.onclick=()=>{g.coach--;showCoach();};}
 setInterval(()=>{try{if(S&&S.blds&&(!S.guide||S.guide.v!==3))guideInit();guideTick();const g=S&&S.guide,ov=document.getElementById('overlay').style.display;if(g&&g.coach===0&&!g.coachAuto&&(!ov||ov==='none')&&!S.over){g.coachAuto=true;showCoach();}}catch(e){console.error(e);}},400);
-document.getElementById('bGuide').onclick=()=>{if(!S.guide||S.guide.v!==3)guideInit();S.guide.hide=false;S.guide.min=false;if(S.guide.fin){S.guide.fin=false;S.guide.mi=Math.min(S.guide.mi,(S.guide.list||misList()).length-1);}guideKey='';renderGuide();};
+document.getElementById('bGuide').onclick=()=>{if(!S.guide||S.guide.v!==3)guideInit();S.guide.hide=false;S.guide.off=false;S.guide.min=false;if(S.guide.fin){S.guide.fin=false;S.guide.mi=Math.min(S.guide.mi,(S.guide.list||misList()).length-1);}guideKey='';renderGuide();};
 addEventListener('resize',()=>{guideKey='';});
 function renderReviewBar(){const r=document.getElementById('reviewBar');const ov=document.getElementById('overlay').style.display;r.style.display=S&&S.over&&S.review&&(!ov||ov==='none')?'flex':'none';}
 document.getElementById('rvBack').onclick=()=>{S.review=false;document.getElementById('reviewBar').style.display='none';showEnd(S.endWin!==undefined?S.endWin:!!S.won);};
