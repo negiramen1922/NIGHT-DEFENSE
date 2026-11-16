@@ -494,6 +494,7 @@ button.danger{background:#2a1210;color:#ff8a80;box-shadow:0 0 0 1px var(--red-li
 
 .res .dl.zero{color:var(--off)}
 #wave{display:flex;align-items:center;gap:12px;padding:0 14px;background:var(--head);color:var(--amber);flex-shrink:0}
+.rtc{color:#d8c89a;font-size:11px}.rtbar{display:block;height:3px;background:#2a2418;max-width:140px}.rtbar>i{display:block;height:100%;background:#d8a85a}
 .daypips{display:flex;gap:2px}.daypips i{width:6px;height:4px;background:#3a3220}.daypips i.on{background:var(--amber)}   /* 【追加】襲撃までの日数 */
 body.night #wave{background:#2a1210;color:var(--red)}   /* 【追加】夜は body.night */
 
@@ -4267,7 +4268,7 @@ function nightIncidentOf(k,g){
     return {ic:'ev_flee',col:'#8aa48d',n:'住民の脱走',t:`暮らしに不満な住民が夜のうちに街を出ていった。住民 −${m}${g>=3?'（夜警が引き止めて1人で済んだ）':''}`,bad:true};}
   return null;}
 function morning(){
-  if(S.phase!=='night')return;phaseReset();S.buyToday={};
+  if(S.phase!=='night')return;rtRest(1);phaseReset();S.buyToday={};
   const N=S.night||{plan:'rest'};S.night=null;
   // 気分（何日か続く幸福度）の日数を減らす
   S.moods=(S.moods||[]).map(m=>({...m,d:m.d-1})).filter(m=>m.d>0);
@@ -4371,6 +4372,26 @@ function fireworks(ms){const hq=hqOf();if(!hq||!S)return;if(FW)festEnd();const b
   S._fwL=[bcx(hq),bcy(hq)+TU,TU*6];(S.lights=S.lights||[]).push(S._fwL);
   const b=document.createElement('button');b.id='fwSkip';b.textContent=back?'夜の画面へ戻る':'閉じる';b.onclick=festEnd;document.body.appendChild(b);
   alertTop('<b>祭りの夜！</b><small>街じゅうの人が城の前に集まって、花火を見上げている</small>','good',2500);}
+// ===== 昼と夜をリアルタイムで進める（2026-11-16）=====
+// 1ターンの生産（TURN_SEC 秒ぶんの計算）を、昼6分・夜6分に半分ずつ分けて、10秒ごとに少しずつ受け取る。
+// 「夜へ」「朝へ」はスキップ：その時間の残りの分をまとめて受け取って、すぐ次へ。時間切れでも自動で次へ進む。
+// 画面（研究・人事など）を開いているあいだ・一時停止中・襲撃中・駐屯地の戦い中は止まる（静かな夜の画面は進む）
+const RT_PHASE=360,RT_TICK=10,RT_HALF=TURN_SEC/2;
+function rtStep(n){for(let i=0;i<n;i++)update(0.1,true);}
+function rtRest(k){const r=S.rt;const g=r?r.g:0;rtStep(Math.max(0,Math.round((RT_HALF*k-g)*10)));S.rt=null;}
+// 朝の報告の「増えた・減った」は、前の「夜へ」からの分（夜＋昼）で数える
+function rtWindow(){S.before={};for(const k of ['steel','fuel','ammo','elec','pop'])S.before[k]=S[k];S.gross={steel:0,ammo:0,pop:0,used:0};}
+function rtTick(dt){
+  if(!S||S.backdrop||S.over||S.waveActive||S.skirm||S.paused||S.tlOn||!S.turnsLeft)return;
+  const ph=S.phase==='night'?'night':'day';if(S.overlay&&!(ph==='night'&&S.overlay==='night'))return;
+  if(!S.rt||S.rt.ph!==ph)S.rt={ph,t:0,g:0};const r=S.rt;
+  r.t=Math.min(RT_PHASE,r.t+dt*(S.speed||1));
+  const want=Math.floor(r.t/RT_TICK)*RT_HALF*RT_TICK/RT_PHASE,n=Math.floor((want-r.g)*10+1e-6);
+  if(n>0){rtStep(n);r.g+=n*0.1;}
+  if(r.t>=RT_PHASE&&!r.auto){r.auto=true;if(ph==='day')endTurn();else{if(S.overlay==='night')closeOverlay();morning();}}
+}
+function rtLeft(){const r=S.rt;const t=r&&r.ph===(S.phase==='night'?'night':'day')?r.t:0;const s=Math.max(0,Math.ceil(RT_PHASE-t));return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
+function rtFrac(){const r=S.rt;return r&&r.ph===(S.phase==='night'?'night':'day')?r.t/RT_PHASE:0;}
 function doEndTurn(){
   {const n=digPits();for(const m of S.mines)if(m.kind==='pit'&&m.armed)m.uses=null;if(n)log(`落とし穴 ${n}個を掘り直した（木材−${n*PIT_DIG}）`);}
   if(!S.waveActive&&S.recentLoss)S.recentLoss=Math.max(0,S.recentLoss-1);
@@ -4380,8 +4401,8 @@ function doEndTurn(){
     if(crit.length){showConfirm(crit);return;}
   }
   S.skipConfirm=false;
-  se('turn');const t0=S.turn;S.rep=[];S.before={};for(const k of ['steel','fuel','ammo','elec','pop'])S.before[k]=S[k];S.doneCnt={};S.gross={steel:0,ammo:0,pop:0,used:0};
-  for(let i=0;i<TURN_SEC*10;i++)update(0.1,true);
+  se('turn');const t0=S.turn;S.rep=[];if(!S.before)rtWindow();S.doneCnt={};if(!S.gross)S.gross={steel:0,ammo:0,pop:0,used:0};
+  rtRest(S.turnsLeft===1?2:1);   // 昼の残りの時間の分をまとめて（襲撃の日は夜の分も）
   advanceResearch();
   tickBaseUp();
   // 欠員補充（防衛施設を優先）
@@ -4396,7 +4417,7 @@ function doEndTurn(){
   const dn=Object.entries(S.doneCnt);if(dn.length){const m='完成：'+dn.map(([k,v])=>k+(v>1?'×'+v:'')).join('、');ev.unshift({msg:m,cls:'good'});log(m,'good');}
   if(S.turnsLeft<=0)startWave();
   else{log(`ターン${S.turn}　第${S.wave+1}襲撃まで残り${S.turnsLeft}ターン`);bigAhead();}
-  turnReport(t0,ev);
+  turnReport(t0,ev);rtWindow();
   if(S.overlay==='res')showResearch();
   renderAll();
 }
@@ -7205,7 +7226,7 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   document.body.classList.toggle('qnight',!S.waveActive&&S.phase==='night');
   if(S.waveActive)wv=`${ui('moon','red',24)}<div class="wvm"><b>${S.turn}日目・夜</b><small>第${S.wave}襲撃 交戦中${S.cur&&S.cur.blood?'・ブラッドムーン':''}</small></div><i class="rmoon"></i>`;
   else if(!S.over){const tot=Math.max(S.prepTotal||S.turnsLeft,S.turnsLeft),past=tot-S.turnsLeft+1;let pips='';for(let i=0;i<tot;i++)pips+=`<i class="${i<past?'on':''}"></i>`;
-    wv=`${S.phase==='night'?ui('moon','amber',24):ui('sun','amber',24)}<div class="wvm"><b>${S.turn}日目・${S.phase==='night'?'夜':'昼'}</b><div class="daypips">${pips}</div></div><div class="wvc"><small>第${S.wave+1}襲撃まで${S.wave+1===finalWave()?'（最後の夜）':''}</small><b>${S.turnsLeft}日</b></div>`;}
+    wv=`${S.phase==='night'?ui('moon','amber',24):ui('sun','amber',24)}<div class="wvm"><b>${S.turn}日目・${S.phase==='night'?'夜':'昼'} <span class="rtc" title="${S.phase==='night'?'夜':'昼'}の残り時間。0になると自動で${S.phase==='night'?'朝':'夜'}へ進む（「${S.phase==='night'?'朝へ':'夜へ'}」で、残りの生産をまとめて受け取ってすぐ進める）">${S.paused?'停止中':rtLeft()}</span></b><i class="rtbar"><i style="width:${(rtFrac()*100).toFixed(1)}%"></i></i><div class="daypips">${pips}</div></div><div class="wvc"><small>第${S.wave+1}襲撃まで${S.wave+1===finalWave()?'（最後の夜）':''}</small><b>${S.turnsLeft}日</b></div>`;}
   setHTML(document.getElementById('wave'),wv);
   nightShortChip();
   renderSheetHandle();
@@ -7514,7 +7535,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.10 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.11 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7599,9 +7620,9 @@ function worldAdd(win){if(!S||S.mode!=='campaign'||S.ex)return;if(!S.gid)S.gid=D
     heroes:S.cmds.map(c=>cmdName(c)),fallen:S.fallen.map(c=>({n:cmdName(c),w:c.diedWave,lv:c.lv})),h:(S.hist||[]).map(x=>[x.n,x.ok?1:0,x.kills||0,x.kia||0,x.blood?1:0,x.bld||0])};
   const L=worldList().filter(x=>x.id!==r.id);L.unshift(r);try{localStorage.setItem(WORLD_KEY,JSON.stringify(L.slice(0,60)));}catch(e){}}
 function worldDate(t){const d=new Date(t);return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;}
-function worldSay(L,sv){if(!L.length&&!sv)return ['normal','まだ、この世界の歴史は白紙です。領主様の最初の街の物語を、これから一緒に書きましょう！'];
-  const w=L.filter(x=>x.win).length;if(!L.length)return ['smile','領主様が今治めている街のことも、毎日ちゃんと帳簿につけていますよ。'];
-  return w?['smile',`これまでに${L.length}つの街を治めて、${w}つの街を守りきりました。どの街のことも、ちゃんと書き残してあります！`]:['normal',`これまでに${L.length}つの街を治めました。守りきれなかった街のことも、忘れないように書き残してあります。`];}
+function worldSay(L,sv){if(!L.length&&!sv)return ['normal','ここは、わたしがつけてきた帳簿の棚です。まだ白紙ですけど……領主様の最初の街の物語を、これから一緒に書きましょう！'];
+  const w=L.filter(x=>x.win).length;if(!L.length)return ['smile','ここは、わたしがつけてきた帳簿の棚です。領主様が今治めている街のことも、毎日ちゃんと帳簿につけていますよ。'];
+  return w?['smile',`ここは、わたしがつけてきた帳簿の棚です。これまでに${L.length}つの街を治めて、${w}つの街を守りきりました。どの街のことも、ちゃんと書き残してあります！`]:['normal',`ここは、わたしがつけてきた帳簿の棚です。これまでに${L.length}つの街を治めました。守りきれなかった街のことも、忘れないように書き残してあります。`];}
 function showWorld(){const L=worldList(),sv=saveInfo();const [ex,say]=worldSay(L,sv);
   const mn=k=>MAPS[k]?MAPS[k].name:'';
   let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>世界の歴史</h2><button id="wdBack">タイトルへ</button></div>
@@ -7625,6 +7646,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。10秒ごとに少しずつ生産が入り、時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める（上の日付の横に残り時間）。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
  ['1.8.4','2026-11-16',['上に出るお知らせが消えたあとも、その場所が押せたままになっていて、複数の部隊をまとめて「固守」などに切り替えるボタンが効かないことがあったのを直した（そのとき、お知らせの行き先の施設が光っていた）']],
@@ -7717,7 +7739,7 @@ function startScoutEx(){closeOverlay();withLoading('番外編を準備してい�
 // 街の名前を決める（2026-11-16）。結果画面・タイムラプス・街の記録・セーブの表示に使う
 const TOWN_IDEAS=['グレイヴェル','エルムウッド','アッシュフォード','ローデン','ミルブルック','ハーヴェン','セリオン','ウィンダミア','ブラックソーン','ルーメン','オークヘイヴン','フェンリス'];
 function askTown(mid,cb,inGame){const def=mid==='t'?'エルム':mid==='f'?'グレイヴェル':TOWN_IDEAS[0];
-  openOverlay('town',`<h2>街の名前を決める</h2><div class="lslow" style="max-width:300px;margin:0 auto 8px">${artPx('lilia_art',LIL_NAME,'')}</div><div class="help" style="line-height:1.8;display:flex;gap:10px;align-items:center">${lilFace(64,'smile')}<span><b style="color:#e8c070">${LIL_NAME}</b>「${inGame?'では、領主様。まずは、この街の名前を決めてください。街の記録や、最後の歴史に残ります':'はじめまして、領主様！ 書記官のリリアです。今日からお手伝いをします！ まずは、この街の名前を決めてください。街の記録や、最後の歴史に残ります'}」</span></div>
+  openOverlay('town',`<h2>街の名前を決める</h2><div class="lslow" style="max-width:300px;margin:0 auto 8px">${artPx('lilia_art',LIL_NAME,'')}</div><div class="help" style="line-height:1.8;display:flex;gap:10px;align-items:center">${lilFace(64,'smile')}<span><b style="color:#e8c070">${LIL_NAME}</b>「${inGame?'では、領主様。まずは、この街の名前を決めてください。街の記録や、最後の歴史に残ります':'はじめまして、領主様！ 王都から参りました、領主様付きの書記官のリリアです。今日からお手伝いをします！ まずは、この街の名前を決めてください。街の記録や、最後の歴史に残ります'}」</span></div>
     <div style="display:flex;gap:6px;margin:10px 0;flex-wrap:wrap"><input id="twName" maxlength="12" value="${def}" style="flex:1;min-width:160px;font-size:16px;padding:6px 8px;background:#0e1510;color:var(--text);border:1px solid var(--line)"><button id="twRand">おまかせ</button></div>
     <div style="display:flex;gap:8px;justify-content:flex-end">${inGame?'':'<button id="twBack">戻る</button>'}<button id="twGo" class="primary">${inGame?'この名前にする':'この名前で始める'}</button></div>`,true);
   const inp=document.getElementById('twName');try{inp.focus();inp.select();}catch(e){}
@@ -7757,7 +7779,7 @@ function showIntro(){
 // ===== 軽いストーリー（2026-11-16 ユーザーが方向性を了承）：ステージ1（草原）だけ =====
 // 王都から辺境の街を任された領主。森の奥のアビスの裂け目から夜ごと魔物。城のレベルが上がるたびに、リリアが帳簿から2〜3行で伝える。第40襲撃で森の主を倒すと裂け目が閉じる
 const STORY={
- 0:['帳簿のはじめに','領主様、ようこそ${TOWN}へ。ここは王国のいちばん東のはずれです。森の奥には「アビス」と呼ばれる裂け目があって、夜になると魔物が湧き出してきます。','この街が落ちれば、魔物は王都へ続く街道をまっすぐ進んでしまいます。昼は街を育てて、夜は守る——それが、これからの毎日です。','あらためまして、書記官のリリアです。${TOWN}のことは、ぜんぶ帳簿につけておきますね！'],
+ 0:['帳簿のはじめに','領主様、ようこそ${TOWN}へ。ここは王国のいちばん東のはずれです。森の奥には「アビス」と呼ばれる裂け目があって、夜になると魔物が湧き出してきます。','この街が落ちれば、魔物は王都へ続く街道をまっすぐ進んでしまいます。昼は街を育てて、夜は守る——それが、これからの毎日です。','あらためまして、領主様付きの書記官のリリアです。領主様がどの街を治めても、ご一緒して帳簿をつけます。${TOWN}のことも、ぜんぶ書き残しておきますね！'],
  // 大きな襲撃の節目（その襲撃を守りきった朝）。先へ進むほど、アビスで起きていることがはっきりしていく（2026-11-16 ユーザーの希望）
  w10:['アビスの魔力','第10襲撃の防衛、おめでとうございます！','最近、アビスのほうで大きな魔力の反応を検知したそうです。何の反応なのかは、まだ分かりません。帳簿に書きとめておきますね。'],
  w15:['強まる反応','第15襲撃も守りきりました！','アビスの魔力の反応は、日に日に強くなっています。魔物たちは、その魔力に呼び寄せられているみたいです。','それから……北の森で、ゴブリンたちが一人の「王」のもとに集まっているといううわさがあります。'],
@@ -7800,7 +7822,7 @@ function gTechDone(){return Object.keys(S.tech||{}).filter(k=>S.tech[k]>0&&!(S.g
 const LIL_NAME='書記官リリア';
 const MISSIONS=[
  {id:'prod',name:'生産施設の建設',
-  say:['はじめまして、領主様！ 書記官のリリアです。今日からお手伝いをします！','資材がないと、守りも街の発展もできません！ まずは木材と石材などの生産施設を建てましょう！{ART:miner,quarry}',
+  say:['はじめまして、領主様！ 王都から参りました、領主様付きの書記官のリリアです。今日からお手伝いをします！','資材がないと、守りも街の発展もできません！ まずは木材と石材などの生産施設を建てましょう！{ART:miner,quarry}',
    ()=>'ただし、<b>土地のレベル</b>で生産の効率が変わるので気をつけてください。たとえば森は、木が深いほど木材がたくさん採れます。'+lilForestImg()+'右上の「土地Lv」のボタンでも確かめられますよ。'],
   steps:[
   {t:'伐採所を4つ建てる',b:'miner',n:4,d:'<b>森</b>のマスに建てると木材が採れます。森が深いほど多く採れます。'},
@@ -8953,6 +8975,7 @@ function loop(now){
     else if(!S.paused)updateIdle(dt);
     if(!S.paused&&!S.waveActive)campWatch();
   }
+  try{rtTick(dt);}catch(e){if(!drawErr++)console.error(e);}
   try{draw();}catch(e){if(!drawErr++)console.error(e);}
   S.fogT=(S.fogT||0)+dt;if(S.fogT>0.5){S.fogT=0;revealAll();}
   uiT+=dt;if(uiT>0.2){uiT=0;try{storyTick();}catch(e){}stripKeyHints();renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
