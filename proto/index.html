@@ -335,7 +335,7 @@ body.fullmap #right.open{transform:none}
 #guide{width:440px;font-size:13px}#guide .gb{max-height:64vh}#guide .gr .gtt{flex:1;min-width:0}#guide .gr button{flex-shrink:0;white-space:nowrap}#guide .gdet2{margin:2px 0 6px 18px;padding:6px 8px;background:#14110c;border-left:3px solid #c8a070;line-height:1.6;color:#e0d6bc}#guide .lart{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:6px;margin:8px 0 4px}#guide .lart .artpx{width:100%}
 #guide .lil{display:flex;gap:8px;align-items:flex-start;background:#1e1a12;border:1px solid #5a4a2a;padding:6px;margin:2px 0 6px}#guide .lil .lilf{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}#guide .lsay{flex:1;min-width:0;line-height:1.7;color:#f0e4c8;font-size:14px}#guide .lsay small{display:block;color:#e8c070;font-size:10.5px;letter-spacing:1px}#guide .lbtn{text-align:right;margin-top:4px}#guide .lbtn button{padding:3px 10px}#guide .lbtn #lDone{width:100%;white-space:normal}#guide .gh .lilf{flex-shrink:0}#guide .gh b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}#guide .gfoot button{font-size:11px;padding:2px 6px}
 #alertTop{position:fixed;left:50%;top:84px;transform:translate(-50%,-20px);z-index:60;display:flex;align-items:center;gap:10px;padding:8px 18px;background:rgba(14,10,10,.94);border:2px solid var(--ac,#ff8a3a);box-shadow:0 0 18px var(--ac,#ff8a3a),0 4px 14px #000c;color:#fff;font-size:16px;font-weight:bold;letter-spacing:1px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:calc(100vw - 24px);text-align:center}
-#alertTop.on{opacity:1;transform:translate(-50%,0)}#alertTop span b{display:block}#alertTop span small{display:block;font-size:12px;font-weight:normal;color:#e8dcc0;letter-spacing:0;margin-top:2px}#alertTop em{font-style:normal;line-height:0;background:#1e1a12;border:1px solid #6a5a3a;padding:3px}#alertTop i{font-style:normal;font-size:20px;color:var(--ac)}
+#alertTop:not(.on){pointer-events:none!important}#alertTop.on{opacity:1;transform:translate(-50%,0)}#alertTop span b{display:block}#alertTop span small{display:block;font-size:12px;font-weight:normal;color:#e8dcc0;letter-spacing:0;margin-top:2px}#alertTop em{font-style:normal;line-height:0;background:#1e1a12;border:1px solid #6a5a3a;padding:3px}#alertTop i{font-style:normal;font-size:20px;color:var(--ac)}
 body.land #alertTop{top:44px;font-size:14px;padding:6px 12px}
 #ovCard .nlil{display:flex;gap:10px;align-items:flex-start;background:#1e1a12;border:1px solid #c8a070;padding:8px 10px;margin:4px 0 10px;line-height:1.7;font-size:13.5px;color:#f0e4c8}#ovCard .nlil small{display:block;color:#e8c070;font-size:11px}#ovCard .nlil ol{margin:4px 0;padding-left:20px}#ovCard .nlil img{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}
 #guide .gcur .gct button{margin-left:auto;flex-shrink:0;padding:2px 8px}
@@ -7432,7 +7432,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.8.3 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.8.4 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7507,6 +7507,7 @@ function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn()
   requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();}finally{b.classList.add('off');}}));}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.8.4','2026-11-16',['上に出るお知らせが消えたあとも、その場所が押せたままになっていて、複数の部隊をまとめて「固守」などに切り替えるボタンが効かないことがあったのを直した（そのとき、お知らせの行き先の施設が光っていた）']],
  ['1.8.3','2026-11-16',['<b>書記官リリアの絵</b>ができた：話す内容に合わせて表情が変わる（ふつう・笑顔・あせり・ほっとした顔）。街の名前を決める画面に、ろうそくの書斎で帳簿をつけるリリア。チュートリアルのあいだ、昼は城のそばをリリアが歩く']],
  ['1.8.2','2026-11-16',['チュートリアル：「人」のミッションで、右の「街」のタブで生産と収支（税・給金）を見られることを案内（画面の絵つき）','チュートリアル：「英雄と熟練度」のミッションで、街にいる英雄の見かた（軍事 → 英雄）と配属のしかたを案内（画面の絵つき）','チュートリアル：「兵士」のミッションの農兵を2部隊から1部隊に（最初の襲撃までに武器工房が間に合うように）','「街」のタブなどの数字を小数なしに']],
  ['1.8.1','2026-11-16',['不具合の修正：施設の詳しい画面の小さな動き（流れのカード）で、作る物（農場ならパン）が一瞬だけ見えてはすぐ消えていた','防衛施設の流れのカードで、矢などがないのに敵に当たっているように動いていた。今は「矢がないので撃てない」と出る','弾の使う量の表示を小数なしに（「2発で矢1」など）']],
