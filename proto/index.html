@@ -1683,7 +1683,7 @@ cv.width=VW; cv.height=VH;
 const FOOD_PER=0.03;
 function foodMul(){return S&&S.mapId==='s'?1.3:1;}
 const BLOOD_NIGHTS=[5,10];   // ブラッドムーンの襲撃（山のマップは第15襲撃も）
-function bloodNights(){if(S&&S.mapId==='t')return [6];if(S&&(S.mapId==='7'||S.mapId==='f'))return [5,10,15,21,25,30,35];if(S&&S.mapId==='s')return [5,10,15,20];return (typeof finalWave==='function'&&finalWave()>=15)?[5,10,15]:BLOOD_NIGHTS;}
+function bloodNights(){if(S&&S.mapId==='t')return [6];if(S&&(S.mapId==='7'||S.mapId==='f'))return [5,10,15,25,30,35];   /* 5回ごと。ボスの夜（20・40）はブラッドムーンにしない（2026-11-16） */if(S&&S.mapId==='s')return [5,10,15,20];return (typeof finalWave==='function'&&finalWave()>=15)?[5,10,15]:BLOOD_NIGHTS;}
 let BLOOD_MODE=false;
 // 税：なし／低／普通／高（住民1人あたり毎ターンの金貨）と幸福度への影響
 const TAX=[{n:'なし',g:0,h:15},{n:'低い',g:0.17,h:6},{n:'普通',g:0.35,h:0},{n:'高い',g:0.59,h:-18}];
@@ -1905,7 +1905,7 @@ const E={
   vampire:{name:'吸血鬼',desc:'倒した兵士をグールに変える。聖銀の攻撃（銀装兵・ミスリルレイ）で受けるダメージ200%',hp:1600,spd:50,dmg:70,rate:1.0,r:10,color:'#7a2a4a',xp:30,armor:0.2,mat:10,vsS:1.5,hunt:6,vampire:true,silverWeak:true},
   ghoul:{name:'グール',desc:'倒れた魔物の死体を食べて回復する（近くで魔物が倒れると体力+300）',hp:900,spd:40,dmg:45,rate:1.0,r:10,color:'#7a8a6a',xp:14,armor:0.1,mat:4,vsS:1.2,hunt:4,eater:true},
   golem:{name:'ストーンゴーレム',desc:'とても硬い石の巨人。壁を壊しに来る（建物へのダメージ300%）。魔法の攻撃で受けるダメージ150%',hp:5000,spd:18,dmg:110,rate:1.0,r:16,color:'#8a8a80',xp:50,armor:0.5,bldMul:3,mat:16,wallBreak:true,magicWeak:true},
-  werewolf:{name:'ワーウルフ',desc:'ブラッドムーンの夜（21回目から）に現れる狼の獣人。兵士にとても強い',hp:700,spd:70,dmg:80,rate:1.0,r:9,color:'#5a5a6a',xp:20,armor:0.1,mat:6,vsS:4,hunt:8,crewKill:true},
+  werewolf:{name:'ワーウルフ',desc:'ブラッドムーンの夜（25回目から）に現れる狼の獣人。兵士にとても強い',hp:700,spd:70,dmg:80,rate:1.0,r:9,color:'#5a5a6a',xp:20,armor:0.1,mat:6,vsS:4,hunt:8,crewKill:true},
   grappler:{name:'オーガ',desc:'ゴブリンと同じ速さで来る硬い大鬼。兵士にも施設にも強い',hp:380,spd:40,dmg:44,rate:1.1,r:11,color:'#6a8a3a',xp:10,bldMul:1.3,mat:2,vsS:1.5,hunt:4},
   troll:  {name:'トロール',desc:'ゴブリンの群れの先頭に立つ破城役。壁を優先して叩き壊し、傷が自然にふさがる',hp:600,spd:40,dmg:50,rate:1.2,r:12,color:'#5a7a6a',xp:14,bldMul:2.5,mat:3,armor:0.15,regen:8,wallBreak:true},
   spitter:{name:'ゴブリンシャーマン',desc:'後方から呪いの弾で、射程12マスの外から防衛施設を狙撃する',hp:120,spd:36,dmg:18,rate:1.8,r:7,color:'#b070e0',xp:8,mat:1.5,ranged:6},
@@ -1976,7 +1976,7 @@ MODEL.aether_golem={ut:'inf',wage:2,name:'エーテルゴーレム',role:'ゴー
 MODEL.silver={ut:'inf',wage:4,name:'銀装兵',role:'銀装兵（歩兵の上位）',color:'#f0f6ff',req:'silvert',hpEach:110,dmg:16,spd:40,cost:{sword:5,mithril:4,fuel:12},desc:'聖銀の鎧の歩兵。重装歩兵のように硬いのに、足も速い。吸血鬼などに少し強い'};
 MODEL.griffon={ut:'cav',wage:6,name:'グリフォン騎兵',role:'グリフォン騎兵（空を移動）',color:'#c8a070',req:'griffont',members:3,hpEach:120,dmg:16,spd:110,fly:true,time:22,cost:{gold:40,fuel:30,mithril:3},desc:'移動は空を飛んで速い（柵・山・川を越える）。攻撃するときは地上に降りるので、地上の魔物からも攻撃される'};
 MODEL.guard={off:true,ut:'guard',wage:4,name:'近衛兵',role:'近衛兵（城の守り）',color:'#e8c860',desc:'城を守る精兵。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内では火力2倍・受ける被害半分。離れると並の兵より少し強い程度'};
-MODEL.scout={ut:'arch',wage:2,name:'斥候',role:'斥候（スカウト）',color:'#8a94a8',req:'scouting',hpEach:18,dmg:4,rate:0.7,range:4,spd:66,vision:20,frail:1.8,scoutEye:true,cost:{gold:15,fuel:10},desc:'足が速く、遠くまで見通す偵察兵。敵の駐留地の正確な場所を見つけられるのは斥候だけ。ひどく打たれ弱く、戦闘ではすぐ倒れる'};
+MODEL.scout={ut:'arch',wage:2,name:'斥候',role:'斥候（スカウト）',color:'#8a94a8',req:'scouting',hpEach:18,dmg:4,rate:0.7,range:4,spd:66,vision:20,frail:1.8,scoutEye:true,cost:{gold:15,fuel:10},desc:'足が速く、遠くまで見通す偵察兵。敵の駐屯地の正確な場所を見つけられるのは斥候だけ。ひどく打たれ弱く、戦闘ではすぐ倒れる'};
 MODEL.farmer={ut:'mil',name:'農兵',role:'農兵（クワ）',color:'#c8a060',wage:1,desc:'クワや鋤を手にした村人。兵舎がなくても城館で集められる。弱いが安く、食料だけで編成できる'};
 const MTC={};for(const k in MODEL)MTC[k]=Object.assign({},UT[MODEL[k].ut],MODEL[k],{key:k});
 function defModel(ut){return {art:'cannoneer',guard:'guard',mil:'farmer',cav:'rider',drake:'dragon',mage:'wizard',inf:'pawn',arch:'archer',tank:'t10',ship:'dd',air:'heli'}[ut]||'geki';}
@@ -2169,9 +2169,9 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('formation',{tier:1,pre:[],cost:{fuel:40,sword:10},icon:'heavy',eff:'小隊（部隊）3つまでを「中隊」にまとめられる。一緒に動き、近くにいる間は火力 +15%・耐久 +10%'});
  set('armcare',{cat:'部隊',tier:1,name:'武具の手入れ',cost:{steel:30,iron:15},t:1,pre:[],icon:'pawn',eff:'近接部隊・竜騎兵の武具の傷み −40%'});
  set('bigquiver',{cat:'部隊',tier:1,name:'大矢筒',cost:{steel:30,ammo:30},t:1,pre:[],icon:'archer',eff:'弓兵隊の矢筒 60本→100本'});
- set('scout',{tier:1,pre:[],eff:'敵の偵察。Lv0：襲撃が来る方向だけ分かる。Lv1：駐留地のおおよその場所が分かる（マップとミニマップに円）・次の襲撃の概数と魔物の種類　Lv2：正確な数　Lv3：方面別の構成'});set('doctrine',{tier:1,pre:[]});set('nighthunt',{tier:1,pre:[]});
+ set('scout',{tier:1,pre:[],eff:'敵の偵察。Lv0：襲撃が来る方向だけ分かる。Lv1：駐屯地のおおよその場所が分かる（マップとミニマップに円）・次の襲撃の概数と魔物の種類　Lv2：正確な数　Lv3：方面別の構成'});set('doctrine',{tier:1,pre:[]});set('nighthunt',{tier:1,pre:[]});
  set('unit_r2',{cat:'部隊',gate:2,tier:2,name:'部隊強化Ⅱ',cost:{gold:60,fuel:60,sword:20},t:2,pre:[],icon:'heavy',eff:'部隊タブのランクⅡの研究を解放（重装歩兵・騎兵・魔術師など）'});
- set('scouting',{cat:'部隊',tier:2,name:'斥候隊',cost:{gold:30,fuel:30},t:1,pre:[],icon:'archer',eff:'兵舎で「斥候」を編成できる。足が速く視界が広い（20マス）。敵の駐留地の正確な場所を見つけられる唯一の部隊。打たれ弱く、受ける被害 180%'});
+ set('scouting',{cat:'部隊',tier:2,name:'斥候隊',cost:{gold:30,fuel:30},t:1,pre:[],icon:'archer',eff:'兵舎で「斥候」を編成できる。足が速く視界が広い（20マス）。敵の駐屯地の正確な場所を見つけられる唯一の部隊。打たれ弱く、受ける被害 180%'});
  set('heavyinf',{tier:2,pre:[]});set('cavalry',{tier:2,pre:[]});set('magic',{tier:4,pre:[]});
  set('shieldwall',{cat:'部隊',tier:2,name:'盾陣',cost:{iron:60,steel:40},t:2,pre:['heavyinf'],icon:'heavy',eff:'重装歩兵が受ける被害 −25%。周り4マスの魔物を引きつける'});
  set('charge',{cat:'部隊',tier:2,name:'騎馬突撃',cost:{gold:40,fuel:60},t:2,pre:['cavalry'],icon:'rider',eff:'騎兵の移動 +20%。しばらく戦っていない騎兵の最初の一撃が3倍'});
@@ -3773,11 +3773,11 @@ function genWave(n){
     heavy:n<7?0:Math.round((n-6)*1.5*bm),
     redcap:blood?Math.round(4+n*1.5):0,
   };
-  if(GL){/* 古い魔物は出てから頭打ち（cap回ぶんまで増える）、後半は新しい魔物に入れ替わる */const bm2=(blood?1.45:after?0.7:1)*(1+0.03*(n-1))*(n<=10?0.7+0.03*n:1);   /* 序盤（〜第10襲撃）は少なめ：第1は0.73倍・第6は0.88倍・第10で1倍（2026-11-15。第6襲撃で負けるという声） */const g=(from,k,cap)=>n<from?0:Math.round(Math.min(n-from+1,cap||8)*k*bm2);
+  if(GL){/* 古い魔物は出てから頭打ち（cap回ぶんまで増える）、後半は新しい魔物に入れ替わる */const bm2=(blood?(n>=30?1:n>=25?1.25:1.45):after?0.7:1)*(1+0.03*(n-1))*(n<=10?0.7+0.03*n:1);   /* 序盤（〜第10襲撃）は少なめ：第1は0.73倍・第6は0.88倍・第10で1倍（2026-11-15。第6襲撃で負けるという声） */const g=(from,k,cap)=>n<from?0:Math.round(Math.min(n-from+1,cap||8)*k*bm2);
     const ns=Math.min(n,10),late=n>26?0.35:n>18?0.5:1;
     Object.assign(cnt,{swarm:Math.round((14+ns*8+ns*ns*1.6)*(n<=4?1.1:n<=9?1.1+0.06*(n-4):1.4)*late*bm2),   /* 第5襲撃での1.1→1.4の段差を、第5〜9でなだらかに */charger:n<2?0:Math.round(ns*5*late*bm2),harpy:g(3,3,10),troll:g(4,1.1,10),grappler:n<5?0:Math.round((3+Math.min(n-5,10)*2.4)*bm2),spitter:g(5,1.2,10),
       gobarcher:g(8,2.2,10),heavy:g(9,1.1),wyvern:g(13,0.7),treant:g(15,0.8),eltreant:g(28,0.4,6),shogre:g(22,1.0),maneater:g(23,1.4),vampire:g(30,0.6,6),ghoul:g(30,1.4,6),golem:g(37,0.5,4),
-      werewolf:blood&&n>=21?Math.round(3+(n-20)*0.4):0,redcap:blood?Math.round(4+Math.min(n,20)*1.2):0});}
+      werewolf:blood&&n>=25?Math.round(3+(n-25)*0.4):0,redcap:blood?Math.round(4+Math.min(n,20)*1.2):0});}
   if(S&&S.mapId==='s'){cnt.charger=Math.round(cnt.charger*0.5);cnt.wolf=n<3?0:Math.round(ns2*4*bm);cnt.tiger=n<9?0:Math.round((n-8)*0.8*bm);cnt.mammoth=n<13?0:Math.max(1,Math.round((n-12)*0.35*bm));}
   const q=[];
   const weights=sides.map((s,i)=>i===0?1.6:1);const wsum=weights.reduce((a,b)=>a+b,0);
@@ -3814,7 +3814,7 @@ function genWave(n){
   return{n,q,sides,main:sides[0],tactic,blood,blizzard:S&&S.mapId==='s'&&[8,13,20].includes(n),hpMul:1+Math.max(0,n-10)*(GL?0.04:0.12),king:n===finalWave(),subs:subs.map((c,i)=>Object.values(c).reduce((a,b)=>a+b,0)+(n===finalWave()&&i===subs.length-1?1:0)),perSide,sideComp,noise0:0.6+Math.random()*0.8,noise1:0.85+Math.random()*0.3};
 }
 function phaseReset(){try{if(S.buildMode||S.buildPick){S.buildMode=null;S.buildPick=false;renderBuild();}S.aimNaval=false;if(S.sel&&S.sel.kind!=='s')S.sel=null;S.selTile=null;renderInfo(true);renderMode();}catch(e){}}
-// ===== 行軍：街から遠く、まだ見えていない敵は少し速く進む（駐留地からの道のりの待ち時間を少し短くする） =====
+// ===== 行軍：街から遠く、まだ見えていない敵は少し速く進む（駐屯地からの道のりの待ち時間を少し短くする） =====
 // 施設・部隊から MARCH_R（防衛施設は射程+2）以内に入ると通常の速さに戻る。e.far は速さの倍率（0=通常）
 // 見えている敵はいつも通常の速さ（画面の中で急に速く動かないように）
 let MARCH_R=8,MARCH_MUL=2,MARCH_SEEN=1;
@@ -3830,12 +3830,12 @@ function marchMap(){
 }
 function farE(e){if(!S._mm)return false;const gx=Math.floor(e.x/TU),gy=Math.floor(e.y/TU),gw=S._mmW;
   const near=gx>=0&&gy>=0&&gx<gw&&gy*gw<S._mm.length&&S._mm[gy*gw+gx];return near?0:seenE(e)?MARCH_SEEN:MARCH_MUL;}
-// ===== 駐留地：アビスから出た派遣部隊が、街とアビスのあいだで次の襲撃を待っている =====
+// ===== 駐屯地：アビスから出た派遣部隊が、街とアビスのあいだで次の襲撃を待っている =====
 // ・次の襲撃の方面ごとに1つ。中身は「次の襲撃の敵の一覧（S.next.q）」のその方面の分そのもの（数だけ持ち、普段は実体を出さない）
 // ・正確な場所が分かるのは斥候だけ（研究「斥候」Lv1以上で、だいたいの範囲だけ地図に出る）
-// ・昼に部隊が CAMP_TRIG 以内に入ると、駐留している魔物が全員出てきて戦闘になる。倒した分は次の襲撃から減る
+// ・昼に部隊が CAMP_TRIG 以内に入ると、駐屯している魔物が全員出てきて戦闘になる。倒した分は次の襲撃から減る
 // ・部隊が CAMP_LEASH より離れると、魔物は陣へ戻る（傷は陣で癒える）
-// ・夜の襲撃では、魔物は駐留地から出発する
+// ・夜の襲撃では、魔物は駐屯地から出発する
 const CAMP_TRIG=7,CAMP_LEASH=14;
 function campById(id){return S.camps&&S.camps.find(c=>c.id===id);}
 function campFor(sd){return S.camps&&S.camps.find(c=>c.side===sd&&c.state!=='gone');}
@@ -3865,12 +3865,13 @@ function makeCamps(){
 }
 function campSync(){if(S.waveActive||S.mode!=='campaign')return;if(S.campWave!==S.wave+1||!S.camps)makeCamps();
   if(!S.campHint&&S.wave>=1&&S.camps&&S.camps.length&&!S.overlay){S.campHint=true;
-    toast('次の襲撃の魔物が、街とアビスのあいだの「駐留地」に集まっています。研究「斥候」で場所の目安が分かり、昼に部隊で叩くと次の襲撃が減ります','warn',9000);
-    log('【駐留地】次の襲撃の魔物は、街とアビスのあいだの駐留地で待っている。研究「斥候」で場所の目安、斥候で正確な場所が分かる。昼に部隊で攻め込むと、倒した分だけ次の襲撃の敵が減る','warn');}}
-function campName(c){return `${sideShort(c.side)}駐留地`;}
+    const how=S.siegeMode===false?'（駐屯地襲撃モードが OFF なので攻め込めません）':S.siegeMode?'昼に部隊を近づけると夜襲をかけられ、倒した分だけ次の襲撃が減ります':'昼に部隊で叩くと次の襲撃が減ります';
+    toast('次の襲撃の魔物が、街とアビスのあいだの「駐屯地」に集まっています。研究「斥候」で場所の目安が分かります。'+how,'warn',9000);
+    log('【駐屯地】次の襲撃の魔物は、街とアビスのあいだの駐屯地で待っている。研究「斥候」で場所の目安、斥候で正確な場所が分かる。昼に部隊で攻め込むと、倒した分だけ次の襲撃の敵が減る','warn');}}
+function campName(c){return `${sideShort(c.side)}駐屯地`;}
 function campTag(sd){const c=S.camps&&S.camps.find(x=>x.side===sd);if(!c||S.waveActive)return '';
-  return c.state==='gone'?' <span class="ctag gone">駐留地 壊滅</span>':c.found?' <span class="ctag found">駐留地 発見</span>':' <span class="ctag">駐留地 未発見</span>';}
-// 倒した駐留兵の分、次の襲撃の一覧から減らす
+  return c.state==='gone'?' <span class="ctag gone">駐屯地 壊滅</span>':c.found?' <span class="ctag found">駐屯地 発見</span>':' <span class="ctag">駐屯地 未発見</span>';}
+// 倒した駐屯兵の分、次の襲撃の一覧から減らす
 function campLoss(e){const w=S.next,c=campById(e.camp);if(!w||!c)return;const i=w.q.findIndex(x=>x.side===c.side&&x.type===e.type);if(i<0)return;const x=w.q.splice(i,1)[0];
   if(w.perSide)w.perSide[c.side]=Math.max(0,(w.perSide[c.side]||1)-1);if(w.sideComp&&w.sideComp[c.side]&&w.sideComp[c.side][e.type])w.sideComp[c.side][e.type]--;
   if(w.subs&&w.subs[x.sub||0]>0)w.subs[x.sub||0]--;c.killed=(c.killed||0)+1;}
@@ -3884,7 +3885,7 @@ function startSkirm(c){
   // 速度は×1に戻して、いったん止める（襲撃の×3がそのまま残っていて、いきなり3倍で始まらないように）
   const wasFast=(S.speed||1)>1;S.speed=1;S.paused=true;renderPauseUI&&renderPauseUI();
   phaseReset();se('alarm');toast(`⚔ ${campName(c)}の魔物 ${n}体が出てきた！ 一時停止中${wasFast?'・速度を×1に戻しました':''}（Space で再開）`,'wave',6000);
-  log(`${campName(c)}に踏み込んだ。駐留していた魔物${n}体が迎え撃ってくる（${CAMP_LEASH*U}マスより離れれば陣へ戻る）`,'warn');
+  log(`${campName(c)}に踏み込んだ。駐屯していた魔物${n}体が迎え撃ってくる（${CAMP_LEASH*U}マスより離れれば陣へ戻る）`,'warn');
   auMusicFor&&auMusicFor();
 }
 function endSkirm(c,why){
@@ -3895,10 +3896,10 @@ function endSkirm(c,why){
   else{c.state='idle';log(`${campName(c)}の魔物は陣へ引き上げた（残り${alive}体・倒した数${c.killed}）`,'warn');}
   auMusicFor&&auMusicFor();renderAll();
 }
-// 駐留兵が狙う部隊：駐留地から CAMP_LEASH 以内にいる部隊のうち、いちばん近いもの
+// 駐屯兵が狙う部隊：駐屯地から CAMP_LEASH 以内にいる部隊のうち、いちばん近いもの
 function campHunt(e,air){const c=campById(e.camp);if(!c)return null;let best=null,bd=1e9;
   for(const s of S.squads){if(s.gar||s.ut==='ship')continue;if(!air&&UT[s.ut].fly&&s.ut!=='mech')continue;if(Math.hypot(s.x-c.x,s.y-c.y)>CAMP_LEASH*TU)continue;const d=Math.hypot(s.x-e.x,s.y-e.y);if(d<bd){bd=d;best=s;}}return best;}
-// 空の駐留兵：部隊へまっすぐ飛んでいく。いなければ陣の上空へ
+// 空の駐屯兵：部隊へまっすぐ飛んでいく。いなければ陣の上空へ
 function campFly(e,d,dt){e.cd-=dt*(e.curse?0.75:1);const s=campHunt(e,true),c=campById(e.camp);if(!c)return;
   const tx=s?s.x:c.x+(e.hx||0),ty=s?s.y:c.y+(e.hy||0),dx=tx-e.x,dy=ty-e.y,dd=Math.hypot(dx,dy)||1;
   if(s&&dd<d.r+12){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;e.atkX=s.x;damageSquad(s,d.dmg*(d.vsS||1));}return;}
@@ -3913,7 +3914,7 @@ function skirmTick(dt){
   const home=S.enemies.every(e=>e.camp!==c.id||Math.hypot(e.x-c.x-(e.hx||0),e.y-c.y-(e.hy||0))<TU*1.2);
   if(S.skirm.away>3&&(home||S.skirm.away>15))endSkirm(c,'withdraw');
 }
-// 昼：斥候の発見と、駐留地への踏み込み
+// 昼：斥候の発見と、駐屯地への踏み込み
 function campWatch(){
   campSync();if(S.waveActive||!S.camps||!S.camps.length)return;
   for(const c of S.camps){if(c.state!=='idle')continue;
@@ -3922,20 +3923,20 @@ function campWatch(){
         const {u,n}=campUnits(c);se('upgrade');toast(`${unitLabel(s)}が${campName(c)}を発見！（約${n}体）`,'good',4500);
         log(`${unitLabel(s)}が${campName(c)}を発見：${Object.keys(u).map(k=>E[k].name+'×'+u[k]).join('・')}。${CAMP_TRIG*U}マス以内に近づくと戦闘になる`,'good');}
       if(S.phase!=='night'&&!S.skirm&&d<CAMP_TRIG*TU){
-        if(S.siegeMode===false){if(!c.offMsg){c.offMsg=1;toast('駐屯地襲撃モードが OFF なので、駐留地には攻め込めません','warn',3500);}continue;}
+        if(S.siegeMode===false){if(!c.offMsg){c.offMsg=1;toast('駐屯地襲撃モードが OFF なので、駐屯地には攻め込めません','warn',3500);}continue;}
         if(S.siegeMode&&typeof openSiegeCamp==='function'){if(!c.found){c.found=true;S.campFoundN=(S.campFoundN||0)+1;}if(!c.asked){c.asked=true;siegeAsk(c);return;}continue;}
         startSkirm(c);return;}}
     if(c.asked&&!S.squads.some(s=>!s.gar&&Math.hypot(s.x-c.x,s.y-c.y)<CAMP_TRIG*TU*1.6))c.asked=false;}
 }
-// ===== 駐屯地襲撃モード β（2026-11-13）：駐留地に近づくと、別の戦場で夜襲をかける（proto の siege.js・本番は siege.js を読み込む） =====
-// 駐留地の陣の形は、駐留地ができたときに決まる（夜襲で選べない。2026-11-13）。31回目から大要塞、22回目から二重の陣、それまでは丸・四角・横長のどれか
+// ===== 駐屯地襲撃モード β（2026-11-13）：駐屯地に近づくと、別の戦場で夜襲をかける（proto の siege.js・本番は siege.js を読み込む） =====
+// 駐屯地の陣の形は、駐屯地ができたときに決まる（夜襲で選べない。2026-11-13）。31回目から大要塞、22回目から二重の陣、それまでは丸・四角・横長のどれか
 function campLay(n){return n>30?'fort':n>21?'double':['ring','square','long'][Math.floor(Math.random()*3)];}
 function siegeModeDefault(){try{return localStorage.getItem('nd_siege_mode')!=='0';}catch(e){return true;}}
 function siegeAsk(c){const {u,n}=campUnits(c);if(!n){c.state='gone';return;}
   if(c.raidDay===S.turn){toast(`${campName(c)}には今日もう夜襲をかけました。明日また攻められます`,'warn',4000);return;}
   S.paused=true;try{renderPauseUI();}catch(e){}
-  openOverlay('siegeAsk',`<h2>${campName(c)}に夜襲をかける？</h2><div class="help" style="line-height:1.8">駐留している魔物 <b>${n}</b> 体（${Object.keys(u).sort((a,b)=>u[b]-u[a]).slice(0,5).map(k=>E[k].name+u[k]).join('・')}）。<br>
-    別の戦場で夜襲をかけます。連れて行く部隊を選び、陣のまわりに置いて戦います。倒した魔物の分だけ<b>次の襲撃が減り</b>、部隊が受けた被害はそのまま残ります。駐留地への夜襲は1日1回です。</div>
+  openOverlay('siegeAsk',`<h2>${campName(c)}に夜襲をかける？</h2><div class="help" style="line-height:1.8">駐屯している魔物 <b>${n}</b> 体（${Object.keys(u).sort((a,b)=>u[b]-u[a]).slice(0,5).map(k=>E[k].name+u[k]).join('・')}）。<br>
+    別の戦場で夜襲をかけます。連れて行く部隊を選び、陣のまわりに置いて戦います。倒した魔物の分だけ<b>次の襲撃が減り</b>、部隊が受けた被害はそのまま残ります。駐屯地への夜襲は1日1回です。</div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button id="saNo">やめる</button><button id="saGo" class="on">部隊を選ぶ</button></div>`,true);
   document.getElementById('saNo').onclick=()=>{closeOverlay();};
   document.getElementById('saGo').onclick=()=>{closeOverlay();openSiegeCamp(c);};}
@@ -3943,7 +3944,7 @@ function siegeAsk(c){const {u,n}=campUnits(c);if(!n){c.state='gone';return;}
 function sqLoss(sq,r){if(!sq||!(sq.hp>0))return;const t=MT(sq),nh=Math.round(sq.hp*Math.max(0,Math.min(1,r)));
   if(nh<=0){sq.hp=0;S.squads=S.squads.filter(x=>x!==sq);S.kia+=sq.members*(t.popEach||(sq.ut==='adv'?1:0));coClean();log(`${unitLabel(sq)} 夜襲で全滅`,'kia');killCmd(sq,`${unitLabel(sq)}を率いて戦死`);if(S.sel===sq)S.sel=null;return;}
   sq.hp=nh;const m=Math.max(1,Math.ceil(sq.hp/(memberHp(sq)*bonus(sq).hp)-1e-6));if(m<sq.members){const lost=sq.members-m;sq.members=m;S.kia+=lost*(t.popEach||(sq.ut==='adv'?1:0));log(`${unitLabel(sq)} 夜襲で${lost}${t.unit}を失った（残り${m}${t.unit}）`,'kia');}}
-// 描画：見つけた駐留地はテントと見張りの魔物。見つけていない駐留地は、研究「斥候」Lv1からだいたいの範囲だけ
+// 描画：見つけた駐屯地はテントと見張りの魔物。見つけていない駐屯地は、研究「斥候」Lv1からだいたいの範囲だけ
 function drawCamps(an,under){
   if(!S.camps||S.waveActive)return;
   for(const c of S.camps){
@@ -4003,7 +4004,7 @@ function spawnEnemy(ent){dexMark(ent.type);
   const d=Object.assign({},E[ent.type]);if(S.cur&&S.cur.blood)d.hp=Math.round(d.hp*1.25);if(S.cur&&S.cur.hpMul)d.hp=Math.round(d.hp*S.cur.hpMul);let x,y;const j=(Math.random()-.5)*0.35;
   if(S.island&&S.hives[ent.side]){const h=S.island,bch=S.hives[ent.side],a=Math.random()*Math.PI*2,r=Math.random()*1.8*TU;
     S.enemies.push({type:ent.type,x:bcx(h)+Math.cos(a)*r,y:bcy(h)+Math.sin(a)*r,hp:d.hp,maxhp:d.hp,cd:0,target:null,retarget:0,wp0:[bch.x*T-1.5*TU,bcy(bch)+(Math.random()-.5)*6*TU]});return;}
-  {const cp=campFor(ent.side);if(cp){const [x,y]=campSpot(cp);S.enemies.push({type:ent.type,x,y,hp:d.hp,maxhp:d.hp,cd:0,target:null,retarget:0});return;}}   // 駐留地から出発
+  {const cp=campFor(ent.side);if(cp){const [x,y]=campSpot(cp);S.enemies.push({type:ent.type,x,y,hp:d.hp,maxhp:d.hp,cd:0,target:null,retarget:0});return;}}   // 駐屯地から出発
   if(S.hives&&S.hives[ent.side]){const h=S.hives[ent.side],a=Math.random()*Math.PI*2,r=Math.random()*1.8*TU;
     S.enemies.push({type:ent.type,x:bcx(h)+Math.cos(a)*r,y:bcy(h)+Math.sin(a)*r,hp:d.hp,maxhp:d.hp,cd:0,target:null,retarget:0});return;}
   const ln=Math.max(0.05,Math.min(0.95,ent.lane+j));
@@ -4043,7 +4044,7 @@ function advanceResearch(){
 // 昼に「夜へ」→静かな夜（夜狩り・深夜残業）→「朝へ」で次のターン。最後の準備ターンの夜は襲撃
 function endTurn(){
   if(S.waveActive||S.over)return;
-  if(S.skirm){toast('駐留地で交戦中です。戦いを終えるか、部隊を下げてから次へ進めます','warn');return;}
+  if(S.skirm){toast('駐屯地で交戦中です。戦いを終えるか、部隊を下げてから次へ進めます','warn');return;}
   if(S.phase==='night'){morning();return;}
   if(S.turnsLeft===1){doEndTurn();return;}
   doEndTurn();
@@ -4098,7 +4099,7 @@ function visitCost(o){return typeof o.cost==='function'?o.cost():(o.cost||{});}
 // 行商人の品（毎回この中から3つ）
 const SHOP=[
   {id:'book',n:'古い研究書',ic:'research',g:60,d:'研究中のもの1つ、残り −1ターン',ok:()=>S.research.some(r=>r.left>1)?'':'研究中のもの（残り2ターン以上）がない',f:()=>{const r=S.research.filter(x=>x.left>1).sort((a,b)=>b.left-a.left)[0];r.left--;return `「${techOf(r.id).name}」が1ターン早まった`;}},
-  {id:'map',n:'宝の地図',ic:'target',g:40,d:'見つけていない駐留地の場所が1つ分かる',ok:()=>(S.camps||[]).some(c=>!c.found&&c.state==='idle')?'':'見つけていない駐留地がない',f:()=>{const c=S.camps.find(c=>!c.found&&c.state==='idle');c.found=true;S.campFoundN=(S.campFoundN||0)+1;return `${campName(c)}の場所が分かった`;}},
+  {id:'map',n:'宝の地図',ic:'target',g:40,d:'見つけていない駐屯地の場所が1つ分かる',ok:()=>(S.camps||[]).some(c=>!c.found&&c.state==='idle')?'':'見つけていない駐屯地がない',f:()=>{const c=S.camps.find(c=>!c.found&&c.state==='idle');c.found=true;S.campFoundN=(S.campFoundN||0)+1;return `${campName(c)}の場所が分かった`;}},
   {id:'arrow',n:'矢のたば',ic:'arrow',g:20,d:'矢 +40',f:()=>{S.ammo+=40;return '矢 +40';}},
   {id:'sword',n:'剣のたば',ic:'sword',g:30,d:'剣 +10',f:()=>{S.sword=(S.sword||0)+10;return '剣 +10';}},
   {id:'ether',n:'エーテル結晶',ic:'ether',g:35,d:'エーテル +15',f:()=>{S.elec+=15;return 'エーテル +15';}},
@@ -4496,7 +4497,7 @@ const NIGHT_STOP=new Set(['coalmine','goldmine','mithmine','smelter','miner','qu
 function update(dt,sim){
   if((S.waveActive||S.skirm)&&!sim)skillTick(dt);
   if(S.over)return;
-  const DAYF=!!S.skirm&&!S.waveActive&&!sim;   // 昼の駐留地戦：生産や建設は昼のターン送りで進むので、ここでは戦闘だけ
+  const DAYF=!!S.skirm&&!S.waveActive&&!sim;   // 昼の駐屯地戦：生産や建設は昼のターン送りで進むので、ここでは戦闘だけ
   if(S.waveActive)calcLights();
   S._kings=S.enemies.filter(e=>e.type==='king');
   S.t+=dt;
@@ -5618,7 +5619,7 @@ function draw(){
       ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#000';const tt='夜はこの円の中の敵だけ狙える';ctx.strokeText(tt,(gx+NS/2)*T,(gy+NS/2)*T+lr*TU+12);ctx.fillStyle='#ffe08a';ctx.fillText(tt,(gx+NS/2)*T,(gy+NS/2)*T+lr*TU+12);ctx.lineWidth=1;}}
   }
   if(fogCv){ctx.imageSmoothingEnabled=true;const kx=fogCv.width/W,ky=fogCv.height/H,c0=Math.max(0,Math.floor(VR[0]*kx)-2),r0=Math.max(0,Math.floor(VR[1]*ky)-2),c1=Math.min(fogCv.width,Math.ceil((VR[0]+VR[2])*kx)+2),r1=Math.min(fogCv.height,Math.ceil((VR[1]+VR[3])*ky)+2);if(c1>c0&&r1>r0)ctx.drawImage(fogCv,c0,r0,c1-c0,r1-r0,c0/kx,r0/ky,(c1-c0)/kx,(r1-r0)/ky);}
-  drawCamps(an);   // 見つけた駐留地は霧の上にも出す
+  drawCamps(an);   // 見つけた駐屯地は霧の上にも出す
   for(const h of (S.island?hiveSpots():[])){ctx.fillStyle='#ffb0c8';ctx.font=`bold ${Math.round(11/Math.min(1,cam.z))}px sans-serif`;ctx.fillText(h.name,bcx(h),bcy(h)-TU*2.6);}
   // 地図の端
   ctx.strokeStyle='rgba(255,90,78,.25)';ctx.lineWidth=2;ctx.strokeRect(0,0,W,H);ctx.lineWidth=1;
@@ -5664,7 +5665,7 @@ function draw(){
   const [mx,my]=mmPos(),ks=MM.w/W;
   ctx.globalAlpha=0.92;ctx.fillStyle='#000';ctx.fillRect(mx-2,my-2,MM.w+4,MM.h+4);if(miniCv)ctx.drawImage(miniCv,mx,my);if(miniFog)ctx.drawImage(miniFog,mx,my);ctx.globalAlpha=1;
   for(const h of (S.island?hiveSpots():[])){ctx.fillStyle='#ff5a8a';ctx.beginPath();ctx.arc(mx+bcx(h)*(MM.w/W),my+bcy(h)*(MM.h/H),3.5,0,7);ctx.fill();}
-  if(S.camps&&!S.waveActive&&lvl('scout')>=1)for(const c of S.camps){if(c.found||c.state!=='idle')continue;ctx.save();ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(255,120,90,.8)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(mx+c.hx*ks,my+c.hy*ks,Math.max(4,c.hr*ks),0,7);ctx.stroke();ctx.restore();}   /* 斥候Lv1から：駐留地のおおよその場所（ミニマップにも） */
+  if(S.camps&&!S.waveActive&&lvl('scout')>=1)for(const c of S.camps){if(c.found||c.state!=='idle')continue;ctx.save();ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(255,120,90,.8)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(mx+c.hx*ks,my+c.hy*ks,Math.max(4,c.hr*ks),0,7);ctx.stroke();ctx.restore();}   /* 斥候Lv1から：駐屯地のおおよその場所（ミニマップにも） */
   if(S.camps&&!S.waveActive)for(const c of S.camps){if(!c.found||c.state==='gone')continue;const x=mx+c.x*ks,y=my+c.y*ks;ctx.fillStyle='#ff9a3a';ctx.beginPath();ctx.moveTo(x,y-4);ctx.lineTo(x+4,y+3);ctx.lineTo(x-4,y+3);ctx.closePath();ctx.fill();}
   for(const b of S.blds){ctx.fillStyle=b.type==='hq'?'#f2b33d':gunOf(b)?'#9fe0a0':CWALL.has(b.type)?'#8a9a8c':'#4f9a62';ctx.fillRect(mx+b.x*T*ks,my+b.y*T*ks,3,3);}
   ctx.fillStyle='#62c6d9';for(const q of S.squads)ctx.fillRect(mx+q.x*ks-1.5,my+q.y*ks-1.5,3,3);
@@ -5680,7 +5681,7 @@ function draw(){
     // 左上には選択中・建設中の表示が重なるので、カーソルの右下に小さく出す（はみ出す時は左・上へ）
     let sx=(mouse.x-cam.x)*cam.z+16,sy=(mouse.y-cam.y)*cam.z+20;if(sx+tw>VW-4)sx=Math.max(4,(mouse.x-cam.x)*cam.z-tw-12);if(sy+th>VH-24)sy=Math.max(4,(mouse.y-cam.y)*cam.z-th-12);
     ctx.fillStyle='#000d';ctx.fillRect(sx,sy,tw,th);L.forEach((l,k)=>{ctx.font=(k?'':'bold ')+'11px sans-serif';ctx.fillStyle=l[1]||'#cfe3cf';ctx.fillText(l[0],sx+7,sy+14+k*15);});ctx.textAlign='center';}}
-  if(S.skirm){const c=campById(S.skirm.id);if(c){const n=S.enemies.filter(e=>e.camp===c.id&&e.hp>0).length;const tx=`⚔ ${campName(c)}と交戦中　残り${n}体　（部隊が駐留地から${CAMP_LEASH*U}マスより離れると、魔物は陣へ戻る）`;
+  if(S.skirm){const c=campById(S.skirm.id);if(c){const n=S.enemies.filter(e=>e.camp===c.id&&e.hp>0).length;const tx=`⚔ ${campName(c)}と交戦中　残り${n}体　（部隊が駐屯地から${CAMP_LEASH*U}マスより離れると、魔物は陣へ戻る）`;
     ctx.font='bold 12px sans-serif';ctx.textAlign='center';const w=ctx.measureText(tx).width+20;ctx.fillStyle='rgba(40,6,4,.85)';ctx.fillRect(VW/2-w/2,VH-58,w,22);ctx.fillStyle='#ff9a86';ctx.fillText(tx,VW/2,VH-43);}}
   if(S.over&&S.review){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,VW,40);ctx.fillStyle='#f2b33d';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText('振り返り中 — 研究 [R]・軍事 [K] などで最後の状態を見られます。襲撃ごとの記録は「記録」ボタン',VW/2,25);}
   if(S.paused&&!S.over){ctx.fillStyle='rgba(0,0,0,.22)';ctx.fillRect(0,0,VW,VH);}
@@ -7045,7 +7046,7 @@ function renderIntel(){
     if(w.subs&&w.subs.length>1)det.push(`<span><b>襲撃は${w.subs.length}つの波</b>：${w.subs.map((v,i)=>`${['第一','第二','第三'][i]}波 約${v}体`).join('　→　')}</span>`);
     det.push(`<span class="muted">偵察Lv${it.L}${it.L<3?'（研究「斥候」で精度向上）':''}</span>`);
     if(S.camps&&S.camps.length){const st=S.camps.map(c=>`${campName(c)}：${c.state==='gone'?'壊滅':c.found?'発見済み':'未発見'}`).join('　');
-      det.push(`<span><b style="color:var(--amber)">駐留地</b>　${st}<br><span class="muted">魔物は駐留地で夜を待っています。${lvl('scout')<1?'研究「斥候」で地図に場所の目安が出ます。':'地図の赤い点線の円が目安。'}斥候で見つけて昼に部隊で叩くと、倒した分だけ次の襲撃が減ります</span></span>`);}
+      det.push(`<span><b style="color:var(--amber)">駐屯地</b>　${st}<br><span class="muted">魔物は駐屯地で夜を待っています。${lvl('scout')<1?'研究「斥候」で地図に場所の目安が出ます。':'地図の赤い点線の円が目安。'}斥候で見つけて昼に部隊で叩くと、倒した分だけ次の襲撃が減ります</span></span>`);}
     {/* 推奨の目安は外した（2026-11-15）：足りない資源の警告に置き換え */
      h+=`<div class="imob"><div class="iml"><small>敵情予測</small><b>${it.total}・${it.sides.map(sd=>{const m=sideName(sd).match(/（(.+?)）/);return (m?m[1]:SIDE_NAME[sd]||'')+' '+(S.hives&&S.hives[sd]?S.hives[sd].s:'');}).join('・')}</b></div>${pipsHTML(dg,5,'danger-pips')}</div>`;}
     h+=`<button id="intelTg" class="ghost">${S.intelOpen?'▴ たたむ':'▾ 詳しく'}</button>`;
@@ -7392,13 +7393,17 @@ function saveMark(ok){let el=document.getElementById('saveMark');if(!el){el=docu
   clearTimeout(el._t1);clearTimeout(el._t2);el.className='on busy';el.innerHTML=`${ui('disk','amber',24)}<span>セーブしています…</span>`;
   el._t1=setTimeout(()=>{el.className='on'+(ok?'':' ng');el.innerHTML=`${ui('disk',ok?'green':'red',24)}<span>${ok?'セーブしました':'セーブできませんでした'}</span>`;
     el._t2=setTimeout(()=>{el.className='';},1600);},500);}
-function saveGame(quiet){if(!canSave())return false;try{const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}
+// セーブを小さく：鉱脈・油田の true/false の升目を「同じ値の続く長さ」で詰める（1つ約320KB → 数KB。2026-11-15）
+function packG(g){if(!Array.isArray(g)||!Array.isArray(g[0]))return g;const w=g[0].length,R=[];let cur=!!g[0][0],n=0;for(const row of g)for(const v of row){if(!!v===cur)n++;else{R.push(n);cur=!cur;n=1;}}R.push(n);return {pk:1,w,h:g.length,f:g[0][0]?1:0,r:R.join(',')};}
+function unpackG(o){if(!o||!o.pk)return o;const R=o.r.split(',').map(Number),out=[];let cur=!!o.f,row=[];for(const n of R){for(let i=0;i<n;i++){row.push(cur);if(row.length===o.w){out.push(row);row=[];}}cur=!cur;}return out;}
+function packSave(o){for(const k of ['ore','oil'])if(o[k])o[k]=packG(o[k]);return o;}
+function saveGame(quiet){if(!canSave())return false;try{const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}packSave(o);
   o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:MAPS[CUR_MAP]?MAPS[CUR_MAP].name:''};
   localStorage.setItem(SAVE_KEY,JSON.stringify({meta,S:o}));saveMark(true);return true;}catch(e){saveMark(false);if(!quiet)toast('セーブできませんでした（ブラウザの保存領域）','bad');return false;}}
 function saveInfo(){try{const r=localStorage.getItem(SAVE_KEY);if(!r)return null;return JSON.parse(r).meta;}catch(e){return null;}}
 function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catch(e){return false;}if(!d||!d.S)return false;
   const m=d.meta;CUR_MAP=m.map;BLOOD_MODE=!!m.blood;setDims('campaign');upDims();squadNo=m.squadNo||1;tankNo=m.tankNo||1;
-  S=d.S;S.flow=new Map();
+  S=d.S;S.flow=new Map();for(const k of ['ore','oil'])if(S[k]&&S[k].pk)S[k]=unpackG(S[k]);
   // 前のセッションの時刻（performance.now 基準）は持ち越さない：発射アニメなどのコマ番号が狂って描画が止まるため
   for(const b of S.blds){delete b.fireT;}for(const q of S.squads||[]){delete q.atkT;}S.vfx=[];
   if(S.skirm||!S.waveActive){S.skirm=null;if(!S.waveActive)S.enemies=[];if(S.camps)for(const c of S.camps)if(c.state==='fight')c.state='idle';}for(const k in AF)delete AF[k];S.grid=Array.from({length:ROWS},()=>new Array(COLS).fill(null));
@@ -7416,11 +7421,11 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   for(const b of S.blds||[])if((b.type==='tower'||b.type==='magetower')&&b.gar){const q=S.squads.find(x=>x.id===b.gar);b.gar=null;if(q){q.gar=null;q.x=bcx(b);q.y=bcy(b)+0.9*TU;}}   /* 櫓・塔は人員で撃つようになった（2026-11-12） */
   return true;}
 // ===== 襲撃のあとの区切り（2026-11-15）：負けたら「第N襲撃のあと」からやり直せる。ゲームごとの番号 gid で、別のゲームの区切りは使わない =====
-function saveCkpt(){if(!S||S.mode!=='campaign')return;S.gid=S.gid||Date.now();const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}
+function saveCkpt(){if(!S||S.mode!=='campaign')return;S.gid=S.gid||Date.now();const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}packSave(o);
   o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'',gid:S.gid,ck:true};
   try{localStorage.setItem(SAVE_KEY+'_ck',JSON.stringify({meta,S:o}));}catch(e){}}
 function ckptInfo(){try{const d=JSON.parse(localStorage.getItem(SAVE_KEY+'_ck'));if(!d||!d.meta)return null;if(S&&S.gid&&d.meta.gid!==S.gid)return null;return d.meta;}catch(e){return null;}}
-function loadCkpt(){const r=localStorage.getItem(SAVE_KEY+'_ck');if(!r)return false;try{localStorage.setItem(SAVE_KEY,r);}catch(e){return false;}closeOverlay();const ok=loadGame();
+function loadCkpt(){const r=localStorage.getItem(SAVE_KEY+'_ck');if(!r)return false;try{localStorage.setItem(SAVE_KEY,r);}catch(e){return false;}closeOverlay();const ok=loadGame();if(ok&&S.wave>=1)S.campHint=true;   /* やり直しで駐屯地の案内をもう一度出さない */
   if(ok){const m=JSON.parse(r).meta;log(`第${m.wave}襲撃のあと（${m.turn}日目）からやり直します`,'good');toast(`第${m.wave}襲撃のあと（${m.turn}日目）からやり直します。次の襲撃に備えましょう`,'good',6000);}return ok;}
 function dryNote(k){if(!S.cur)return;const d=S.cur.dry=S.cur.dry||{};d[k]=(d[k]||0)+1;}
 // 負けた理由の手がかり：その襲撃で起きたことだけを並べる（推測で決めつけない）
@@ -7457,14 +7462,14 @@ function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn()
 const UPDATES=[
  ['1.5.1','2026-11-16',['<b>効果音を選び直した</b>：建設（木はのこぎり、石は石を積む音、鉱山・精錬所・火薬工房・精製炉はつるはし、畑は耕して種まき）、襲撃の知らせは城の大鐘、英雄の戦死は鐘、研究の開始・完了、騎兵の突撃、敵を倒す音、襲撃をしのいだ・勝利・敗北、ボタンなど操作の音','<b>大事な音が聞こえやすく</b>：襲撃の知らせ・英雄の戦死・施設の破壊などが鳴っている間は、小さな音（発射・撃破・建設など）を少し下げる']],
  ['1.5','2026-11-15',['<b>街の記録</b>：「記録」ボタンで、襲撃ごとの結果と、施設の数・生産量・資源の移り変わりをグラフで見られる（5回ごとの襲撃の目印つき）。数字をまとめてコピーして表計算ソフトに貼れる','<b>街の成長のタイムラプス</b>：ゲームの終わり（勝っても負けても）や街の記録から、最初の日からの街の移り変わりを早送りで見られる','<b>iPad などタブレット</b>で指で遊びやすく：キーの案内を隠し、ボタンを大きく、範囲選択ボタンを出す。ダブルタップで画面が拡大されないように','不具合の修正：建設する施設を選んでも、上の帯に名前・費用・置き方が出ないことがあった']],
- ['1.4.3','2026-11-15',['<b>矢・武具などの消費を元に戻した</b>（1.4.1 で約1.3倍にしたもの。矢が途中で尽きて守れなくなることがあった）','<b>BGM を 8bit 風に</b>：ホーム・昼・静かな夜・祭り・襲撃の曲を新しく。ブラッドムーンの夜に専用の曲、勝ったとき・負けたときの結果画面に曲。ボスの曲はそのまま','<b>効果音を作り直し</b>：建設（木・石・金属・火・畑）、研究、敵を倒す（ザシュッ）、騎兵の突撃（バシン）、襲撃の知らせ、しのいだとき・勝利・敗北のファンファーレ など']],
+ ['1.4.3','2026-11-15',['<b>矢・武具などの消費を元に戻した</b>（1.4.1 で約130%にしたもの。矢が途中で尽きて守れなくなることがあった）','<b>BGM を 8bit 風に</b>：ホーム・昼・静かな夜・祭り・襲撃の曲を新しく。ブラッドムーンの夜に専用の曲、勝ったとき・負けたときの結果画面に曲。ボスの曲はそのまま','<b>効果音を作り直し</b>：建設（木・石・金属・火・畑）、研究、敵を倒す（ザシュッ）、騎兵の突撃（バシン）、襲撃の知らせ、しのいだとき・勝利・敗北のファンファーレ など']],
  ['1.4.2','2026-11-14',['<b>罠もドラッグで一列にまとめて置ける</b>ように（壁と同じ操作）','<b>取り消し</b>：さっき置いたもの（一列ぶん）を全額返して戻せる。帯の「取り消し」か Ctrl+Z。その日のうちなら何回でも','罠を押すと「撤去」できるように（費用の半分が戻る）','改築中の残りターンを建物の枠の中に出して、密集した街でも重ならないように']],
  ['1.4.1','2026-11-14',['<b>軽量化</b>：夜の描画を大幅に軽く（敵の多い襲撃で約3倍軽く）','敵の地上部隊が10〜20体の群れでまとまって押し寄せるように（数は同じ）。範囲攻撃は爆心から離れるほど弱く（端で40%）','部隊の補給・補充・手当てを前哨砦・城館でも受けられるように（いちばん近いところへ行く）','矢・武具などの消費を少し増やした。石炭と関係のない研究には石炭を使わない','改築中・城の強化中がマップで分かるように（残りターンと進み具合）','研究画面：改築の研究を各ランクのいちばん上に','祭りの費用を人口に合わせた','盾持ちオーガなど、敵の向きが左右にパタパタ変わる不具合を修正']],
- ['1.4','2026-11-13',['<b>駐屯地襲撃モード β</b>：ステージ選択で ON にすると、見つけた駐留地へ攻め込むとき、別の戦場で夜襲をかけて戦う。手持ちの部隊で戦い、倒した魔物の分だけ次の襲撃が減る（部隊の損耗も残る）','ステージ1の名前を<b>グレイヴェル平原</b>に','<b>モンスター図鑑</b>をタイトルへ。セーブをまたいで記録が残る。立ち絵が少し動くように','<b>アップデート情報</b>をゲームの中で見られるように','上の資源の表示：新しい資材が増えても入りきるように詰めて表示。石炭・合金のアイコンを見やすく','襲撃の曲を40回の襲撃に合わせて、ランクが上がるごとに盛り上がるように']],
+ ['1.4','2026-11-13',['<b>駐屯地襲撃モード β</b>：ステージ選択で ON にすると、見つけた駐屯地へ攻め込むとき、別の戦場で夜襲をかけて戦う。手持ちの部隊で戦い、倒した魔物の分だけ次の襲撃が減る（部隊の損耗も残る）','ステージ1の名前を<b>グレイヴェル平原</b>に','<b>モンスター図鑑</b>をタイトルへ。セーブをまたいで記録が残る。立ち絵が少し動くように','<b>アップデート情報</b>をゲームの中で見られるように','上の資源の表示：新しい資材が増えても入りきるように詰めて表示。石炭・合金のアイコンを見やすく','襲撃の曲を40回の襲撃に合わせて、ランクが上がるごとに盛り上がるように']],
  ['1.3','2026-11-13',['<b>ステージ1（草原）を40回の襲撃まで</b>：20回目に中ボス「ゴブリンキング」、40回目にラスボス「蠢く木陰」','ステージ選択：沼地・山脈・雪原・荒野は Coming Soon','新しい魔物：トレント・エルダートレント・盾持ちオーガ・マンイーター・吸血鬼・グール・ストーンゴーレム・ワーウルフ','ランクⅠ〜Ⅶ（城Lv7まで）、新しい素材、施設の改築','新しい防衛施設・罠：風船爆弾・メイジの塔・バリアストーン・テスラタワー・ハープーンランチャー・ミスリルレイ・ドラゴンブレス ほか','新しい部隊：エーテルゴーレム・狙撃兵・銀装兵・グリフォン騎兵','図鑑の特徴に名前、数字は小数なしで表示']],
  ['1.2','2026-11-10',['夜の過ごし方（休む・宴・祈り・夜警・夜なべ）と夜の出来事','教会・熟練度・罠の見直し・市場の売り買い','部隊の範囲選択、オートセーブ、読み込み画面']],
  ['1.1','',['スマホ横持ちに対応、ホーム画面に追加してアプリとして遊べるように','タブを 建設・研究・軍事・街 に整理','城の強化・造り替えにターンがかかるように']],
- ['1.0','',['画面デザインとドット絵を一新','敵の駐留地・斥候・モンスター図鑑']],
+ ['1.0','',['画面デザインとドット絵を一新','敵の駐屯地・斥候・モンスター図鑑']],
 ];
 function updSeen(){try{return localStorage.getItem('nd_upd_seen')===UPDATES[0][0];}catch(e){return true;}}
 function showUpdates(){try{localStorage.setItem('nd_upd_seen',UPDATES[0][0]);}catch(e){}
@@ -7508,7 +7513,7 @@ function showIntro(){
     ['waste','ステージ5','荒野','#d0a060','Coming Soon','']];
   const soonImg=id=>(id==='m'||id==='s')?mapIcon(id):'';
   openOverlay('intro',`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>ステージを選ぶ</h2><button id="inBack">タイトルへ</button></div>${saveInfo()?'<div class="wn" style="font-size:12px;margin-bottom:6px">新しく始めると、今のセーブデータは上書きされます</div>':''}
-  <div class="tskRow"><span><b>駐屯地襲撃モード <span style="color:#f2b33d">β</span></b><small>ON：見つけた駐留地に近づくと、別の戦場で夜襲をかけて戦う（倒した分だけ次の襲撃が減る）。OFF：駐留地には攻め込めない</small></span><span class="tskSw"><button data-sgm="1">ON</button><button data-sgm="0">OFF</button></span></div>
+  <div class="tskRow"><span><b>駐屯地襲撃モード <span style="color:#f2b33d">β</span></b><small>ON：見つけた駐屯地に近づくと、別の戦場で夜襲をかけて戦う（倒した分だけ次の襲撃が減る）。OFF：駐屯地には攻め込めない</small></span><span class="tskSw"><button data-sgm="1">ON</button><button data-sgm="0">OFF</button></span></div>
   <div id="inTasks" class="tskRow"><span><b>初心者タスク</b><small>生産・防衛の目標と、やり方のヒントをマップに表示します（どのステージでも使えます）</small></span><span class="tskSw"><button data-tsk="1">ON</button><button data-tsk="0">OFF</button></span></div>
   <div style="display:flex;flex-direction:column;gap:8px;margin:4px 0 6px">`+MAPL.map(([id,nm,sub,col,diff,desc])=>diff==='Coming Soon'?`<button disabled style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px;opacity:.55;cursor:default">
     <span style="position:relative;width:144px;height:84px;flex-shrink:0;border:1px solid var(--line);background:#14161a;display:flex;align-items:center;justify-content:center">${soonImg(id)?`<img src="${soonImg(id)}" width="144" height="84" style="image-rendering:pixelated;position:absolute;inset:0;filter:grayscale(1) brightness(.45)" alt="">`:''}<b style="position:relative;color:#e8dcc0;font-size:13px;letter-spacing:1px">COMING SOON</b></span>
@@ -7551,8 +7556,8 @@ const GUIDE={
   {t:'兵士か弓兵を2部隊つくる',c:()=>S.squads.filter(q=>q.ut==='inf'||q.ut==='arch').length,n:2,hi:'#bArmy',d:'「軍事 [K]」の「訓練」から編成します。兵士は剣、弓兵は矢を使います。',rw:{gold:40}},
   {t:'研究を1つ完了する',c:()=>gTechDone(),n:1,hi:'#bRes',d:'下の「研究 [R]」で研究を選びます。研究員として住民が必要です。完了すると新しい施設や強化が使えます。',rw:{gold:40}},
   {t:'投石機を建てる',b:'how',n:1,d:'研究「投石機」（防衛タブ）で解放。石を飛ばして、壁の向こうの敵をまとめて攻撃します。',rw:{stone:60}},
-  {t:'研究「斥候」で駐留地の場所をつかむ',c:()=>lvl('scout'),n:1,hi:'#bRes',d:'次の襲撃の魔物は、街とアビスのあいだの<b>駐留地</b>で待っています。研究「斥候」（部隊タブ）をすると、地図に<b>駐留地のだいたいの場所</b>（赤い点線の円）が出ます。',rw:{fuel:40}},
-  {t:'斥候で駐留地を見つける',c:()=>S.campFoundN||0,n:1,hi:'#bArmy',d:'研究「斥候隊」で<b>斥候</b>を編成し、赤い点線の円へ向かわせます。見つけた駐留地へ<b>昼のうちに部隊で攻め込む</b>と、倒した分だけ次の襲撃の敵が減ります。',rw:{gold:60}},
+  {t:'研究「斥候」で駐屯地の場所をつかむ',c:()=>lvl('scout'),n:1,hi:'#bRes',d:'次の襲撃の魔物は、街とアビスのあいだの<b>駐屯地</b>で待っています。研究「斥候」（部隊タブ）をすると、地図に<b>駐屯地のだいたいの場所</b>（赤い点線の円）が出ます。',rw:{fuel:40}},
+  {t:'斥候で駐屯地を見つける',c:()=>S.campFoundN||0,n:1,hi:'#bArmy',d:'研究「斥候隊」で<b>斥候</b>を編成し、赤い点線の円へ向かわせます。見つけた駐屯地へ<b>昼のうちに部隊で攻め込む</b>と、倒した分だけ次の襲撃の敵が減ります。',rw:{gold:60}},
  ]},
 };
 const COACH=[
@@ -7705,10 +7710,10 @@ function showHelp(fromTitle){
   <p>部隊を選んでマップをクリックすると移動。${K('迎撃')}＝近づく敵に向かう、${K('固守')}＝その場（壁ぎわ）で守る、${K('帰還・補給')}＝街へ戻って補給。${K('一時停止 [Space]')}中も指示が出せます。</p>
   <p>戦闘後は<b>戦闘報告</b>で、撃破数・被害・使った資源が確認できます。</p></section>
 
-  <section><h3>駐留地（敵の待機場所）</h3>
-  <p>次の襲撃で来る魔物は、街とアビスのあいだの<b>駐留地</b>で夜を待っています。襲撃の夜は、ここから出発します。</p>
-  <p>研究${K('斥候')}をすると、地図に駐留地の<b>だいたいの場所</b>（赤い点線の円）が出ます。研究「斥候隊」で編成できる<b>斥候</b>を近くへ向かわせると、正確な場所と中の魔物が分かります。</p>
-  <p>昼のうちに部隊で駐留地へ攻め込むと戦闘になり、<b>倒した分だけ次の襲撃の敵が減ります</b>。部隊が離れると、魔物は陣に戻って傷を癒やします。</p></section>
+  <section><h3>駐屯地（敵の待機場所）</h3>
+  <p>次の襲撃で来る魔物は、街とアビスのあいだの<b>駐屯地</b>で夜を待っています。襲撃の夜は、ここから出発します。</p>
+  <p>研究${K('斥候')}をすると、地図に駐屯地の<b>だいたいの場所</b>（赤い点線の円）が出ます。研究「斥候隊」で編成できる<b>斥候</b>を近くへ向かわせると、正確な場所と中の魔物が分かります。</p>
+  <p>昼のうちに部隊で駐屯地へ攻め込むと戦闘になり、<b>倒した分だけ次の襲撃の敵が減ります</b>。部隊が離れると、魔物は陣に戻って傷を癒やします。</p></section>
 
   <section><h3>うまくいかないとき</h3>
   <p>壊された施設は<b>廃墟</b>として残り、半額で建て直せます。大きな被害のあとは<b>避難民</b>や<b>王都からの援助</b>が来ることも。${K('記録')} で過去の襲撃を振り返れます。</p></section>
@@ -8334,7 +8339,7 @@ function playFest(st,t){const M=AU.music,s=st%16,bar=Math.floor(st/16)%4,ch=FEST
   if(s%2===1)tone(2600,t,0.03,{type:'square',vol:0.014,lp:5000,dest:M});                            // 鉦
   if(s%4===2)for(const n of ch)tone(mt(n),t,0.12,{type:'triangle',vol:0.036,dest:M});              // 和音の刻み
   if(s%2===0){const m=FEST_M[(st/2)%32];if(m)tone(mt(m+(V.horn?-12:0)),t,0.2,{type:V.flute?'triangle':'square',vol:0.048,lp:3000,dest:M,send:true});}}
-// 駐留地攻撃（夜襲）：見つかる前は忍び寄る低音（84）、見つかったら太鼓が入って速く（140）
+// 駐屯地攻撃（夜襲）：見つかる前は忍び寄る低音（84）、見つかったら太鼓が入って速く（140）
 function playSiege(st,t){const M=AU.music,s=st%16,bar=Math.floor(st/16)%4,root=[40,40,43,38][bar];
   if(!AU.intensity){
     if(s%4===0)tone(mtof(root),t,0.35,{type:'triangle',vol:0.338,lp:500,dest:M});
