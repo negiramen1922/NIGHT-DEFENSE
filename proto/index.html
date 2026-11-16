@@ -339,7 +339,7 @@ body.fullmap #right.open{transform:none}
 body.land #alertTop{top:44px;font-size:14px;padding:6px 12px}
 #ovCard .vpop{display:flex;gap:12px;align-items:center;padding:10px 12px;margin:0 0 8px;background:#141210;border:2px solid var(--vc);box-shadow:0 0 14px color-mix(in srgb,var(--vc) 35%,transparent)}#ovCard .vpi{flex-shrink:0;width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:#1e1a12;border:1px solid #4a4030}#ovCard .vpk{font-size:11px;color:var(--vc);letter-spacing:2px}#ovCard .vpop .nvt{margin-top:4px;line-height:1.7}
 #ovCard .vops{display:flex;flex-direction:column;gap:6px;margin:6px 0}#ovCard .vop{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;line-height:1.6}#ovCard button.vop{flex-direction:column;align-items:flex-start}#ovCard .nshop .vop{background:#15130e;border:1px solid #3a3428;margin:0 0 4px}
-#ovCard .bkl{display:flex;flex-wrap:wrap;gap:6px;max-height:34vh;overflow:auto}#ovCard .bki{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:4px 10px 4px 6px;background:#15130e;box-shadow:0 0 0 1px #3a3428}#ovCard .bki svg,#ovCard .bki img{flex-shrink:0}#ovCard .bki b{color:var(--amber);font-weight:400}#ovCard .bkc{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 2px;padding:6px 10px;background:#111814;box-shadow:0 0 0 1px var(--frame);font-size:13px}#ovCard .bkc .aft b{color:#f0e4c8}#ovCard .bkc .aft.lack b{color:var(--red)}.bkn{display:inline-block;min-width:16px;margin-left:6px;padding:0 4px;font-size:11px;line-height:16px;background:var(--amber);color:#111;text-align:center}
+#ovCard .bkl{display:flex;flex-wrap:wrap;gap:6px;max-height:34vh;overflow:auto}#ovCard .bki{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;background:#15130e;box-shadow:0 0 0 1px #3a3428}#ovCard .bkv{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:48px}#ovCard .bkv small{font-size:11px;color:var(--text);white-space:nowrap}#ovCard .bki svg,#ovCard .bki img{flex-shrink:0}#ovCard .bki b{color:var(--amber);font-weight:400;font-size:16px}#ovCard .bkc{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 2px;padding:6px 10px;background:#111814;box-shadow:0 0 0 1px var(--frame);font-size:13px}#ovCard .bkc .aft b{color:#f0e4c8}#ovCard .bkc .aft.lack b{color:var(--red)}.bkn{display:inline-block;min-width:16px;margin-left:6px;padding:0 4px;font-size:11px;line-height:16px;background:var(--amber);color:#111;text-align:center}
 #ovCard .vaf{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:#d8ccb0}#ovCard .aft{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}#ovCard .aft b{color:#f0e4c8}#ovCard .aft.lack b{color:var(--red)}.use small.hv{font-size:10px;color:#9a8e74;margin-left:1px}
 #ovCard .stk{text-align:center;font-size:11px;letter-spacing:3px;color:#c8a070;margin:2px 0}
 #ovCard .wdL{display:flex;flex-direction:column;gap:6px;max-height:48vh;overflow:auto}#ovCard .wd{display:block;width:100%;text-align:left;padding:8px 10px;background:#15130e;border:1px solid #4a4030;line-height:1.6;font-size:12px}#ovCard .wd.now{border-color:#3a6a7a}#ovCard .wdh{display:flex;justify-content:space-between;gap:8px;font-size:14px}#ovCard .wdr{font-size:12px;font-weight:bold}#ovCard .nlil{display:flex;gap:10px;align-items:flex-start;background:#1e1a12;border:1px solid #c8a070;padding:8px 10px;margin:4px 0 10px;line-height:1.7;font-size:13.5px;color:#f0e4c8}#ovCard .nlil small{display:block;color:#e8c070;font-size:11px}#ovCard .nlil ol{margin:4px 0;padding-left:20px}#ovCard .nlil img{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}
@@ -1837,7 +1837,7 @@ Object.assign(B,{
   lab:    {name:'研究室',glyph:'研',hp:200,heat:2,cost:{steel:80,stone:30},pop:4,power:0,spec:'内政',grp:'prod',desc:'研究枠を増やす'},
   market: {name:'交易市場',glyph:'市',hp:200,heat:2,cost:{steel:60,stone:10},pop:3,power:0,spec:'内政',grp:'prod',desc:'外の商人と取引できる施設。魔核を金貨で売れるほか、木材・石材・鉄・食料を銀貨で売り買いできる（施設を選んで「交易」）。資材を売ると銀貨が入り、資材は銀貨でしか買えない。1日に買える量にも上限がある（市場が増えると上限も増える）。毎ターン金貨 +4、住民の幸福度 +6（2棟まで効果）'},
   tavern: {name:'酒場',glyph:'酒',hp:180,heat:2,cost:{steel:50,gold:30},pop:2,power:0,spec:'内政',grp:'prod',desc:'住民の憩いの場。幸福度 +10（2棟まで効果）。食料を少し使う（−2/T）',req:'brewing'},
-  church: {name:'教会',glyph:'聖',hp:320,heat:2,cost:{steel:40,stone:60,gold:40},pop:2,power:0,spec:'内政',grp:'prod',desc:'祈りの場。幸福度 +4（2棟まで効果）。夜の「祈り」で上がる幸福度が増える（1棟ごと +5・2棟まで）。赤い月の予告のとき、祈りが無料になる'},
+  church: {name:'教会',glyph:'聖',hp:320,heat:2,cost:{steel:40,stone:60,gold:40},pop:2,power:0,spec:'内政',grp:'prod',desc:'祈りの場。幸福度 +4（2棟まで効果）。教会があると、夜に「祈り」ができる（幸福度 +5）。赤い月の予告のとき、祈りが無料になる'},
   stable: {name:'馬小屋',glyph:'馬',hp:280,heat:2,cost:{steel:90,gold:40},pop:3,power:0,spec:'騎兵',grp:'prod',cap:2,desc:'騎兵隊（5騎）を2隊まで編成・治療・補充',req:'cavalry'},
   aerie:  {name:'竜舎',glyph:'竜',hp:420,heat:4,cost:{steel:150,stone:80,gold:120},pop:4,power:0,spec:'騎兵',grp:'prod',cap:1,desc:'ドラゴンライダー（2騎）を1隊だけ育てる。非常に目立ち、魔物に狙われやすい',req:'dragon'},
   magic:  {name:'魔導院',glyph:'魔',hp:240,heat:3,cost:{steel:80,stone:40,elec:15},pop:3,power:0,spec:'魔導',grp:'prod',cap:2,desc:'魔術師隊（3人）を2隊まで育成・治療・補充',req:'magic'},
@@ -4117,12 +4117,12 @@ function nightGuards(){return S.squads.filter(q=>!q.hunt).length;}
 // 幸福度の「気分」：何日か続く上乗せ（祭り・宴など）。happyParts に出る
 function addMood(n,v,d){S.moods=(S.moods||[]).filter(m=>m.n!==n);S.moods.push({n,v,d});S.happy=Math.max(0,Math.min(100,S.happy+v));}
 function churchN(){return Math.min(2,S.blds.filter(b=>b.type==='church'&&!(b.bt>0)).length);}
-function prayGain(){return 3+5*churchN();}
+function prayGain(){return 5;}   /* 祈りは教会がないとできない。幸福度 +5（2026-11-16 ユーザーの指定。前は 3＋教会1棟ごと5） */
 // 今夜の過ごし方
 const NPLAN=[
   {id:'rest',name:'休む',ic:'bed',d:()=>'ゆっくり休む。幸福度 +2'},
   {id:'feast',name:'宴',ic:'ev_fest',need:()=>S.blds.some(b=>b.type==='tavern'&&!(b.bt>0))?'':'酒場が必要',cost:{gold:15,fuel:20},d:()=>'酒場で宴を開く。幸福度 +6（2日続く）'},
-  {id:'pray',name:'祈り',ic:'sun',d:()=>`みんなで祈る。幸福度 +${prayGain()}${churchN()?`（教会×${churchN()}）`:'（教会があるともっと上がる）'}`},
+  {id:'pray',name:'祈り',ic:'sun',need:()=>churchN()?'':'教会が必要',d:()=>`教会でみんなで祈る。幸福度 +${prayGain()}`},
   {id:'watch',name:'夜警を厚く',ic:'eye',cost:{gold:10},d:()=>'見張りを増やす。今夜は事件が起きない'},
   {id:'overtime',name:'夜なべ',ic:'moon',need:()=>has('overtime')?'':'研究「延長シフト」が必要',d:()=>`夜も働く。生産 ${has('allnight')?'昼と同じ':'昼の半分'}・幸福度 −${has('allnight')?15:8}`},
 ];
@@ -4303,7 +4303,7 @@ function morning(){
   const p=N.plan;
   if(p==='rest'){addMood('よく休んだ',2,1);pl.push('ゆっくり休んだ。幸福度 +2');}
   if(p==='feast'){const c=planOf('feast').cost;if(canAfford(c)){for(const k in c)S[k]-=c[k];addMood('宴',6,2);pl.push(`酒場で宴を開いた。幸福度 +6（2日）　${resTxt({gold:-c.gold,fuel:-c.fuel},true)}`);}}
-  if(p==='pray'){const v=prayGain();addMood('祈り',v,1);pl.push(`みんなで祈った。幸福度 +${v}`);}
+  if(p==='pray'&&churchN()){const v=prayGain();addMood('祈り',v,1);pl.push(`みんなで祈った。幸福度 +${v}`);}
   if(p==='watch'){if(S.gold>=10){S.gold-=10;pl.push('見張りを増やした。事件は起きなかった（金貨 −10）');}}
   if(p==='fest'){const v=15+(S.fireworks?5:0);addMood('祭り',v,3);pl.push(`祭りの夜！ 幸福度 +${v}（3日続く）${S.fireworks?'・花火が大成功':''}`);S.fireworks=false;}
   if(p==='overtime'&&has('overtime')){const full=has('allnight');const before={steel:S.steel,fuel:S.fuel};S.gross={steel:0,ammo:0,pop:0,used:0};for(let i=0;i<(full?100:50);i++)update(0.1,true);addMood('夜なべの疲れ',-(full?15:8),1);ot={wood:Math.round(S.steel-before.steel),food:Math.round(S.fuel-before.fuel)};log(`夜なべ：木材+${ot.wood}・幸福度−${full?15:8}`,'warn');}
@@ -5217,7 +5217,7 @@ function supText(s){const sp=supOf(s);if(!sp)return '';const r=s.sup/sp.max;retu
 let BULK=null;
 // items：[アイコン, 名前, 数]。文字だけの説明は出さない（2026-11-16 ユーザーの指定：アイコンと名前×N）
 function bulkAsk(title,items,cost,doIt,back){
-  const L=items.map(([icn,n,k])=>`<span class="bki">${icn}<span>${n}</span>${k>1?`<b>×${k}</b>`:''}</span>`).join('');
+  const L=items.map(([icn,n,k])=>`<span class="bki"><span class="bkv">${icn}<small>${n}</small></span><b>×${k}</b></span>`).join('');   /* アイコンの下に名前、その横に数（2026-11-16 ユーザーの指定） */
   BULK={doIt,back};
   openOverlay('bulk',`<h2 style="margin:0 0 8px">${title}</h2><div class="bkl">${L}</div>
    <div class="bkc">${afterText(cost)}</div>
@@ -5228,15 +5228,15 @@ function bulkNo(){const b=BULK;BULK=null;closeOverlay();if(b&&b.back)b.back();}
 function cntBy(list,f){const m=new Map();for(const x of list){const k=f(x);m.set(k,(m.get(k)||0)+1);}return [...m.entries()];}
 function askRepairAll(back){if(S.waveActive){se('error');toast('戦闘中は修理できない（昼に修理しよう）','warn');return;}
   const ra=repairAllCost(),bl=S.blds.filter(damaged);let miss=0;for(const b of S.blds)if(b.shMax>0)miss+=Math.max(0,b.shMax-(b.shield||0));
-  const items=cntBy(bl,b=>b.type).map(([t,k])=>[icSvg(t,20),B[t].name,k]);const pd=pitsToDig().length,sb=spikesBroken().length;
-  if(pd)items.push([icSvg('pit',20),B.pit.name,pd]);if(sb)items.push([icSvg('spike',20),B.spike.name,sb]);
-  const ec=miss>0?Math.ceil(miss/10):0;if(ec)items.push([icSvg('barrier',20),'シールド',S.blds.filter(b=>b.shMax>0&&(b.shield||0)<b.shMax).length]);
+  const items=cntBy(bl,b=>b.type).map(([t,k])=>[icSvg(t,28),B[t].name,k]);const pd=pitsToDig().length,sb=spikesBroken().length;
+  if(pd)items.push([icSvg('pit',28),B.pit.name,pd]);if(sb)items.push([icSvg('spike',28),B.spike.name,sb]);
+  const ec=miss>0?Math.ceil(miss/10):0;if(ec)items.push([icSvg('barrier',28),'シールド',S.blds.filter(b=>b.shMax>0&&(b.shield||0)<b.shMax).length]);
   if(!items.length){se('error');toast('修理が必要な施設はありません','warn');return;}
   const cost={steel:ra.c};if(ec)cost.elec=ec;
   bulkAsk('一括修理',items,cost,repairAll,back);}
 function askSupplyAll(back){const list=S.squads.filter(needsSupply);if(!list.length){se('error');toast('補給が必要な部隊はありません','warn');return;}
   const c=supCost(list),cost={};for(const k in c)if(c[k]>0)cost[k]=Math.ceil(c[k]);
-  const items=cntBy(list,q=>q.model||defModel(q.ut)).map(([m,k])=>{const nm=(MTC[m]&&MTC[m].name)||m;return [icSvg(m,20),nm.endsWith('隊')?nm:nm+'隊',k];});
+  const items=cntBy(list,q=>q.model||defModel(q.ut)).map(([m,k])=>{const nm=(MTC[m]&&MTC[m].name)||m;return [icSvg(m,28),nm.endsWith('隊')?nm:nm+'隊',k];});
   bulkAsk('一括補給',items,cost,supplyAll,back);}
 function supCostHTML(list){const c=supCost(list),pop=Math.ceil(c.pop||0);delete c.pop;for(const k in c)c[k]=Math.ceil(c[k]);return costText(c,pop);}
 function supCostText(c){return Object.keys(c).map(k=>`${k==='pop'?'人員':RES_NAME[k]}${Math.round(c[k]*10)/10}`).join('・')||'なし';}
@@ -7709,7 +7709,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコンと名前 ×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い']],
+ ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）']],
  ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。生産は昼だけ、10秒ごとに少しずつ入る。時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める。残りは地図の上の横長のバーで（太陽・月が左から右へ進む）。昼の後半は夕方に。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
