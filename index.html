@@ -130,6 +130,20 @@ select{background:#0e1510;color:var(--text);border:1px solid var(--line);font:in
 #log{height:170px;overflow-y:auto;font-size:11px;line-height:1.5}
 #log .kia{color:var(--red)} #log .good{color:var(--green)} #log .warn{color:var(--amber)}
 #overlay.home{background:radial-gradient(ellipse at 50% 30%,#1a2238 0%,#0a0d18 55%,#050608 100%)!important}
+#ovBg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;pointer-events:none}#overlay.home #ovBg{display:block}
+#overlay.home::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(5,6,10,.15) 0%,rgba(5,6,10,.55) 70%,rgba(5,6,10,.8) 100%);pointer-events:none}
+#overlay.home .card{position:relative;z-index:1}
+.ttl{text-align:center;padding:8px 4px 2px}.ttl .tlogo svg,.ttl .tlogo img,.ttl .tlogo canvas{max-height:118px;width:auto}
+.ttl .tsub{color:#c8a070;letter-spacing:.08em;margin:2px 0 10px;font-size:13px}
+.ttl .tmain{display:flex;gap:8px;max-width:440px;margin:0 auto 8px}.ttl .tmain button{flex:1;padding:10px;font-size:15px;display:flex;flex-direction:column;align-items:center;gap:2px}.ttl .tmain small{font-size:10.5px;color:#c8b890;font-weight:normal}
+.ttl .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:440px;margin:0 auto}.ttl .tgrid button,.ttl .tmoreL button{padding:7px 6px;font-size:13px}.ttl .tarr{margin-left:4px;font-size:10px}.ttl .tmoreL{display:flex;flex-wrap:wrap;gap:6px;max-width:440px;margin:6px auto 0;padding-top:6px;border-top:1px dashed #5a4a2a}.ttl .tmoreL button{flex:1 1 40%}   /* 数が奇数のときは最後の1つが横いっぱい */.ttl .tmoreL[hidden]{display:none}
+.ttl .tfoot{font-size:11px;margin-top:10px}
+.tcorner{position:fixed;right:14px;bottom:14px;z-index:5;display:flex;gap:8px}.tcorner button{padding:8px 12px;font-size:14px;background:rgba(14,12,8,.9)}.tcorner #tSet{font-size:20px;line-height:1;padding:6px 11px}
+.tsetP{position:fixed;right:14px;bottom:62px;z-index:6;width:min(320px,calc(100vw - 28px));background:rgba(18,15,10,.97);box-shadow:0 0 0 2px #c8a070,0 8px 24px #000c;padding:10px 12px;text-align:left}.tsetP[hidden]{display:none}
+.tsetH{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}.tsetH b{color:#e8c070;letter-spacing:.1em}.tsetH button{padding:0 8px}
+.tvol{display:flex;flex-direction:column;gap:6px;padding-bottom:8px;margin-bottom:8px;border-bottom:1px dashed #5a4a2a;font-size:13px}.tvol label{display:flex;align-items:center;gap:8px}.tvol input{accent-color:#f2b33d}.tvol input{flex:1}.tvol b{width:28px;text-align:right}.tvol button{align-self:flex-start;padding:3px 10px}
+.tsetL{display:flex;flex-wrap:wrap;gap:6px}.tsetL button{flex:1 1 40%;padding:6px;font-size:13px}
+@media (max-height:520px){.ttl{padding:2px}.ttl .tlogo svg,.ttl .tlogo img,.ttl .tlogo canvas{max-height:58px}.ttl .tsub{margin:0 0 6px;font-size:11px}.ttl .tmain{margin-bottom:6px}.ttl .tmain button{padding:6px;font-size:14px}.ttl .tgrid{gap:4px;max-width:520px}.ttl .tgrid button,.ttl .tmoreL button{padding:4px;font-size:12px}.ttl .tmoreL{gap:4px;max-width:520px}.ttl .tmoreL button{flex:1 1 30%}.ttl .tfoot{margin-top:6px;font-size:10px}#overlay.home .card{max-height:96vh;max-height:96dvh}}
 #overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:20;touch-action:pan-y}
 #overlay .card{background:var(--panel);border:1px solid var(--amber);padding:20px 24px;max-width:540px;width:92%;max-height:88vh;max-height:88dvh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 body.ov #left,body.ov #right{overflow:hidden!important}
@@ -7128,7 +7142,8 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
 function openOverlay(kind,html,wide){
   const card0=document.getElementById('ovCard'),same=S.overlay===kind&&document.getElementById('overlay').style.display==='flex';
   const keep=same?{top:card0.scrollTop,inner:[...card0.querySelectorAll('*')].filter(e=>e.scrollTop>0||e.scrollLeft>0).map(e=>[innerKey(e,card0),e.scrollTop,e.scrollLeft])}:null;
-  S.overlay=kind;document.getElementById('overlay').classList.toggle('home',kind==='title'||kind==='intro'||(kind==='help'&&/タイトルへ/.test(html)));const card=document.getElementById('ovCard');card.className='card'+(wide?' wide':'')+' ov-'+kind;card.innerHTML=html;
+  S.overlay=kind;document.getElementById('overlay').classList.toggle('home',kind==='title'||kind==='intro'||(kind==='help'&&/タイトルへ/.test(html)));
+  {const ov=document.getElementById('overlay');let v=document.getElementById('ovBg');const home=ov.classList.contains('home');if(home&&!v){v=document.createElement('video');v.id='ovBg';v.src='tut/title.mp4';v.muted=true;v.loop=true;v.autoplay=true;v.playsInline=true;v.setAttribute('playsinline','');ov.insertBefore(v,ov.firstChild);}if(v){if(home){try{v.play().catch(()=>{});}catch(e){}}else{try{v.pause();}catch(e){}}}}const card=document.getElementById('ovCard');card.className='card'+(wide?' wide':'')+' ov-'+kind;card.innerHTML=html;
   document.getElementById('overlay').style.display='flex';document.body.classList.add('ov');card.scrollTop=keep?keep.top:0;
   if(keep)for(const [k,t,l] of keep.inner){const e=findInner(k,card);if(e){e.scrollTop=t;e.scrollLeft=l;}}   // 中の一覧（図鑑・研究の列など）も
   return card;
@@ -7407,7 +7422,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.7',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.8',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7482,6 +7497,7 @@ function withLoading(msg,fn){const b=document.getElementById('boot');if(!b){fn()
   requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn();}finally{b.classList.add('off');}}));}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.8','2026-11-16',['<b>タイトル画面</b>：後ろで、夜の襲撃を城壁でしのぐ街の様子が動くように（前は真っ暗だった）','タイトルのボタンを減らして、スクロールしなくても全部見えるように：「つづきから」「はじめから」「モンスター図鑑」「アップデート情報」。「つづきから」には街の名前と何回目の襲撃の前かを出す','右下に「遊び方」と<b>設定（⚙）</b>：BGM・効果音の音量、消音、<b>音楽室</b>（ゲームの曲を聴ける）、クレジット、ホーム画面に追加','旧版（ver 0.9）へのボタンをなくした']],
  ['1.7','2026-11-16',['<b>チュートリアルを作り直し</b>（ステージ0 廃村エルム）：書記官リリアが「領主様」に話しかけて、9つのミッションで基本を案内する（生産施設の建設 → 人 → 研究 → 防衛 → 兵士 → 英雄と熟練度 → 軍需 → 夜と朝 → 城のレベル上げ）。実際に手を動かして進める','説明には動く絵を。柵の一列置きと部隊の移動は、実際の操作の短い動画で見られる','<b>番外編「偵察と駐屯地攻め」</b>：街が育ったところから始めて、斥候で駐屯地を見つけ、夜襲をかけるまでを覚える','兵科の「兵士」を<b>剣士</b>に（兵全体の「兵士」とまぎらわしいため）','廃村エルムの廃墟をなくした（最初の資材が建て直しに使われてしまうため）','<b>街の名前</b>を始めに決められるように。結果の画面・街の記録・タイムラプス（「○○の歴史」）に出る','<b>研究員</b>：研究のたびに待機中の住民を使うのをやめた。城に5人、研究室を建てると3人が研究員としてつく（バリスタの射手と同じ）','<b>新しくできるようになったことの知らせ</b>：城のレベルが上がったとき・研究で新しい施設が建てられるようになったとき、施設のアイコンつきで画面の上に出す（押すとその画面へ）','エーテル採掘所は、研究「エーテル採掘」（ランクⅡ）をしてから建てられるように','<b>山場の前は準備が6日</b>：ブラッドムーンと大きな夜の前だけ、襲撃までの日数を4日から6日に','<b>上のお知らせ</b>：英雄の戦死・城への攻撃・城が危ないとき・大きな夜（ブラッドムーン、ゴブリンの王の軍勢、最後の夜）の知らせ（5日前と前の日）と、その夜の始まり']],
  ['1.6','2026-11-16',['<b>前の襲撃のあとからやり直す</b>：負けたとき、ひとつ前の襲撃をしのいだあとから始め直せる。負けの画面に「この襲撃で起きたこと」（矢が尽きた回数など）も出る','<b>足りない資源の警告</b>：夜へ進む前に、襲撃で足りなくなりそうな資源を「夜へ」の横に出す','<b>序盤の敵を減らした</b>（第1〜第9襲撃。第10襲撃からは今までどおり）','<b>施設の流れ</b>：施設の詳しい画面に「使う物 → 作る物」の流れ。地図の表示切り替えに「生産」（施設ごとの作る量・使う量）。採集施設には埋蔵量のバー','上の帯の「推奨」の目安を外した（足りない資源の警告に置き換え）','ステージ選択に、ステージ2の解放の条件（ステージ1で第10襲撃をしのぐ）と、いまの記録','<b>ブラッドムーン</b>は5回ごとで、ボスの夜（第20・第40）は外した。ワーウルフは第25襲撃のブラッドムーンから。後半のブラッドムーンの敵の数を控えめにして、最後の夜がいちばんの山場になるように','言葉を「<b>駐屯地</b>」にそろえた（前は「駐留地」とまざっていた）','セーブを小さく（約4分の1）']],
  ['1.5.1','2026-11-16',['<b>効果音を選び直した</b>：建設（木はのこぎり、石は石を積む音、鉱山・精錬所・火薬工房・精製炉はつるはし、畑は耕して種まき）、襲撃の知らせは城の大鐘、英雄の戦死は鐘、研究の開始・完了、騎兵の突撃、敵を倒す音、襲撃をしのいだ・勝利・敗北、ボタンなど操作の音','<b>大事な音が聞こえやすく</b>：襲撃の知らせ・英雄の戦死・施設の破壊などが鳴っている間は、小さな音（発射・撃破・建設など）を少し下げる']],
@@ -7502,27 +7518,45 @@ function showUpdates(){try{localStorage.setItem('nd_upd_seen',UPDATES[0][0]);}ca
   document.getElementById('upBack').onclick=showTitle;}
 function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.add('off');}const sv=saveInfo();
   const dt=sv?new Date(sv.date):null;const when=dt?`${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`:'';
-  openOverlay('title',`<div style="text-align:center;padding:10px 6px 4px">
-    ${pixelLogo()}
-    <div style="color:#c8a070;letter-spacing:.08em;margin:4px 0 8px;font-size:13px">〜 ${GAME_SUB} 〜</div>
-    <div class="muted tdesc" style="font-size:12px;max-width:540px;margin:0 auto 16px;line-height:1.8">${GAME_DESC}</div>
-    <div style="display:flex;flex-direction:column;gap:8px;max-width:340px;margin:0 auto">
-      ${sv?`<button id="tContinue" class="on" style="padding:10px;font-size:15px"><b>つづきから</b></button>`:''}
-      <button id="tNew" ${sv?'':'class="on"'} style="padding:10px;font-size:15px"><b>はじめから</b></button>
-      <button id="tHelp" style="padding:8px">遊び方</button>
-      <button id="tDex" style="padding:8px">モンスター図鑑</button>
-      <button id="tUpd" style="padding:8px">アップデート情報${updSeen()?'':' <b style="color:#f2b33d">NEW</b>'}</button>
-      <button id="tCredit" style="padding:8px">クレジット</button>
-      ${isAppMode()?'':'<button id="tInstall" style="padding:8px">ホーム画面に追加（アプリにする）</button>'}
-      <button id="tOld" style="padding:6px;font-size:12px" class="ghost">旧版（ver 0.9）で遊ぶ</button>
+  /* タイトル（2026-11-16）：後ろに夜の襲撃の動画（tut/title.mp4）、ボタンは2列にしてPCでスクロールしないように */
+  openOverlay('title',`<div class="ttl">
+    <div class="tlogo">${pixelLogo()}</div>
+    <div class="tsub">〜 ${GAME_SUB} 〜</div>
+    <div class="tmain">
+      ${sv?`<button id="tContinue" class="on"><b>つづきから</b>${sv.name?`<small>${sv.name}　第${(sv.wave||0)+1}襲撃の前</small>`:''}</button>`:''}
+      <button id="tNew" ${sv?'':'class="on"'}><b>はじめから</b></button>
     </div>
-    <div class="muted" style="font-size:11px;margin-top:14px">ver ${GAME_VER}　・　PC・スマホ（横持ち）で遊べます　・　進行はブラウザに自動保存されます</div></div>`);
+    <div class="tgrid">
+      <button id="tDex">モンスター図鑑</button>
+      <button id="tUpd">アップデート情報${updSeen()?'':' <b style="color:#f2b33d">NEW</b>'}</button>
+    </div>
+    <div class="tcorner"><button id="tHelp" title="遊び方">？ 遊び方</button><button id="tSet" title="設定">⚙</button></div>
+    <div class="tsetP" hidden>
+      <div class="tsetH"><b>設定</b><button id="tSetX" class="ghost">×</button></div>
+      <div class="tvol"><label>BGM<input type="range" id="tVB" min="0" max="1" step="0.05" value="${AU.bgmVol}"><b id="tVBn">${Math.round(AU.bgmVol*100)}</b></label>
+        <label>効果音<input type="range" id="tVS" min="0" max="1" step="0.05" value="${AU.seVol}"><b id="tVSn">${Math.round(AU.seVol*100)}</b></label>
+        <button id="tMute">${AU.on?'消音にする':'音を出す'}</button></div>
+      <div class="tsetL">
+        <button id="tMusic">♪ 音楽室</button>
+        <button id="tCredit">クレジット</button>
+        ${isAppMode()?'':'<button id="tInstall">ホーム画面に追加</button>'}
+      </div>
+    </div>
+    <div class="muted tfoot">ver ${GAME_VER}　・　PC・スマホ（横持ち）で遊べます　・　進行はブラウザに自動保存されます</div></div>`);
   const c=document.getElementById('tContinue');if(c)c.onclick=()=>{closeOverlay();withLoading('セーブを読み込んでいます…',()=>{if(!loadGame())toast('セーブデータを読み込めませんでした','bad');});};
   document.getElementById('tNew').onclick=()=>{if(sv&&!confirmNew())return;showIntro();};
   document.getElementById('tHelp').onclick=()=>showHelp(true);
+  /* 右下の設定（⚙）：音量・音楽室・クレジット・ホーム画面に追加（2026-11-16） */
+  {const sb=document.getElementById('tSet'),sp=document.querySelector('.tsetP');const tog=v=>{sp.hidden=v==null?!sp.hidden:!v;sb.classList.toggle('on',!sp.hidden);};
+   if(sb&&sp){sb.onclick=()=>{tog();se('click');};document.getElementById('tSetX').onclick=()=>tog(false);}
+   const vb=document.getElementById('tVB'),vs=document.getElementById('tVS');
+   if(vb)vb.oninput=()=>{auSetBgm(+vb.value);document.getElementById('tVBn').textContent=Math.round(vb.value*100);};
+   if(vs)vs.oninput=()=>{auSetSe(+vs.value);document.getElementById('tVSn').textContent=Math.round(vs.value*100);};
+   if(vs)vs.onchange=()=>se('click');
+   const mu=document.getElementById('tMute');if(mu)mu.onclick=()=>{auToggle();mu.textContent=AU.on?'消音にする':'音を出す';};
+   const ms=document.getElementById('tMusic');if(ms)ms.onclick=()=>{if(typeof window.openMusic==='function')window.openMusic();else toast('音楽室を読み込めませんでした','bad');};}
   document.getElementById('tDex').onclick=()=>{se('click');showDex(true);};
   document.getElementById('tUpd').onclick=()=>{se('click');showUpdates();};
-  document.getElementById('tOld').onclick=()=>{location.href='v0.9/index.html';};
   {const ti=document.getElementById('tInstall');if(ti)ti.onclick=()=>doInstall(true);}
   document.getElementById('tCredit').onclick=()=>openOverlay('title',`<h2>クレジット</h2><div style="line-height:1.9">${GAME_TITLE} — ${GAME_SUB}　ver ${GAME_VER}<br>企画・ゲームデザイン：ねぎらーめん<br>プログラム・ドット絵・効果音・音楽：Claude と共同制作<br><span class="muted">すべてのドット絵と音はこのゲームのために作られたものです</span></div><div style="margin-top:12px"><button id="crBack">タイトルへ</button></div>`)&&(document.getElementById('crBack').onclick=showTitle);}
 // 画面の上のお知らせ（2026-11-16）：英雄の戦死・城への攻撃・山場（ブラッドムーン・ボス）の予告。通信ログに加えて、上に大きく出す

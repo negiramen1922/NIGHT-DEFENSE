@@ -830,19 +830,22 @@ body.siegeOn #boot{display:none}
 
 // ---------- タイトルに「攻城戦（試作）」を足す ----------
 // ---------- 音楽室（ホームから BGM を聴く）。曲はゲーム本体が音を合成して鳴らす（AU）。聴いている間だけ曲を固定する ----------
-const TRACKS=[
-  {n:'ホーム',d:'タイトル画面。ゆっくり・少し寂しげ',track:'home',it:0},
-  {n:'昼（準備）',d:'昼の街づくり',track:'prep',it:0,stage:1},
-  {n:'静かな夜',d:'襲撃のない夜。鈴と虫の声',track:'night',it:0,stage:1},
-  {n:'祭りの夜',d:'太鼓と手拍子と笛',track:'fest',it:0,stage:1},
-  {n:'敵の襲撃（序盤）',d:'第1〜3襲撃',track:'battle',it:0,stage:1},
-  {n:'敵の襲撃（第4襲撃から）',d:'旋律が加わる',track:'battle',it:1,stage:1},
-  {n:'敵の襲撃（最後の襲撃）',d:'いちばん激しい',track:'battle',it:2,stage:1},
-  {n:'ボス襲来',d:'ゴブリンキングが来た夜。重い金管とティンパニ',track:'boss',it:0,stage:1},
-  {n:'駐屯地攻撃（忍び寄る）',d:'夜襲。見つかる前',track:'siege',it:0},
-  {n:'駐屯地攻撃（見つかった）',d:'夜襲。戦太鼓が入る',track:'siege',it:1},
+const TRACKS=[   /* 音楽室の曲（2026-11-16：今のゲームの曲に合わせた。「ボス」などゲームの外の言い方はしない） */
+  {n:'ホーム',d:'タイトル画面。夜明け前',track:'home',it:0},
+  {n:'昼（準備）',d:'のどかな村。昼の街づくり',track:'prep',it:0,stage:1},
+  {n:'静かな夜',d:'月明かり。襲撃のない夜',track:'night',it:0,stage:1},
+  {n:'祭りの夜',d:'祭りの企画のあとの夜',track:'fest',it:0,stage:1},
+  {n:'襲撃（はじめのころ）',d:'第1〜第11襲撃',track:'battle',it:0,stage:1},
+  {n:'襲撃（なかごろ）',d:'第12〜第34襲撃。旋律が加わる',track:'battle',it:1,stage:1},
+  {n:'襲撃（終わりの近く）',d:'第35襲撃から。いちばん激しい',track:'battle',it:2,stage:1},
+  {n:'ブラッドムーン',d:'赤い月の夜。狂乱',track:'blood',it:0,stage:1},
+  {n:'大きな夜',d:'ゴブリンの王の軍勢・森が動き出す夜',track:'boss',it:0,stage:1},
+  {n:'夜襲（忍び寄る）',d:'駐屯地への夜襲。見つかる前',track:'siege',it:0},
+  {n:'夜襲（見つかった）',d:'戦太鼓が入る',track:'siege',it:1},
+  {n:'守りきった',d:'勝ったときの結果の画面',track:'res_win',it:0},
+  {n:'城が落ちた',d:'負けたときの結果の画面',track:'res_lose',it:0},
 ];
-const STAGES=[['t','廃村エルム','笛'],['f','辺境の街グレイヴェル','基本'],['m','山上の砦ハルデン','低く・角笛'],['s','雪原の関所ヴィンター','鐘']];
+const STAGES=[['t','廃村エルム','笛'],['f','グレイヴェル平原','基本']];
 let musicHooked=false,MUS=null,MUS_MAP='f';
 function musicHook(){if(musicHooked||typeof auMusicFor!=='function'||typeof AU==='undefined')return;musicHooked=true;const orig=auMusicFor;
   const setT=(tr,it)=>{AU.intensity=it;if(AU.track!==tr){AU.track=tr;AU.step=0;AU.nextT=AU.ctx.currentTime+0.2;}};
@@ -872,13 +875,13 @@ function renderMusic(){const r=document.getElementById('sgMusic');if(!r)return;c
   document.getElementById('sgMClose').onclick=closeMusic;}
 // 効果音・BGM ラボ（soundlab.js）：試作版だけ。押したときに読み込む。ラボで BGM を選んであれば、起動時にも読み込む（ゲームの曲を差し替えるため）
 function loadLab(cb){if(window.openSoundLab){cb&&cb();return;}const sc=document.createElement('script');sc.src='soundlab.js';sc.onload=()=>{cb&&cb();};document.head.appendChild(sc);}
-// タイトルのボタンは「その他」の中（.ttl .tmoreL）に足す（2026-11-16）
-const tAdd=(after,el)=>{const g=document.querySelector('.ttl .tmoreL')||document.querySelector('.ttl .tgrid');if(g)g.appendChild(el);else after.insertAdjacentElement('afterend',el);};
+// 試作版だけのタイトルのボタンは、右下の設定（⚙）の中（.tsetL）に足す（2026-11-16）
+const tAdd=(after,el)=>{const g=document.querySelector('.tsetL')||document.querySelector('.ttl .tgrid');if(g)g.appendChild(el);else after.insertAdjacentElement('afterend',el);};
 function hook(){if(typeof showTitle!=='function'||typeof E==='undefined'||typeof SPR==='undefined'){setTimeout(hook,200);return;}
-  const orig=showTitle;window.showTitle=showTitle=function(){const r=orig.apply(this,arguments);if(!String(typeof GAME_VER!=='undefined'?GAME_VER:'').includes('試作'))return r;   /* 単独の攻城戦・音楽室は試作版だけ */try{const nb=document.getElementById('tNew');if(nb&&!document.getElementById('tSiege')){const b=document.createElement('button');b.id='tSiege';b.textContent='攻城戦（試作）';b.style.padding='8px';b.onclick=openSiege;tAdd(nb,b);}if(nb&&!document.getElementById('tMusic')){const m=document.createElement('button');m.id='tMusic';m.textContent='♪ 音楽室・音量';m.style.padding='8px';m.onclick=openMusic;tAdd(document.getElementById('tSiege')||nb,m);}if(nb&&!document.getElementById('tLab')){const l=document.createElement('button');l.id='tLab';l.textContent='♪ 効果音・BGM ラボ';l.style.padding='8px';l.onclick=()=>loadLab(()=>window.openSoundLab());tAdd(document.getElementById('tMusic')||nb,l);}}catch(e){}return r;};
+  const orig=showTitle;window.showTitle=showTitle=function(){const r=orig.apply(this,arguments);if(!String(typeof GAME_VER!=='undefined'?GAME_VER:'').includes('試作'))return r;   /* 単独の攻城戦・音楽室は試作版だけ */try{const nb=document.getElementById('tNew');if(nb&&!document.getElementById('tSiege')){const b=document.createElement('button');b.id='tSiege';b.textContent='攻城戦（試作）';b.style.padding='8px';b.onclick=openSiege;tAdd(nb,b);}if(nb&&!document.getElementById('tLab')){const l=document.createElement('button');l.id='tLab';l.textContent='♪ 効果音・BGM ラボ';l.style.padding='8px';l.onclick=()=>loadLab(()=>window.openSoundLab());tAdd(document.getElementById('tMusic')||nb,l);}}catch(e){}return r;};
   if(typeof S!=='undefined'&&S&&S.overlay==='title')showTitle();
   musicHook();
   try{if(String(typeof GAME_VER!=='undefined'?GAME_VER:'').includes('試作')){const pk=JSON.parse(localStorage.getItem('nd_bgm_pick')||'{}');if(Object.keys(pk).length)loadLab();}}catch(e){}
-  window.openSiege=openSiege;window.openSiegeCamp=openSiegeCamp;window.__siege=()=>G;window.__sgSpawn=(k,x,y)=>{spawnSquad(k,x,y);G.pool[k]--;};window.__siegeUpd=dt=>update(dt);window.__tb=tBlock;window.__fp=findPath;window.__reach=reachable;}
+  window.openSiege=openSiege;window.openMusic=openMusic;window.openSiegeCamp=openSiegeCamp;window.__siege=()=>G;window.__sgSpawn=(k,x,y)=>{spawnSquad(k,x,y);G.pool[k]--;};window.__siegeUpd=dt=>update(dt);window.__tb=tBlock;window.__fp=findPath;window.__reach=reachable;}
 hook();
 })();
