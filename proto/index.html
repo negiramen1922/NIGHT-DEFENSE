@@ -318,7 +318,8 @@ body.fullmap #right.open{transform:none}
 #guide .grw{font-size:11px;color:#b8d898}
 #guide button{padding:2px 7px;font-size:11px}
 #guide .gtabs{display:flex;gap:4px;margin-bottom:3px}#guide .gtabs button{flex:1;padding:3px 4px;font-size:12px}#guide .gtabs button.on{background:#c8a070;color:#111;font-weight:bold}
-#guide .lil{display:flex;gap:8px;align-items:flex-start;background:#1e1a12;border:1px solid #5a4a2a;padding:6px;margin:2px 0 6px}#guide .lil .lilf{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}#guide .lsay{flex:1;line-height:1.6;color:#f0e4c8;font-size:12.5px}#guide .lsay small{display:block;color:#e8c070;font-size:10.5px;letter-spacing:1px}#guide .lbtn{text-align:right;margin-top:4px}#guide .lbtn button{padding:3px 10px}#guide .lbtn #lDone{width:100%;white-space:normal}#guide .gh .lilf{flex-shrink:0}#guide .gh b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}#guide .gfoot button{font-size:11px;padding:2px 6px}
+#guide{width:440px;font-size:13px}#guide .gb{max-height:64vh}#guide .gr .gtt{flex:1;min-width:0}#guide .gr button{flex-shrink:0;white-space:nowrap}#guide .gdet2{margin:2px 0 6px 18px;padding:6px 8px;background:#14110c;border-left:3px solid #c8a070;line-height:1.6;color:#e0d6bc}#guide .lart{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:6px;margin:8px 0 4px}#guide .lart .artpx{width:100%}
+#guide .lil{display:flex;gap:8px;align-items:flex-start;background:#1e1a12;border:1px solid #5a4a2a;padding:6px;margin:2px 0 6px}#guide .lil .lilf{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}#guide .lsay{flex:1;min-width:0;line-height:1.7;color:#f0e4c8;font-size:14px}#guide .lsay small{display:block;color:#e8c070;font-size:10.5px;letter-spacing:1px}#guide .lbtn{text-align:right;margin-top:4px}#guide .lbtn button{padding:3px 10px}#guide .lbtn #lDone{width:100%;white-space:normal}#guide .gh .lilf{flex-shrink:0}#guide .gh b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}#guide .gfoot button{font-size:11px;padding:2px 6px}
 #alertTop{position:fixed;left:50%;top:84px;transform:translate(-50%,-20px);z-index:60;display:flex;align-items:center;gap:10px;padding:8px 18px;background:rgba(14,10,10,.94);border:2px solid var(--ac,#ff8a3a);box-shadow:0 0 18px var(--ac,#ff8a3a),0 4px 14px #000c;color:#fff;font-size:16px;font-weight:bold;letter-spacing:1px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:calc(100vw - 24px);text-align:center}
 #alertTop.on{opacity:1;transform:translate(-50%,0)}#alertTop span b{display:block}#alertTop span small{display:block;font-size:12px;font-weight:normal;color:#e8dcc0;letter-spacing:0;margin-top:2px}#alertTop em{font-style:normal;line-height:0;background:#1e1a12;border:1px solid #6a5a3a;padding:3px}#alertTop i{font-style:normal;font-size:20px;color:var(--ac)}
 body.land #alertTop{top:44px;font-size:14px;padding:6px 12px}
@@ -597,8 +598,8 @@ body.night #intel .lbl{background:#5a1a14;color:#ffb0a8}
 }
 
 /* ---------- 初心者タスク：たたんだ時は「今のタスク1つ」だけ ---------- */
-#guide{box-shadow:0 -2px 0 #8a6a3a,0 2px 0 #8a6a3a,-2px 0 0 #8a6a3a,2px 0 0 #8a6a3a,0 4px 16px #000a;border:none;width:290px}
-#guide .gb{max-height:28vh}
+#guide{box-shadow:0 -2px 0 #8a6a3a,0 2px 0 #8a6a3a,-2px 0 0 #8a6a3a,2px 0 0 #8a6a3a,0 4px 16px #000a;border:none;width:440px}   /* 2026-11-16：チュートリアルの説明が読めるように広く */
+#guide .gb{max-height:min(58vh,calc(100vh - 260px))}#guide .gdet2 .lart{max-width:260px}
 #guide.min .gcur{display:block}   /* 【追加】.gcur = 現在のタスク1行＋バー */
 #guide .gcur{display:none;padding:8px 10px}
 
@@ -866,7 +867,7 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 #right .box[data-rt="build"]>#facCapBox,#right .box[data-rt="econ"]>#econ,#right .box[data-rt="army"]>#armyBox{margin-top:10px}
 
 /* 初心者タスク */
-#guide,#guide.min{width:290px;background:rgba(20,17,12,.95);font-size:12px}
+#guide,#guide.min{width:440px;background:rgba(20,17,12,.95);font-size:13px}   /* 2026-11-16：チュートリアル用に広く */
 #guide .gh{padding:6px 8px;gap:8px}
 #guide .gh b{font-size:12px;color:#e8c070}
 #guide .gh .gp{font-family:var(--px-font);font-size:12px;color:#c8b890}
@@ -7586,7 +7587,7 @@ function gTechDone(){return Object.keys(S.tech||{}).filter(k=>S.tech[k]>0&&!(S.g
 const LIL_NAME='書記官リリア';
 const MISSIONS=[
  {id:'prod',name:'生産施設の建設',
-  say:['はじめまして、領主様！ 書記官のリリアです。今日から${TOWN}のお手伝いをします！','資材がないと、守りも街の発展もできません！ まずは木材と石材などの生産施設を建てましょう！',
+  say:['はじめまして、領主様！ 書記官のリリアです。今日から${TOWN}のお手伝いをします！','資材がないと、守りも街の発展もできません！ まずは木材と石材などの生産施設を建てましょう！{ART:miner,quarry}',
    ()=>'ただし、<b>土地のレベル</b>で生産の効率が変わるので気をつけてください。たとえば森は、木が深いほど木材がたくさん採れます。'+lilForestImg()+'右上の「土地Lv」のボタンでも確かめられますよ。'],
   steps:[
   {t:'伐採所を4つ建てる',b:'miner',n:4,d:'<b>森</b>のマスに建てると木材が採れます。森が深いほど多く採れます。'},
@@ -7594,38 +7595,38 @@ const MISSIONS=[
   {t:'鉱山を1つ建てる',b:'ironmine',n:1,d:'<b>鉄鉱脈</b>のマスに建てると鉄が採れます。'}],
   done:'いい調子です！ 建てたら「夜へ」で日を進めてください。毎日、資材が入ってきます。'},
  {id:'people',name:'人',
-  say:['施設を動かすには、働く人が必要です。住居を建てると、毎ターン住民が増えていきます。','ただし、1つの家に住める人数には限りがあるので気をつけてください。住居の研究で、住める人数を増やすこともできます。','人が増えると、食料も必要になります。畑や漁場を、人数に合わせて建てましょう。食べ物に余裕があると、みんなうれしいです！'],
+  say:['施設を動かすには、働く人が必要です。住居を建てると、毎ターン住民が増えていきます。{ART:barracks}','ただし、1つの家に住める人数には限りがあるので気をつけてください。住居の研究で、住める人数を増やすこともできます。','人が増えると、食料も必要になります。畑や漁場を、人数に合わせて建てましょう。食べ物に余裕があると、みんなうれしいです！{ART:farm,fishery}'],
   steps:[
   {t:'住居を2つ建てる',b:'barracks',n:2,d:'住民がふえ、税で金貨が入ります。'},
   {t:'農場を2つ建てる',b:'farm',n:2,d:'<b>平地</b>に建てると食料がとれます。水辺には漁場も建てられます。'}],
   done:'これで、人も食べ物も増えていきます！'},
  {id:'res',name:'研究',
-  say:['研究を進めると、生産の効率を上げたり、兵士や防衛施設の力を上げたりできます。さっそく「伐採技術」の研究をしてみましょう。','研究室を建てると研究員が増えるので、余裕があったら建ててみてくださいね。'],
+  say:['研究を進めると、生産の効率を上げたり、兵士や防衛施設の力を上げたりできます。さっそく「伐採技術」の研究をしてみましょう。','研究室を建てると研究員が増えるので、余裕があったら建ててみてくださいね。{ART:lab}'],
   steps:[
   {t:'「伐採技術」の研究を完了する',c:()=>lvl('mine'),n:1,hi:'#bRes',d:'下の「研究」を押して、生産タブの「伐採技術」を選び「研究を開始」。'},
   {t:'「石工技術」の研究を完了する',c:()=>lvl('quarrying'),n:1,hi:'#bRes',d:'同じく生産タブの「石工技術」です。石切り場の産出が増えます。'}],
   done:'研究は、いちど終えればずっと効きます。研究員が空いていたら、どんどん進めましょう！'},
  {id:'def',name:'防衛',
-  say:['資材もそろってきたので、いよいよ街を守るために動きましょう。最初はバリスタがおすすめです。','ほかにも、物見櫓はバリスタより射程が長かったり、研究を進めると投石機が使えるようになったりしますよ。','敵が来る方角に壁を建てておけば、敵を足止めして、そのあいだにバリスタなどで攻撃できます。','敵は暗闇から攻めてきます。防衛施設がたくさんあっても、暗闇の敵には攻撃できないので気をつけてください。篝火で照らしましょう！'],
+  say:['資材もそろってきたので、いよいよ街を守るために動きましょう。最初はバリスタがおすすめです。{ART:mg}','ほかにも、物見櫓はバリスタより射程が長かったり、研究を進めると投石機が使えるようになったりしますよ。{ART:tower1,how}','敵が来る方角に壁を建てておけば、敵を足止めして、そのあいだにバリスタなどで攻撃できます。','敵は暗闇から攻めてきます。防衛施設がたくさんあっても、暗闇の敵には攻撃できないので気をつけてください。篝火で照らしましょう！{ART:brazier}'],
   steps:[
   {t:'バリスタを2つ建てる',b:'mg',n:2,d:'矢を撃つ防衛施設。空の敵も撃てます。壁の内側、敵が来る方角に。'},
   {t:'木の柵（壁）を8つ建てる',b:'fence',n:8,d:'敵の通り道をふさぎます。ドラッグすると一列に置けます。'},
   {t:'篝火を2つ建てる',b:'brazier',n:2,d:'壁の外を照らします。耐久が低いので、敵の通り道には置かないこと。'}],
   done:'りっぱな守りです！ 次は、守りの兵を集めましょう。'},
  {id:'army',name:'兵士',
-  say:['防衛施設のほかに、兵士でも街を守れます。城で農兵を招集しましょう。1部隊は5人です。','兵士たちには「迎撃」「固守」「補給」などの指示を出したり、立つ場所を指示したりできます。','「迎撃」は、近くに敵が来たら攻撃しに行ってくれます。「固守」は、その場からあまり離れずに守ってくれます。近接の部隊を壁の近くに固守で置いておけば、壁ごしに敵を攻撃してくれますよ。','兵舎を建てると、農兵のほかの兵士も招集できるようになります。'],
+  say:['防衛施設のほかに、兵士でも街を守れます。城で農兵を招集しましょう。1部隊は5人です。{ART:farmer}','兵士たちには「迎撃」「固守」「補給」などの指示を出したり、立つ場所を指示したりできます。','「迎撃」は、近くに敵が来たら攻撃しに行ってくれます。「固守」は、その場からあまり離れずに守ってくれます。近接の部隊を壁の近くに固守で置いておけば、壁ごしに敵を攻撃してくれますよ。','兵舎を建てると、農兵のほかの兵士も招集できるようになります。{ART:train,pawn}'],
   steps:[
   {t:'農兵を2部隊やとう',c:()=>S.squads.filter(q=>q.model==='farmer').length,n:2,ping:'hq',d:'城をクリックして、選択中パネルから農兵を招集します。'},
   {t:'部隊を移動させてみる',c:()=>S.movedN||0,n:1,d:'部隊をクリックして選び、地図の行きたい場所を押します。'},
   {t:'兵舎を建てる',b:'train',n:1,d:'剣士や弓兵など、農兵のほかの部隊を招集できる施設です。'}],
   done:'頼もしい兵たちです！'},
  {id:'hero',name:'英雄と熟練度',
-  say:['街には<b>英雄</b>がいます。英雄を部隊や施設に<b>配属</b>すると、その部隊や施設を強くしてくれます。','英雄には、それぞれ<b>スキル</b>があります。防衛施設の連射を上げる「速射」、生産を上げる「指導」など、英雄ごとに違います。英雄を選んで確かめてみてください。向いている配属先に置くと、もっと力を発揮しますよ。','それから、部隊には<b>熟練度</b>があります。戦いを経験するほど熟練度が上がって、強くなっていきます。熟練の部隊は大事にしてくださいね！'],
+  say:['街には<b>英雄</b>がいます。英雄を部隊や施設に<b>配属</b>すると、その部隊や施設を強くしてくれます。{ART:h_guard,h_admin}','英雄には、それぞれ<b>スキル</b>があります。防衛施設の連射を上げる「速射」、生産を上げる「指導」など、英雄ごとに違います。英雄を選んで確かめてみてください。向いている配属先に置くと、もっと力を発揮しますよ。','それから、部隊には<b>熟練度</b>があります。戦いを経験するほど熟練度が上がって、強くなっていきます。熟練の部隊は大事にしてくださいね！'],
   steps:[
   {t:'英雄を部隊か施設に配属する',c:()=>S.assignN||0,n:1,hi:'#bArmy',d:'施設か部隊をクリックして、選択中パネルの「配属英雄」から英雄を選びます。下の「軍事」→「英雄」からも配属できます。英雄を選ぶと、スキルと向いている配属先が見られます。'}],
   done:'これで、英雄の力も借りられます！ 次は、戦うための武器です。'},
  {id:'arms',name:'軍需',
-  say:['街を守るには武器が必要です。防衛施設や弓兵は矢を、剣士たちは剣と防具を使います。','武器工房を建てると、矢・剣・防具を作れます。何を作るかは、武器工房に指示を出してあげてください。'],
+  say:['街を守るには武器が必要です。防衛施設や弓兵は矢を、剣士たちは剣と防具を使います。','武器工房を建てると、矢・剣・防具を作れます。何を作るかは、武器工房に指示を出してあげてください。{ART:ammo}'],
   steps:[
   {t:'武器工房を建てる',b:'ammo',n:1,d:'矢・剣・防具を作る施設です。'},
   {t:'矢を30作る',c:()=>Math.floor((S.made&&S.made.ammo)||0),n:30,ping:'ammo',d:'武器工房は、はじめは矢を作ります。「夜へ」で日を進めると、矢が増えていきます。'},
@@ -7638,14 +7639,14 @@ const MISSIONS=[
   {t:'朝に一括修理か一括補給をする',c:()=>S.careN||0,n:1,hi:'#bRepAll,#bSupAll',d:'下の「一括修理」「一括補給」です。足りない資材は赤で出ます。'}],
   done:'しのぎました、領主様！ この調子です。'},
  {id:'castle',name:'城のレベル上げ',
-  say:['ここからが大事です、領主様！ 城のレベルを上げると、<b>新しいランク</b>の研究と施設が開きます。','城をクリックして「強化」を押しましょう。何日かかかりますが、そのあいだも城はふつうに働きます。','城が上がったら、まず新しいランクの研究を見てください。強い施設や新しい素材は、そこにあります。後回しにすると、魔物に追いつかれてしまいます！'],
+  say:['ここからが大事です、領主様！ 城のレベルを上げると、<b>新しいランク</b>の研究と施設が開きます。{ART:castle1,castle2}','城をクリックして「強化」を押しましょう。何日かかかりますが、そのあいだも城はふつうに働きます。','城が上がったら、まず新しいランクの研究を見てください。強い施設や新しい素材は、そこにあります。後回しにすると、魔物に追いつかれてしまいます！'],
   steps:[
   {t:'城をLv2にする',c:()=>S.baseLv||1,n:2,castle:2,d:'城をクリックして、選択中パネルの「強化」。'},
   {t:'ランクⅡの研究を1つ完了する',c:()=>TECH.filter(t=>techRank(t)===2&&has(t.id)).length,n:1,hi:'#bRes',d:'研究画面の「ランクⅡ」の列です。新しい施設や素材が並んでいます。'}],
   done:'これで、わたしからお教えする基本は全部です、領主様！ 城を上げる → 新しいランクの研究、が強くなる近道です。あとは6回の襲撃を守りきってください。……領主様なら、きっと大丈夫です！'},
  // ===== 番外編：偵察と駐屯地攻め（直前の状態から始める） =====
  {id:'scout',name:'偵察',
-  say:['番外編へようこそ、領主様！ ここでは、街がもう育ったところから始めます。','魔物たちは、街とアビスのあいだの<b>駐屯地</b>で、次の襲撃を待っています。','研究「斥候」をすると、駐屯地のだいたいの場所が地図に出ます。そのあと研究「斥候隊」で、斥候の部隊を作れるようになります。','斥候は足が速く、遠くまで見えます。赤い点線の円へ向かわせて、駐屯地を見つけましょう！'],
+  say:['番外編へようこそ、領主様！ ここでは、街がもう育ったところから始めます。','魔物たちは、街とアビスのあいだの<b>駐屯地</b>で、次の襲撃を待っています。','研究「斥候」をすると、駐屯地のだいたいの場所が地図に出ます。そのあと研究「斥候隊」で、斥候の部隊を作れるようになります。','斥候は足が速く、遠くまで見えます。赤い点線の円へ向かわせて、駐屯地を見つけましょう！{ART:archer}'],
   steps:[
   {t:'研究「斥候」をする',c:()=>lvl('scout'),n:1,hi:'#bRes',d:'部隊タブの研究です。地図に駐屯地のだいたいの場所（赤い点線の円）が出ます。'},
   {t:'研究「斥候隊」をする',c:()=>lvl('scouting'),n:1,hi:'#bRes',d:'部隊タブの研究です。兵舎で「斥候」を編成できるようになります。'},
@@ -7653,7 +7654,7 @@ const MISSIONS=[
   {t:'駐屯地を見つける',c:()=>S.campFoundN||0,n:1,d:'斥候を選んで、赤い点線の円の中へ動かします。近づくと駐屯地が見つかります。'}],
   done:'見つけました！ 次は、こちらから攻め込みましょう。'},
  {id:'raid',name:'駐屯地攻め',
-  say:['見つけた駐屯地に部隊を近づけると、夜襲をかけられます。連れて行く部隊を選んで、陣のまわりに置いて戦います。','陣の魔物は、ほとんどがテントで眠っています。見張りや物見櫓に見つかる前に近づいて、テントを焼くのが近道です。','倒した魔物と、焼いたテントの中の魔物の分だけ、次の襲撃が減ります。大きな夜の前に叩いておくと、ぐっと楽になりますよ！'],
+  say:['見つけた駐屯地に部隊を近づけると、夜襲をかけられます。連れて行く部隊を選んで、陣のまわりに置いて戦います。','陣の魔物は、ほとんどがテントで眠っています。見張りや物見櫓に見つかる前に近づいて、テントを焼くのが近道です。{ART:camp_tent,camp_boss}','倒した魔物と、焼いたテントの中の魔物の分だけ、次の襲撃が減ります。大きな夜の前に叩いておくと、ぐっと楽になりますよ！'],
   steps:[
   {t:'駐屯地に夜襲をかける',c:()=>S.siegeN||0,n:1,d:'部隊を選んで駐屯地へ動かすと「夜襲をかける？」と出ます。'}],
   done:'お見事です、領主様！ これで、守るだけでなく攻めることもできます。'},
@@ -7670,7 +7671,10 @@ function misList(){const mid=S&&(S.ex||S.mapId);return STAGE_MIS[mid]||[];}
 const GUIDE={};for(const m of MISSIONS)GUIDE[m.id]=m;   /* 「場所を示す」（guideWhere）がミッションの id で手順を引く */
 function misSay(m){return m.say.filter(x=>typeof x!=='function'||x());}
 function townName(){return (S&&S.townName)||(MAPS[S&&S.mapId]?MAPS[S.mapId].name:'この街');}
-function lilTxt(t){if(typeof t==='function')t=t();return String(t||'').replace(/\$\{TOWN\}/g,townName());}
+function lilTxt(t){if(typeof t==='function')t=t();return String(t||'').replace(/\$\{TOWN\}/g,townName()).replace(/\{ART:([a-z0-9_,]+)\}/g,(m,ks)=>lilArt(ks.split(',')));}
+// 説明の絵：ゲームの立ち絵（4コマで動く）を並べる。2026-11-16 ユーザーの希望「説明には画像を・動いているとなおよい」
+const ART_NAME={camp_tent:'テント',camp_boss:'大将のテント',castle1:'城 Lv1',castle2:'城 Lv2',h_inf:'英雄（歩兵）',h_admin:'英雄（内政）',h_guard:'英雄（守備）',tower1:'物見櫓',pawn:'剣士',farmer:'農兵',archer:'弓兵'};
+function lilArt(keys){const L=keys.filter(k=>NDART[k]);if(!L.length)return '';return `<div class="lart" style="--n:${Math.min(2,L.length)}">${L.map(k=>artPx(k,ART_NAME[k]||(B[k]?B[k].name:''),'')).join('')}</div>`;}
 const COACH=[
  [null,'画面の説明','画面の見かたを順に説明します。'],
  ['#resbar','資源','金貨・木材・石材・鉄・食料・矢・剣など。横の小さな数字は<b>1日の増減</b>です。アイコンにマウスを乗せると名前が出ます。'],
@@ -7720,9 +7724,8 @@ function renderGuide(){const el=document.getElementById('guide');const g=S&&S.gu
   if(!talking&&!g.cleared){
     m.steps.forEach((st,i)=>{const dn=!!g.done[m.id+':'+i];let pg=0;try{pg=gProg(st);}catch(e){}
       const ico=st.b?icSvg(st.b,16):st.ping?icSvg(st.ping,16):'';
-      h+=`<div class="gr ${dn?'ok':''} ${g.open===i?'op':''}" data-gopen="${i}"><span class="gck">${dn?ui('check','green',12):'□'}</span>${ico}<span class="gtt">${st.t}</span><span class="gpg">${dn?'':st.n>1?pg+'/'+st.n:''}</span>${dn?'':`<button data-gwhere="${i}">場所を示す</button>`}`;
-      if(g.open===i){const d=typeof st.d==='function'?st.d():st.d;h+=`<div class="gdet"><div class="gd">${d}</div>${st.n>1&&!dn?`<div class="gbar"><i style="width:${Math.round(pg/st.n*100)}%"></i></div>`:''}</div>`;}
-      h+=`</div>`;});
+      h+=`<div class="gr ${dn?'ok':''} ${g.open===i?'op':''}" data-gopen="${i}"><span class="gck">${dn?ui('check','green',12):'□'}</span>${ico}<span class="gtt">${st.t}</span><span class="gpg">${dn?'':st.n>1?pg+'/'+st.n:''}</span>${dn?'':`<button data-gwhere="${i}">場所を示す</button>`}</div>`;
+      if(g.open===i){const d=typeof st.d==='function'?st.d():st.d;const art=lilArt([st.art||st.b].filter(Boolean));h+=`<div class="gdet2">${art}<div class="gd">${d}</div>${st.n>1&&!dn?`<div class="gbar"><i style="width:${Math.round(pg/st.n*100)}%"></i></div>`:''}</div>`;}});
     h+=`<div class="gnote">好きな順に進められます。項目を押すと説明が出ます。</div>`;}
   h+=`<div class="gfoot"><button id="gCoach">画面の説明</button><button id="gSay">もう一度聞く</button><button id="gSkip" class="ghost">このミッションをとばす</button></div></div>`;
   el.className=g.min?'min':'';el.innerHTML=h;
