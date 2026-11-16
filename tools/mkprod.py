@@ -14,4 +14,5 @@ for a,b in [("const SAVE_KEY='abyss_save_v3_proto',","const SAVE_KEY='abyss_save
 assert s.count('<script src="siege.js"></script>')==1
 open(dst+'/index.html','w',encoding='utf-8').write(s)
 shutil.copy(src+'/siege.js',dst+'/siege.js')
+shutil.copytree(src+'/tut',dst+'/tut',dirs_exist_ok=True)   # チュートリアルの動画
 print('production updated:',ver)

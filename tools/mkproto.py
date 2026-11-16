@@ -2,7 +2,7 @@
 # 使い方：リポジトリの一番上で  python3 tools/mkproto.py . proto
 # siege.js（駐屯地襲撃モード β）は本番・試作版の両方で読み込む。逆向き（試作版→本番）は tools/mkprod.py
 # 試作版はセーブ・アプリ名・キャッシュ名を本番と分ける（試作版の不具合で本番のセーブを壊さないため）
-import sys,json,re
+import sys,json,re,shutil,os
 src,dst=sys.argv[1],sys.argv[2]
 s=open(src+'/index.html',encoding='utf-8').read()
 ver=re.search(r"GAME_VER='([^']*)'",s).group(1)
@@ -19,3 +19,5 @@ w=open(src+'/sw.js').read().replace("const CACHE = 'nd-v1';","const CACHE = 'nd-
 for f in ['siege.js','icon-192.png','icon-512.png','icon-maskable-512.png','apple-touch-icon.png']:
     open(dst+'/'+f,'wb').write(open(src+'/'+f,'rb').read())
 print('proto updated:',ver,'試作版')
+
+if os.path.isdir(src+'/tut'):shutil.copytree(src+'/tut',dst+'/tut',dirs_exist_ok=True)   # チュートリアルの動画
