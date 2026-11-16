@@ -4399,7 +4399,7 @@ function doEndTurn(){
 function unlockNews(t){if(!S||S.backdrop||lvl(t.id)>1)return;const L=BUILD_GROUPS.flatMap(g=>g.list).filter(k=>B[k].req===t.id);
   if(!L.length)return;for(const k of L)newsTop(`${t.name}の研究が完了しました`,`${B[k].name}を建てられます（建設のタブ）`,kcImg(k)?`<img src="${kcImg(k)}" width="36" height="36" style="image-rendering:pixelated">`:icSvg(k,36),()=>{gRt('build');gHi(`#build button[data-k="${k}"]`);});}
 function tickBaseUp(){if(!S.baseUp)return;S.baseUp.left--;if(S.baseUp.left>0)return;
-  S.baseLv=Math.min(BASE_MAX,S.baseUp.to);S.baseUp=null;se('upgrade');storyQueue(S.baseLv);
+  S.baseLv=Math.min(BASE_MAX,S.baseUp.to);S.baseUp=null;se('upgrade');storyQueue('r'+S.baseLv);
   const m=`城がLv${S.baseLv}になった（英雄の上限${maxCmd()}名・領地拡大・施設の上限${facCap()}）`;log(m,'good');
   {const nR=TECH.filter(t=>techRank(t)===S.baseLv).length;const ck='castle'+Math.max(1,Math.min(7,S.baseLv));newsTop(`城のレベルが${S.baseLv}に上がりました`,nR?`新しい研究内容（ランク${['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'][S.baseLv]}）を確認してみましょう`:'新しい研究内容を確認してみましょう',ICIMG[ck]?sprImg(ck,36):icSvg('hq',36),()=>{const b=document.getElementById('bRes');if(b)b.click();});}if(S.rep)S.rep.push({msg:m,cls:'good'});revealAll();}
 function turnReport(t0,ev){
@@ -7477,7 +7477,7 @@ function tlSnap(tag){if(!S||S.mode!=='campaign'||S.review)return;S.tl=S.tl||[];S
   const g={};for(const [n] of TL_GROUPS)g[n]=0;for(const b of S.blds){if(b.bt>0&&!b.upg)continue;g[tlGroup(b.type)]++;}g['罠']=(S.mines||[]).length;
   const e=econ(),R=o=>{const r={};for(const k in o)r[k]=Math.round((o[k]||0)*10)/10;return r;},res={};for(const k of TL_RES)res[k]=Math.round(S[k]||0);
   S.tl.push({d:S.turn,w:S.wave,tag,n:S.blds.filter(b=>!(b.bt>0&&!b.upg)).length,g,pop:popTotal(),res,gross:R(e.gross||{}),net:R(e.net||{}),bl:S.baseLv||1,tech:TECH.filter(t=>has(t.id)).length});}
-function recordWave(ws,ok){if(S&&!S.gid)S.gid=Date.now();if(ok)try{const k='nd_best_'+(S.mapId||CUR_MAP);if((+localStorage.getItem(k)||0)<S.wave)localStorage.setItem(k,S.wave);}catch(e){}try{tlSnap(ok?'襲撃のあと':'陥落');}catch(e){}S.hist=S.hist||[];ws=ws||S.waveStart||{};S.hist.push({n:S.wave,day:S.turn,blood:!!(S.cur&&S.cur.blood),kills:S.waveKills,bld:S.bldLost-(ws.bld||0),kia:S.kia-(ws.kia||0),mat:S.mat-(ws.mat||0),heroes:S.fallen.length-(ws.fallen||0),ok,pop:popTotal(),tech:TECH.filter(t=>has(t.id)).length});}
+function recordWave(ws,ok){if(S&&!S.gid)S.gid=Date.now();if(ok)try{storyQueue('w'+S.wave);}catch(e){}if(ok)try{const k='nd_best_'+(S.mapId||CUR_MAP);if((+localStorage.getItem(k)||0)<S.wave)localStorage.setItem(k,S.wave);}catch(e){}try{tlSnap(ok?'襲撃のあと':'陥落');}catch(e){}S.hist=S.hist||[];ws=ws||S.waveStart||{};S.hist.push({n:S.wave,day:S.turn,blood:!!(S.cur&&S.cur.blood),kills:S.waveKills,bld:S.bldLost-(ws.bld||0),kia:S.kia-(ws.kia||0),mat:S.mat-(ws.mat||0),heroes:S.fallen.length-(ws.fallen||0),ok,pop:popTotal(),tech:TECH.filter(t=>has(t.id)).length});}
 // 大きな損害を受けた翌朝の立て直し：避難民がすぐ来て、王都の援助は2ターン後に届く
 function reliefAfter(ws){const lb=S.bldLost-(ws.bld||0),lk=S.kia-(ws.kia||0),sev=lb*2+lk;if(sev<20)return '';
   const ref=Math.min(40,Math.round(10+sev*0.4));S.pop+=ref;log(`近くの村から避難民 ${ref}人が逃げ込んできた`,'good');
@@ -7617,7 +7617,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','城のレベルが上がるたびに、リリアが帳簿から短い話を伝える（広がる裂け目・ゴブリンの王のうわさ・アビスの主・赤い月の獣・近づく森）','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
+ ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
  ['1.8.4','2026-11-16',['上に出るお知らせが消えたあとも、その場所が押せたままになっていて、複数の部隊をまとめて「固守」などに切り替えるボタンが効かないことがあったのを直した（そのとき、お知らせの行き先の施設が光っていた）']],
  ['1.8.3','2026-11-16',['<b>書記官リリアの絵</b>ができた：話す内容に合わせて表情が変わる（ふつう・笑顔・あせり・ほっとした顔）。街の名前を決める画面に、ろうそくの書斎で帳簿をつけるリリア。チュートリアルのあいだ、昼は城のそばをリリアが歩く']],
@@ -7750,21 +7750,35 @@ function showIntro(){
 // 王都から辺境の街を任された領主。森の奥のアビスの裂け目から夜ごと魔物。城のレベルが上がるたびに、リリアが帳簿から2〜3行で伝える。第40襲撃で森の主を倒すと裂け目が閉じる
 const STORY={
  0:['帳簿のはじめに','領主様、ようこそ${TOWN}へ。ここは王国のいちばん東のはずれです。森の奥には「アビス」と呼ばれる裂け目があって、夜になると魔物が湧き出してきます。','この街が落ちれば、魔物は王都へ続く街道をまっすぐ進んでしまいます。昼は街を育てて、夜は守る——それが、これからの毎日です。','あらためまして、書記官のリリアです。${TOWN}のことは、ぜんぶ帳簿につけておきますね！'],
- 2:['広がる裂け目','城が大きくなって、王都にも${TOWN}の名前が届きはじめました。','でも斥候さんの話では、アビスの裂け目は少しずつ広がっているそうです。魔物の数も、これから増えていきます。'],
- 3:['群れを率いる者','魔物の中に、群れを率いる者が出てきました。','北の森では、ゴブリンの王が軍勢を集めているといううわさです。いつか、その王が自分で攻めてくるかもしれません。'],
- 4:['アビスの主','古い書物を調べました。アビスの奥には「主」がいて、裂け目はその主の息づかいで開いたり閉じたりするそうです。','主を倒せば、裂け目は閉じるかもしれません。……そのときまで、${TOWN}を守りきらないと。'],
- 5:['赤い月の獣','赤い月の夜に、人の形をした獣を見たという話があります。','狼のような爪と、ものすごい速さだったそうです。領主様、ブラッドムーンの夜は、どうか気をつけて。'],
- 6:['近づく森','森の木々が、夜ごとに街のほうへ少しずつ寄ってきている気がします。','毎朝、森の端の位置も帳簿につけています。……やっぱり、近づいています。アビスの主は、森そのものなのかもしれません。'],
- 7:['最後の夜にむけて','ここまで大きな城は、王国の辺境にはほかにありません。','あと少しです、領主様。森の主が出てくるのは、きっともうすぐです。${TOWN}のみんなと一緒に、最後の夜を迎えましょう！']};
+ // 大きな襲撃の節目（その襲撃を守りきった朝）。先へ進むほど、アビスで起きていることがはっきりしていく（2026-11-16 ユーザーの希望）
+ w10:['アビスの魔力','第10襲撃の防衛、おめでとうございます！','最近、アビスのほうで大きな魔力の反応を検知したそうです。何の反応なのかは、まだ分かりません。帳簿に書きとめておきますね。'],
+ w15:['強まる反応','第15襲撃も守りきりました！','アビスの魔力の反応は、日に日に強くなっています。魔物たちは、その魔力に呼び寄せられているみたいです。','それから……北の森で、ゴブリンたちが一人の「王」のもとに集まっているといううわさがあります。'],
+ w20:['王の地図','ゴブリンの王を退けました！ 領主様、お見事です！','王の持ち物から、古い地図が見つかりました。アビスの奥に印がつけてあって……魔力の反応がある場所と、ぴったり同じなんです。'],
+ w25:['眠っていた主','第25襲撃の防衛、おめでとうございます！','地図と古い書物を調べて、分かりました。反応の正体は、アビスの奥で眠っていた「主」です。主が目を覚ましかけていて、そのせいで魔物が湧いているようです。','赤い月の夜に現れた狼の獣も、主の魔力で姿を変えられたのかもしれません。'],
+ w30:['近づく森','第30襲撃も守りきりました！','主の魔力が、森の木々にまで流れこんでいます。森の端が、毎朝少しずつ街に近づいているんです。','アビスの主は……森そのものの姿で現れるのかもしれません。'],
+ w35:['目覚め','第35襲撃の防衛、おめでとうございます！','斥候さんから知らせが届きました。アビスの主が、とうとう目を覚ましました。','第40襲撃の夜、森の主が${TOWN}へ向かってきます。これが最後の戦いです。主を倒せば、きっと裂け目も閉じます。領主様、一緒に乗りこえましょう！']};
+// 城のランクが上がったとき：街が大きくできること＋そのランクで新しくできること（素材は、研究 → 施設 → 集める の順で案内）
+const RANK_SAY={
+ 2:['ランク2になったことで、石炭とエーテルを扱えるようになりました。','研究の「炭鉱」を進めて炭鉱を建てて、石炭を集めましょう！ エーテルは「エーテル採掘」の研究のあと、泉のそばにエーテル採掘所を建てると採れます。'],
+ 3:['ランク3になったことで、金と合金を扱えるようになりました。','研究の「金鉱」で金鉱を、「精錬所」で精錬所を建てられます。合金は、鉄と金と石炭から精錬所で作ります。'],
+ 4:['ランク4になったことで、魔法の守りが使えるようになりました。','バリアストーンやメイジの塔、エーテル爆弾は、研究の「防衛」にあります。エーテルをたくわえておきましょう！'],
+ 5:['ランク5になったことで、もっと強い兵と守りが使えるようになりました。','テスラタワーや重力の罠、狙撃兵やエーテルゴーレムの研究ができます。'],
+ 6:['ランク6になったことで、聖銀を扱えるようになりました。','研究の「聖銀鉱」を進めて聖銀鉱を建てて、聖銀を集めましょう！ いちばん強い兵や守りに使います。'],
+ 7:['ランク7になりました。これ以上ない、最高の城です！','ドラゴンブレスやメテオコールなど、いちばん強い守りの研究ができます。']};
 function storyOn(){return S&&S.mode==='campaign'&&!S.ex&&(S.mapId==='f'||S.mapId==='7');}
-function storyQueue(k){if(!storyOn()||!STORY[k])return;S.storySeen=S.storySeen||[];if(S.storySeen.includes(k))return;S.storySeen.push(k);(S.storyQ=S.storyQ||[]).push(k);}
+function storyQueue(k){if(!storyOn()||!(STORY[k]||(String(k).startsWith('r')&&RANK_SAY[+String(k).slice(1)])))return;S.storySeen=S.storySeen||[];if(S.storySeen.includes(k))return;S.storySeen.push(k);(S.storyQ=S.storyQ||[]).push(k);}
 // 画面が空いたとき（ほかの画面・襲撃中でないとき）に1つずつ出す（ゲームのループから呼ぶ）
 function storyTick(){if(!S||!S.storyQ||!S.storyQ.length||S.overlay||S.waveActive||S.over||TLP||FW)return;const k=S.storyQ.shift();showStory(k);}
-function showStory(k){const [ttl,...L]=STORY[k];const ex=k===5||k===6?'panic':k===0||k===7?'smile':'normal';
-  openOverlay('story',`<div class="lslow" style="max-width:320px;margin:0 auto 8px">${artPx('lilia_art','','')}</div><div class="stk">${k?`${TOWN_CH(k)}`:'序'}</div><h2 style="margin:0 0 6px;text-align:center">${ttl}</h2>
+function showStory(k){const rk=String(k).startsWith('r')?+String(k).slice(1):0;
+  const lilArtH=`<div class="lslow" style="max-width:320px;margin:0 auto 8px">${artPx('lilia_art','','')}</div>`;
+  if(rk){const L=RANK_SAY[rk];   /* 城のランクが上がったとき：できるようになったことの案内 */
+    openOverlay('story',`${lilArtH}<h2 style="margin:0 0 6px;text-align:center">城のランクが${rk}に上がりました</h2>
+     <div class="nlil">${lilFace(64,'smile')}<div><small>${LIL_NAME}</small><div style="margin:0 0 6px">城のランクが${rk}になりました！ 街をもっと大きくできますね！</div>${L.map(t=>`<div style="margin:0 0 6px">${lilTxt(t)}</div>`).join('')}</div></div><div class="nfoot"><button id="stRes">研究を開く</button><button id="stOk" class="on">閉じる [Enter]</button></div>`,true);
+    document.getElementById('stOk').onclick=closeOverlay;document.getElementById('stRes').onclick=()=>{closeOverlay();showResearch();};return;}
+  const [ttl,...L]=STORY[k];const ex=k==='w35'||k==='w30'?'panic':k==='w20'?'smile':'normal';
+  openOverlay('story',`${lilArtH}<div class="stk">${k===0?'序':`${townName()}の帳簿より`}</div><h2 style="margin:0 0 6px;text-align:center">${ttl}</h2>
    <div class="nlil">${lilFace(64,ex)}<div><small>${LIL_NAME}</small>${L.map(t=>`<div style="margin:0 0 6px">${lilTxt(t)}</div>`).join('')}</div></div><div class="nfoot"><button id="stOk" class="on">閉じる [Enter]</button></div>`,true);
   document.getElementById('stOk').onclick=closeOverlay;}
-function TOWN_CH(k){return `${townName()}の帳簿より`;}
 // 終わりのことば（結果の画面と世界の歴史）
 function storyEnd(win,town){return win?`森の主が倒れて、アビスの裂け目が静かに閉じていきます……。${town}は、最後まで落ちませんでした。この日のことは、世界の歴史に書き残しておきます！`:`${town}の城は落ちてしまいました。でも、ここで食い止めた魔物の数だけ、王都の人たちは無事です。この街のことも、ちゃんと書き残しておきます。`;}
 // ===== 初心者タスク（生産・防衛の目標）と画面の説明 =====
