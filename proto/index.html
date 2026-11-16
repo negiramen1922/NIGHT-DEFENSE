@@ -8081,7 +8081,7 @@ const SE_ALT={
  // 前回までの「今の音」の説明（ラボの表示用）
  SE_ALT.click[0][1]='カチッ';SE_ALT.error[0][1]='ブブッ';SE_ALT.turn[0][1]='ページをめくる＋ポーン';SE_ALT.upgrade[0][1]='パワーアップ（タタタター）';SE_ALT.hire[0][1]='金貨の音＋小さなファンファーレ';SE_ALT.launch[0][1]='パパパーン（出撃のラッパ）';
  // ユーザーが選んだ案を、選んでいない人の標準に（2026-11-15）
- for(const [n,lb] of [['b_wood','案C'],['b_stone','案C'],['b_metal','案C'],['b_farm','案B'],['resStart','案B'],['hit','案C'],['bigkill','案C'],['clear','案B'],['lose','案B'],['alarm','案E'],['kia','案D'],['research','案F'],['click','案A'],['error','案C'],['upgrade','案C'],['hire','案A']]){const i=SE_ALT[n].findIndex(x=>x[0].startsWith(lb));if(i>0)SE_DEF[n]=i;}
+ for(const [n,lb] of [['b_wood','案C'],['b_stone','案C'],['b_metal','案C'],['b_farm','案B'],['resStart','案B'],['hit','案C'],['bigkill','案C'],['clear','案B'],['lose','案B'],['alarm','案E'],['kia','案A'],['win','案E'],['kill','案A'],['research','案F'],['click','案A'],['error','案C'],['upgrade','案C'],['hire','案A']]){const i=SE_ALT[n].findIndex(x=>x[0].startsWith(lb));if(i>0)SE_DEF[n]=i;}
 }
 // 効果音の優先順位（2026-11-15 決定）：大事な音が鳴っている間は、それより下の音を小さくする
 // 1 襲撃の知らせ・陥落 ＞ 2 英雄の戦死 ＞ 3 施設の破壊 ＞ 4 大きな敵の撃破 ＞ 5 範囲攻撃 ＞ 6 発射 ＞ 7 小さな敵の撃破 ＞ 8 建設。操作の音（0）は下げない
