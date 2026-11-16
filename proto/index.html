@@ -5735,7 +5735,7 @@ function draw(){
   // ===== 画面座標での表示 =====
   ctx.setTransform(1,0,0,1,0,0);
   if(S.waveActive||S.phase==='night')drawNight(an);
-  drawFW();
+  drawFW();drawTlRip();
   if(S.mapId==='s')drawSnow(an);
   // 襲撃方面の警告（画面の端に固定表示）
   {const w2=S.waveActive?S.cur:S.next;
@@ -7614,7 +7614,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で（★ 何が増えるかつき）','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
+ ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で（★ 何が増えるかつき）','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
  ['1.8.4','2026-11-16',['上に出るお知らせが消えたあとも、その場所が押せたままになっていて、複数の部隊をまとめて「固守」などに切り替えるボタンが効かないことがあったのを直した（そのとき、お知らせの行き先の施設が光っていた）']],
  ['1.8.3','2026-11-16',['<b>書記官リリアの絵</b>ができた：話す内容に合わせて表情が変わる（ふつう・笑顔・あせり・ほっとした顔）。街の名前を決める画面に、ろうそくの書斎で帳簿をつけるリリア。チュートリアルのあいだ、昼は城のそばをリリアが歩く']],
  ['1.8.2','2026-11-16',['チュートリアル：「人」のミッションで、右の「街」のタブで生産と収支（税・給金）を見られることを案内（画面の絵つき）','チュートリアル：「英雄と熟練度」のミッションで、街にいる英雄の見かた（軍事 → 英雄）と配属のしかたを案内（画面の絵つき）','チュートリアル：「兵士」のミッションの農兵を2部隊から1部隊に（最初の襲撃までに武器工房が間に合うように）','「街」のタブなどの数字を小数なしに']],
@@ -8124,7 +8124,26 @@ function playTimelapse(back){const F=tlFrames();if(F.length<2){toast('まだ記�
   setTimeout(()=>{try{resizeView();}catch(e){}tlFit();tlShow();},60);
   TLP.timer=setInterval(()=>{if(!TLP||!TLP.play)return;if(TLP.i>=F.length-1){TLP.play=false;tlUi();return;}TLP.i++;tlShow();},400);}
 function tlFit(){const [x0,y0,x1,y1]=TLP.box,w=(x1-x0)*T,h=(y1-y0)*T;cam.z=Math.max(0.3,Math.min(2,Math.min(VW/w,VH/h)));cam.x=(x0*T+w/2)-VW/cam.z/2;cam.y=(y0*T+h/2)-VH/cam.z/2;}
-function tlShow(){if(!TLP)return;const {bl,mn}=tlBuild(TLP.F[TLP.i]);S.blds=bl;S.mines=mn;for(const r of S.grid)r.fill(null);for(const b of bl)try{gridSet(b,true);}catch(e){}tlUi();}
+function tlShow(){if(!TLP)return;const {bl,mn}=tlBuild(TLP.F[TLP.i]);S.blds=bl;S.mines=mn;for(const r of S.grid)r.fill(null);for(const b of bl)try{gridSet(b,true);}catch(e){}
+  if(TLP.shown===TLP.i-1&&TLP.i>0)tlRipple(TLP.F[TLP.i-1],TLP.F[TLP.i]);TLP.shown=TLP.i;tlUi();}
+// タイムラプスの波紋（2026-11-16 ユーザーの希望。PVのように）：新しく建った施設は青い波紋、強化（改築）された施設は金色の波紋と上へ昇る光
+// 記録の鍵は「種類|x|y|Lv」なので、同じ場所・同じ種類で Lv だけ違えば強化、前になかった場所なら新築
+function tlRipple(prev,cur){const P=new Set(prev),pos=new Map();for(const k of prev){if(k.startsWith('m:'))continue;const [t,x,y,lv]=k.split('|');pos.set(t+'|'+x+'|'+y,+lv||1);}
+  const now=performance.now();TLP.rip=(TLP.rip||[]).filter(r=>now-r.t0<1400);let n=0;
+  for(const k of cur){if(P.has(k)||n>=40)continue;n++;
+    if(k.startsWith('m:')){const [,x,y]=k.slice(2).split('|');TLP.rip.push({x:(+x+.5)*T,y:(+y+.5)*T,r:T*1.2,t0:now+n*25,up:false});continue;}
+    const [t,x,y,lv]=k.split('|'),sz=newSz(t),p=pos.get(t+'|'+x+'|'+y);
+    TLP.rip.push({x:(+x+sz/2)*T,y:(+y+sz/2)*T,r:T*(1.2+sz*0.9),t0:now+n*25,up:p!=null&&(+lv||1)>p});}}
+function drawTlRip(){if(!TLP||!TLP.rip||!TLP.rip.length)return;const now=performance.now(),z=cam.z;ctx.save();ctx.globalCompositeOperation='lighter';
+  for(const r of TLP.rip){const k=(now-r.t0)/(r.up?1300:1000);if(k<0||k>1)continue;const x=(r.x-cam.x)*z,y=(r.y-cam.y)*z,R=r.r*z,a=1-k;
+    if(!r.up){// 新築：青い波紋が2重に広がる＋中心がふわっと光る
+      for(const d of [0,0.22]){const q=k-d;if(q<0)continue;ctx.strokeStyle=`rgba(98,198,255,${(1-q)*0.9})`;ctx.lineWidth=Math.max(1.5,3*z*(1-q));ctx.beginPath();ctx.arc(x,y,R*(0.25+q*1.1),0,7);ctx.stroke();}
+      if(k<0.4){const g=ctx.createRadialGradient(x,y,1,x,y,R*0.8);g.addColorStop(0,`rgba(140,220,255,${0.5*(1-k/0.4)})`);g.addColorStop(1,'rgba(60,160,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,R*0.8,0,7);ctx.fill();}}
+    else{// 強化：金色のひし形の波紋＋下から上へ昇る光の粒
+      const s=R*(0.3+k*1.0);ctx.strokeStyle=`rgba(255,210,90,${a})`;ctx.lineWidth=Math.max(1.5,3*z*a);ctx.beginPath();ctx.moveTo(x,y-s);ctx.lineTo(x+s,y);ctx.lineTo(x,y+s);ctx.lineTo(x-s,y);ctx.closePath();ctx.stroke();
+      ctx.fillStyle=`rgba(255,230,140,${a})`;for(let i=0;i<8;i++){const ox=Math.sin(i*2.4+r.x)*R*0.55,oy=R*0.5-k*R*1.6-((i*37)%10)/10*R*0.4,w=Math.max(2,2.5*z);ctx.fillRect(x+ox-w/2,y+oy,w,w*2);}
+      if(k<0.5){ctx.fillStyle=`rgba(255,220,120,${(1-k*2)*0.35})`;ctx.beginPath();ctx.arc(x,y,R*0.6,0,7);ctx.fill();}}}
+  ctx.restore();}
 function tlUi(){if(!TLP)return;const r=S.tl[TLP.i]||{},bar=document.getElementById('tlBar');if(bar)bar.value=TLP.i;
   document.getElementById('tlDay').textContent=`${r.d||'?'}日目・第${(r.w||0)+(r.tag==='朝'||r.tag==='開始'?1:0)}襲撃${r.tag==='朝'||r.tag==='開始'?'の前':'のあと'}`;
   document.getElementById('tlPlay').textContent=TLP.play?'一時停止':'再生';document.getElementById('tlSpd').textContent='速さ ×'+TLP.speed;
