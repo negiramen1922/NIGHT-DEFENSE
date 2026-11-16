@@ -3744,14 +3744,19 @@ function bonus0(o){
 }
 function prodNeighborMul(b){for(const o of S.blds){if(o===b||o.type!==b.type||Math.abs(o.x-b.x)>2*U||Math.abs(o.y-b.y)>2*U)continue;if(heroSk(o,'shidou'))return 1.25;}return 1;}
 function hireCost(c){return {gold:60+(c.lv-1)*80+(c.trait?20:0)};}
+// 英雄の候補（2026-11-16）：内政2人・戦闘3人に分ける。戦闘は、今の街で使える分類だけ（竜騎兵を育てられないのに竜騎の英雄は出さない）
+const CAND_N={内政:2,戦闘:3};
+function specUsable(sp){if(sp==='内政'||sp==='守備'||sp==='歩兵')return true;const uts=Object.keys(SPEC_OF_UT).filter(u=>SPEC_OF_UT[u]===sp);return uts.some(u=>modelsFor(u).length>0);}
+function battleSpecs(){return Object.keys(SPECS).filter(sp=>sp!=='内政'&&specUsable(sp));}
+function candLv(){let lv=1;const r=Math.random();const w=S.wave;if(r<0.15+w*0.04)lv=2;if(r<0.04+w*0.02)lv=3;if(w>=6&&r<0.03)lv=4;return lv;}
+function candSide(c){return c.spec==='内政'?'内政':'戦闘';}
+function newCand(side,lv){const L=side==='内政'?['内政']:battleSpecs();return makeCmd(L[Math.floor(Math.random()*L.length)],lv||candLv());}
 function genCands(){
   S.cands=[];
-  for(let i=0;i<3;i++){
-    let lv=1;const r=Math.random();const w=S.wave;
-    if(r<0.15+w*0.04)lv=2;if(r<0.04+w*0.02)lv=3;if(w>=6&&r<0.03)lv=4;
-    S.cands.push(makeCmd(null,lv));
-  }
+  for(const side in CAND_N)for(let i=0;i<CAND_N[side];i++)S.cands.push(newCand(side));
 }
+// 古いセーブの候補に、今は使えない分類の英雄がいたら入れ替える
+function fixCands(){if(!S.cands)return;S.cands=S.cands.map(c=>specUsable(c.spec)?c:newCand('戦闘',c.lv));}
 function hire(id){
   const c=S.cands.find(x=>x.id===id);if(!c)return;const cost=hireCost(c);
   if(!canAfford(cost,3)||S.cmds.length>=maxCmd())return;
@@ -7441,16 +7446,19 @@ function showHire(target,mode){
   let h=target?'':`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">人事・英雄の雇用</h2><button id="ovClose">閉じる [J]</button></div>`;
   if(showH){h+=`<h3 style="margin:0 0 4px">英雄の候補者</h3>
   <div class="help" style="margin-bottom:8px">候補者は襲撃を撃退するたびに入れ替わります。雇用には人員3名が必要です（副官・幕僚として）。在籍 <b style="color:var(--text)">${S.cmds.length}/${maxCmd()}</b>　／　木材 ${Math.floor(S.steel)}　人員 ${S.pop}
-  ${full?'<br><span style="color:var(--amber)">定員に達しています</span>':''}</div><div class="cands">`;
-  for(const c of S.cands){const sp=SPECS[c.spec];const cost=hireCost(c);const tr=TRAITS.find(t=>t.n===c.trait);
+  ${full?'<br><span style="color:var(--amber)">定員に達しています</span>':''}</div>`;
+  fixCands();
+  for(const [side,note] of [['内政','生産施設に配属して、生産を上げる'],['戦闘','部隊か防衛施設に配属して、戦いを強くする']]){const L=S.cands.filter(c=>candSide(c)===side);
+  h+=`<h4 style="margin:8px 0 4px">${side}の英雄 <span class="muted" style="font-weight:normal;font-size:11px">${note}</span></h4><div class="cands">`;
+  if(!L.length)h+=`<div class="muted">${side}の候補者はいません（雇った・次の撃退後に補充）</div>`;
+  for(const c of L){const sp=SPECS[c.spec];const cost=hireCost(c);const tr=TRAITS.find(t=>t.n===c.trait);
     h+=`<div class="cand"><div class="t" style="display:flex;justify-content:space-between"><b style="display:flex;align-items:center;gap:4px">${icSvg('h_'+c.spec,28)}${cmdName(c)}</b><span class="spec" style="color:${sp.color};border-color:${sp.color}">${c.spec}</span></div>
     <div class="muted" style="margin:4px 0">${sp.desc}</div>
     <div>Lv${c.lv}　攻${c.atk} 防${c.def} 技${c.tec}</div>
     <div style="margin:3px 0;min-height:16px">${c.trait?`特性：<b>${c.trait}</b> <span class="muted">${tr.d}</span>`:'<span class="muted">特性なし</span>'}</div>
     <div style="font-size:11px;margin:4px 0">${skillLine(c,true)}</div>
     <button data-hire="${c.id}" style="margin-top:6px;width:100%" ${canAfford(cost,3)&&!full?'':'disabled'}>雇用（${costText(cost,3)}）</button></div>`;}
-  if(!S.cands.length)h+='<div class="muted">候補者がいません。次の撃退後に補充されます</div>';
-  h+=`</div>`;}
+  h+=`</div>`;}}
   if(showA){h+=`<h3 style="margin:${showH?12:0}px 0 4px">冒険者ギルド</h3><div class="help">金貨で雇える即戦力。人員を使わないが、倒れた仲間は補充できず、毎ターン給金がかかる。剣士は武具、狩人は矢、魔導士はエーテルの補給が必要</div><div class="cands">`;
   for(const k of ['advSword','advBow','advMage']){const m=MTC[k];h+=`<div class="cand"><div style="display:flex;gap:6px;align-items:center">${icSvg(k==='advBow'?'archer':k==='advMage'?'wizard':'pawn',28)}<b style="color:${m.color}">${m.name}</b></div><div class="muted" style="margin:4px 0">${m.desc}</div><button data-adv="${k}" style="width:100%" ${canAfford(m.cost)&&!S.waveActive?'':'disabled'}>雇う（${costText(m.cost)}）</button></div>`;}
   h+=`</div>`;}
