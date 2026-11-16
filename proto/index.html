@@ -137,9 +137,9 @@ select{background:#0e1510;color:var(--text);border:1px solid var(--line);font:in
 .ttl{text-align:center;padding:8px 4px 2px}.ttl .tlogo svg,.ttl .tlogo img,.ttl .tlogo canvas{max-height:118px;width:auto}
 .ttl .tsub{color:#c8a070;letter-spacing:.08em;margin:2px 0 10px;font-size:13px}
 .ttl .tmain{display:flex;gap:8px;max-width:440px;margin:0 auto 8px}.ttl .tmain button{flex:1;padding:10px;font-size:15px;display:flex;flex-direction:column;align-items:center;gap:2px}.ttl .tmain small{font-size:10.5px;color:#c8b890;font-weight:normal}
-.ttl .tgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;max-width:440px;margin:0 auto}.ttl .tgrid button,.ttl .tmoreL button{padding:7px 6px;font-size:13px}.ttl .tarr{margin-left:4px;font-size:10px}.ttl .tmoreL{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:440px;margin:6px auto 0;padding-top:6px;border-top:1px dashed #5a4a2a}.ttl .tmoreL[hidden]{display:none}
+.ttl .tgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;max-width:440px;margin:0 auto}.ttl .tgrid button,.ttl .tmoreL button{padding:7px 6px;font-size:13px}.ttl .tarr{margin-left:4px;font-size:10px}.ttl .tmoreL{display:flex;flex-wrap:wrap;gap:6px;max-width:440px;margin:6px auto 0;padding-top:6px;border-top:1px dashed #5a4a2a}.ttl .tmoreL button{flex:1 1 40%}   /* 数が奇数のときは最後の1つが横いっぱい */.ttl .tmoreL[hidden]{display:none}
 .ttl .tfoot{font-size:11px;margin-top:10px}
-@media (max-height:520px){.ttl{padding:2px}.ttl .tlogo svg,.ttl .tlogo img,.ttl .tlogo canvas{max-height:58px}.ttl .tsub{margin:0 0 6px;font-size:11px}.ttl .tmain{margin-bottom:6px}.ttl .tmain button{padding:6px;font-size:14px}.ttl .tgrid{gap:4px;max-width:520px}.ttl .tgrid button,.ttl .tmoreL button{padding:4px;font-size:12px}.ttl .tmoreL{grid-template-columns:repeat(3,1fr);gap:4px;max-width:520px}.ttl .tfoot{margin-top:6px;font-size:10px}#overlay.home .card{max-height:96vh;max-height:96dvh}}
+@media (max-height:520px){.ttl{padding:2px}.ttl .tlogo svg,.ttl .tlogo img,.ttl .tlogo canvas{max-height:58px}.ttl .tsub{margin:0 0 6px;font-size:11px}.ttl .tmain{margin-bottom:6px}.ttl .tmain button{padding:6px;font-size:14px}.ttl .tgrid{gap:4px;max-width:520px}.ttl .tgrid button,.ttl .tmoreL button{padding:4px;font-size:12px}.ttl .tmoreL{gap:4px;max-width:520px}.ttl .tmoreL button{flex:1 1 30%}.ttl .tfoot{margin-top:6px;font-size:10px}#overlay.home .card{max-height:96vh;max-height:96dvh}}
 #overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:20;touch-action:pan-y}
 #overlay .card{background:var(--panel);border:1px solid var(--amber);padding:20px 24px;max-width:540px;width:92%;max-height:88vh;max-height:88dvh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 body.ov #left,body.ov #right{overflow:hidden!important}
@@ -7531,7 +7531,7 @@ function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.a
       <button id="tUpd">アップデート情報${updSeen()?'':' <b style="color:#f2b33d">NEW</b>'}</button>
       <button id="tCredit">クレジット</button>
       ${isAppMode()?'':'<button id="tInstall">ホーム画面に追加</button>'}
-      <button id="tOld" class="ghost">旧版（ver 0.9）</button>
+      <button id="tOld">旧版（ver 0.9）で遊ぶ</button>
     </div>
     <div class="muted tfoot">ver ${GAME_VER}　・　PC・スマホ（横持ち）で遊べます　・　進行はブラウザに自動保存されます</div></div>`);
   const c=document.getElementById('tContinue');if(c)c.onclick=()=>{closeOverlay();withLoading('セーブを読み込んでいます…',()=>{if(!loadGame())toast('セーブデータを読み込めませんでした','bad');});};
