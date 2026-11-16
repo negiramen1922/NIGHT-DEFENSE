@@ -761,6 +761,7 @@ button.ghost:hover:not(:disabled){box-shadow:none;color:var(--amber)}
 #viewSeg button.on kbd{color:#111;border-color:#111}
 #viewCap{flex-basis:100%;font-size:11px;color:var(--text);padding:3px 8px;text-align:right;border-top:1px solid var(--line)}
 body:not(.fullmap) #modeBar,#modeBar{max-width:calc(100% - 330px)}
+@media (min-width:901px){#modeBar{top:auto;bottom:22px}}   /* 選択中・建設の帯は地図の左下に（上は昼夜のバーと表示の切り替えだけにする。2026-11-16 画面の整理） */
 @media (max-width:900px){#viewSeg{top:48px;right:8px;max-width:calc(100% - 16px)}#viewSeg button{padding:4px 8px;font-size:11px}#viewSeg kbd{display:none}#viewCap{display:none!important}#modeBar{max-width:calc(100% - 20px)}}
 #pauseMsg{display:none;position:absolute;left:0;right:0;top:42%;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:3;text-shadow:0 2px 0 #000,0 0 12px #000}
 #pauseMsg b{font-family:var(--px-font);font-weight:400;font-size:24px;letter-spacing:.2em;color:var(--amber)}
@@ -847,6 +848,8 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 #info .cmdbtns button.ret{background:#2a1210;color:#ff8a80;box-shadow:0 0 0 1px var(--red-line)}
 #info .cmdbtns button.ret.cur{box-shadow:0 0 0 2px #ff8a80}
 #info .iact{display:flex;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}
+#info .ihtop{display:flex;gap:10px;align-items:center}#info .ihtop .banner{width:120px;max-width:120px;flex-shrink:0;margin:0}#info .ihtop .banner .tag,#info .ihtop .artpx .al,#info .ihtop .artpx .as{display:none}#info .ihtop .ihead{flex:1;min-width:0;flex-wrap:wrap;margin:0;row-gap:2px}
+#info .iquick{margin:8px 0 6px;padding:2px 8px 6px;background:#111814;box-shadow:0 0 0 1px var(--frame)}#info .iquick details.isec:last-of-type{border-bottom:none}#info .iquick .iact{margin-top:6px;padding-top:6px}
 #info .iact button{flex:1}
 #info select{margin-top:2px}
 #info .upg{border:none;background:transparent;padding:0;margin:6px 0}
@@ -5833,7 +5836,7 @@ function draw(){
   ctx.fillStyle='#ff5a4e';for(const e of S.enemies){const ex=mx+e.x*ks,ey=my+e.y*ks;if(ex>=mx&&ey>=my&&ex<mx+MM.w&&ey<my+MM.h&&isSeen(Math.floor(e.x/T),Math.floor(e.y/T)))ctx.fillRect(ex-1,ey-1,2,2);}
   ctx.strokeStyle='#f2b33d';ctx.strokeRect(mx+cam.x*ks+.5,my+cam.y*ks+.5,VW/cam.z*ks,VH/cam.z*ks);
   ctx.strokeStyle='#2a3a2d';ctx.strokeRect(mx-2.5,my-2.5,MM.w+5,MM.h+5);
-  ctx.fillStyle='rgba(207,227,207,.55)';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText(IS_TOUCH?'ドラッグ:移動　2本指:拡大縮小　タップ:選択':'ドラッグ/WASD:移動　ホイール:拡大縮小',8,VH-10);ctx.textAlign='center';
+  ctx.fillStyle='rgba(207,227,207,.55)';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText(IS_TOUCH?'ドラッグ:移動　2本指:拡大縮小　タップ:選択':'ドラッグ/WASD:移動　ホイール:拡大縮小'+(S.squads&&S.squads.length>1?'　Shift＋ドラッグ:部隊を範囲選択':''),8,VH-10);ctx.textAlign='center';
   // カーソル下の地形
   if(mouse.in){const gx=Math.floor(mouse.x/T),gy=Math.floor(mouse.y/T);if(gx>=0&&gy>=0&&gx<COLS&&gy<ROWS&&(S.ter[gy][gx]||S.oil[gy][gx]||S.ore[gy][gx])){const t=S.ter[gy][gx],lv=t===1?elevAt(gx,gy):t===2?forestAt(gx,gy):t===4?marshAt(gx,gy):0;
     // 通常表示は1行だけ。土地レベル表示 [T] の時は効果を行ごとに出す
@@ -6863,10 +6866,10 @@ function catOf(o){if(o.kind==='s')return '部隊';const t=o.type;if(t==='hq')ret
 function heatName(o){const h=heatOf(o);return h<=0?'なし':h<=1?'低':h<=2?'中':'高';}
 function crewTile(o){const n=crewNeed(o)||0,e=Math.round(eff(o)*100);return `<small>要員</small><b>${o.crew||0}/${n}<span class="${e<100?'bd':'gd'}">${e}%</span></b>`;}
 function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
-  let h=`<div class="banner">${artOf(o)}<span class="tag">${tag}</span></div>`;
+  let h=`<div class="ihtop"><div class="banner">${artOf(o)}<span class="tag">${tag}</span></div>`;   /* 絵は名前の横の小さな絵に（2026-11-16 画面の整理） */
   const r=Math.max(0,o.hp/o.maxhp),hc=r<0.3?' low':r<0.6?' mid':'';
   if(isS){const t=MT(o);
-    h+=`<div class="ihead"><span class="iname">${unitLabel(o)}</span>${o.coNo?`<span class="muted">第${o.coNo}中隊</span>`:''}<span class="ist">${MODE_NAME[o.mode]||''}</span><span class="ir">兵 ${o.members}/${t.members}</span></div>`;
+    h+=`<div class="ihead"><span class="iname">${unitLabel(o)}</span>${o.coNo?`<span class="muted">第${o.coNo}中隊</span>`:''}<span class="ist">${MODE_NAME[o.mode]||''}</span><span class="ir">兵 ${o.members}/${t.members}</span></div></div>`;
     h+=`<div class="hpline"><span>体力</span><span id="iHp">${Math.round(r*100)}%</span></div><div class="hpbar${hc}"><i id="iHpBar" style="width:${Math.round(r*100)}%"></i></div>`;
     const sp=supOf(o);if(sp)h+=`<div class="hpline"><span>${sp.name}</span><span id="iSup">${supText(o)}</span></div><div class="hpbar sup"><i id="iSupBar" style="width:${Math.round(o.sup/sp.max*100)}%"></i></div>`;
     {const vb=vetBar(o);h+=`<div class="hpline"><span class="vetl">${vetIc(o,12)}熟練度 <b>${VET[vetLv(o)].n}</b></span><span id="iVet">${vb.txt}</span></div><div class="hpbar vet"><i id="iVetBar" style="width:${vb.pct}%"></i></div>`;}
@@ -6874,7 +6877,7 @@ function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
     h+=`<div class="stats"><div><small>火力</small><b>${Math.round(unitDmg(o)/t.rate)}<span>/秒</span></b></div><div><small>射程</small><b>${Math.round(unitRange(o)*U)}<span>マス${unitSplash(o)?'・範囲':''}</span></b></div><div><small>熟練度</small><b class="vetb">${vetIc(o,12)}${VET[vetLv(o)].n}</b></div></div>`;
     return h;}
   const d=B[o.type];
-  h+=`<div class="ihead"><span class="iname">${stageName(o)}</span>${d.grp?`<span class="ilv">${'◆'.repeat(o.lv||1)}</span>`:''}<span class="itype">${tag}</span></div>`;
+  h+=`<div class="ihead"><span class="iname">${stageName(o)}</span>${d.grp?`<span class="ilv">${'◆'.repeat(o.lv||1)}</span>`:''}<span class="itype">${tag}</span></div></div>`;
   h+=`<div class="hpline"><span>耐久</span><span id="iHp">${Math.ceil(o.hp)} / ${Math.ceil(o.maxhp)}</span></div><div class="hpbar${hc}"><i id="iHpBar" style="width:${Math.round(r*100)}%"></i></div>`;
   const tiles=[];
   if(gunOf(o))tiles.push(`<small>射程</small><b>${Math.round(rangeOf(o)*U)}<span>マス</span></b>`);
@@ -6886,6 +6889,13 @@ function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
   h+=`<div class="stats">${tiles.slice(0,3).map(t=>t.startsWith('<div id="iCrew"')?t:`<div>${t}</div>`).join('')}</div>`;
   h+=flowHTML(o.type,o);   /* 施設の中身の小さなムービー（2026-11-15） */
   return h;}
+// よく使う操作（改築・城のレベル・作るもの・生産・部隊の編成・配置・つながった壁・修理）を、耐久のすぐ下の「操作」の箱にまとめる（2026-11-16 画面の整理）
+const QUICK_RE=[/改築|拠点レベル/,/作るもの|^生産$|砲弾/,/部隊の編成|配置中|がいません/,/つながった壁/];
+function infoQuick(el,o){const hb=el.querySelector(':scope > .hpbar');if(!hb)return;const kids=[...el.children],secs=kids.filter(x=>x.matches('details.isec'));
+  const pick=[];for(const re of QUICK_RE)for(const d of secs)if(re.test(d.dataset.k||'')&&!pick.includes(d))pick.push(d);
+  const rep=o&&damaged(o)?el.querySelector('.iact #iRep'):null;if(!pick.length&&!rep)return;   /* 修理は傷んでいるときだけ上へ（解体は下のまま） */
+  for(const d of pick){const sb=d.querySelector('.sb');if(!sb)continue;for(const m of [...sb.children])if(m.classList.contains('muted')&&m.textContent.length>40&&sb.querySelector(':scope > button, :scope > div > button'))sb.appendChild(m);}   /* 長い説明はボタンのあとへ */
+  const q=document.createElement('div');q.className='iquick';if(rep){const r=document.createElement('div');r.className='iact';r.appendChild(rep);q.appendChild(r);}pick.forEach(d=>q.appendChild(d));hb.after(q);}
 // .upg の箱を折りたたみ（details）にする。開閉は項目ごとに保存
 function detailsify(root){let st={};try{st=JSON.parse(localStorage.getItem('nd_info_open')||'{}');}catch(e){}
   root.querySelectorAll('.upg').forEach(u=>{const first=u.firstElementChild;if(!first)return;let title='',svHTML='',lead=[];
@@ -6896,7 +6906,7 @@ function detailsify(root){let st={};try{st=JSON.parse(localStorage.getItem('nd_i
     else if(first.classList.contains('row')&&first.querySelector('b')){const b=first.querySelector('b');title=b.innerHTML;b.remove();svHTML=first.innerHTML;first.remove();}
     else return;
     const key=title.replace(/<[^>]+>/g,'').replace(/[：:].*$/,'').trim();
-    const d=document.createElement('details');d.className='isec';d.open=key in st?!!st[key]:/改築|施設改修|拠点レベル|部隊の編成|配置中|がいません|つながった壁|買い物の目安|交易|作るもの/.test(key);
+    const d=document.createElement('details');d.className='isec';d.dataset.k=key;d.open=key in st?!!st[key]:/改築|施設改修|拠点レベル|部隊の編成|配置中|がいません|つながった壁|買い物の目安|交易|作るもの/.test(key);
     const sm=document.createElement('summary');sm.innerHTML=`<span class="st">${title}</span><span class="sv">${svHTML}</span>`;
     const body=document.createElement('div');body.className='sb';while(u.firstChild)body.appendChild(u.firstChild);
     d.append(sm,body);d.addEventListener('toggle',()=>{st[key]=d.open;try{localStorage.setItem('nd_info_open',JSON.stringify(st));}catch(e){}});u.replaceWith(d);});}
@@ -7055,13 +7065,13 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(o.type==='hq'){const gq=S.squads.filter(q=>q.ut==='guard');h+=`<div class="upg"><b>近衛兵</b><div class="muted" style="font-size:11px">城で編成できる精鋭（部隊画面 [K]）。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内で火力2倍・被害半分</div>${gq.length?gq.map(q=>`<div class="row" style="align-items:center"><span>${unitLabel(q)} ${q.members}/${UT.guard.members}人・${q.gar?'駐屯中':'出撃中'}</span>${q.gar?`<button data-gdout="${q.id}" style="padding:2px 8px">外に出す</button>`:''}</div>`).join(''):'<div class="muted" style="font-size:11px">まだいません</div>'}</div>`;}
   if(o.type==='hq'){const c=baseUpCost();h+=`<div class="upg"><div class="row"><b>拠点レベル ${S.baseLv}/${BASE_MAX}</b><span class="muted">英雄 ${S.cmds.length}/${maxCmd()}</span></div>
     <div class="muted" style="font-size:11px">レベルが上がると：英雄の上限 +2・領地の半径 +6マス・城館に住める人数 +10・施設の上限 +${FAC_PER_LV}・前哨砦 +1・罠の上限 ${trapCap()}→${TRAP_CAP[Math.min(TRAP_CAP.length-1,S.baseLv||1)]}。<b style="color:var(--text)">Lv2で施設のLv2と研究ランクⅡ、Lv3で施設のLv3と研究ランクⅢ</b>が解放。城の姿も 木→石→鉄→魔核合金 と変わり、<b style="color:#c48aff">Lv5で結界</b>（襲撃のたびに城への被害を1500まで防ぐ）。Lv3以上への強化には魔核が必要</div>
-    ${S.baseUp?`<div class="gd" style="margin-top:4px">Lv${S.baseUp.to}に強化中…　残り${S.baseUp.left}ターン（強化中も城は普段どおり働きます）</div>`:S.baseLv<BASE_MAX?`<button id="iBaseUp" style="margin-top:4px;width:100%" ${canAfford(c)&&!S.waveActive?'':'disabled'}>拠点をLv${S.baseLv+1}に（${costText(c)}・${baseUpTurns()}ターン）</button>`:'<div class="gd">最大レベル</div>'}</div>`;}
+    ${S.baseUp?`<div class="gd" style="margin-top:4px">Lv${S.baseUp.to}に強化中…　残り${S.baseUp.left}ターン（強化中も城は普段どおり働きます）</div>`:S.baseLv<BASE_MAX?`<button id="iBaseUp" class="on wide" ${canAfford(c)&&!S.waveActive?'':'disabled'}><span>城をLv${S.baseLv+1}に強化</span><span class="cost">${costText(c)}<span class="t">${baseUpTurns()}ターン</span></span></button>`:'<div class="gd">最大レベル</div>'}</div>`;}
   if(false)h+=`<div class="muted" style="margin-top:6px;font-size:11px">研究「城館防衛火器」で自衛火器を設置できます</div>`;
   if(!isS&&o.kind==='b'&&(WALL_TYPES.includes(o.type)||o.type==='gate'||o.type==='tower')&&ready(o)){const G=wallGroup(o);const dm=G.filter(damaged);const rc=dm.reduce((a,x)=>a+repairCost(x),0);
     const WR=WALL_TYPES,nx=WR[WR.indexOf(o.type)+1];const up=nx&&(!B[nx].req||has(B[nx].req))?G.filter(x=>x.type===o.type&&placeOK(nx,x.x,x.y)):[];const uc={};for(const k in costOf(nx||'fence'))uc[k]=(costOf(nx||'fence')[k]||0)*up.length;
     h+=`<div class="upg"><b>つながった壁</b><span>${G.length}枚・傷み${dm.length}</span><div><button id="wgRep" class="wide" ${dm.length&&S.steel>=rc&&!S.waveActive?'':'disabled'}><span>まとめて修理（${dm.length}枚）</span><span class="cost">${costText({steel:rc})}</span></button>${up.length?`<button id="wgUp" class="wide" ${canAfford(uc)&&!S.waveActive?'':'disabled'}><span>${B[o.type].name}を${B[nx].name}にまとめて建て替え（${up.length}枚）</span><span class="cost">${costText(uc)}</span></button>`:''}</div></div>`;}
   if(!isS)h+=`<div class="iact"><button id="iRep">修理</button>${o.type!=='hq'?`<button id="iDemo" class="danger" title="${o.bt>0&&!o.upg?'全額返還':'建設費の50%返還・人員復帰'}">${o.bt>0&&!o.upg?'建設を取り消す':'解体'}</button>`:''}</div>`;
-  el.innerHTML=h;detailsify(el);
+  el.innerHTML=h;detailsify(el);if(!isS)infoQuick(el,o);
   el.querySelectorAll('[data-hpick]').forEach(b=>b.onclick=()=>{S.heroPick=S.heroPick===o.id?null:o.id;renderInfo(true);});
   el.querySelectorAll('[data-hero]').forEach(b=>b.onclick=()=>{const id=b.dataset.hero;if(id){const x=S.cmds.find(q=>q.id===id);if(x){assign(x,o);se('click');}}else if(c){assign(c,null);o.cmd=null;}S.heroPick=null;renderInfo(true);renderCmds(true);});
   const sel=document.getElementById('iCmd');
@@ -7560,7 +7570,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.11 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.12 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7671,6 +7681,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に']],
  ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。生産は昼だけ、10秒ごとに少しずつ入る。時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める。残りは地図の上の横長のバーで（太陽・月が左から右へ進む）。昼の後半は夕方に。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
@@ -8942,7 +8953,7 @@ function renderMode(){
   else if(S.sel&&S.sel.kind==='s')t=`${icSvg(S.sel.model||defModel(S.sel.ut),24)}<b class="mn">${unitLabel(S.sel)}</b><span class="ms">を指揮中・${tap}で移動</span>${X}`;
   else if(S.sel)t=`${icSvg(S.sel.type,24)}<b class="mn">${B[S.sel.type]?B[S.sel.type].name:''}</b><span class="ms">を選択中${gunOf(S.sel)?'・射程を表示':''}</span>${X}`;
   else if(S.boxMode)t=`<b class="mn">範囲選択</b><span class="ms">・選びたい部隊を囲むようにドラッグ</span><button id="mBoxX" class="ghost">やめる</button>`;
-  else t=(isNarrow()||IS_TOUCH)?'<span class="ms">指揮・タップで選択、2本指で拡大</span><button id="mBox" class="ghost">範囲選択</button>':(S.squads.length>1?'<span class="ms">Shift＋ドラッグで部隊を範囲選択</span>':'');
+  else t=(isNarrow()||IS_TOUCH)?'<span class="ms">指揮・タップで選択、2本指で拡大</span><button id="mBox" class="ghost">範囲選択</button>':'';
   // 取り消しボタンは、帯の中身が決まったあとに足す（2026-11-15 修正：前は「もし〜なら」のつながりの途中に入っていて、建設の帯が上書きされていた）
   if((S.buildMode||S.buildPick)&&S.undo&&S.undo.length&&!S.waveActive)t+=`<button id="mUndo" class="ghost" title="さっき置いたもの（一列ぶん）を取り消す。資源は全額戻る"><span>↶ 取り消し</span>${IS_TOUCH?'':'<kbd>Ctrl+Z</kbd>'}</button>`;
   bar.classList.toggle('idle',!t);bar.classList.toggle('hint',!S.buildMode&&!S.buildPick&&!S.sel&&!(S.multi&&S.multi.length)&&!S.aimNaval);
