@@ -1853,7 +1853,7 @@ Object.assign(B,{
   lab:    {name:'研究室',glyph:'研',hp:200,heat:2,cost:{steel:80,stone:30},pop:4,power:0,spec:'内政',grp:'prod',desc:'研究枠を増やす'},
   market: {name:'交易市場',glyph:'市',hp:200,heat:2,cost:{steel:60,stone:10},pop:3,power:0,spec:'内政',grp:'prod',desc:'外の商人と取引できる施設。魔核を金貨で売れるほか、木材・石材・鉄・食料を銀貨で売り買いできる（施設を選んで「交易」）。資材を売ると銀貨が入り、資材は銀貨でしか買えない。1日に買える量にも上限がある（市場が増えると上限も増える）。毎ターン金貨 +4、住民の幸福度 +6（2棟まで効果）'},
   tavern: {name:'酒場',glyph:'酒',hp:180,heat:2,cost:{steel:50,gold:30},pop:2,power:0,spec:'内政',grp:'prod',desc:'住民の憩いの場。幸福度 +10（2棟まで効果）。食料を少し使う（−2/T）',req:'brewing'},
-  church: {name:'教会',glyph:'聖',hp:320,heat:2,cost:{steel:40,stone:60,gold:40},pop:2,power:0,spec:'内政',grp:'prod',desc:'祈りの場。幸福度 +4（2棟まで効果）。教会があると、夜に「祈り」ができる（幸福度 +5）。赤い月の予告のとき、祈りが無料になる'},
+  church: {name:'教会',glyph:'聖',hp:320,heat:2,cost:{steel:40,stone:60,gold:40},pop:2,power:0,spec:'内政',grp:'prod',desc:'祈りの場。幸福度 +4（2棟まで効果）。夜の「祈り」で幸福度が上がる。赤い月の予告のとき、祈りが無料になる'},
   stable: {name:'馬小屋',glyph:'馬',hp:280,heat:2,cost:{steel:90,gold:40},pop:3,power:0,spec:'騎兵',grp:'prod',cap:2,desc:'騎兵隊（5騎）を2隊まで編成・治療・補充',req:'cavalry'},
   aerie:  {name:'竜舎',glyph:'竜',hp:420,heat:4,cost:{steel:150,stone:80,gold:120},pop:4,power:0,spec:'騎兵',grp:'prod',cap:1,desc:'ドラゴンライダー（2騎）を1隊だけ育てる。非常に目立ち、魔物に狙われやすい',req:'dragon'},
   magic:  {name:'魔導院',glyph:'魔',hp:240,heat:3,cost:{steel:80,stone:40,elec:15},pop:3,power:0,spec:'魔導',grp:'prod',cap:2,desc:'魔術師隊（3人）を2隊まで育成・治療・補充',req:'magic'},
@@ -2037,14 +2037,15 @@ MODEL.griffon={ut:'cav',wage:6,name:'グリフォン騎兵',role:'グリフォ�
 MODEL.guard={off:true,ut:'guard',wage:4,name:'近衛兵',role:'近衛兵（城の守り）',color:'#e8c860',desc:'城を守る精兵。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内では火力2倍・受ける被害半分。離れると並の兵より少し強い程度'};
 MODEL.scout={ut:'arch',wage:2,name:'斥候',role:'斥候（スカウト）',color:'#8a94a8',req:'scouting',hpEach:18,dmg:4,rate:0.7,range:4,spd:66,vision:20,frail:1.8,scoutEye:true,cost:{gold:15,fuel:10},desc:'足が速く、遠くまで見通す偵察兵。敵の駐屯地の正確な場所を見つけられるのは斥候だけ。ひどく打たれ弱く、戦闘ではすぐ倒れる'};
 MODEL.farmer={ut:'mil',name:'農兵',role:'農兵（クワ）',color:'#c8a060',wage:1,desc:'クワや鋤を手にした村人。兵舎がなくても城館で集められる。弱いが安く、食料だけで編成できる'};
+const IS_PROTO=/\/proto\//.test(location.pathname);   /* 試作版だけで試すもの（兵種・強さの見直し）は IS_PROTO で分ける。本番は今までどおり（2026-11-17） */
 /* 2026-11-16 兵種の見直し（ユーザーの指定）：
    銃兵（ランクⅢ・火薬のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い
    チャリオット（ランクⅢ・騎馬突撃のあと）：騎兵を強化。突撃で群れを突っ切り、通った魔物すべてに当たる。大きな魔物でも止まらない
    狙撃兵：射程をもっと長く、3発撃ってから長い装填。大きな魔物に強い */
-MODEL.gunner={ut:'arch',wage:3,name:'銃兵',role:'銃兵（マスケット）',color:'#c0a070',req:'musket',members:4,hpEach:50,dmg:28,rate:2.2,range:7,spd:24,time:18,cost:{gold:20,iron:12,powder:4,fuel:10},desc:'火薬の銃を持つ部隊。足が遅く、撃つ間隔も長いが、1発が重く射程が長い。火薬を使う'};
+if(IS_PROTO){MODEL.gunner={ut:'arch',wage:3,name:'銃兵',role:'銃兵（マスケット）',color:'#c0a070',req:'musket',members:4,hpEach:50,dmg:28,rate:2.2,range:7,spd:24,time:18,cost:{gold:20,iron:12,powder:4,fuel:10},desc:'火薬の銃を持つ部隊。足が遅く、撃つ間隔も長いが、1発が重く射程が長い。火薬を使う'};
 MODEL.chariot={ut:'cav',wage:5,name:'チャリオット',role:'チャリオット（戦車）',color:'#d0a060',req:'chariott',members:3,hpEach:150,dmg:15,rate:0.8,time:20,cost:{gold:30,steel:30,sword:5,fuel:20},chariot:true,desc:'馬に引かせた戦車。突撃すると魔物の群れの中を突っ切り、通った道の魔物すべてに強い一撃を与える。大きな魔物にぶつかっても止まらない'};
 if(MODEL.rider)MODEL.rider.until='chariott';   /* チャリオットの研究のあとは騎兵は編成できない（今いる騎兵はチャリオットになる） */
-Object.assign(MODEL.sniper,{range:12,mag:3,magRate:0.7,reload:7,vsBig:1.6,desc:'魔法と火薬のライフルで、遠くの大きな魔物を撃ち抜く（いちばん硬い敵を狙う。大きな魔物には1.6倍）。続けて3発撃ったあと、長い装填に入る'});
+Object.assign(MODEL.sniper,{range:12,mag:3,magRate:0.7,reload:7,vsBig:1.6,desc:'魔法と火薬のライフルで、遠くの大きな魔物を撃ち抜く（いちばん硬い敵を狙う。大きな魔物には1.6倍）。続けて3発撃ったあと、長い装填に入る'});}
 const MTC={};for(const k in MODEL)MTC[k]=Object.assign({},UT[MODEL[k].ut],MODEL[k],{key:k});
 function defModel(ut){return {art:'cannoneer',guard:'guard',mil:'farmer',cav:'rider',drake:'dragon',mage:'wizard',inf:'pawn',arch:'archer',tank:'t10',ship:'dd',air:'heli'}[ut]||'geki';}
 const UNIT_HOME={hq:'mil',train:'inf',stable:'cav',aerie:'drake',magic:'mage'};
@@ -2059,7 +2060,9 @@ function modelsFor(ut){return Object.keys(MODEL).filter(k=>MODEL[k].ut===ut&&!MO
 function buyModels(ut){return Object.keys(MODEL).filter(k=>MODEL[k].ut===ut&&MODEL[k].buy);}
 // 建設に必要なターン数（記載なしは1ターン）
 const BUILD_T={power:2,lab:2,hangar:2,rail:2,reactor:3,elecf:2,tankf:2,outpost:2};
-function buildTurns(type){return Math.max(1,(BUILD_T[type]||1)-(has('prefab')?1:0));}
+const INSTANT_B=new Set(['fence']);   /* 木の柵と罠は置いたらすぐ完成（2026-11-17 ユーザーの指定） */
+function buildTurns(type){if(INSTANT_B.has(type)||(B[type]&&B[type].isMine))return 0;return Math.max(1,(BUILD_T[type]||1)-(has('prefab')?1:0));}
+function turnsTxt(n){return n>0?n+'T':'すぐ';}
 // 強化にかかるターン数（数字はここで調整）
 const BASE_UP_T={1:2,2:3,3:4,4:5,5:6,6:6};   // 城：Lv2へ2T・Lv3へ3T・Lv4へ4T・Lv5へ5T（強化中も城は普段どおり働く）
 const ENCH_T=[1,2,3];                 // 魔核強化：★1へ1T・★2へ2T・★3へ3T（強化中の施設は停止）
@@ -2251,9 +2254,9 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('goldt',{cat:'生産',tier:3,name:'金鉱',cost:{steel:80,stone:40,gold:40},t:3,pre:[],icon:'goldmine',eff:'「金鉱」を建設できる（素材の金を掘る。金貨ではない）'});
  set('smeltt',{cat:'生産',tier:3,name:'精錬所',cost:{steel:100,stone:60,iron:30,gold:60},t:3,pre:['goldt'],icon:'smelter',eff:'「精錬所」を建設できる（鉄・金・石炭から合金を作る）'});
  set('mitht',{cat:'生産',tier:6,name:'聖銀鉱',cost:{steel:150,stone:80,alloy:30,gold:120},t:5,pre:[],icon:'mithmine',eff:'「聖銀鉱」を建設できる（聖銀を掘る）'});
- set('snipert',{cat:'部隊',tier:5,name:'狙撃兵',cost:{gold:120,iron:60,powder:30},t:5,pre:['musket'],icon:'archer',eff:'兵舎で「狙撃兵」を訓練できる（とても遠くから大きな魔物を撃ち抜く。3発撃って長い装填）'});
- set('musket',{cat:'部隊',tier:3,name:'銃兵',cost:{gold:60,iron:40},t:3,pre:['gunpowder'],icon:'gunner',eff:'兵舎で「銃兵」を編成できる（足が遅く撃つのも遅いが、1発が重く射程が長い。火薬を使う）'});
- set('chariott',{cat:'部隊',tier:3,name:'チャリオット',cost:{gold:80,steel:120,iron:40},t:3,pre:['charge'],icon:'chariot',eff:'騎兵がチャリオットになる：突撃で群れを突っ切り、通った魔物すべてに当たる。大きな魔物でも止まらない（今いる騎兵も強化される）'});
+ set('snipert',{cat:'部隊',tier:5,name:'狙撃兵',cost:{gold:120,iron:60,powder:30},t:5,pre:IS_PROTO?['musket']:[],icon:'archer',eff:IS_PROTO?'兵舎で「狙撃兵」を訓練できる（とても遠くから大きな魔物を撃ち抜く。3発撃って長い装填）':'兵舎で「狙撃兵」を訓練できる（遠くの大きな魔物を撃ち抜く）'});
+ if(IS_PROTO){set('musket',{cat:'部隊',tier:3,name:'銃兵',cost:{gold:60,iron:40},t:3,pre:['gunpowder'],icon:'gunner',eff:'兵舎で「銃兵」を編成できる（足が遅く撃つのも遅いが、1発が重く射程が長い。火薬を使う）'});
+ set('chariott',{cat:'部隊',tier:3,name:'チャリオット',cost:{gold:80,steel:120,iron:40},t:3,pre:['charge'],icon:'chariot',eff:'騎兵がチャリオットになる：突撃で群れを突っ切り、通った魔物すべてに当たる。大きな魔物でも止まらない（今いる騎兵も強化される）'});}
  set('golemt',{cat:'部隊',tier:5,name:'エーテルゴーレム',cost:{stone:120,elec:80,gold:100},t:5,pre:[],icon:'heavy',eff:'兵舎で「エーテルゴーレム」を作れる（とても硬い壁役）'});
  set('silvert',{cat:'部隊',tier:6,name:'銀装兵',cost:{gold:120,mithril:20,iron:60},t:5,pre:[],icon:'heavy',eff:'兵舎で「銀装兵」を訓練できる（硬くて速い歩兵の上位）'});
  set('griffont',{cat:'部隊',tier:6,name:'グリフォン騎兵',cost:{gold:150,mithril:20,fuel:80},t:6,pre:['cavalry'],icon:'rider',eff:'馬小屋で「グリフォン騎兵」を育てられる（空を飛んで移動し、降りて戦う）'});
@@ -2299,8 +2302,8 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('abysslamp',{tier:3,name:'蒼い炎',cost:{mat:40,fuel:40},pre:[],icon:'brazier',eff:'篝火に魔核をくべて、青く強い炎にする。篝火の照らす範囲 +8マス、物見櫓 +3マス'});
  del('abyssbolt');
  // 部隊ランクⅢ：砲兵
- set('artillery',{cat:'部隊',tier:4,name:'砲兵',cost:{iron:80,gold:60},t:3,pre:[],icon:'cannoneer',eff:'兵舎で「砲兵隊」を編成できる（担いで運べる小型の大砲を持つ4人の部隊。射程12の範囲攻撃。鉄を砲弾に使う。近づかれると脆い）'});
- set('gunnery',{cat:'部隊',tier:4,name:'砲術',cost:{iron:60,gold:60},t:3,pre:['artillery'],icon:'cannoneer',eff:'砲兵隊の射程 +3、火力 +30%'});
+ set('artillery',{cat:'部隊',tier:IS_PROTO?4:3,name:'砲兵',cost:{iron:80,gold:60},t:3,pre:[],icon:'cannoneer',eff:'兵舎で「砲兵隊」を編成できる（担いで運べる小型の大砲を持つ4人の部隊。射程12の範囲攻撃。鉄を砲弾に使う。近づかれると脆い）'});
+ set('gunnery',{cat:'部隊',tier:IS_PROTO?4:3,name:'砲術',cost:{iron:60,gold:60},t:3,pre:['artillery'],icon:'cannoneer',eff:'砲兵隊の射程 +3、火力 +30%'});
  // 内政ランクⅡ：集合住宅
  set('apart',{cat:'内政',tier:2,name:'集合住宅',cost:{steel:80,stone:40},t:2,pre:['housing'],icon:'apart',eff:'「集合住宅」を建設できる（1棟に36名まで住める。改築でLv2:54名・Lv3:72名。毎ターン5名ずつ住民が増える）'});
  // 装備の解放
@@ -2310,7 +2313,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('heavyarms',{cat:'部隊',tier:2,name:'鋼の武具',cost:{iron:40,steel:30},t:2,pre:[],icon:'heavy',eff:'魔術師以外の武器が「鋼」になる（鉄の剣→鋼の剣、鉄の矢→鋼の矢など）：攻撃 140%（鉄の武器を100%として。補給で鉄も使う）'});
  set('horsearch',{cat:'部隊',tier:2,name:'騎射',cost:{steel:40,fuel:40},t:2,pre:['cavalry'],icon:'rider_hbow',eff:'騎兵の武器が「騎射の騎槍」に上がる（重武器も要る）：空の敵も射落とせる'});
  set('elemental',{cat:'部隊',tier:2,name:'属性魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard_tstaff',eff:'魔術師の杖が「属性の杖」に上がる（範囲＋雷の連鎖＋足止め）'});
- set('shells',{cat:'部隊',tier:4,name:'特殊砲弾',cost:{iron:60,gold:40},t:3,pre:['artillery'],icon:'cannoneer',eff:'砲兵の弾が「特殊砲弾」に上がる（火力+40%・燃やす）'});
+ set('shells',{cat:'部隊',tier:IS_PROTO?4:3,name:'特殊砲弾',cost:{iron:60,gold:40},t:3,pre:['artillery'],icon:'cannoneer',eff:'砲兵の弾が「特殊砲弾」に上がる（火力+40%・燃やす）'});
  set('dragongear',{cat:'部隊',tier:3,name:'竜具',cost:{iron:80,gold:60},t:3,pre:['dragon'],icon:'dragon_darmor',eff:'竜騎兵に「竜具」（鉤爪と鉄鎧）：火力+30%・空の敵に2倍・被害−30%'});
  set('poison',{eff:'魔物の毒腺を鏃に塗る。物見櫓・バリスタに撃たれた魔物は毒で3秒かけて追加の被害（与えた被害の30%・装甲無視）。弓兵隊は装備「毒矢」が使える'});
  set('charge',{eff:'騎兵の移動 +20%。突撃の1体目への一撃が×3→×4'});
@@ -3565,7 +3568,7 @@ function placeB(type,x,y,free,szo){
       if(urec)urec.replaced=occ.slice();
       S.blds=S.blds.filter(o=>!occ.includes(o));}
   }
-  if(!free){b.bt=b.btTotal=buildTurns(type)*TURN_SEC;b.hp=Math.round(hp*0.4);}
+  if(!free&&buildTurns(type)>0){b.bt=b.btTotal=buildTurns(type)*TURN_SEC;b.hp=Math.round(hp*0.4);}
   if(urec){urec.b=b;urec.type=type;addUndo(urec);}
   S.blds.push(b);gridSet(b,true);if(S.ruins){const n=b.sz;S.ruins=S.ruins.filter(r=>{const rn=r.sz||newSz(r.type);return r.x+rn<=x||r.x>=x+n||r.y+rn<=y||r.y>=y+n;});}
   return b;
@@ -3858,7 +3861,7 @@ function genWave(n){
     heavy:n<7?0:Math.round((n-6)*1.5*bm),
     redcap:blood?Math.round(4+n*1.5):0,
   };
-  if(GL){/* 古い魔物は出てから頭打ち（cap回ぶんまで増える）、後半は新しい魔物に入れ替わる */const bm2=(blood?(n>=30?1:n>=25?1.25:1.45):after?0.7:1)*(1+0.03*(n-1))*(n<=10?0.7+0.03*n:1)*(1+Math.max(0,n-10)*0.03);   /* 第10襲撃より後は数を1回ごと+3%（第20で1.3倍・第30で1.6倍・第40で1.9倍）。前は体力を上げていたが、強さは種類と数だけにした（2026-11-16 ユーザーの指定） */   /* 序盤（〜第10襲撃）は少なめ：第1は0.73倍・第6は0.88倍・第10で1倍（2026-11-15。第6襲撃で負けるという声） */const g=(from,k,cap)=>n<from?0:Math.round(Math.min(n-from+1,cap||8)*k*bm2);
+  if(GL){/* 古い魔物は出てから頭打ち（cap回ぶんまで増える）、後半は新しい魔物に入れ替わる */const bm2=(blood?(n>=30?1:n>=25?1.25:1.45):after?0.7:1)*(1+0.03*(n-1))*(n<=10?0.7+0.03*n:1)*(IS_PROTO?1+Math.max(0,n-10)*0.03:1);   /* 試作版：第10襲撃より後は数を1回ごと+3%（第20で1.3倍・第30で1.6倍・第40で1.9倍）。前は体力を上げていたが、強さは種類と数だけにした（2026-11-16 ユーザーの指定） */   /* 序盤（〜第10襲撃）は少なめ：第1は0.73倍・第6は0.88倍・第10で1倍（2026-11-15。第6襲撃で負けるという声） */const g=(from,k,cap)=>n<from?0:Math.round(Math.min(n-from+1,cap||8)*k*bm2);
     const ns=Math.min(n,10),late=n>26?0.35:n>18?0.5:1;
     Object.assign(cnt,{swarm:Math.round((14+ns*8+ns*ns*1.6)*(n<=4?1.1:n<=9?1.1+0.06*(n-4):1.4)*late*bm2),   /* 第5襲撃での1.1→1.4の段差を、第5〜9でなだらかに */charger:n<2?0:Math.round(ns*5*late*bm2),harpy:g(3,3,10),troll:g(4,1.1,10),grappler:n<5?0:Math.round((3+Math.min(n-5,10)*2.4)*bm2),spitter:g(5,1.2,10),
       gobarcher:g(8,2.2,10),heavy:g(9,1.1),wyvern:g(13,0.7),treant:g(15,0.8),eltreant:g(28,0.4,6),shogre:g(22,1.0),maneater:g(23,1.4),vampire:g(30,0.6,6),ghoul:g(30,1.4,6),golem:g(37,0.5,4),
@@ -3896,7 +3899,7 @@ function genWave(n){
   });
   q.sort((a,b)=>a.t-b.t);
   const perSide={},sideComp={};for(const e of q){perSide[e.side]=(perSide[e.side]||0)+1;const c=sideComp[e.side]=sideComp[e.side]||{};c[e.type]=(c[e.type]||0)+1;}
-  return{n,q,sides,main:sides[0],tactic,blood,blizzard:S&&S.mapId==='s'&&[8,13,20].includes(n),hpMul:1,   /* 襲撃が進んでも魔物の体力は上げない。強さは魔物の種類と数だけで（2026-11-16 ユーザーの指定） */king:n===finalWave(),subs:subs.map((c,i)=>Object.values(c).reduce((a,b)=>a+b,0)+(n===finalWave()&&i===subs.length-1?1:0)),perSide,sideComp,noise0:0.6+Math.random()*0.8,noise1:0.85+Math.random()*0.3};
+  return{n,q,sides,main:sides[0],tactic,blood,blizzard:S&&S.mapId==='s'&&[8,13,20].includes(n),hpMul:IS_PROTO?1:1+Math.max(0,n-10)*(GL?0.04:0.12),   /* 試作版：襲撃が進んでも魔物の体力は上げない。強さは魔物の種類と数だけで（2026-11-16 ユーザーの指定）。本番は今までどおり */king:n===finalWave(),subs:subs.map((c,i)=>Object.values(c).reduce((a,b)=>a+b,0)+(n===finalWave()&&i===subs.length-1?1:0)),perSide,sideComp,noise0:0.6+Math.random()*0.8,noise1:0.85+Math.random()*0.3};
 }
 function phaseReset(){try{if(S.buildMode||S.buildPick){S.buildMode=null;S.buildPick=false;renderBuild();}S.aimNaval=false;if(S.sel&&S.sel.kind!=='s')S.sel=null;S.selTile=null;renderInfo(true);renderMode();}catch(e){}}
 // ===== 行軍：街から遠く、まだ見えていない敵は少し速く進む（駐屯地からの道のりの待ち時間を少し短くする） =====
@@ -3964,7 +3967,7 @@ function campSpot(c){const a=Math.random()*6.283,r=Math.sqrt(Math.random())*2.6*
 function startSkirm(c){
   const {u,n}=campUnits(c);if(!n){c.state='gone';return;}
   if(!c.found)S.campFoundN=(S.campFoundN||0)+1;c.found=true;c.state='fight';S.skirm={id:c.id,away:0,t:0,n0:n};
-  const hm=S.next.blood?1.25:1;
+  const hm=(S.next.blood?1.25:1)*(S.next.hpMul||1);
   for(const ty in u)for(let i=0;i<u[ty];i++){const d=E[ty];if(!d)continue;const [x,y]=campSpot(c);const hp=Math.round(d.hp*hm);
     S.enemies.push({type:ty,x,y,hp,maxhp:hp,cd:0.5+Math.random(),target:null,retarget:0,camp:c.id,hx:x-c.x,hy:y-c.y});dexMark(ty);}
   // 速度は×1に戻して、いったん止める（襲撃の×3がそのまま残っていて、いきなり3倍で始まらないように）
@@ -4087,7 +4090,7 @@ function gdexMark(t,kill){const G=gdex();const o=G[t]||(G[t]={seen:0,kills:0});o
 function gdexFlush(){if(!GDEX_DIRTY)return;GDEX_DIRTY=false;try{localStorage.setItem(gdexKey(),JSON.stringify(GDEX));}catch(e){}}
 setInterval(gdexFlush,4000);addEventListener('pagehide',gdexFlush);
 function spawnEnemy(ent){dexMark(ent.type);
-  const d=Object.assign({},E[ent.type]);if(S.cur&&S.cur.blood)d.hp=Math.round(d.hp*1.25);let x,y;const j=(Math.random()-.5)*0.35;
+  const d=Object.assign({},E[ent.type]);if(S.cur&&S.cur.blood)d.hp=Math.round(d.hp*1.25);if(S.cur&&S.cur.hpMul)d.hp=Math.round(d.hp*S.cur.hpMul);let x,y;const j=(Math.random()-.5)*0.35;
   if(S.island&&S.hives[ent.side]){const h=S.island,bch=S.hives[ent.side],a=Math.random()*Math.PI*2,r=Math.random()*1.8*TU;
     S.enemies.push({type:ent.type,x:bcx(h)+Math.cos(a)*r,y:bcy(h)+Math.sin(a)*r,hp:d.hp,maxhp:d.hp,cd:0,target:null,retarget:0,wp0:[bch.x*T-1.5*TU,bcy(bch)+(Math.random()-.5)*6*TU]});return;}
   {const cp=campFor(ent.side);if(cp){const [x,y]=campSpot(cp);S.enemies.push({type:ent.type,x,y,hp:d.hp,maxhp:d.hp,cd:0,target:null,retarget:0});return;}}   // 駐屯地から出発
@@ -4155,12 +4158,12 @@ function nightGuards(){return S.squads.filter(q=>!q.hunt).length;}
 // 幸福度の「気分」：何日か続く上乗せ（祭り・宴など）。happyParts に出る
 function addMood(n,v,d){S.moods=(S.moods||[]).filter(m=>m.n!==n);S.moods.push({n,v,d});S.happy=Math.max(0,Math.min(100,S.happy+v));}
 function churchN(){return Math.min(2,S.blds.filter(b=>b.type==='church'&&!(b.bt>0)).length);}
-function prayGain(){return 5;}   /* 祈りは教会がないとできない。幸福度 +5（2026-11-16 ユーザーの指定。前は 3＋教会1棟ごと5） */
+function prayGain(){return IS_PROTO?5:3+5*churchN();}   /* 祈りは教会がないとできない。幸福度 +5（2026-11-16 ユーザーの指定。前は 3＋教会1棟ごと5） */
 // 今夜の過ごし方
 const NPLAN=[
   {id:'rest',name:'休む',ic:'bed',d:()=>'ゆっくり休む。幸福度 +2'},
   {id:'feast',name:'宴',ic:'ev_fest',need:()=>S.blds.some(b=>b.type==='tavern'&&!(b.bt>0))?'':'酒場が必要',cost:{gold:15,fuel:20},d:()=>'酒場で宴を開く。幸福度 +6（2日続く）'},
-  {id:'pray',name:'祈り',ic:'sun',need:()=>churchN()?'':'教会が必要',d:()=>`教会でみんなで祈る。幸福度 +${prayGain()}`},
+  {id:'pray',name:'祈り',ic:'sun',need:()=>!IS_PROTO||churchN()?'':'教会が必要',d:()=>IS_PROTO?`教会でみんなで祈る。幸福度 +${prayGain()}`:`みんなで祈る。幸福度 +${prayGain()}${churchN()?`（教会×${churchN()}）`:'（教会があるともっと上がる）'}`},
   {id:'watch',name:'夜警を厚く',ic:'eye',cost:{gold:10},d:()=>'見張りを増やす。今夜は事件が起きない'},
   {id:'overtime',name:'夜なべ',ic:'moon',need:()=>has('overtime')?'':'研究「延長シフト」が必要',d:()=>`夜も働く。生産 ${has('allnight')?'昼と同じ':'昼の半分'}・幸福度 −${has('allnight')?15:8}`},
 ];
@@ -4341,7 +4344,7 @@ function morning(){
   const p=N.plan;
   if(p==='rest'){addMood('よく休んだ',2,1);pl.push('ゆっくり休んだ。幸福度 +2');}
   if(p==='feast'){const c=planOf('feast').cost;if(canAfford(c)){for(const k in c)S[k]-=c[k];addMood('宴',6,2);pl.push(`酒場で宴を開いた。幸福度 +6（2日）　${resTxt({gold:-c.gold,fuel:-c.fuel},true)}`);}}
-  if(p==='pray'&&churchN()){const v=prayGain();addMood('祈り',v,1);pl.push(`みんなで祈った。幸福度 +${v}`);}
+  if(p==='pray'&&(!IS_PROTO||churchN())){const v=prayGain();addMood('祈り',v,1);pl.push(`みんなで祈った。幸福度 +${v}`);}
   if(p==='watch'){if(S.gold>=10){S.gold-=10;pl.push('見張りを増やした。事件は起きなかった（金貨 −10）');}}
   if(p==='fest'){const v=15+(S.fireworks?5:0);addMood('祭り',v,3);pl.push(`祭りの夜！ 幸福度 +${v}（3日続く）${S.fireworks?'・花火が大成功':''}`);S.fireworks=false;}
   if(p==='overtime'&&has('overtime')){const full=has('allnight');const before={steel:S.steel,fuel:S.fuel};S.gross={steel:0,ammo:0,pop:0,used:0};for(let i=0;i<(full?100:50);i++)update(0.1,true);addMood('夜なべの疲れ',-(full?15:8),1);ot={wood:Math.round(S.steel-before.steel),food:Math.round(S.fuel-before.fuel)};log(`夜なべ：木材+${ot.wood}・幸福度−${full?15:8}`,'warn');}
@@ -4731,6 +4734,7 @@ function update(dt,sim){
     if(b.bt>0){
       b.bt-=dt;if(!b.upg)b.hp=Math.min(b.maxhp,b.hp+b.maxhp*0.6*dt/b.btTotal);
       if(b.bt<=0.01){
+        if(!b.upg)b.hp=Math.max(b.hp,b.maxhp);   /* 建て終わったら耐久は満タン（昼のターン送りで最後の少しが足りず、耐久が少し減って見えていた。2026-11-17） */
         b.bt=0;S.fx.push({x:bcx(b),y:bcy(b),r:TU,t:0,dur:0.6,c:'#6fe08a'});
         if(b.upg==='ench'){b.upg=false;b.ench=Math.min(3,(b.ench||0)+1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${d.name} の魔核強化が完了（★${b.ench}）`,'good');if(!S.rep)se('upgrade');}
         else if(b.upg==='mat'){b.upg=false;b.mat=Math.min(2,(b.mat||0)+1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${MAT_NAME[b.type][b.mat]}への造り替えが完了`,'good');if(!S.rep)se('upgrade');}
@@ -6878,7 +6882,7 @@ function renderBuild(){
   }
   el.querySelectorAll('button[data-k]').forEach(bt=>{const k=bt.dataset.k,d=B[k],c=costOf(k);
     setText(bt.querySelector('.bn'),d.name);
-    setHTML(bt.querySelector('small'),costText(c,d.pop)+(d.power?` ${ic('power',12)}${d.power>0?'+':''}${d.power}`:'')+`<span class="t">${buildTurns(k)}T</span>`);
+    setHTML(bt.querySelector('small'),costText(c,d.pop)+(d.power?` ${ic('power',12)}${d.power>0?'+':''}${d.power}`:'')+`<span class="t">${turnsTxt(buildTurns(k))}</span>`);
     const cb=capBlock(k);const dis=!canAfford(c,d.pop)||!!cb;bt.classList.toggle('na',dis);bt.classList.toggle('capd',!!cb);if(bt.disabled)bt.disabled=false;bt.title=cb||d.desc;
     bt.classList.toggle('on',S.buildMode===k);});
 }
@@ -6903,7 +6907,7 @@ function tileBuildHTML(x,y,title){
   let h=`<div style="margin-top:8px" class="muted">${title}</div>`;
   for(const {g,list} of gs){
     h+=`<div style="font-size:10px;color:var(--cyan);margin:4px 0 2px">${g.name}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">`;
-    for(const k of list){const d=B[k],c=costOf(k);h+=`<button data-tb="${k}" style="text-align:left;padding:3px 5px;line-height:1.25" ${canAfford(c,d.pop)?'':'disabled'} title="${d.desc}">${d.name}<br><small style="color:var(--dim);font-size:10px">${costText(c,d.pop)} ／ ${buildTurns(k)}T</small></button>`;}
+    for(const k of list){const d=B[k],c=costOf(k);h+=`<button data-tb="${k}" style="text-align:left;padding:3px 5px;line-height:1.25" ${canAfford(c,d.pop)?'':'disabled'} title="${d.desc}">${d.name}<br><small style="color:var(--dim);font-size:10px">${costText(c,d.pop)} ／ ${turnsTxt(buildTurns(k))}</small></button>`;}
     h+=`</div>`;
   }
   return h;
@@ -7047,7 +7051,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(!o&&S.heroView){const c=S.cmds.find(x=>x.id===S.heroView&&x.alive);if(c){const key='hv'+c.id+c.lv+Math.floor(c.xp)+c.assign+c.kills;if(!force&&key===lastInfoKey)return;lastInfoKey=key;el.innerHTML=heroDetail(c);const hc=document.getElementById('hvClose');if(hc)hc.onclick=closeHeroView;const g=document.getElementById('hvGo');if(g)g.onclick=()=>{const t=findObj(c.assign);if(t){S.sel=t;renderInfo(true);}};return;}S.heroView=null;}
   if(S.buildMode&&!o){
     const key='bm'+S.buildMode;if(!force&&key===lastInfoKey)return;lastInfoKey=key;
-    const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)}ターン　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。${IS_TOUCH?'「建設をやめる」で建設モードを終了':'右クリック・Escで建設モードを終了'}</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div>${flowHTML(S.buildMode,null)}<button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
+    const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)?buildTurns(S.buildMode)+'ターン':'すぐ完成'}　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。${IS_TOUCH?'「建設をやめる」で建設モードを終了':'右クリック・Escで建設モードを終了'}</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div>${flowHTML(S.buildMode,null)}<button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
   if(!o&&S.selTile){const {x,y}=S.selTile;const key='tile'+x+','+y+affordSig()+(S.grid[y][x]?1:0)+S.enemies.length%7+'r'+((S.ruins||[]).length);
     if(!force&&key===lastInfoKey)return;lastInfoKey=key;
     let h=`<div class="row"><b>マス（${x}, ${y}）</b><button id="tClose" style="padding:0 6px">×</button></div>`+tileDesc(x,y);
@@ -7815,7 +7819,8 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）','<b>時間のバー</b>を地図の中から出して、敵情予測と地図のあいだの細い帯に（残りの時間も出る）','<b>ミニマップに小さな見出し</b>をつけた：「大・小」で大きさを切り替え、「－」でたたむ（たたむと見出しだけになり、「＋」で戻す）','<b>防衛施設の詳しい画面に、夜の実際の動き</b>：施設が、地図の上と同じ絵の弾（バリスタは重い矢、投石機は石、物見櫓は矢など）で、歩いてくる魔物を撃つ小さな場面','<b>弾がまったくなくて撃てない防衛施設</b>には、地図の上で施設の上に赤い「!!」を出すように（昼でも分かる）','<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる']],
+ ['1.12（試作版だけ）','',['<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）','<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
+ ['1.12','2026-11-17',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>時間のバー</b>を地図の中から出して、敵情予測と地図のあいだの細い帯に（残りの時間も出る）','<b>ミニマップに小さな見出し</b>をつけた：「大・小」で大きさを切り替え、「－」でたたむ（たたむと見出しだけになり、「＋」で戻す）','<b>防衛施設の詳しい画面に、夜の実際の動き</b>：施設が、地図の上と同じ絵の弾（バリスタは重い矢、投石機は石、物見櫓は矢など）で、歩いてくる魔物を撃つ小さな場面','<b>弾がまったくなくて撃てない防衛施設</b>には、地図の上で施設の上に赤い「!!」を出すように（昼でも分かる）','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる','<b>木の柵は置いたらすぐ完成</b>（罠と同じ）','不具合の修正：建て終わった施設の耐久が少し減って見えることがあった']],
  ['1.11.1','2026-11-17',['不具合の修正：昼に建てた「1ターンで完成」の施設が、次の朝になっても完成していないことがあった（建てた時刻によって、同じ日に建てたのに片方だけ完成することも）。今は、昼のいつ建てても次の朝に完成する','城の説明などに残っていた、今はいない「近衛兵」の話を消した']],
  ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。生産は昼だけ、10秒ごとに少しずつ入る。時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める。残りは地図の上の横長のバーで（太陽・月が左から右へ進む）。昼の後半は夕方に。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
@@ -7838,10 +7843,11 @@ const UPDATES=[
  ['1.1','',['スマホ横持ちに対応、ホーム画面に追加してアプリとして遊べるように','タブを 建設・研究・軍事・街 に整理','城の強化・造り替えにターンがかかるように']],
  ['1.0','',['画面デザインとドット絵を一新','敵の駐屯地・斥候・モンスター図鑑']],
 ];
-function updSeen(){try{return localStorage.getItem('nd_upd_seen')===UPDATES[0][0];}catch(e){return true;}}
-function showUpdates(){try{localStorage.setItem('nd_upd_seen',UPDATES[0][0]);}catch(e){}
+function UPD(){return UPDATES.filter(u=>IS_PROTO||!u[0].includes('試作'));}   /* 「試作版だけ」の更新は本番では見せない */
+function updSeen(){try{return localStorage.getItem('nd_upd_seen')===UPD()[0][0];}catch(e){return true;}}
+function showUpdates(){try{localStorage.setItem('nd_upd_seen',UPD()[0][0]);}catch(e){}
   openOverlay('title',`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>アップデート情報</h2><button id="upBack">タイトルへ</button></div>
-  <div style="max-height:62vh;overflow:auto;line-height:1.8">${UPDATES.map(([v,d,L],i)=>`<div style="margin:0 0 12px"><h3 style="margin:0 0 4px;color:${i?'var(--dim)':'#f2b33d'}">ver ${v}${d?`<small class="muted" style="margin-left:8px">${d}</small>`:''}</h3><ul style="margin:0;padding-left:18px">${L.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('')}</div>`,true);
+  <div style="max-height:62vh;overflow:auto;line-height:1.8">${UPD().map(([v,d,L],i)=>`<div style="margin:0 0 12px"><h3 style="margin:0 0 4px;color:${i?'var(--dim)':'#f2b33d'}">ver ${v}${d?`<small class="muted" style="margin-left:8px">${d}</small>`:''}</h3><ul style="margin:0;padding-left:18px">${L.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('')}</div>`,true);
   document.getElementById('upBack').onclick=showTitle;}
 function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.add('off');}const sv=saveInfo();
   const dt=sv?new Date(sv.date):null;const when=dt?`${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`:'';

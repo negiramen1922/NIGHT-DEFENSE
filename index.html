@@ -338,7 +338,9 @@ body.fullmap #right.open{transform:none}
 body.land #alertTop{top:44px;font-size:14px;padding:6px 12px}
 #ovCard .vpop{display:flex;gap:12px;align-items:center;padding:10px 12px;margin:0 0 8px;background:#141210;border:2px solid var(--vc);box-shadow:0 0 14px color-mix(in srgb,var(--vc) 35%,transparent)}#ovCard .vpi{flex-shrink:0;width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:#1e1a12;border:1px solid #4a4030}#ovCard .vpk{font-size:11px;color:var(--vc);letter-spacing:2px}#ovCard .vpop .nvt{margin-top:4px;line-height:1.7}
 #ovCard .vops{display:flex;flex-direction:column;gap:6px;margin:6px 0}#ovCard .vop{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;line-height:1.6}#ovCard button.vop{flex-direction:column;align-items:flex-start}#ovCard .nshop .vop{background:#15130e;border:1px solid #3a3428;margin:0 0 4px}
+#ovCard .bkl{display:flex;flex-wrap:wrap;gap:6px;max-height:34vh;overflow:auto}#ovCard .bki{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;background:#15130e;box-shadow:0 0 0 1px #3a3428}#ovCard .bkv{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:48px}#ovCard .bkv small{font-size:11px;color:var(--text);white-space:nowrap}#ovCard .bki svg,#ovCard .bki img{flex-shrink:0}#ovCard .bki b{color:var(--amber);font-weight:400;font-size:16px}#ovCard .bkc{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 2px;padding:6px 10px;background:#111814;box-shadow:0 0 0 1px var(--frame);font-size:13px}#ovCard .bkc .aft b{color:#f0e4c8}#ovCard .bkc .aft.lack b{color:var(--red)}.bkn{display:inline-block;min-width:16px;margin-left:6px;padding:0 4px;font-size:11px;line-height:16px;background:var(--amber);color:#111;text-align:center}
 #ovCard .vaf{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:#d8ccb0}#ovCard .aft{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}#ovCard .aft b{color:#f0e4c8}#ovCard .aft.lack b{color:var(--red)}.use small.hv{font-size:10px;color:#9a8e74;margin-left:1px}
+#ovCard .pols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}#ovCard .pol{display:flex;flex-direction:column;align-items:stretch;gap:6px;text-align:left;padding:10px;background:#15130e;box-shadow:0 0 0 1px #3a3428}#ovCard .pol.on{box-shadow:0 0 0 2px var(--lc),0 0 12px color-mix(in srgb,var(--lc) 40%,transparent)}#ovCard .polh{display:flex;align-items:center;gap:8px;font-size:18px;color:var(--lc)}#ovCard .pold{font-size:12px;color:var(--text)}#ovCard .poll{display:flex;flex-wrap:wrap;gap:6px}#ovCard .poll span{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:52px}#ovCard .poll small{font-size:10px;color:var(--dim);white-space:nowrap}
 #ovCard .stk{text-align:center;font-size:11px;letter-spacing:3px;color:#c8a070;margin:2px 0}
 #ovCard .wdL{display:flex;flex-direction:column;gap:6px;max-height:48vh;overflow:auto}#ovCard .wd{display:block;width:100%;text-align:left;padding:8px 10px;background:#15130e;border:1px solid #4a4030;line-height:1.6;font-size:12px}#ovCard .wd.now{border-color:#3a6a7a}#ovCard .wdh{display:flex;justify-content:space-between;gap:8px;font-size:14px}#ovCard .wdr{font-size:12px;font-weight:bold}#ovCard .nlil{display:flex;gap:10px;align-items:flex-start;background:#1e1a12;border:1px solid #c8a070;padding:8px 10px;margin:4px 0 10px;line-height:1.7;font-size:13.5px;color:#f0e4c8}#ovCard .nlil small{display:block;color:#e8c070;font-size:11px}#ovCard .nlil ol{margin:4px 0;padding-left:20px}#ovCard .nlil img{flex-shrink:0;background:#2a3a5a;border:1px solid #8a7a5a}
 #guide .gcur .gct button{margin-left:auto;flex-shrink:0;padding:2px 8px}
@@ -722,7 +724,7 @@ button.ghost:hover:not(:disabled){box-shadow:none;color:var(--amber)}
   body.intelMin:not(.land) #intel{min-height:30px!important;flex-wrap:nowrap}
   body.intelMin:not(.land) #intel>*:not(.lbl):not(.imini):not(#intelMin){display:none!important}
   body.intelMin:not(.land) #intel .lbl{min-height:30px!important;flex-direction:row;align-items:center;gap:8px}
-  body.intelMin:not(.land) #intel .imini{display:inline-flex;align-items:baseline;gap:4px;font-size:12px}
+  body.intelMin:not(.land) #intel .imini{display:inline-flex;align-items:center;gap:4px 10px;font-size:12px;min-width:0;overflow:hidden;white-space:nowrap}body.intelMin:not(.land) #intel .imsrc{color:var(--text)}body.intelMin:not(.land) #intel .imet{display:inline-flex;gap:6px;align-items:center}body.intelMin:not(.land) #intel .imet>span{display:inline-flex;align-items:center;gap:1px;font-family:var(--px-font);font-size:12px}
   body.intelMin:not(.land) #intel .imini b{font-family:var(--px-font);font-weight:400;font-size:15px;color:var(--red)}
   body.intelMin:not(.land) #intelMin{top:50%;transform:translateY(-50%)}
 }
@@ -755,12 +757,15 @@ button.ghost:hover:not(:disabled){box-shadow:none;color:var(--amber)}
 #intel .ctag{font-size:10px;padding:0 4px;margin-left:2px;box-shadow:0 0 0 1px currentColor;color:var(--dim);white-space:nowrap}#intel .ctag.found{color:#ff9a86}#intel .ctag.gone{color:var(--green)}
 #viewSeg{position:absolute;z-index:4;top:10px;right:10px;display:flex;flex-wrap:wrap;justify-content:flex-end;max-width:60%;gap:0;background:rgba(18,26,20,.92);box-shadow:0 0 0 1px var(--frame)}
 #viewSeg button{box-shadow:none;border:none;padding:4px 10px;font-size:12px;background:transparent;color:var(--dim)}
-#viewSeg button kbd{margin-left:5px}
+#viewSeg button kbd{margin-left:5px}#viewSeg #vCyc{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;color:var(--text)}#viewSeg #vCyc small{font-size:10px;color:var(--dim)}#viewSeg #vCyc b{font-weight:400;min-width:5.5em;text-align:left}#viewSeg #vCyc .vnx{color:var(--dim);font-size:10px}#viewSeg #vCyc.on small,#viewSeg #vCyc.on .vnx{color:#111}
 #viewSeg button.on{background:var(--amber);color:#111}
 #viewSeg button.on kbd{color:#111;border-color:#111}
 #viewCap{flex-basis:100%;font-size:11px;color:var(--text);padding:3px 8px;text-align:right;border-top:1px solid var(--line)}
 body:not(.fullmap) #modeBar,#modeBar{max-width:calc(100% - 330px)}
+@media (min-width:901px){#modeBar{top:auto;bottom:22px}}   /* 選択中・建設の帯は地図の左下に（上は昼夜のバーと表示の切り替えだけにする。2026-11-16 画面の整理） */
 @media (max-width:900px){#viewSeg{top:48px;right:8px;max-width:calc(100% - 16px)}#viewSeg button{padding:4px 8px;font-size:11px}#viewSeg kbd{display:none}#viewCap{display:none!important}#modeBar{max-width:calc(100% - 20px)}}
+#mmHead{position:absolute;z-index:5;display:flex;align-items:center;gap:2px;height:20px;padding:0 0 0 6px;background:rgba(14,20,16,.95);box-shadow:0 0 0 1px var(--frame);font-size:11px;color:var(--dim);box-sizing:border-box}#mmHead span{flex:1;font-family:var(--px-font)}#mmHead button{height:20px;min-width:22px;padding:0 5px;font-size:11px;line-height:20px;box-shadow:none;border:none;background:transparent;color:var(--text)}#mmHead button:hover{background:#26302a}#mmHead.min #mmSz{display:none}#mmHead.min{color:var(--text)}
+#rtBar{display:none;align-items:center;gap:8px;height:22px;padding:0 10px;margin:0 0 4px;background:#0e130f;box-shadow:0 0 0 1px var(--frame)}#rtBar.on{display:flex}#rtBar img{width:16px;height:16px;image-rendering:pixelated;flex-shrink:0}#rtBar #rtIcB{opacity:.6}#rtBar .rtTrack{position:relative;flex:1;height:6px;background:#3a2e18}#rtBar.night .rtTrack{background:#1c2240}#rtBar #rtFill{position:absolute;left:0;top:0;bottom:0;width:0}#rtBar #rtSun{position:absolute;top:50%;width:20px;height:20px;transform:translate(-50%,-50%)}#rtBar #rtTxt{font-family:var(--px-font);font-size:12px;color:var(--text);min-width:7.5em;text-align:right;white-space:nowrap}
 #pauseMsg{display:none;position:absolute;left:0;right:0;top:42%;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:3;text-shadow:0 2px 0 #000,0 0 12px #000}
 #pauseMsg b{font-family:var(--px-font);font-weight:400;font-size:24px;letter-spacing:.2em;color:var(--amber)}
 #pauseMsg small{font-size:12px;color:var(--text);background:rgba(5,6,5,.6);padding:2px 10px}
@@ -791,7 +796,7 @@ body.night .dOnly{display:none!important}
 
 /* 通信ログ */
 body:not(.fullmap) .logbox{flex:0 0 62px!important;min-height:62px;height:62px;margin-top:8px!important}
-.logbox h3{display:flex;align-items:center;gap:6px;font-size:12px!important;color:var(--amber);background:var(--head);cursor:default}
+.logbox h3{display:flex;align-items:center;gap:6px;font-size:12px!important;color:var(--amber);background:var(--head);cursor:pointer}.logbox h3 .lgar{margin-left:auto;color:var(--dim);font-size:10px}body.logMin:not(.fullmap) .logbox{flex:0 0 28px!important;min-height:28px;height:28px}body.logMin .logbox h3{padding:4px 10px!important;align-items:center!important}body.logMin #log{overflow:hidden!important;height:22px!important;min-height:22px!important;margin-top:3px;flex:1 1 auto!important;padding-top:4px!important;padding-bottom:0!important;display:block!important}
 .logbox h3 .lgic{display:inline-flex}
 #log{display:flex;flex-direction:column;overflow-y:auto;height:auto!important}
 #log>div:first-child{margin-top:auto}
@@ -846,6 +851,8 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 #info .cmdbtns button.ret{background:#2a1210;color:#ff8a80;box-shadow:0 0 0 1px var(--red-line)}
 #info .cmdbtns button.ret.cur{box-shadow:0 0 0 2px #ff8a80}
 #info .iact{display:flex;gap:6px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}
+#info .ihtop{display:flex;gap:10px;align-items:center}#info .ihtop .banner{width:120px;max-width:120px;flex-shrink:0;margin:0}#info .ihtop .banner .tag,#info .ihtop .artpx .al,#info .ihtop .artpx .as{display:none}#info .ihtop .ihead{flex:1;min-width:0;flex-wrap:wrap;margin:0;row-gap:2px}
+#info .iquick{margin:8px 0 6px;padding:2px 8px 6px;background:#111814;box-shadow:0 0 0 1px var(--frame)}#info .iquick details.isec:last-of-type{border-bottom:none}#info .iquick .iact{margin-top:6px;padding-top:6px}
 #info .iact button{flex:1}
 #info select{margin-top:2px}
 #info .upg{border:none;background:transparent;padding:0;margin:6px 0}
@@ -1029,7 +1036,8 @@ body.land #saveMark{right:calc(var(--rail) + 8px);bottom:auto;top:44px}   /* ス
 .ov-res .tnode .tm .cst{display:inline-flex;gap:8px;flex-wrap:wrap;row-gap:2px;min-width:0}.ov-res .tnode .tm{gap:6px}.ov-res .tnode .tm .tt2{flex-shrink:0;align-self:flex-end}   /* 材料が多い研究は折り返す */
 .ov-res .tnode .tm .tt2{color:var(--dim)}
 .ov-res .tnode .tbar{margin-top:3px}
-.ov-res .tnode.key{box-shadow:0 0 0 1px #6d8a72,inset 3px 0 0 var(--amber)}.ov-res .tnode.prio{box-shadow:0 0 0 2px #f2c84a,0 0 10px rgba(242,200,74,.35)}.ov-res .tnode.prio.sel{box-shadow:0 0 0 2px #f2c84a,0 0 0 4px rgba(255,255,255,.5)}.ov-res .tnode .tpr{font-size:10.5px;color:#f2c84a;font-weight:bold;letter-spacing:1px;margin-bottom:1px}
+.ov-res .tnode.key{box-shadow:0 0 0 1px #6d8a72,inset 3px 0 0 var(--amber)}.ov-res .tln{display:inline-flex;align-items:center;margin-left:5px;padding:0 3px;box-shadow:0 0 0 1px var(--lc);vertical-align:1px}.ov-res .tln.off{box-shadow:0 0 0 1px var(--red);background:rgba(200,40,30,.25)}.ov-res .polw{color:#ff8a7a;font-size:11.5px;margin-top:4px;display:flex;align-items:center;gap:4px}
+.ov-res .tnode.prio{box-shadow:0 0 0 2px #f2c84a,0 0 10px rgba(242,200,74,.35)}.ov-res .tnode.prio.sel{box-shadow:0 0 0 2px #f2c84a,0 0 0 4px rgba(255,255,255,.5)}.ov-res .tnode .tpr{font-size:10.5px;color:#f2c84a;font-weight:bold;letter-spacing:1px;margin-bottom:1px}
 .ov-res .tnode.done.key{box-shadow:0 0 0 1px #2f6a3d,inset 3px 0 0 var(--amber)}
 .ov-res .tnode.ready:hover{box-shadow:0 0 0 1px var(--amber)}
 .ov-res .tdet{margin:10px 24px 20px;flex-shrink:0;justify-content:space-between;flex-wrap:wrap}
@@ -1290,7 +1298,7 @@ body.land #build .bchips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}b
 body.resMin:not(.land) #wrap #resbar .res.key{grid-template-columns:auto 2.4em}}
 body.land #wrap #resbar .res .dl{display:inline-block!important;min-width:3em}
 /* PCの下のボタン：一括修理・一括補給は文字が変わっても幅を固定 */
-@media (min-width:901px){#bRepAll,#bSupAll{width:170px;justify-content:flex-start}}
+@media (min-width:901px){#bRepAll,#bSupAll{width:124px;justify-content:center}}   /* 費用はボタンに書かない（押すと確認が出る）ので短く。2026-11-16 */
 #controls>#bHire,#controls>#bHero{display:none!important}
 .asubs{display:flex;gap:0;margin:0 0 8px;box-shadow:0 0 0 1px var(--line)}
 .asubs button{flex:1;padding:6px 2px;font-size:12px;border:none;box-shadow:none;border-right:1px solid var(--line);background:transparent}
@@ -1533,6 +1541,8 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .dhints{font-size:13px;line-height:1.8;margin:2px 0 8px}.dhints b{color:var(--amber,#f2b33d)}
 /* 施設の中身の小さなムービー（2026-11-15） */
 .fbox{margin:6px 0 8px;border:1px solid var(--line,#33402f);background:rgba(0,0,0,.25);border-radius:3px}
+#info .fdwrap{position:relative}#info canvas.fdemo{display:block;width:100%;height:auto;aspect-ratio:3/1;image-rendering:pixelated;box-shadow:0 0 0 1px var(--frame)}#info .fdry2{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:12px;color:var(--red);text-shadow:0 1px 0 #000}
+.flow .frot{display:inline-block;transform:rotate(90deg)}   /* 矢のアイコンは上向きなので、敵の方（右）へ向ける（2026-11-16） */
 .flow{position:relative;display:flex;align-items:center;justify-content:center;height:64px;overflow:hidden;background:linear-gradient(90deg,rgba(255,120,90,.06),transparent 35%,transparent 65%,rgba(120,240,140,.07))}
 .flow .fb{position:relative;z-index:2;animation:fbWork 1.1s ease-in-out infinite}
 .flow .fl{position:relative;flex:1;height:100%;animation:none;opacity:1}   /* 古い .fl（ちらつき）の効果が当たって、作る物が一瞬だけ見えていた（2026-11-16） */
@@ -1600,10 +1610,12 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
   <div id="main">
   <div id="left">
     <div id="intel"></div>
+    <div id="rtBar" title="昼と夜の残り時間"><img id="rtIcA" alt=""><div class="rtTrack"><i id="rtFill"></i><img id="rtSun" alt=""></div><img id="rtIcB" alt=""><span id="rtTxt"></span></div>
     <div id="mapWrap">
     <div id="modeBar"><span id="modeTxt"></span><button id="mExit" class="ghost"><span class="xic"></span><span>解除</span><kbd>Esc</kbd></button></div>
     <canvas id="cv"></canvas>
-    <div id="viewSeg" title="マップの表示を切り替え"><button data-v="n">通常</button><button data-v="lv">土地Lv<kbd>T</kbd></button><button data-v="heat">狙われやすさ<kbd>H</kbd></button><button data-v="prod">生産</button><span id="viewCap"></span></div>
+    <div id="viewSeg" title="押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（土地Lv は T、狙われやすさ は H でも）"><button id="vCyc"><small>表示</small><b id="vCycN">通常</b><span class="vnx">▸</span></button><span id="viewCap"></span></div>
+    <div id="mmHead"><span>地図</span><button id="mmSz" class="ghost">小</button><button id="mmMin" class="ghost">－</button></div>
     <div id="pauseMsg"><b>一時停止中</b><small>指示はそのまま出せます・Space で再開</small></div>
     </div>
     <div id="toasts" style="position:fixed;z-index:40;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;transform:translateX(-50%)"></div>
@@ -1652,7 +1664,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <span class="help">左クリック: 選択/建設　右クリック・Esc: 取消　部隊を選んで地図をクリック: 移動　Q: 部隊を順に選択</span>
       </div></details>
     </div>
-    <div class="box logbox" style="margin-top:6px"><h3><span class="lgic"></span>通信ログ</h3><div id="log"></div></div>
+    <div class="box logbox" style="margin-top:6px"><h3 id="logTg" title="通信ログをたたむ／ひらく"><span class="lgic"></span>通信ログ<span class="lgar">▾</span></h3><div id="log"></div></div>
   </div>
   <div id="right">
     <div id="sheetHandle"><span id="sheetSel"></span><span id="sheetLbl">▲ 詳細・建設</span></div>
@@ -1660,7 +1672,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
     <div id="infoSplit" title="上下にドラッグして、詳細と下のパネルの高さを変える（ダブルクリックで元に戻す）"><span class="grip"></span></div><button id="infoClose" title="詳細を閉じる">×</button>
     <div id="rtabs"><button data-rt="info" class="tabInfo">選択中</button><button data-rt="build" class="on">建設</button><button data-rt="res">研究</button><button data-rt="army">軍事</button><button data-rt="econ">街</button></div>
     <div class="box" data-rt="econ" style="display:none"><h3>街の状況</h3><div id="econ"></div></div>
-    <div class="box" data-rt="build"><h3>建設</h3><div id="facCapBox"></div><button id="bRepB" class="wide" style="width:100%;margin:0 0 8px">一括修理</button><div id="build"></div></div>
+    <div class="box" data-rt="build"><h3>建設</h3><div id="facCapBox"></div><div id="build"></div></div>
     <div class="box" data-rt="army" style="display:none"><h3>軍事</h3><div id="armySubs" class="asubs"></div><div id="armyBox"></div></div>
     <div class="box" data-rt="res" style="display:none"><h3>研究</h3><div id="resBox"></div></div>
   </div>
@@ -1703,7 +1715,15 @@ const IS_TOUCH=matchMedia('(pointer: coarse)').matches;
 // タブレット（iPad など）：画面が広くて指で操作する端末。PC 用の配置のまま、指で使いやすくする（キーの案内を隠す・ボタンを大きく・範囲選択ボタン）2026-11-15
 function tabUI(){return IS_TOUCH&&innerWidth>900;}
 function stripKeyHints(){if(!IS_TOUCH)return;for(const b of document.querySelectorAll('button,label.help')){for(const n of b.childNodes){if(n.nodeType===3&&/\s?\[[A-Z]\]/.test(n.nodeValue))n.nodeValue=n.nodeValue.replace(/\s?\[[A-Z]\]/g,'');}}}
-const MM={w:192,h:128};    // ミニマップ
+const MM={w:192,h:128};    // ミニマップ（絵の大きさ）
+// ミニマップの表示：大・小・隠す（右下のボタンで切り替え。2026-11-16 ユーザーの希望）
+const MMV={w:192,h:128};let MM_MODE='l';try{MM_MODE=localStorage.getItem('nd_mm')||'l';}catch(e){}
+let MM_PREV='l';try{MM_PREV=localStorage.getItem('nd_mm_prev')||'l';}catch(e){}
+function mmApply(){const k=MM_MODE==='s'?0.55:1;MMV.w=Math.round(MM.w*k);MMV.h=Math.round(MM.h*k);const h=document.getElementById('mmHead');if(!h)return;h.classList.toggle('min',MM_MODE==='h');
+  const sz=document.getElementById('mmSz'),mn=document.getElementById('mmMin');if(sz){sz.textContent=MM_MODE==='s'?'大':'小';sz.title=MM_MODE==='s'?'ミニマップを大きく':'ミニマップを小さく';}if(mn){mn.textContent=MM_MODE==='h'?'＋':'－';mn.title=MM_MODE==='h'?'ミニマップを出す':'ミニマップをたたむ';}}
+function mmSet(m){if(m==='h'&&MM_MODE!=='h')MM_PREV=MM_MODE;MM_MODE=m;try{localStorage.setItem('nd_mm',MM_MODE);localStorage.setItem('nd_mm_prev',MM_PREV);}catch(e){}mmApply();}
+function mmCycle(){mmSet(MM_MODE==='h'?MM_PREV:'h');}
+mmApply();
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 cv.width=VW; cv.height=VH;
 const FOOD_PER=0.03;
@@ -1832,7 +1852,7 @@ Object.assign(B,{
   lab:    {name:'研究室',glyph:'研',hp:200,heat:2,cost:{steel:80,stone:30},pop:4,power:0,spec:'内政',grp:'prod',desc:'研究枠を増やす'},
   market: {name:'交易市場',glyph:'市',hp:200,heat:2,cost:{steel:60,stone:10},pop:3,power:0,spec:'内政',grp:'prod',desc:'外の商人と取引できる施設。魔核を金貨で売れるほか、木材・石材・鉄・食料を銀貨で売り買いできる（施設を選んで「交易」）。資材を売ると銀貨が入り、資材は銀貨でしか買えない。1日に買える量にも上限がある（市場が増えると上限も増える）。毎ターン金貨 +4、住民の幸福度 +6（2棟まで効果）'},
   tavern: {name:'酒場',glyph:'酒',hp:180,heat:2,cost:{steel:50,gold:30},pop:2,power:0,spec:'内政',grp:'prod',desc:'住民の憩いの場。幸福度 +10（2棟まで効果）。食料を少し使う（−2/T）',req:'brewing'},
-  church: {name:'教会',glyph:'聖',hp:320,heat:2,cost:{steel:40,stone:60,gold:40},pop:2,power:0,spec:'内政',grp:'prod',desc:'祈りの場。幸福度 +4（2棟まで効果）。夜の「祈り」で上がる幸福度が増える（1棟ごと +5・2棟まで）。赤い月の予告のとき、祈りが無料になる'},
+  church: {name:'教会',glyph:'聖',hp:320,heat:2,cost:{steel:40,stone:60,gold:40},pop:2,power:0,spec:'内政',grp:'prod',desc:'祈りの場。幸福度 +4（2棟まで効果）。夜の「祈り」で幸福度が上がる。赤い月の予告のとき、祈りが無料になる'},
   stable: {name:'馬小屋',glyph:'馬',hp:280,heat:2,cost:{steel:90,gold:40},pop:3,power:0,spec:'騎兵',grp:'prod',cap:2,desc:'騎兵隊（5騎）を2隊まで編成・治療・補充',req:'cavalry'},
   aerie:  {name:'竜舎',glyph:'竜',hp:420,heat:4,cost:{steel:150,stone:80,gold:120},pop:4,power:0,spec:'騎兵',grp:'prod',cap:1,desc:'ドラゴンライダー（2騎）を1隊だけ育てる。非常に目立ち、魔物に狙われやすい',req:'dragon'},
   magic:  {name:'魔導院',glyph:'魔',hp:240,heat:3,cost:{steel:80,stone:40,elec:15},pop:3,power:0,spec:'魔導',grp:'prod',cap:2,desc:'魔術師隊（3人）を2隊まで育成・治療・補充',req:'magic'},
@@ -2016,10 +2036,19 @@ MODEL.griffon={ut:'cav',wage:6,name:'グリフォン騎兵',role:'グリフォ�
 MODEL.guard={off:true,ut:'guard',wage:4,name:'近衛兵',role:'近衛兵（城の守り）',color:'#e8c860',desc:'城を守る精兵。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内では火力2倍・受ける被害半分。離れると並の兵より少し強い程度'};
 MODEL.scout={ut:'arch',wage:2,name:'斥候',role:'斥候（スカウト）',color:'#8a94a8',req:'scouting',hpEach:18,dmg:4,rate:0.7,range:4,spd:66,vision:20,frail:1.8,scoutEye:true,cost:{gold:15,fuel:10},desc:'足が速く、遠くまで見通す偵察兵。敵の駐屯地の正確な場所を見つけられるのは斥候だけ。ひどく打たれ弱く、戦闘ではすぐ倒れる'};
 MODEL.farmer={ut:'mil',name:'農兵',role:'農兵（クワ）',color:'#c8a060',wage:1,desc:'クワや鋤を手にした村人。兵舎がなくても城館で集められる。弱いが安く、食料だけで編成できる'};
+const IS_PROTO=/\/proto\//.test(location.pathname);   /* 試作版だけで試すもの（兵種・強さの見直し）は IS_PROTO で分ける。本番は今までどおり（2026-11-17） */
+/* 2026-11-16 兵種の見直し（ユーザーの指定）：
+   銃兵（ランクⅢ・火薬のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い
+   チャリオット（ランクⅢ・騎馬突撃のあと）：騎兵を強化。突撃で群れを突っ切り、通った魔物すべてに当たる。大きな魔物でも止まらない
+   狙撃兵：射程をもっと長く、3発撃ってから長い装填。大きな魔物に強い */
+if(IS_PROTO){MODEL.gunner={ut:'arch',wage:3,name:'銃兵',role:'銃兵（マスケット）',color:'#c0a070',req:'musket',members:4,hpEach:50,dmg:28,rate:2.2,range:7,spd:24,time:18,cost:{gold:20,iron:12,powder:4,fuel:10},desc:'火薬の銃を持つ部隊。足が遅く、撃つ間隔も長いが、1発が重く射程が長い。火薬を使う'};
+MODEL.chariot={ut:'cav',wage:5,name:'チャリオット',role:'チャリオット（戦車）',color:'#d0a060',req:'chariott',members:3,hpEach:150,dmg:15,rate:0.8,time:20,cost:{gold:30,steel:30,sword:5,fuel:20},chariot:true,desc:'馬に引かせた戦車。突撃すると魔物の群れの中を突っ切り、通った道の魔物すべてに強い一撃を与える。大きな魔物にぶつかっても止まらない'};
+if(MODEL.rider)MODEL.rider.until='chariott';   /* チャリオットの研究のあとは騎兵は編成できない（今いる騎兵はチャリオットになる） */
+Object.assign(MODEL.sniper,{range:12,mag:3,magRate:0.7,reload:7,vsBig:1.6,desc:'魔法と火薬のライフルで、遠くの大きな魔物を撃ち抜く（いちばん硬い敵を狙う。大きな魔物には1.6倍）。続けて3発撃ったあと、長い装填に入る'});}
 const MTC={};for(const k in MODEL)MTC[k]=Object.assign({},UT[MODEL[k].ut],MODEL[k],{key:k});
 function defModel(ut){return {art:'cannoneer',guard:'guard',mil:'farmer',cav:'rider',drake:'dragon',mage:'wizard',inf:'pawn',arch:'archer',tank:'t10',ship:'dd',air:'heli'}[ut]||'geki';}
 const UNIT_HOME={hq:'mil',train:'inf',stable:'cav',aerie:'drake',magic:'mage'};
-function modelsAt(bt){return Object.keys(MODEL).filter(k=>UT[MODEL[k].ut].home===bt&&!MODEL[k].buy&&!MODEL[k].off&&(!MODEL[k].req||has(MODEL[k].req)));}
+function modelsAt(bt){return Object.keys(MODEL).filter(k=>UT[MODEL[k].ut].home===bt&&!MODEL[k].buy&&!MODEL[k].off&&(!MODEL[k].req||has(MODEL[k].req))&&!(MODEL[k].until&&has(MODEL[k].until)));}
 // 試作：城のレベルごとに持てる部隊の上限（2026-11-11 ユーザー案）
 const SQUAD_CAP=[12,20,30,40,52,65,80];
 function squadCap(){return SQUAD_CAP[Math.max(0,Math.min(SQUAD_CAP.length-1,(S.baseLv||1)-1))];}
@@ -2030,7 +2059,9 @@ function modelsFor(ut){return Object.keys(MODEL).filter(k=>MODEL[k].ut===ut&&!MO
 function buyModels(ut){return Object.keys(MODEL).filter(k=>MODEL[k].ut===ut&&MODEL[k].buy);}
 // 建設に必要なターン数（記載なしは1ターン）
 const BUILD_T={power:2,lab:2,hangar:2,rail:2,reactor:3,elecf:2,tankf:2,outpost:2};
-function buildTurns(type){return Math.max(1,(BUILD_T[type]||1)-(has('prefab')?1:0));}
+const INSTANT_B=new Set(['fence']);   /* 木の柵と罠は置いたらすぐ完成（2026-11-17 ユーザーの指定） */
+function buildTurns(type){if(INSTANT_B.has(type)||(B[type]&&B[type].isMine))return 0;return Math.max(1,(BUILD_T[type]||1)-(has('prefab')?1:0));}
+function turnsTxt(n){return n>0?n+'T':'すぐ';}
 // 強化にかかるターン数（数字はここで調整）
 const BASE_UP_T={1:2,2:3,3:4,4:5,5:6,6:6};   // 城：Lv2へ2T・Lv3へ3T・Lv4へ4T・Lv5へ5T（強化中も城は普段どおり働く）
 const ENCH_T=[1,2,3];                 // 魔核強化：★1へ1T・★2へ2T・★3へ3T（強化中の施設は停止）
@@ -2222,7 +2253,9 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('goldt',{cat:'生産',tier:3,name:'金鉱',cost:{steel:80,stone:40,gold:40},t:3,pre:[],icon:'goldmine',eff:'「金鉱」を建設できる（素材の金を掘る。金貨ではない）'});
  set('smeltt',{cat:'生産',tier:3,name:'精錬所',cost:{steel:100,stone:60,iron:30,gold:60},t:3,pre:['goldt'],icon:'smelter',eff:'「精錬所」を建設できる（鉄・金・石炭から合金を作る）'});
  set('mitht',{cat:'生産',tier:6,name:'聖銀鉱',cost:{steel:150,stone:80,alloy:30,gold:120},t:5,pre:[],icon:'mithmine',eff:'「聖銀鉱」を建設できる（聖銀を掘る）'});
- set('snipert',{cat:'部隊',tier:5,name:'狙撃兵',cost:{gold:120,iron:60,powder:30},t:5,pre:[],icon:'archer',eff:'兵舎で「狙撃兵」を訓練できる（遠くの大きな魔物を撃ち抜く）'});
+ set('snipert',{cat:'部隊',tier:5,name:'狙撃兵',cost:{gold:120,iron:60,powder:30},t:5,pre:IS_PROTO?['musket']:[],icon:'archer',eff:IS_PROTO?'兵舎で「狙撃兵」を訓練できる（とても遠くから大きな魔物を撃ち抜く。3発撃って長い装填）':'兵舎で「狙撃兵」を訓練できる（遠くの大きな魔物を撃ち抜く）'});
+ if(IS_PROTO){set('musket',{cat:'部隊',tier:3,name:'銃兵',cost:{gold:60,iron:40},t:3,pre:['gunpowder'],icon:'gunner',eff:'兵舎で「銃兵」を編成できる（足が遅く撃つのも遅いが、1発が重く射程が長い。火薬を使う）'});
+ set('chariott',{cat:'部隊',tier:3,name:'チャリオット',cost:{gold:80,steel:120,iron:40},t:3,pre:['charge'],icon:'chariot',eff:'騎兵がチャリオットになる：突撃で群れを突っ切り、通った魔物すべてに当たる。大きな魔物でも止まらない（今いる騎兵も強化される）'});}
  set('golemt',{cat:'部隊',tier:5,name:'エーテルゴーレム',cost:{stone:120,elec:80,gold:100},t:5,pre:[],icon:'heavy',eff:'兵舎で「エーテルゴーレム」を作れる（とても硬い壁役）'});
  set('silvert',{cat:'部隊',tier:6,name:'銀装兵',cost:{gold:120,mithril:20,iron:60},t:5,pre:[],icon:'heavy',eff:'兵舎で「銀装兵」を訓練できる（硬くて速い歩兵の上位）'});
  set('griffont',{cat:'部隊',tier:6,name:'グリフォン騎兵',cost:{gold:150,mithril:20,fuel:80},t:6,pre:['cavalry'],icon:'rider',eff:'馬小屋で「グリフォン騎兵」を育てられる（空を飛んで移動し、降りて戦う）'});
@@ -2268,8 +2301,8 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('abysslamp',{tier:3,name:'蒼い炎',cost:{mat:40,fuel:40},pre:[],icon:'brazier',eff:'篝火に魔核をくべて、青く強い炎にする。篝火の照らす範囲 +8マス、物見櫓 +3マス'});
  del('abyssbolt');
  // 部隊ランクⅢ：砲兵
- set('artillery',{cat:'部隊',tier:3,name:'砲兵',cost:{iron:80,gold:60},t:3,pre:[],icon:'cannoneer',eff:'兵舎で「砲兵隊」を編成できる（担いで運べる小型の大砲を持つ4人の部隊。射程12の範囲攻撃。鉄を砲弾に使う。近づかれると脆い）'});
- set('gunnery',{cat:'部隊',tier:3,name:'砲術',cost:{iron:60,gold:60},t:3,pre:['artillery'],icon:'cannoneer',eff:'砲兵隊の射程 +3、火力 +30%'});
+ set('artillery',{cat:'部隊',tier:IS_PROTO?4:3,name:'砲兵',cost:{iron:80,gold:60},t:3,pre:[],icon:'cannoneer',eff:'兵舎で「砲兵隊」を編成できる（担いで運べる小型の大砲を持つ4人の部隊。射程12の範囲攻撃。鉄を砲弾に使う。近づかれると脆い）'});
+ set('gunnery',{cat:'部隊',tier:IS_PROTO?4:3,name:'砲術',cost:{iron:60,gold:60},t:3,pre:['artillery'],icon:'cannoneer',eff:'砲兵隊の射程 +3、火力 +30%'});
  // 内政ランクⅡ：集合住宅
  set('apart',{cat:'内政',tier:2,name:'集合住宅',cost:{steel:80,stone:40},t:2,pre:['housing'],icon:'apart',eff:'「集合住宅」を建設できる（1棟に36名まで住める。改築でLv2:54名・Lv3:72名。毎ターン5名ずつ住民が増える）'});
  // 装備の解放
@@ -2279,7 +2312,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('heavyarms',{cat:'部隊',tier:2,name:'鋼の武具',cost:{iron:40,steel:30},t:2,pre:[],icon:'heavy',eff:'魔術師以外の武器が「鋼」になる（鉄の剣→鋼の剣、鉄の矢→鋼の矢など）：攻撃 140%（鉄の武器を100%として。補給で鉄も使う）'});
  set('horsearch',{cat:'部隊',tier:2,name:'騎射',cost:{steel:40,fuel:40},t:2,pre:['cavalry'],icon:'rider_hbow',eff:'騎兵の武器が「騎射の騎槍」に上がる（重武器も要る）：空の敵も射落とせる'});
  set('elemental',{cat:'部隊',tier:2,name:'属性魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard_tstaff',eff:'魔術師の杖が「属性の杖」に上がる（範囲＋雷の連鎖＋足止め）'});
- set('shells',{cat:'部隊',tier:3,name:'特殊砲弾',cost:{iron:60,gold:40},t:3,pre:['artillery'],icon:'cannoneer',eff:'砲兵の弾が「特殊砲弾」に上がる（火力+40%・燃やす）'});
+ set('shells',{cat:'部隊',tier:IS_PROTO?4:3,name:'特殊砲弾',cost:{iron:60,gold:40},t:3,pre:['artillery'],icon:'cannoneer',eff:'砲兵の弾が「特殊砲弾」に上がる（火力+40%・燃やす）'});
  set('dragongear',{cat:'部隊',tier:3,name:'竜具',cost:{iron:80,gold:60},t:3,pre:['dragon'],icon:'dragon_darmor',eff:'竜騎兵に「竜具」（鉤爪と鉄鎧）：火力+30%・空の敵に2倍・被害−30%'});
  set('poison',{eff:'魔物の毒腺を鏃に塗る。物見櫓・バリスタに撃たれた魔物は毒で3秒かけて追加の被害（与えた被害の30%・装甲無視）。弓兵隊は装備「毒矢」が使える'});
  set('charge',{eff:'騎兵の移動 +20%。突撃の1体目への一撃が×3→×4'});
@@ -2980,9 +3013,16 @@ const TECH_MAT_FREE=new Set(['aethert','coalt','goldt','smeltt','mitht','kc_work
 const TECH_NO_COAL=new Set(['masonry','castle','tower','fcs','bighow','wallplus','thorn','hisousha','yariana','resetpit','magetower','aebombt','gravityt','meteort','barrierst','dragwall',
   'cavalry','magic','dragon','elite','scouting','shieldwall','charge','highmagic','fieldsup','snipert','golemt','griffont','battalion','division','dragonscale',
   'trade','allnight','apart','carapace','abysslamp','poison','totem','amulet','mine2','quarry2','farm2','fish2','bonearmor','horsearch','elemental']);
+// ===== 街の研究方針（2026-11-16 ユーザーの指定）：城がランクⅣになったら「工業」か「魔法」を選ぶ。方針と違うランクⅣ以上の研究は費用2倍 =====
+const TECH_LINE={artillery:'ind',gunnery:'ind',shells:'ind',harpoont:'ind',snipert:'ind',
+  magic:'mag',highmagic:'mag',magetower:'mag',aebombt:'mag',barrierst:'mag',teslat:'mag',gravityt:'mag',golemt:'mag',mrayt:'mag',meteort:'mag',dbreatht:'mag',mwall:'mag',dragwall:'mag',dragon:'mag',dragonscale:'mag'};
+const POLICY_ON=false;   /* 研究の整理が終わるまで止めておく（2026-11-17 ユーザーの指定：選ぶ場面は研究を整理してから） */
+const POLICY={ind:{n:'工業',ic:'powder',col:'#e0a050'},mag:{n:'魔法',ic:'elec',col:'#a080ff'}};
+function techLine(t){return POLICY_ON?TECH_LINE[t.id]||null:null;}
+function offPolicy(t){return !!(S&&S.policy&&techLine(t)&&techLine(t)!==S.policy&&techRank(t)>=4);}
 function techCost(t){const L=lvl(t.id);const c={};const base=Object.assign({},t.cost);if(t.tier>=2)base.gold=(base.gold||0)+20*(t.tier-1);
   {const M=TECH_MAT[t.tier||1];if(M&&!TECH_MAT_FREE.has(t.id))for(const k in M)if(!base[k]&&!(k==='coal'&&TECH_NO_COAL.has(t.id)))base[k]=M[k];}
-  if((t.tier||1)>=2){if(base.stone)base.stone=Math.max(5,Math.round(base.stone*0.5/5)*5);if(base.iron)base.iron=Math.max(5,Math.round(base.iron*0.6/5)*5);}   /* 研究の石材・鉄を減らす（建設と壁に回す・2026-11-13） */for(const k in base)c[k]=Math.round(base[k]*(1+0.7*L));return c;}
+  if((t.tier||1)>=2){if(base.stone)base.stone=Math.max(5,Math.round(base.stone*0.5/5)*5);if(base.iron)base.iron=Math.max(5,Math.round(base.iron*0.6/5)*5);}   /* 研究の石材・鉄を減らす（建設と壁に回す・2026-11-13） */for(const k in base)c[k]=Math.round(base[k]*(1+0.7*L)*(offPolicy(t)?2:1));return c;}
 function techTurns(t){return t.t+lvl(t.id);}
 const MAP_MAXTIER={m:3,t:2,s:3};   // 草原（f）は城のランクを上げれば研究を最後までできる（2026-11-13）
 function mapMaxTier(){return MAP_MAXTIER[CUR_MAP]||7;}
@@ -3245,6 +3285,9 @@ Object.assign(NDART,NDART_ADD);
 /* 蠢く木陰の森の抱擁（2026-11-13） */
 Object.assign(NDSPR.effects,{"fx_root_spike":{"size":32,"pal":{"a":"#1c1824","b":"#3a2a1c","c":"#1c140e","d":"#8a6040","e":"#c8b490","f":"#5a4630","g":"#6a4630","h":"#4a3020","i":"#ffffff","j":"#7a6448","k":"#8a7a6088","l":"#6a6a6a88"},"anims":{"play":[["................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","............aaaaaaaaa...........",".........aaabbbbbbbbbaaa........","........accccccccccccccca.......",".........aaaaaaaaaaaaaaa........"],["................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","...................aa...........",".................aadea..........","...............fadghda..........","..............aadghaa...........",".............adggghaf...........","............aadghghaa...........",".........aaabdggggghbaaa........","........accccccccccccccca.......",".........aaaaaaaaaaaaaaa........"],["................................","................................","................................","................................","................................","...............i....a...........","...................aea..........","..................adda..........","..................ada...........","...............a..ada...........","..............adaaada...........","...............agdgha...........","................adgha...........","................adgha...........","................adgha...........","...............adghada..........","...............adghga...........","...............adgha............","...............adgha............","............a.adgggha...........","...........adaadghgha...........","............agdgggha............",".............adggghajb..........","...........bfadgggha.fj.........",".............adghgha............",".............adgggha............",".........jb.adgggggha...bf......","............adgggggha...........","............adgghggha...........",".........aaabdggggghbaaa........","........accccccccccccccca.......",".........aaaaaaaaaaaaaaa........"],["................................","....................a...........","...................aea..........","..................adda..........","..................ada...........","..................ada...........","...............a..ada...........","..............adaada............","...............agdgha...........","................adgha...........","................adgha...........","................adgha...........","...............adghaa...........","...............adghada..........","...............adghga...........","...............adgha............","...............adgha............","............a..adgha............","...........adaadgggha...........","............agadgggha...........",".............adghgha............",".............adgggha............",".............adgggha............",".............adgggha............",".............adghgha............",".............adgggha............","............adgggggha...........","............adgggggha...........","............adgghggha...........",".........aaabdggggghbaaa........","........accccccccccccccca.......",".........aaaaaaaaaaaaaaa........"],["................................","................................","....................a...........","...................aea..........","..................adda..........","..................ada...........","..................ada...........","...............a.aada...........","..............adadgha...........","...............agdgha...........","................adgha...........","................adgha...........","................adgha...........","...............adghada..........","...............adghga...........","...............adgha............","...............adgha............","...............adgha............","............a.adgggha...........","...........adaadgggha...........","............agdghgha............",".............adgggha............",".............adgggha............",".............adgggha............",".............adghgha............",".............adgggha............","............adgggggha...........","............adgggggha...........","............adgghggha...........",".........aaabdggggghbaaa........","........accccccccccccccca.......",".........aaaaaaaaaaaaaaa........"],["................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","...................aa...........","...............a..adea..........","..............ada.adda..........","...............agadaa...........","................adgha...........","................adghda..........","...............adghga...........","............a..adgha............","...........ada.adgha............","............agadghgha...........",".............adgggha............",".............adgggha............",".............adgggha............","............adgghggha...........",".........aaabdggggghbaaa........","........accccccccccccccca.......",".........aaaaaaaaaaaaaaa........"],["................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................",".............k.....l............","............aaaaaaaaa...........",".........aaabbbbbbbbbaaa........","........accccccccccccccca.......",".........aaaaaaaaaaaaaaa........"]]}},"fx_root_spike3":{"size":48,"pal":{"a":"#1c1824","b":"#3a2a1c","c":"#1c140e","d":"#c8b490","e":"#8a6040","f":"#6a4630","g":"#4a3020","h":"#7a6448","i":"#5a4630","j":"#ffffff","k":"#8a7a6088","l":"#6a6a6a88"},"anims":{"play":[["................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","....................aaaaaaaaa....aaaaaaaaa......","...aaabbbbbbbbbaaaaabbbbbbbbbaaaabbbbbbbbbaaa...","..acccccccccccccaccccccccccccaccccccccccccccca..","...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."],["................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","......aa........................................",".....adeaa......................................",".....aaaefgaah..................................",".......aefffgai.....aaaaaaaaa....aaaaaaaaa......","...aaabefffffgbaaaaabbbbbbbbbaaaabbbbbbbbbaaa...","..acccccccccccccaccccccccccccaccccccccccccccca..","...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."],["................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................",".....ada.j......................................",".....aeea...j...................................",".....aaea.......................................","....aeaeaa......................................",".....aaefga.....................................","......aefga.....................................","......aefga.a...................................",".......aefgfaa..................................",".......aefga....................................","......aefffga...................................",".....aeefgfga..............aa...................","......aaefffgahb.........aaeda..................",".....biaefffga.ih......iaefgea..................",".......aefgfga........aaefgaa...................","...hb.aefffffga...bi.aefffgai...................","......aefffffga.....aaefgfgaa....aaaaaaaaa......","...aaabefffffgbaaaaabefffffgbaaaabbbbbbbbbaaa...","..acccccccccccccaccccccccccccaccccccccccccccca..","...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."],["................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................",".......................j....a...................","...........................ada..................","..........................aeea..................","..........................aea...................",".......................a..aea...................",".....ada..............aeaaaea...................",".....aeea..............afefga...................","......aea...............aefga...................",".....aaea...............aefga...................","....aeaaea..............aefga...................",".....aaefga............aefgaea..................","......aefga............aefgfa...................","......aaefgaa..........aefga....................",".......aefgaea.........aefga....................",".......aefgfa.......a.aefffga...................",".......aefga.......aeaaefgfga...................","......aaefga........afefffga....................",".....aaffffga........aefffgahb..................",".......aefgfga.....biaefffga.ih.................",".......aefffga.......aefgfga.........a..........",".......aefffga.......aefffga........ada.........",".......aefgfga...hb.aefffffga...bi.aeega........","......aefffffga.....aefffffga.....aefffgai......","......aefffffga.....aeffgffga....aaefgfgaa......","...aaabefffffgbaaaaabefffffgbaaaabefffffgbaaa...","..acccccccccccccaccccccccccccaccccccccccccccca..","...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."],["................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","............................a...................","...........................ada..................","..........................aeea..................","..........................aea...................","..........................aea...................",".......................a..aea...................","......................aeaaea....................",".......................afefga...................","........................aefga.......ja..........","......a.................aefga.......aeaj........",".....ada................aefga.......aea.........",".....aeea..............aefgaa.....a.aea.........","......aea..............aefgaea...aeaaea.........",".....aaeaa.............aefgfa.....afefga........","....aafefga............aefga.......aefga........","......aefga............aefga.......aefgaa.......","......aefga.a.......a..aefga.......aefgaea......",".......aefgaea.....aeaaefffga......aefgfa.......",".......aefgfa.......afaefffga......aefga........",".......aefga.........aefgfga.......aefga........",".......aefga.........aefffga.....aaefffga.......",".....aeefffga........aefffga....aafefffga.......","......afefgfga.......aefffga......aefffgahb.....",".......aefffga.......aefgfga....biaefffga.ih....",".......aefffga.......aefffga......aefgfga.......",".......aefgfga......aefffffga.....aefffga.......","......aefffffga.....aefffffga.hb.aefffffga...bi.","......aefffffga.....aeffgffga....aeffgffga......","...aaabefffffgbaaaaabefffffgbaaaabefffffgbaaa...","..acccccccccccccaccccccccccccaccccccccccccccca..","...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."],["................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","............................a...................","...........................ada..................","..........................aeea..................","..........................aea........a..........","..........................aea.......ada.........",".......................a.aaea.......aea.........","......................aeaefga.......aea.........",".......................afefga.......aea.........","........................aefga....aeaaea.........","........................aefga.....afefga........","........................aefga......aefga........",".......................aefgaea.....aefga........",".......................aefgfa......aefga........",".......................aefga.......aefgaa.......",".......................aefga.......aefgfaa......",".......................aefga.......aefga........","....................a.aefffga......aefga........","...................aeaaefffga....a.aefga........",".....adea...........afefgfga....aeaefffga.......","....aeeea............aefffga.....afefffga.......",".....aaefga.a........aefffga......aefffga.......","......aefgaaea.......aefffga......aefffga.......","......aaefgaa........aefgfga......aefffga.......",".....aeaefga.........aefffga......aefgfga.......","......affgfga.......aefffffga.....aefffga.......",".......aefffga......aefffffga....aefffffga......",".......aefffga......aeffgffga....aeffgffga......","...aaabefffffgbaaaaabefffffgbaaaabefffffgbaaa...","..acccccccccccccaccccccccccccaccccccccccccccca..","...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."],["................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................",".....................................a..........","....................................ada.........","....................................aea.........","....................................aea.........","..................................a.aea.........",".................................aeaefga........","..................................afefga........","...................................aefga........","...................................aefga........","...........................aa......aefgaa.......",".......................a..aeda.....aefgfaa......","......................aea.aeea.....aefga........",".......................afaeaa......aefga........","........................aefga......aefga........","........................aefgea...aaefffga.......",".......................aefgfa...aeaefffga.......","....................a..aefga.....aaefffga.......","...................aea.aefga......aefffga.......","....................afaefgfga.....aefffga.......",".....................aefffga......aefgfga.......",".....................aefffga......aefffga.......",".....................aefffga.....aefffffga......",".......k.....l......aeffgffga....aeffgffga......","...aaabbbbbbbbbaaaaabefffffgbaaaabefffffgbaaa...","..acccccccccccccaccccccccccccaccccccccccccccca..","...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."],["................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................",".....................................a..........","..................................a.ada.........",".................................aeaaea.........","..................................afaea.........","...................................aefgaa.......","...................................aefgfaa......",".................................a.aefga........","................................aeaaefga........",".................................afefgfga.......","..................................aefffga.......",".....................k.....l......aefffga.......",".......k.....l......aaaaaaaaa....aeffgffga......","...aaabbbbbbbbbaaaaabbbbbbbbbaaaabefffffgbaaa...","..acccccccccccccaccccccccccccaccccccccccccccca..","...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."],["................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................","................................................",".....................k.....l......k.....l.......",".......k.....l......aaaaaaaaa....aaaaaaaaa......","...aaabbbbbbbbbaaaaabbbbbbbbbaaaabbbbbbbbbaaa...","..acccccccccccccaccccccccccccaccccccccccccccca..","...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."]]}}});
 /* 施設の段ごとの絵（改築・2026-11-13）：[1段目, 2段目, …]。無い段は前の段の絵 */
+for(const [a,b] of [['gunner','sniper'],['chariot','rider']])if(NDSPR.units&&!NDSPR.units[a]&&NDSPR.units[b])NDSPR.units[a]=NDSPR.units[b];   /* 銃兵・チャリオットの絵ができるまで借りる */
+for(const [a,b] of [['gunner','sniper'],['chariot','rider']])if(!NDART[a]&&NDART[b])NDART[a]=NDART[b];
+for(const [a,b] of [['gunner','sniper'],['chariot','rider']])if(!WICON[a]&&WICON[b])WICON[a]=WICON[b];
 for(const k of ['griffon','griffon_dragon'])if(NDSPR.units[k]&&!NDSPR.units[k].anims.walk)NDSPR.units[k].anims.walk=NDSPR.units[k].anims.fly;
 for(const [a,b] of [['e_grove','boss_shade'],['e_shogre','ogre_shield'],['e_eltreant','e_elder_treant']])if(!NDART[a]&&NDART[b])NDART[a]=NDART[b];
 const STAGE_ART={mg:['mg','mg_iron','mg_alloy','mg_magic','mg_holy'],how:['how','how_iron'],cannon:['cannon','mabou','cannon_dragon'],mortar:['mortar','mortar_magic'],hisou:['balloon','balloon_aether'],
@@ -3524,7 +3567,7 @@ function placeB(type,x,y,free,szo){
       if(urec)urec.replaced=occ.slice();
       S.blds=S.blds.filter(o=>!occ.includes(o));}
   }
-  if(!free){b.bt=b.btTotal=buildTurns(type)*TURN_SEC;b.hp=Math.round(hp*0.4);}
+  if(!free&&buildTurns(type)>0){b.bt=b.btTotal=buildTurns(type)*TURN_SEC;b.hp=Math.round(hp*0.4);}
   if(urec){urec.b=b;urec.type=type;addUndo(urec);}
   S.blds.push(b);gridSet(b,true);if(S.ruins){const n=b.sz;S.ruins=S.ruins.filter(r=>{const rn=r.sz||newSz(r.type);return r.x+rn<=x||r.x>=x+n||r.y+rn<=y||r.y>=y+n;});}
   return b;
@@ -3817,7 +3860,7 @@ function genWave(n){
     heavy:n<7?0:Math.round((n-6)*1.5*bm),
     redcap:blood?Math.round(4+n*1.5):0,
   };
-  if(GL){/* 古い魔物は出てから頭打ち（cap回ぶんまで増える）、後半は新しい魔物に入れ替わる */const bm2=(blood?(n>=30?1:n>=25?1.25:1.45):after?0.7:1)*(1+0.03*(n-1))*(n<=10?0.7+0.03*n:1);   /* 序盤（〜第10襲撃）は少なめ：第1は0.73倍・第6は0.88倍・第10で1倍（2026-11-15。第6襲撃で負けるという声） */const g=(from,k,cap)=>n<from?0:Math.round(Math.min(n-from+1,cap||8)*k*bm2);
+  if(GL){/* 古い魔物は出てから頭打ち（cap回ぶんまで増える）、後半は新しい魔物に入れ替わる */const bm2=(blood?(n>=30?1:n>=25?1.25:1.45):after?0.7:1)*(1+0.03*(n-1))*(n<=10?0.7+0.03*n:1)*(IS_PROTO?1+Math.max(0,n-10)*0.03:1);   /* 試作版：第10襲撃より後は数を1回ごと+3%（第20で1.3倍・第30で1.6倍・第40で1.9倍）。前は体力を上げていたが、強さは種類と数だけにした（2026-11-16 ユーザーの指定） */   /* 序盤（〜第10襲撃）は少なめ：第1は0.73倍・第6は0.88倍・第10で1倍（2026-11-15。第6襲撃で負けるという声） */const g=(from,k,cap)=>n<from?0:Math.round(Math.min(n-from+1,cap||8)*k*bm2);
     const ns=Math.min(n,10),late=n>26?0.35:n>18?0.5:1;
     Object.assign(cnt,{swarm:Math.round((14+ns*8+ns*ns*1.6)*(n<=4?1.1:n<=9?1.1+0.06*(n-4):1.4)*late*bm2),   /* 第5襲撃での1.1→1.4の段差を、第5〜9でなだらかに */charger:n<2?0:Math.round(ns*5*late*bm2),harpy:g(3,3,10),troll:g(4,1.1,10),grappler:n<5?0:Math.round((3+Math.min(n-5,10)*2.4)*bm2),spitter:g(5,1.2,10),
       gobarcher:g(8,2.2,10),heavy:g(9,1.1),wyvern:g(13,0.7),treant:g(15,0.8),eltreant:g(28,0.4,6),shogre:g(22,1.0),maneater:g(23,1.4),vampire:g(30,0.6,6),ghoul:g(30,1.4,6),golem:g(37,0.5,4),
@@ -3855,7 +3898,7 @@ function genWave(n){
   });
   q.sort((a,b)=>a.t-b.t);
   const perSide={},sideComp={};for(const e of q){perSide[e.side]=(perSide[e.side]||0)+1;const c=sideComp[e.side]=sideComp[e.side]||{};c[e.type]=(c[e.type]||0)+1;}
-  return{n,q,sides,main:sides[0],tactic,blood,blizzard:S&&S.mapId==='s'&&[8,13,20].includes(n),hpMul:1+Math.max(0,n-10)*(GL?0.04:0.12),king:n===finalWave(),subs:subs.map((c,i)=>Object.values(c).reduce((a,b)=>a+b,0)+(n===finalWave()&&i===subs.length-1?1:0)),perSide,sideComp,noise0:0.6+Math.random()*0.8,noise1:0.85+Math.random()*0.3};
+  return{n,q,sides,main:sides[0],tactic,blood,blizzard:S&&S.mapId==='s'&&[8,13,20].includes(n),hpMul:IS_PROTO?1:1+Math.max(0,n-10)*(GL?0.04:0.12),   /* 試作版：襲撃が進んでも魔物の体力は上げない。強さは魔物の種類と数だけで（2026-11-16 ユーザーの指定）。本番は今までどおり */king:n===finalWave(),subs:subs.map((c,i)=>Object.values(c).reduce((a,b)=>a+b,0)+(n===finalWave()&&i===subs.length-1?1:0)),perSide,sideComp,noise0:0.6+Math.random()*0.8,noise1:0.85+Math.random()*0.3};
 }
 function phaseReset(){try{if(S.buildMode||S.buildPick){S.buildMode=null;S.buildPick=false;renderBuild();}S.aimNaval=false;if(S.sel&&S.sel.kind!=='s')S.sel=null;S.selTile=null;renderInfo(true);renderMode();}catch(e){}}
 // ===== 行軍：街から遠く、まだ見えていない敵は少し速く進む（駐屯地からの道のりの待ち時間を少し短くする） =====
@@ -4076,12 +4119,14 @@ function cancelResearch(id){
   for(const k in r.paid)S[k]+=k==='pop'?r.paid[k]:Math.floor(r.paid[k]/2);S.pop+=r.res||0;
   S.research=S.research.filter(x=>x!==r);log(`研究中止：${techOf(id).name}（費用の半分を回収）`,'warn');
 }
+// チャリオットの研究：今いる騎兵の部隊をチャリオットにする（人数は新しい上限まで、体力の割合はそのまま）
+function chariotUp(){let n=0;for(const q of S.squads){if(q.model!=='rider')continue;const r=q.hp/q.maxhp;q.model='chariot';q.members=Math.min(q.members,MTC.chariot.members);q.maxhp=unitMaxHp(q);q.hp=q.maxhp*r;n++;}if(n)log(`騎兵 ${n}部隊がチャリオットになった`,'good');}
 function advanceResearch(){
   let chance=0;
   for(const b of S.blds){if(b.type==='lab'){if(b.lv>=3)chance+=0.12;const c=cmdOf(b);if(c){chance+=c.tec*0.03*match(c,b)*(c.trait==='技術畑'?1.3:1);gainXp(c,3);}}}
   for(const r of S.research){r.left--;if(r.left>0&&Math.random()<chance){r.left--;log(`研究所より報告：${techOf(r.id).name} の進捗が前倒し`,'good');}}
   const done=S.research.filter(r=>r.left<=0);
-  if(done.length)se('research');for(const r of done){if(r.paid.pop){S.pop+=r.paid.pop;}S.pop+=r.res||0;S.tech[r.id]=lvl(r.id)+1;const t=techOf(r.id);log(`研究完了：${t.name}${tMax(t)>1||t.lvRank?' Lv'+lvl(r.id):''}`,'good');unlockNews(t);}
+  if(done.length)se('research');for(const r of done){if(r.paid.pop){S.pop+=r.paid.pop;}S.pop+=r.res||0;S.tech[r.id]=lvl(r.id)+1;const t=techOf(r.id);log(`研究完了：${t.name}${tMax(t)>1||t.lvRank?' Lv'+lvl(r.id):''}`,'good');unlockNews(t);if(r.id==='chariott')chariotUp();}
   S.research=S.research.filter(r=>r.left>0);
   if(done.length)rescaleHp();
 }
@@ -4112,12 +4157,12 @@ function nightGuards(){return S.squads.filter(q=>!q.hunt).length;}
 // 幸福度の「気分」：何日か続く上乗せ（祭り・宴など）。happyParts に出る
 function addMood(n,v,d){S.moods=(S.moods||[]).filter(m=>m.n!==n);S.moods.push({n,v,d});S.happy=Math.max(0,Math.min(100,S.happy+v));}
 function churchN(){return Math.min(2,S.blds.filter(b=>b.type==='church'&&!(b.bt>0)).length);}
-function prayGain(){return 3+5*churchN();}
+function prayGain(){return IS_PROTO?5:3+5*churchN();}   /* 祈りは教会がないとできない。幸福度 +5（2026-11-16 ユーザーの指定。前は 3＋教会1棟ごと5） */
 // 今夜の過ごし方
 const NPLAN=[
   {id:'rest',name:'休む',ic:'bed',d:()=>'ゆっくり休む。幸福度 +2'},
   {id:'feast',name:'宴',ic:'ev_fest',need:()=>S.blds.some(b=>b.type==='tavern'&&!(b.bt>0))?'':'酒場が必要',cost:{gold:15,fuel:20},d:()=>'酒場で宴を開く。幸福度 +6（2日続く）'},
-  {id:'pray',name:'祈り',ic:'sun',d:()=>`みんなで祈る。幸福度 +${prayGain()}${churchN()?`（教会×${churchN()}）`:'（教会があるともっと上がる）'}`},
+  {id:'pray',name:'祈り',ic:'sun',need:()=>!IS_PROTO||churchN()?'':'教会が必要',d:()=>IS_PROTO?`教会でみんなで祈る。幸福度 +${prayGain()}`:`みんなで祈る。幸福度 +${prayGain()}${churchN()?`（教会×${churchN()}）`:'（教会があるともっと上がる）'}`},
   {id:'watch',name:'夜警を厚く',ic:'eye',cost:{gold:10},d:()=>'見張りを増やす。今夜は事件が起きない'},
   {id:'overtime',name:'夜なべ',ic:'moon',need:()=>has('overtime')?'':'研究「延長シフト」が必要',d:()=>`夜も働く。生産 ${has('allnight')?'昼と同じ':'昼の半分'}・幸福度 −${has('allnight')?15:8}`},
 ];
@@ -4142,7 +4187,7 @@ const VISIT={
 function useText(c){return Object.keys(c).filter(k=>c[k]).map(k=>{const have=Math.floor(S[k]||0),lack=have<c[k];return `<span class="use${lack?' lack':''}" title="${RES_NAME[k]||k} ${c[k]}を使う（いま ${have}）${lack?'・足りない':''}">${ic(k,12)}−${c[k]}<small class="hv">（いま${have}）</small></span>`;}).join('');}
 // 使う前と後：「金貨 347 → 317」（夜の出来事のポップアップ。2026-11-16 ユーザーの希望：消費するとき今どれくらいあるか見えるように）
 function afterText(c){const ks=Object.keys(c).filter(k=>c[k]);if(!ks.length)return '<span class="muted">使う物はありません</span>';
-  return ks.map(k=>{const have=Math.floor(S[k]||0),lack=have<c[k];return `<span class="aft${lack?' lack':''}">${ic(k,14)}${RES_NAME[k]||k} <b>${have}</b> → <b>${lack?'足りない':have-c[k]}</b></span>`;}).join('');}
+  return ks.map(k=>{const have=Math.floor(S[k]||0),lack=have<c[k];return lack?`<span class="aft lack" title="足りない">${ic(k,14)}${RES_NAME[k]||k} <b style="color:#f0e4c8">${have}</b> / <b>${c[k]}</b></span>`:`<span class="aft">${ic(k,14)}${RES_NAME[k]||k} <b>${have}</b> → <b>${have-c[k]}</b></span>`;   /* 足りないときは「今 / 要る量」（要る量を赤で） */}).join('');}
 function visitCost(o){return typeof o.cost==='function'?o.cost():(o.cost||{});}
 // 夜の出来事で、リリアが言うこと [表情, せりふ]
 const VISIT_LIL={trav:['normal','寒そうな一家です……。食料を少し分ければ、この街に残ってくれるかもしれません。'],fest:['smile','お祭りの相談です！ 開けば、街のみんなが元気になりますよ。'],shop:['smile','行商人さんです。珍しい品があるかもしれません。金貨の残りに気をつけてくださいね。'],
@@ -4298,7 +4343,7 @@ function morning(){
   const p=N.plan;
   if(p==='rest'){addMood('よく休んだ',2,1);pl.push('ゆっくり休んだ。幸福度 +2');}
   if(p==='feast'){const c=planOf('feast').cost;if(canAfford(c)){for(const k in c)S[k]-=c[k];addMood('宴',6,2);pl.push(`酒場で宴を開いた。幸福度 +6（2日）　${resTxt({gold:-c.gold,fuel:-c.fuel},true)}`);}}
-  if(p==='pray'){const v=prayGain();addMood('祈り',v,1);pl.push(`みんなで祈った。幸福度 +${v}`);}
+  if(p==='pray'&&(!IS_PROTO||churchN())){const v=prayGain();addMood('祈り',v,1);pl.push(`みんなで祈った。幸福度 +${v}`);}
   if(p==='watch'){if(S.gold>=10){S.gold-=10;pl.push('見張りを増やした。事件は起きなかった（金貨 −10）');}}
   if(p==='fest'){const v=15+(S.fireworks?5:0);addMood('祭り',v,3);pl.push(`祭りの夜！ 幸福度 +${v}（3日続く）${S.fireworks?'・花火が大成功':''}`);S.fireworks=false;}
   if(p==='overtime'&&has('overtime')){const full=has('allnight');const before={steel:S.steel,fuel:S.fuel};S.gross={steel:0,ammo:0,pop:0,used:0};for(let i=0;i<(full?100:50);i++)update(0.1,true);addMood('夜なべの疲れ',-(full?15:8),1);ot={wood:Math.round(S.steel-before.steel),food:Math.round(S.fuel-before.fuel)};log(`夜なべ：木材+${ot.wood}・幸福度−${full?15:8}`,'warn');}
@@ -4393,23 +4438,16 @@ function rtTick(dt){
 function rtCol(f,ph){if(ph==='night')return '#7a8cff';return f<0.6?'#f2c94c':f<0.85?'#f29a3a':'#e0603a';}
 const RT_IMG={};function rtIcon(k){if(!RT_IMG[k]){const im=new Image();im.src=piURL(k,k==='moon'?'light':'amber');RT_IMG[k]=im;}return RT_IMG[k];}
 let rtBarBox=null;
-function drawRtBar(){rtBarBox=null;if(!S||S.backdrop||S.over||S.waveActive||S.tlOn||!S.turnsLeft)return;
-  const ph=S.phase==='night'?'night':'day',f=rtFrac();const vs=document.getElementById('viewSeg'),cv=document.getElementById('cv')||ctx.canvas;let right=VW-12;try{if(vs&&vs.offsetParent){const r=vs.getBoundingClientRect(),c=cv.getBoundingClientRect();right=Math.min(right,r.left-c.left-16);}}catch(e){}
-  let top=16;try{const c=cv.getBoundingClientRect();for(const id of ['modeBar','modeTxt']){const e=document.getElementById(id);if(e&&e.offsetParent&&e.offsetHeight){const r=e.getBoundingClientRect();if(r.top-c.top<60)top=Math.max(top,r.bottom-c.top+14);}}if(top>16&&vs&&vs.offsetParent){const r=vs.getBoundingClientRect();if(r.top-c.top<top+20)right=VW-12;}}catch(e){}   // スマホは上の操作の帯の下に
-  const x0=30,w=Math.max(120,Math.min(520,right-x0-30)),y=top,h=8;   // 右上の表示切り替えと重ならないように
-  ctx.save();ctx.fillStyle='rgba(5,7,5,.75)';ctx.fillRect(x0-14,y-12,w+28,h+24);
-  // 道のり（昼は黄色→だいだい→赤、夜は青）
-  if(ph==='day'){const g=ctx.createLinearGradient(x0,0,x0+w,0);g.addColorStop(0,'#5a4a1c');g.addColorStop(0.6,'#5a3e1c');g.addColorStop(1,'#4a2418');ctx.fillStyle=g;}else ctx.fillStyle='#1c2240';
-  ctx.fillRect(x0,y,w,h);
-  if(ph==='day'){const g=ctx.createLinearGradient(x0,0,x0+w,0);g.addColorStop(0,'#f2c94c');g.addColorStop(0.6,'#f2a03a');g.addColorStop(1,'#e0603a');ctx.fillStyle=g;}else ctx.fillStyle='#7a8cff';
-  ctx.fillRect(x0,y,w*f,h);
-  // 目盛り（1分ごと）
-  ctx.fillStyle='rgba(0,0,0,.45)';for(let i=1;i<6;i++)ctx.fillRect(x0+w*i/6-1,y,2,h);
-  // 終わりの印：昼は月（夜が来る）、夜は太陽（朝が来る）
-  const ie=rtIcon(ph==='day'?'moon':'sun');if(ie.complete&&ie.naturalWidth){ctx.globalAlpha=0.7;ctx.imageSmoothingEnabled=false;ctx.drawImage(ie,x0+w+2,y+h/2-9,18,18);ctx.globalAlpha=1;}
-  const im=rtIcon(ph==='day'?'sun':'moon');if(im.complete&&im.naturalWidth){ctx.imageSmoothingEnabled=false;ctx.drawImage(im,x0+w*f-14,y+h/2-14,28,28);}
-  if(S.paused){ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillStyle='#ffe08a';ctx.fillText('一時停止中',x0+w/2,y+h+11);}
-  ctx.restore();rtBarBox=[x0-14,y-12,w+28,h+24];}
+/* 時間のバーは地図の中に描かず、敵情予測と地図のあいだの細い帯（#rtBar）に（2026-11-16 ユーザーの指定） */
+let rtKey='';
+function drawRtBar(){const el=document.getElementById('rtBar');if(!el)return;const show=!!(S&&!S.backdrop&&!S.over&&!S.waveActive&&!S.tlOn&&S.turnsLeft);
+  if(el.classList.contains('on')!==show){el.classList.toggle('on',show);setTimeout(()=>{try{resizeView();}catch(e){}},0);}if(!show)return;
+  const ph=S.phase==='night'?'night':'day',f=rtFrac(),pc=Math.round(f*1000)/10,k=ph+pc+rtLeft()+(S.paused?'p':'');if(k===rtKey)return;rtKey=k;
+  el.classList.toggle('night',ph==='night');
+  const fl=document.getElementById('rtFill');fl.style.width=pc+'%';fl.style.background=ph==='night'?'#7a8cff':`linear-gradient(90deg,#f2c94c,${rtCol(f,ph)})`;
+  const sun=document.getElementById('rtSun');sun.style.left=pc+'%';const a=piURL(ph==='day'?'sun':'moon',ph==='day'?'amber':'light'),b=piURL(ph==='day'?'moon':'sun',ph==='day'?'light':'amber');
+  if(sun.dataset.k!==a){sun.dataset.k=a;sun.src=a;document.getElementById('rtIcA').src=a;document.getElementById('rtIcB').src=b;}
+  document.getElementById('rtTxt').textContent=(ph==='day'?'昼':'夜')+' あと'+rtLeft()+(S.paused?'（停止中）':'');}
 // 昼の後半は夕方に（地図をだいだい色にして少し暗く）
 function drawDusk(){if(!S||S.backdrop||S.waveActive||S.phase==='night')return;const f=rtFrac();if(f<0.55)return;const a=Math.min(1,(f-0.55)/0.45);
   ctx.save();ctx.globalCompositeOperation='multiply';ctx.fillStyle=`rgb(255,${Math.round(255-105*a)},${Math.round(255-165*a)})`;ctx.fillRect(0,0,VW,VH);ctx.restore();}
@@ -4605,20 +4643,21 @@ function nearestHangar(s){
 // 4秒戦わないと勢いがたまる→12マス以内に地上の敵が来たら、群れへまっすぐ走り込み、その先3マスまで突き抜ける。
 // 1体目×3（研究「騎馬突撃」で×4）・2体目×2・3体目から×1。大きな敵や壁・岩場・川で止まる。突き抜けたら少し下がってまた勢いをためる
 const CHG_R=6,CHG_BIG=new Set(['grappler','troll','heavy','mammoth','king','tiger']);
-function chgReady(s){return s.ut==='cav'&&s.mode==='guard'&&!s.gar&&(s.idleT||0)>=(heroSk(s,'moutotsu')?2:4);}
+function chgReady(s){return s.ut==='cav'&&s.mode==='guard'&&!s.gar&&(s.idleT||0)>=(heroSk(s,'moutotsu')||MT(s).chariot?2:4);}
 function cavCharge(s,dt){const c=s.chg;
   if(!c){if(!S.waveActive||!chgReady(s)||s.tx!=null||s.pull)return false;
     const tg=densest(s.ax,s.ay,CHG_R*TU,1.6*TU);if(!tg||E[tg.type].fly)return false;
     const dx=tg.x-s.x,dy=tg.y-s.y,d=Math.hypot(dx,dy)||1;if(d<0.5*TU)return false;
-    s.chg={ux:dx/d,uy:dy/d,left:d+1.5*TU,n:0,hit:new Set()};s.ang=Math.atan2(dy,dx);se('squad');return true;}
+    s.chg={ux:dx/d,uy:dy/d,left:d+(MT(s).chariot?4:1.5)*TU,n:0,hit:new Set()};s.ang=Math.atan2(dy,dx);se('squad');return true;}
   const sp=MT(s).spd*2*(s.yugT>0?1.6:1)*dt,step=Math.min(sp,c.left);
   const nx=s.x+c.ux*step,ny=s.y+c.uy*step;
   const gx=Math.floor(nx/T),gy=Math.floor(ny/T);
   if(allyBlockAt(gx,gy)&&!(gx===Math.floor(s.x/T)&&gy===Math.floor(s.y/T)))return chgEnd(s,'壁');
   (S.dust=S.dust||[]).push({x:s.x,y:s.y,t:0});
-  const mul=[has('charge')?4:3,2];const moutotsu=heroSk(s,'moutotsu');
-  for(const e of S.enemies){if(e.hp<=0||isFly(e)||c.hit.has(e))continue;if(segDist(e.x,e.y,s.x,s.y,nx,ny)>0.7*TU)continue;
-    c.hit.add(e);const m=mul[c.n]||1;c.n++;hitEnemy(e,unitDmg(s)*m,s);if(moutotsu&&!E[e.type].boss)e.stun=Math.max(e.stun||0,1);
+  const ch=!!MT(s).chariot,mul=ch?[2]:[has('charge')?4:3,2];const moutotsu=heroSk(s,'moutotsu');   /* チャリオット：通った魔物すべてに×2・大きな魔物でも止まらない */
+  for(const e of S.enemies){if(e.hp<=0||isFly(e)||c.hit.has(e))continue;if(segDist(e.x,e.y,s.x,s.y,nx,ny)>(ch?0.9:0.7)*TU)continue;
+    c.hit.add(e);const m=ch?mul[0]:mul[c.n]||1;c.n++;hitEnemy(e,unitDmg(s)*m,s);if(moutotsu&&!E[e.type].boss)e.stun=Math.max(e.stun||0,1);
+    if(CHG_BIG.has(e.type)&&ch){damageSquad(s,s.maxhp*0.03);S.fx.push({x:e.x,y:e.y,r:0.6*TU,t:0,dur:0.3,c:'#ffd070'});continue;}
     if(CHG_BIG.has(e.type)){damageSquad(s,s.maxhp*0.05);S.fx.push({x:e.x,y:e.y,r:0.8*TU,t:0,dur:0.35,c:'#ffd070'});s.x=nx;s.y=ny;return chgEnd(s,'大物');}
     // 小さな魔物は横へはじき飛ばす
     const px=-c.uy,py=c.ux,sd=((e.x-s.x)*px+(e.y-s.y)*py)>=0?1:-1,kx=e.x+px*sd*0.5*TU,ky=e.y+py*sd*0.5*TU;if(!eBlock(terAt(kx,ky))){e.x=kx;e.y=ky;}}
@@ -4694,6 +4733,7 @@ function update(dt,sim){
     if(b.bt>0){
       b.bt-=dt;if(!b.upg)b.hp=Math.min(b.maxhp,b.hp+b.maxhp*0.6*dt/b.btTotal);
       if(b.bt<=0.01){
+        if(!b.upg)b.hp=Math.max(b.hp,b.maxhp);   /* 建て終わったら耐久は満タン（昼のターン送りで最後の少しが足りず、耐久が少し減って見えていた。2026-11-17） */
         b.bt=0;S.fx.push({x:bcx(b),y:bcy(b),r:TU,t:0,dur:0.6,c:'#6fe08a'});
         if(b.upg==='ench'){b.upg=false;b.ench=Math.min(3,(b.ench||0)+1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${d.name} の魔核強化が完了（★${b.ench}）`,'good');if(!S.rep)se('upgrade');}
         else if(b.upg==='mat'){b.upg=false;b.mat=Math.min(2,(b.mat||0)+1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${MAT_NAME[b.type][b.mat]}への造り替えが完了`,'good');if(!S.rep)se('upgrade');}
@@ -4868,8 +4908,9 @@ function update(dt,sim){
     if(tg&&s.cd<=0&&!s.chg&&(ssp?(ssp.melee||s.sup>=1):S[sak]>=sau)){
       let worn=1;if(ssp){if(s.sup>=1)s.sup-=(ssp.melee&&has('armcare')?0.6:1);else worn=0.5;}else useRes(UT[s.ut].name,sak,sau);
       const chg=1;s.idleT=0;
-      s.cd=t.rate*eqP(s,'rate')*(s.rapidT>0?0.5:1);s.ang=Math.atan2(tg.y-s.y,tg.x-s.x);s.atkT=nowS();s.face=tg.x<s.x?-1:1;
-      const ED=E[tg.type]||{};let em=1;for(const q of eqList(s)){if(q.vsBig&&BIG_E.has(tg.type))em*=q.vsBig;if(q.vsSmall&&SMALL_E.has(tg.type))em*=q.vsSmall;if(q.vsFly&&ED.fly)em*=q.vsFly;}
+      s.cd=t.rate*eqP(s,'rate')*(s.rapidT>0?0.5:1);if(t.mag){s.mag=(s.mag==null?t.mag:s.mag)-1;if(s.mag<=0){s.mag=t.mag;s.cd=t.reload*eqP(s,'rate');}else s.cd=t.magRate;}   /* 狙撃兵：続けて撃ってから長い装填 */
+      s.ang=Math.atan2(tg.y-s.y,tg.x-s.x);s.atkT=nowS();s.face=tg.x<s.x?-1:1;
+      const ED=E[tg.type]||{};let em=1;if(t.vsBig&&(BIG_E.has(tg.type)||(ED.hp||0)>=300))em*=t.vsBig;for(const q of eqList(s)){if(q.vsBig&&BIG_E.has(tg.type))em*=q.vsBig;if(q.vsSmall&&SMALL_E.has(tg.type))em*=q.vsSmall;if(q.vsFly&&ED.fly)em*=q.vsFly;}
       const apx=eqS(s,'ap');if(apx&&ED.armor)em*=(1-ED.armor*(1-apx))/(1-ED.armor);
       let burn=eqS(s,'burn');if(eqHas(s,'needFire')&&!nearFire(s,4))burn=0;const slow=eqS(s,'slow');
       const dm=em*chg*(overWall?(eqS(s,'wall')||0.6):1)*worn*unitDmg(s)*(tg.sub&&has('asw')?1.8:1)*(heroSk(s,'jurin')&&['swarm','charger','redcap'].includes(tg.type)?1.25:1);
@@ -5211,6 +5252,31 @@ function supplyAll(){S.careN=(S.careN||0)+1;let n=0;const list=S.squads.filter(n
   if(n){se('upgrade');log(`一括補給：${n}部隊（離れている部隊は近くの所属施設・前哨砦・城館で補給を受ける）`,'good');}else{se('error');if(list.length)log('補給する資材が足りない','warn');}renderInfo(true);if(S.overlay==='army')showArmy();}
 function supplyOne(id){const x=S.squads.find(q=>q.id==id);if(x)orderSupply(x,false);renderInfo(true);}
 function supText(s){const sp=supOf(s);if(!sp)return '';const r=s.sup/sp.max;return `${Math.round(r*100)}%${r<0.25?(sp.melee?'（消耗：火力低下）':'（残りわずか）'):''}`;}
+// 一括修理・一括補給の確認（2026-11-16 ユーザーの希望）：ボタンには費用を書かず、押したら「何を直す・何に補給するか」と「使う物（今 → 後）」を並べて、はい／いいえ
+let BULK=null;
+// items：[アイコン, 名前, 数]。文字だけの説明は出さない（2026-11-16 ユーザーの指定：アイコンと名前×N）
+function bulkAsk(title,items,cost,doIt,back){
+  const L=items.map(([icn,n,k])=>`<span class="bki"><span class="bkv">${icn}<small>${n}</small></span><b>×${k}</b></span>`).join('');   /* アイコンの下に名前、その横に数（2026-11-16 ユーザーの指定） */
+  BULK={doIt,back};
+  openOverlay('bulk',`<h2 style="margin:0 0 8px">${title}</h2><div class="bkl">${L}</div>
+   <div class="bkc">${afterText(cost)}</div>
+   <div style="margin:10px 0 2px">これを消費して${title}しますか？</div><div class="nfoot"><button id="bkNo">いいえ</button><button id="bkYes" class="on">はい [Enter]</button></div>`,true);
+  document.getElementById('bkYes').onclick=bulkYes;document.getElementById('bkNo').onclick=bulkNo;}
+function bulkYes(){const b=BULK;BULK=null;closeOverlay();if(b){b.doIt();if(b.back)b.back();}}
+function bulkNo(){const b=BULK;BULK=null;closeOverlay();if(b&&b.back)b.back();}
+function cntBy(list,f){const m=new Map();for(const x of list){const k=f(x);m.set(k,(m.get(k)||0)+1);}return [...m.entries()];}
+function askRepairAll(back){if(S.waveActive){se('error');toast('戦闘中は修理できない（昼に修理しよう）','warn');return;}
+  const ra=repairAllCost(),bl=S.blds.filter(damaged);let miss=0;for(const b of S.blds)if(b.shMax>0)miss+=Math.max(0,b.shMax-(b.shield||0));
+  const items=cntBy(bl,b=>b.type).map(([t,k])=>[icSvg(t,28),B[t].name,k]);const pd=pitsToDig().length,sb=spikesBroken().length;
+  if(pd)items.push([icSvg('pit',28),B.pit.name,pd]);if(sb)items.push([icSvg('spike',28),B.spike.name,sb]);
+  const ec=miss>0?Math.ceil(miss/10):0;if(ec)items.push([icSvg('barrier',28),'シールド',S.blds.filter(b=>b.shMax>0&&(b.shield||0)<b.shMax).length]);
+  if(!items.length){se('error');toast('修理が必要な施設はありません','warn');return;}
+  const cost={steel:ra.c};if(ec)cost.elec=ec;
+  bulkAsk('一括修理',items,cost,repairAll,back);}
+function askSupplyAll(back){const list=S.squads.filter(needsSupply);if(!list.length){se('error');toast('補給が必要な部隊はありません','warn');return;}
+  const c=supCost(list),cost={};for(const k in c)if(c[k]>0)cost[k]=Math.ceil(c[k]);
+  const items=cntBy(list,q=>q.model||defModel(q.ut)).map(([m,k])=>{const nm=(MTC[m]&&MTC[m].name)||m;return [icSvg(m,28),nm.endsWith('隊')?nm:nm+'隊',k];});
+  bulkAsk('一括補給',items,cost,supplyAll,back);}
 function supCostHTML(list){const c=supCost(list),pop=Math.ceil(c.pop||0);delete c.pop;for(const k in c)c[k]=Math.ceil(c[k]);return costText(c,pop);}
 function supCostText(c){return Object.keys(c).map(k=>`${k==='pop'?'人員':RES_NAME[k]}${Math.round(c[k]*10)/10}`).join('・')||'なし';}
 // 火力の重なり方：研究どうしは足し算 → 研究・英雄・その場の効果はそれぞれ掛け算
@@ -5612,6 +5678,7 @@ function draw(){
   drawRuins();
   for(const b of S.blds){{const m=3*TU,bx=b.x*T,by=b.y*T,bs=bsz(b)*T;if(bx+bs<VR[0]-m||by+bs<VR[1]-m||bx>VR[0]+VR[2]+m||by>VR[1]+VR[3]+m)continue;}drawBuilding(b,an);if(b.ench){const n=bsz(b);for(let i=0;i<b.ench;i++){const sx=b.x*T+3+i*5,sy=b.y*T+3;ctx.fillStyle='#1a0e2a';ctx.fillRect(sx-1,sy-1,5,5);ctx.fillStyle='#c48aff';ctx.fillRect(sx,sy,3,3);}}}
   drawUpgBadges(an);
+  if(!S.backdrop)for(const b of S.blds)if(outOfAmmo(b))drawNoAmmo(b);
   if(S.viewProd&&!S.waveActive)drawProdView();
   drawClusters(an);
   drawMills(an);
@@ -5825,17 +5892,18 @@ function draw(){
     ctx.save();ctx.translate(sx,sy);ctx.rotate(a);ctx.beginPath();ctx.moveTo(5,0);ctx.lineTo(-4,-4);ctx.lineTo(-4,4);ctx.closePath();ctx.fill();ctx.restore();
   }
   // ミニマップ
-  const [mx,my]=mmPos(),ks=MM.w/W;
-  ctx.globalAlpha=0.92;ctx.fillStyle='#000';ctx.fillRect(mx-2,my-2,MM.w+4,MM.h+4);if(miniCv)ctx.drawImage(miniCv,mx,my);if(miniFog)ctx.drawImage(miniFog,mx,my);ctx.globalAlpha=1;
-  for(const h of (S.island?hiveSpots():[])){ctx.fillStyle='#ff5a8a';ctx.beginPath();ctx.arc(mx+bcx(h)*(MM.w/W),my+bcy(h)*(MM.h/H),3.5,0,7);ctx.fill();}
+  if(MM_MODE!=='h'){const [mx,my]=mmPos(),ks=MMV.w/W;
+  ctx.globalAlpha=0.92;ctx.fillStyle='#000';ctx.fillRect(mx-2,my-2,MMV.w+4,MMV.h+4);if(miniCv)ctx.drawImage(miniCv,mx,my,MMV.w,MMV.h);if(miniFog)ctx.drawImage(miniFog,mx,my,MMV.w,MMV.h);ctx.globalAlpha=1;
+  for(const h of (S.island?hiveSpots():[])){ctx.fillStyle='#ff5a8a';ctx.beginPath();ctx.arc(mx+bcx(h)*(MMV.w/W),my+bcy(h)*(MMV.h/H),3.5,0,7);ctx.fill();}
   if(S.camps&&!S.waveActive&&lvl('scout')>=1)for(const c of S.camps){if(c.found||c.state!=='idle')continue;ctx.save();ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(255,120,90,.8)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(mx+c.hx*ks,my+c.hy*ks,Math.max(4,c.hr*ks),0,7);ctx.stroke();ctx.restore();}   /* 斥候Lv1から：駐屯地のおおよその場所（ミニマップにも） */
   if(S.camps&&!S.waveActive)for(const c of S.camps){if(!c.found||c.state==='gone')continue;const x=mx+c.x*ks,y=my+c.y*ks;ctx.fillStyle='#ff9a3a';ctx.beginPath();ctx.moveTo(x,y-4);ctx.lineTo(x+4,y+3);ctx.lineTo(x-4,y+3);ctx.closePath();ctx.fill();}
   for(const b of S.blds){ctx.fillStyle=b.type==='hq'?'#f2b33d':gunOf(b)?'#9fe0a0':CWALL.has(b.type)?'#8a9a8c':'#4f9a62';ctx.fillRect(mx+b.x*T*ks,my+b.y*T*ks,3,3);}
   ctx.fillStyle='#62c6d9';for(const q of S.squads)ctx.fillRect(mx+q.x*ks-1.5,my+q.y*ks-1.5,3,3);
-  ctx.fillStyle='#ff5a4e';for(const e of S.enemies){const ex=mx+e.x*ks,ey=my+e.y*ks;if(ex>=mx&&ey>=my&&ex<mx+MM.w&&ey<my+MM.h&&isSeen(Math.floor(e.x/T),Math.floor(e.y/T)))ctx.fillRect(ex-1,ey-1,2,2);}
+  ctx.fillStyle='#ff5a4e';for(const e of S.enemies){const ex=mx+e.x*ks,ey=my+e.y*ks;if(ex>=mx&&ey>=my&&ex<mx+MMV.w&&ey<my+MMV.h&&isSeen(Math.floor(e.x/T),Math.floor(e.y/T)))ctx.fillRect(ex-1,ey-1,2,2);}
   ctx.strokeStyle='#f2b33d';ctx.strokeRect(mx+cam.x*ks+.5,my+cam.y*ks+.5,VW/cam.z*ks,VH/cam.z*ks);
-  ctx.strokeStyle='#2a3a2d';ctx.strokeRect(mx-2.5,my-2.5,MM.w+5,MM.h+5);
-  ctx.fillStyle='rgba(207,227,207,.55)';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText(IS_TOUCH?'ドラッグ:移動　2本指:拡大縮小　タップ:選択':'ドラッグ/WASD:移動　ホイール:拡大縮小',8,VH-10);ctx.textAlign='center';
+  ctx.strokeStyle='#2a3a2d';ctx.strokeRect(mx-2.5,my-2.5,MMV.w+5,MMV.h+5);}
+  mmBtnPos();
+  ctx.fillStyle='rgba(207,227,207,.55)';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText(IS_TOUCH?'ドラッグ:移動　2本指:拡大縮小　タップ:選択':'ドラッグ/WASD:移動　ホイール:拡大縮小'+(S.squads&&S.squads.length>1?'　Shift＋ドラッグ:部隊を範囲選択':''),8,VH-10);ctx.textAlign='center';
   // カーソル下の地形
   if(mouse.in){const gx=Math.floor(mouse.x/T),gy=Math.floor(mouse.y/T);if(gx>=0&&gy>=0&&gx<COLS&&gy<ROWS&&(S.ter[gy][gx]||S.oil[gy][gx]||S.ore[gy][gx])){const t=S.ter[gy][gx],lv=t===1?elevAt(gx,gy):t===2?forestAt(gx,gy):t===4?marshAt(gx,gy):0;
     // 通常表示は1行だけ。土地レベル表示 [T] の時は効果を行ごとに出す
@@ -5991,7 +6059,7 @@ function drawBldV2(b,an){const r=bldSpr(b);if(!r||!r[0])return false;const [sp,a
   if(!building)drawResBar(b,x+2,y-1,S2-4,2);
   if(b.hp<b.maxhp-0.5&&!building){ctx.fillStyle='#300';ctx.fillRect(x+2,y-1,S2-4,2);ctx.fillStyle=b.hp/b.maxhp>.4?'#6fe08a':'#ff5a4e';ctx.fillRect(x+2,y-1,(S2-4)*b.hp/b.maxhp,2);}
   if(b.wall&&b.wall.hp<b.wall.maxhp){ctx.fillStyle='#222';ctx.fillRect(x+2,y+S2-2,S2-4,2);ctx.fillStyle='#b8c8b8';ctx.fillRect(x+2,y+S2-2,(S2-4)*b.wall.hp/b.wall.maxhp,2);}
-  if((b.starved||b.noFuel||b.noAmmo)&&!building){ctx.fillStyle='#ff5a4e';ctx.font='bold 11px sans-serif';ctx.fillText('!',x+S2-4,y+8);}
+  if((b.starved||b.noFuel)&&!building){ctx.fillStyle='#ff5a4e';ctx.font='bold 11px sans-serif';ctx.fillText('!',x+S2-4,y+8);}
   if(d.pop&&b.crew<crewNeed(b)&&!building){ctx.fillStyle=b.crew?'#f2b33d':'#ff5a4e';ctx.font='bold 8px sans-serif';ctx.fillText(b.crew+'/'+crewNeed(b),x+S2-8,y+S2-4);}
   if(b.off){ctx.fillStyle='rgba(20,16,28,.45)';ctx.fillRect(x,y,S2,S2);ctx.fillStyle='#e0d0b0';ctx.fillRect(cx-4,cy-5,2,10);ctx.fillRect(cx+2,cy-5,2,10);}
   if(b.bt>0&&b.upg){ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(x+1,y+1,S2-2,S2-2);}   /* 札と進み具合は drawUpgBadges で上に描く */
@@ -6341,8 +6409,13 @@ function artOf(o){{const k=artKey(o);if(k)return artPx(k,o.kind==='s'?unitLabel(
 const mouse={x:0,y:0,in:false};
 function toScreen(ev){const r=cv.getBoundingClientRect();return{x:(ev.clientX-r.left)*VW/r.width,y:(ev.clientY-r.top)*VH/r.height};}
 function toCanvas(ev){const p=toScreen(ev);return{x:cam.x+p.x/cam.z,y:cam.y+p.y/cam.z,sx:p.x,sy:p.y};}
-function mmPos(){if(typeof TLP!=='undefined'&&TLP)return [-9999,-9999];   /* タイムラプス中はミニマップを出さない */const off=document.body.classList.contains('fullmap')&&!isNarrow()&&document.getElementById('right').classList.contains('open')?350:0;return[VW-MM.w-8-off,VH-MM.h-8-(document.body.classList.contains('fullmap')&&!isNarrow()?46:0)];}
-function inMini(p){const [mx,my]=mmPos();return p.sx>=mx&&p.sy>=my&&p.sx<mx+MM.w&&p.sy<my+MM.h?{x:(p.sx-mx)/MM.w*W,y:(p.sy-my)/MM.h*H}:null;}
+function mmPos(){if((typeof TLP!=='undefined'&&TLP)||MM_MODE==='h')return [-9999,-9999];   /* タイムラプス中はミニマップを出さない */const off=document.body.classList.contains('fullmap')&&!isNarrow()&&document.getElementById('right').classList.contains('open')?350:0;return[VW-MMV.w-8-off,VH-MMV.h-8-(document.body.classList.contains('fullmap')&&!isNarrow()?46:0)];}
+// ミニマップの切り替えボタン：ミニマップの右上の角に（隠しているときは地図の右下）
+// ミニマップの小さな見出し（地図・大小・たたむ）：ミニマップのすぐ上。たたんだときは見出しだけを地図の右下に
+let mmBK='';function mmBtnPos(){const b=document.getElementById('mmHead');if(!b)return;const show=!!(S&&!S.backdrop&&!(typeof TLP!=='undefined'&&TLP));b.style.display=show?'':'none';if(!show)return;const r=cv.getBoundingClientRect(),w=document.getElementById('mapWrap').getBoundingClientRect(),k=r.width/VW;
+  let L,T0,W2;if(MM_MODE==='h'){W2=Math.round(MM.w*0.55*k);L=Math.round(r.left-w.left+(VW-8)*k-W2);T0=Math.round(r.top-w.top+(VH-8)*k-b.offsetHeight);}else{const [mx,my]=mmPos();W2=Math.round((MMV.w+4)*k);L=Math.round(r.left-w.left+(mx-2)*k);T0=Math.round(r.top-w.top+(my-2)*k-b.offsetHeight);}
+  const key=L+','+T0+','+W2;if(key!==mmBK){mmBK=key;b.style.left=L+'px';b.style.top=T0+'px';b.style.width=W2+'px';}}
+function inMini(p){if(MM_MODE==='h')return null;const [mx,my]=mmPos();return p.sx>=mx&&p.sy>=my&&p.sx<mx+MMV.w&&p.sy<my+MMV.h?{x:(p.sx-mx)/MMV.w*W,y:(p.sy-my)/MMV.h*H}:null;}
 const drag={mini:false};
 cv.addEventListener('mousemove',ev=>{const p=toCanvas(ev);mouse.x=p.x;mouse.y=p.y;mouse.in=true;});
 // ポインタ操作：タップ＝選択／ドラッグ＝地図移動／2本指＝ピンチで拡大縮小（マウス・タッチ共通）
@@ -6484,7 +6557,7 @@ function reserveOf(type,x,y){const v=yieldAt(type,x,y);return type==='miner'?Mat
 // b があればその施設の今の量（レベル・研究・場所・幸福度こみ）。b が null（これから建てる）なら Lv1・ふつうの場所での目安
 function flowOf(type,b){let pr=null;if(b)pr=prodOf(b);else{const h=hqOf();const f={type,x:h?h.x:0,y:h?h.y:0,lv:1,bt:0,ym:1,id:-1,crew:B[type].pop||0};try{const r0=richAt;window.richAt=()=>1;try{pr=prodOf(f);}finally{window.richAt=r0;}}catch(e){pr=null;}}
   return pr;}
-function flowHTML(type,b){const d=B[type];if(!d)return '';const g=b?gunOf(b):(d.range&&d.grp==='def'?d:null);let pr=null;try{pr=flowOf(type,b);}catch(e){}
+function flowHTML(type,b){const d=B[type];if(!d)return '';const g=(b?gunOf(b):null)||(d.range&&d.grp==='def'&&!(b&&b.bt>0)?d:null);let pr=null;try{pr=flowOf(type,b);}catch(e){}
   const tIc=icSvg(type,40);const lane=(items,cls)=>`<div class="fl ${cls}">${items.map((k,i)=>`<i style="animation-delay:${(i*0.55).toFixed(2)}s;top:${items.length>1?20+i*(60/Math.max(1,items.length-1)):50}%">${ic(k,16)}</i>`).join('')}</div>`;
   if(pr){const pos=Object.entries(pr).filter(a=>a[1]>0.05),neg=Object.entries(pr).filter(a=>a[1]<-0.05);if(!pos.length&&!neg.length&&b)return `<div class="fbox"><div class="fnote muted">今は何も作っていません（${b.dep?'資源を掘り尽くした':b.off?'止めている':'人員や資源が足りない'}）</div></div>`;
     const keysIn=neg.map(a=>a[0]),keysOut=pos.map(a=>a[0]);const nm=k=>RES_NAME[k]||k;const v=x=>Math.max(1,Math.round(Math.abs(x)));
@@ -6494,9 +6567,68 @@ function flowHTML(type,b){const d=B[type];if(!d)return '';const g=b?gunOf(b):(d.
     /* 弾が足りないときは撃つ動きをしない（2026-11-16 ユーザーの指摘：矢がないのに当たっているように見えた） */
     const lack=per.filter(([k,x])=>(S[k]||0)<x).map(([k])=>RES_NAME[k]||k);const dry=lack.length>0;
     const perTxt=([k,x])=>x<1?`${Math.max(2,Math.round(1/x))}発で${ic(k,12)}${RES_NAME[k]||k}1`:`1発ごとに${ic(k,12)}${RES_NAME[k]||k}${Math.round(x)}`;
-    return `<div class="fbox"><div class="flow gun${dry?' dry':''}"><div class="fb">${tIc}</div>${dry?`<div class="fl fdry"><span class="bd" style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:12px">${lack.join('・')}がないので撃てない</span></div>`:`<div class="fl fshot">${per.map(([k],i)=>`<i style="animation-delay:${(i*0.3).toFixed(2)}s">${ic(k,14)}</i>`).join('')}</div>`}<div class="fen">${typeof eSpr==='function'?eSpr('swarm',26):'敵'}</div></div>
+    /* 防衛施設は、夜の実際の動きを見せる（固定の場面。地図の上の絵と同じ絵・同じ弾で撃つ。2026-11-16 ユーザーの指定） */
+    return `<div class="fbox"><div class="fdwrap"><canvas class="fdemo" width="600" height="200" data-t="${type}" data-id="${b?b.id:''}"></canvas></div>
       <div class="ftxt"><span class="bd">${per.map(perTxt).join('・')}</span><span class="muted">（弾が尽きると撃てない。${g.splash?'範囲攻撃':'1体ずつ'}・射程${Math.round((g.range||0)*U)}マス）</span></div></div>`;}
   return '';}
+// 防衛施設の夜の動き（詳しい画面の小さな場面）：左に施設、右から魔物が歩いてきて、施設が本物の弾を撃つ
+// 弾がまったくなくて撃てない防衛施設：地図の上で、施設の上に赤い「!!」（2026-11-16 ユーザーの希望）
+function outOfAmmo(b){if(!b||b.bt>0||b.type==='hq')return false;const g=gunOf(b);if(!g)return false;const ak=g.ammoKey||'ammo';if((S[ak]||0)<(g.ammoUse||1)*USE_MUL)return true;return !!g.ammo2&&Object.entries(g.ammo2).some(([k,v])=>(S[k]||0)<v);}
+function drawNoAmmo(b){const n=bsz(b),x=(b.x+n/2)*T,y=b.y*T-2,z=Math.max(0.6,Math.min(2,1/(cam.z||1))),w=20*z,h=14*z,pu=0.75+0.25*Math.sin(performance.now()/180);
+  ctx.save();ctx.globalAlpha=pu;ctx.fillStyle='#c0201a';ctx.strokeStyle='#ffd0c8';ctx.lineWidth=1.2*z;ctx.beginPath();ctx.rect(x-w/2,y-h-4*z,w,h);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x-3*z,y-4*z);ctx.lineTo(x,y);ctx.lineTo(x+3*z,y-4*z);ctx.closePath();ctx.fillStyle='#c0201a';ctx.fill();
+  ctx.fillStyle='#fff';ctx.font=`bold ${Math.round(11*z)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('!!',x,y-h/2-4*z+0.5);ctx.restore();}
+function fdemoStart(root){root.querySelectorAll('canvas.fdemo').forEach(c=>{if(!c._run){c._run=true;fdemoRun(c);}});}
+function fdemoRun(c){const g2=c.getContext('2d'),type=c.dataset.t,d=B[type]||{},dry=!!c.dataset.dry,P=SPR.projectiles||{},SPE=SPR.enemies||{};
+  const b=S.blds.find(x=>String(x.id)===c.dataset.id)||{type,lv:1,x:0,y:0,id:-1,kind:'b'};
+  const W0=300,H0=100,bx=44,by=60,air=!!d.air&&!d.ground,st={en:[],sh:[],fx:[],cd:0.3,sp:0.6,last:performance.now(),fire:-1e9};
+  const rate=Math.max(0.45,Math.min(2.2,d.rate||1));
+  const kind=d.bolt?'bolt':d.balloon?'balloon':d.splash?'shell':d.salvo?'salvo':d.chain?'zig':d.cannon?'line':d.harpoon?'line':d.cone?'line':d.ray?'line':'arrow';
+  const lineC=d.cannon?['#2a2a2a',4]:d.harpoon?['#c0c8d4',3]:d.cone?['#ffb14e',3]:['#9fd0ff',3];
+  const shellSp=type==='magetower'?(P.fireball||P.cannonball):d.flat?P.cannonball:type==='mortar'?P.mortar_shell:type==='how'?(P.stone_big||P.stone):P.stone;
+  const pimg=(sp,a)=>{if(!sp||!sp.img)return null;const L=sp.img.dirs||sp.img.anim||sp.img.play||Object.values(sp.img)[0];if(!L||!L.length)return null;return (sp.img.dirs?L[sprDir(a)%L.length]:L[Math.floor(performance.now()/120)%L.length])||L[0]||null;};
+  const spawn=(x0)=>st.en.push({k:air?'harpy':Math.random()<0.75?'swarm':'charger',x:x0||W0+14,y:(air?44:by-4)+(Math.random()-.5)*30,die:0,ph:Math.random()*6});
+  for(const x0 of [150,215,280])spawn(x0);   /* はじめから何体か歩いてくる */
+  const kill=(e)=>{if(e&&!e.die)e.die=0.001;};
+  const near=(x,y,r)=>st.en.filter(e=>!e.die&&Math.hypot(e.x-x,e.y-y)<r);
+  function shoot(t){const a=Math.atan2(t.y-(by-10),t.x-bx);st.fire=performance.now();
+    if(kind==='salvo'){for(let k=0;k<8;k++)st.sh.push({k:'arrow',x:bx+6,y:by-12,tx:t.x+(Math.random()-.5)*18,ty:t.y+(Math.random()-.5)*14,t:0,dur:0.35,tg:k===0?t:null});return;}
+    const dur=kind==='shell'?0.75:kind==='balloon'?1.4:kind==='bolt'?0.38:kind==='arrow'?0.32:0.16;
+    st.sh.push({k:kind,x:bx+8,y:by-12,tx:t.x,ty:t.y,t:0,dur,tg:t});}
+  function land(s){if(s.k==='shell'||s.k==='balloon'){for(const e of near(s.tx,s.ty,16))kill(e);st.fx.push({x:s.tx,y:s.ty,t0:performance.now()});}
+    else if(s.k==='bolt'){kill(s.tg);const behind=st.en.filter(e=>!e.die&&e!==s.tg&&e.x>s.tg.x&&Math.abs(e.y-s.tg.y)<10).sort((p,q)=>p.x-q.x)[0];kill(behind);}
+    else if(s.k==='zig'){kill(s.tg);near(s.tg.x,s.tg.y,40).slice(0,2).forEach(kill);}else kill(s.tg);}
+  function frame(now){if(!c.isConnected)return;const dt=Math.min(0.05,(now-st.last)/1000);st.last=now;
+    st.sp-=dt;if(st.sp<=0){spawn();st.sp=0.9+Math.random()*0.7;}
+    for(const e of st.en){if(e.die)e.die+=dt;else if(e.x>bx+44)e.x-=(e.k==='charger'?30:20)*dt;}
+    st.en=st.en.filter(e=>e.die<0.7);
+    st.cd-=dt;const tg=st.en.filter(e=>!e.die&&e.x<W0-8).sort((p,q)=>p.x-q.x)[0];
+    if(!dry&&st.cd<=0&&tg){st.cd=rate;shoot(tg);}
+    for(const s2 of st.sh){s2.t+=dt;if(s2.t>=s2.dur&&!s2.done){s2.done=true;if(s2.tg){s2.tx=s2.tg.x;s2.ty=s2.tg.y;}land(s2);}}
+    st.sh=st.sh.filter(s2=>!s2.done||s2.t<s2.dur+0.12);
+    // 背景：夜の草地と、施設のまわりの明かり
+    g2.setTransform(2,0,0,2,0,0);g2.imageSmoothingEnabled=false;g2.fillStyle='#16241a';g2.fillRect(0,0,W0,H0);
+    g2.fillStyle='rgba(255,255,255,.025)';for(let x=0;x<W0;x+=16)for(let y=(x/16)%2?0:8;y<H0;y+=16)g2.fillRect(x,y,8,8);
+    // 施設
+    try{const r=bldSpr(b);let im=null;if(r&&r[0]){const [sp,an]=r,ft=(now-st.fire)/1000;if(an==='dirs')im=(ft>=0&&ft<0.72&&sp.img.fire)?sp.img.fire[Math.min(5,Math.floor(ft/0.12))]:sp.img.dirs[0];else{const L=sp.img[an]||sp.img.idle;if(L)im=L[Math.floor(now/200)%L.length];}}
+      if(!im&&ICIMG[type])im=ICIMG[type];if(im){const z=56;g2.drawImage(im,bx-z/2,by-z+12,z,z);}}catch(e){}
+    // 魔物（地図と同じ歩きの絵。左向き）
+    for(const e of st.en){const SP=SPE['e_'+e.k];const L=SP&&SP.img.walk;const sz=e.k==='harpy'?30:26;g2.save();g2.globalAlpha=e.die?Math.max(0,1-e.die/0.7):1;g2.translate(e.x,e.y+(air?Math.sin(now/160+e.ph)*2:0));g2.scale(-1,1);if(e.die)g2.rotate(-e.die*2);
+      if(L){g2.drawImage(L[Math.floor(now/120+e.ph)%L.length],-sz/2,-sz/2,sz,sz);}else{g2.fillStyle='#7aa050';g2.fillRect(-5,-6,10,12);}g2.restore();}
+    // 弾（地図と同じ弾の絵）
+    for(const s2 of st.sh){if(s2.done)continue;const k=Math.min(1,s2.t/s2.dur),a=Math.atan2(s2.ty-s2.y,s2.tx-s2.x);
+      if(s2.k==='line'||s2.k==='zig'){g2.save();g2.globalAlpha=1-k*0.5;g2.strokeStyle=s2.k==='zig'?'#e0c8ff':lineC[0];g2.lineWidth=s2.k==='zig'?2:lineC[1];g2.beginPath();g2.moveTo(s2.x,s2.y);if(s2.k==='zig'){for(let i=1;i<5;i++)g2.lineTo(s2.x+(s2.tx-s2.x)*i/5+(Math.random()-.5)*8,s2.y+(s2.ty-s2.y)*i/5+(Math.random()-.5)*8);}g2.lineTo(s2.tx,s2.ty);g2.stroke();g2.restore();continue;}
+      const arc=s2.k==='shell'?30:s2.k==='balloon'?6:s2.k==='bolt'?2:5,x=s2.x+(s2.tx-s2.x)*k,y=s2.y+(s2.ty-s2.y)*k-Math.sin(k*Math.PI)*arc;
+      if(s2.k==='balloon'){const L=P.balloon_bomb&&P.balloon_bomb.img.float;if(L)g2.drawImage(L[Math.floor(now/160)%L.length],x-10,y-12,20,20);continue;}
+      if(s2.k==='shell'&&P.shadow){const sh=pimg(P.shadow,0);if(sh&&sh.width)g2.drawImage(sh,Math.round(s2.x+(s2.tx-s2.x)*k-sh.width/2),Math.round(s2.y+(s2.ty-s2.y)*k-sh.height/2+6));}
+      const im=pimg(s2.k==='bolt'?P.bolt:s2.k==='shell'?shellSp:P.arrow,a);
+      if(im&&im.width)g2.drawImage(im,Math.round(x-im.width/2),Math.round(y-im.height/2));else{g2.fillStyle='#e8d8b0';g2.fillRect(x-3,y-1,6,2);}}
+    // 着弾の爆発
+    const EX=SPR.effects&&SPR.effects.explosion;st.fx=st.fx.filter(f=>{const i=Math.floor((now-f.t0)/80);const L=EX&&EX.img.play;if(!L||i>=L.length)return false;const im=L[i];if(!im||!im.width)return false;g2.drawImage(im,f.x-im.width/2,f.y-im.height/2);return true;});
+    // 夜の暗さ（施設のまわりだけ明るい）
+    const gr=g2.createRadialGradient(bx,by-10,20,bx,by-10,260);gr.addColorStop(0,'rgba(6,8,26,0)');gr.addColorStop(0.35,'rgba(6,8,26,.25)');gr.addColorStop(1,'rgba(6,8,26,.55)');g2.fillStyle=gr;g2.fillRect(0,0,W0,H0);
+    requestAnimationFrame(frame);}
+  requestAnimationFrame(frame);}
 // マップの「生産」表示（切り替え式）：各施設の上に、1ターンに作る物（緑）と使う物（赤）
 function drawProdView(){const z=cam.z||1,fs=Math.min(24,Math.max(7,10/z)),isz=fs*1.25,gap=fs*0.35,pad=fs*0.35;ctx.save();ctx.font=`bold ${fs}px sans-serif`;ctx.textBaseline='middle';ctx.textAlign='left';
   for(const b of S.blds){let pr=null;try{pr=prodOf(b);}catch(e){}if(!pr)continue;const L=Object.entries(pr).filter(a=>Math.abs(a[1])>=0.5&&a[0]!=='pop');if(!L.length)continue;
@@ -6574,6 +6706,7 @@ document.addEventListener('keydown',ev=>{
   if(ev.key==='j'||ev.key==='J'){if(!S.overlay)openArmyTab('hero');return;}
   if(S.overlay==='report'&&(ev.key==='Enter'||ev.key==='Escape'||ev.code==='Space')){ev.preventDefault();closeOverlay();return;}
   if(S.overlay==='confirm'&&ev.key==='Escape'){closeOverlay();return;}
+  if(S.overlay==='bulk'&&(ev.key==='Enter'||ev.key==='Escape')){ev.preventDefault();if(ev.key==='Enter')bulkYes();else bulkNo();return;}
   if(S.overlay==='night'&&ev.key==='Enter'){ev.preventDefault();closeOverlay();morning();return;}
   if(S.overlay==='visit'&&(ev.key==='Enter'||ev.key==='Escape')){ev.preventDefault();closeOverlay();return;}
   if(S.overlay==='story'&&(ev.key==='Enter'||ev.key==='Escape'||ev.code==='Space')){ev.preventDefault();closeOverlay();return;}
@@ -6587,8 +6720,8 @@ document.addEventListener('keydown',ev=>{
   if(ev.code==='Space'){ev.preventDefault();togglePause();}
   if(ev.key==='Enter'){ev.preventDefault();endTurn();}
   if(ev.key==='h'||ev.key==='H')toggleHeat();
-  if(ev.key==='x'||ev.key==='X')repairAll();
-  if(!S.overlay&&(ev.key==='n'||ev.key==='N'))supplyAll();
+  if(!S.overlay&&(ev.key==='x'||ev.key==='X'))askRepairAll();
+  if(!S.overlay&&(ev.key==='n'||ev.key==='N'))askSupplyAll();
   if(ev.key==='m'||ev.key==='M')auToggle();
   if((ev.key==='u'||ev.key==='U')&&S.sel&&S.sel.kind==='b'){upgrade(S.sel);renderInfo(true);}
   if((ev.key==='q'||ev.key==='Q')&&S.squads.length){const i=S.sel&&S.sel.kind==='s'?S.squads.indexOf(S.sel):-1;S.sel=S.squads[(i+1)%S.squads.length];S.buildMode=null;renderInfo(true);}
@@ -6606,10 +6739,12 @@ function renderPauseUI(){if(!S)return;const p=!!S.paused&&!S.over;const b=docume
 let viewKey='';
 function curView(){return S.showLv?'lv':S.heat?'heat':S.viewProd?'prod':'n';}
 function setView(v){S.showLv=v==='lv';S.heat=v==='heat';S.viewProd=v==='prod';syncView();}
-function syncView(){viewKey=curView();document.querySelectorAll('#viewSeg [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===viewKey));
+// 表示の切り替えはボタン1つ（押すたびに次へ。2026-11-16 ユーザーの希望）
+const VIEW_ORDER=['n','lv','heat','prod'],VIEW_NAME={n:'通常',lv:'土地Lv',heat:'狙われやすさ',prod:'生産'};
+function syncView(){viewKey=curView();{const b=document.getElementById('vCyc');if(b){b.classList.toggle('on',viewKey!=='n');const n=document.getElementById('vCycN');if(n)n.textContent=VIEW_NAME[viewKey];}}
   const c=document.getElementById('viewCap');c.textContent=viewKey==='prod'?'1ターンに作る物（緑）と使う物（赤）':viewKey==='lv'?'色が濃いほど Lv が高い　岩=黄・森=緑・沼=青・鉱脈=橙・泉=紫':viewKey==='heat'?'赤く広がるほど敵が先に狙う（壁・防衛施設は狙われにくい）':'';c.style.display=viewKey==='n'?'none':'';}
 function toggleHeat(){setView(S.heat?'n':'heat');}
-document.querySelectorAll('#viewSeg [data-v]').forEach(b=>b.onclick=()=>{setView(b.dataset.v);se&&se('click');});
+{const b=document.getElementById('vCyc');if(b)b.onclick=()=>{setView(VIEW_ORDER[(VIEW_ORDER.indexOf(curView())+1)%VIEW_ORDER.length]);se&&se('click');};}
 document.getElementById('bPause').onclick=togglePause;document.getElementById('bPauseSeg').onclick=togglePause;
 document.getElementById('bSave').onclick=()=>{if(!saveGame()){toast(S.waveActive?'襲撃中はセーブできません（朝に自動保存されます）':'今はセーブできません','warn');}};
 document.querySelector('#more .moreBody').addEventListener('click',e=>{if(e.target.closest('button'))document.getElementById('more').open=false;});
@@ -6694,7 +6829,7 @@ document.getElementById('bArmy').onclick=()=>openArmyTab('list',true);
 function setRT(t){if(t==='info'&&!isNarrow())t='build';if(S&&t==='econ')S.econSeen=(S.econSeen||0)+1;if(S&&t==='army'&&S.armySub==='hero')S.heroSeen=(S.heroSeen||0)+1;document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
-document.getElementById('bRepAll').onclick=repairAll;document.getElementById('bRepB').onclick=repairAll;document.getElementById('bSupAll').onclick=supplyAll;
+document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bSupAll').onclick=()=>askSupplyAll();
 document.getElementById('bHelp').onclick=()=>{if(!S.overlay)showHelp(false);};
 document.getElementById('bNaval').onclick=toggleNaval;
 document.getElementById('bMute').onclick=auToggle;
@@ -6746,7 +6881,7 @@ function renderBuild(){
   }
   el.querySelectorAll('button[data-k]').forEach(bt=>{const k=bt.dataset.k,d=B[k],c=costOf(k);
     setText(bt.querySelector('.bn'),d.name);
-    setHTML(bt.querySelector('small'),costText(c,d.pop)+(d.power?` ${ic('power',12)}${d.power>0?'+':''}${d.power}`:'')+`<span class="t">${buildTurns(k)}T</span>`);
+    setHTML(bt.querySelector('small'),costText(c,d.pop)+(d.power?` ${ic('power',12)}${d.power>0?'+':''}${d.power}`:'')+`<span class="t">${turnsTxt(buildTurns(k))}</span>`);
     const cb=capBlock(k);const dis=!canAfford(c,d.pop)||!!cb;bt.classList.toggle('na',dis);bt.classList.toggle('capd',!!cb);if(bt.disabled)bt.disabled=false;bt.title=cb||d.desc;
     bt.classList.toggle('on',S.buildMode===k);});
 }
@@ -6771,7 +6906,7 @@ function tileBuildHTML(x,y,title){
   let h=`<div style="margin-top:8px" class="muted">${title}</div>`;
   for(const {g,list} of gs){
     h+=`<div style="font-size:10px;color:var(--cyan);margin:4px 0 2px">${g.name}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">`;
-    for(const k of list){const d=B[k],c=costOf(k);h+=`<button data-tb="${k}" style="text-align:left;padding:3px 5px;line-height:1.25" ${canAfford(c,d.pop)?'':'disabled'} title="${d.desc}">${d.name}<br><small style="color:var(--dim);font-size:10px">${costText(c,d.pop)} ／ ${buildTurns(k)}T</small></button>`;}
+    for(const k of list){const d=B[k],c=costOf(k);h+=`<button data-tb="${k}" style="text-align:left;padding:3px 5px;line-height:1.25" ${canAfford(c,d.pop)?'':'disabled'} title="${d.desc}">${d.name}<br><small style="color:var(--dim);font-size:10px">${costText(c,d.pop)} ／ ${turnsTxt(buildTurns(k))}</small></button>`;}
     h+=`</div>`;
   }
   return h;
@@ -6865,10 +7000,10 @@ function catOf(o){if(o.kind==='s')return '部隊';const t=o.type;if(t==='hq')ret
 function heatName(o){const h=heatOf(o);return h<=0?'なし':h<=1?'低':h<=2?'中':'高';}
 function crewTile(o){const n=crewNeed(o)||0,e=Math.round(eff(o)*100);return `<small>要員</small><b>${o.crew||0}/${n}<span class="${e<100?'bd':'gd'}">${e}%</span></b>`;}
 function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
-  let h=`<div class="banner">${artOf(o)}<span class="tag">${tag}</span></div>`;
+  let h=`<div class="ihtop"><div class="banner">${artOf(o)}<span class="tag">${tag}</span></div>`;   /* 絵は名前の横の小さな絵に（2026-11-16 画面の整理） */
   const r=Math.max(0,o.hp/o.maxhp),hc=r<0.3?' low':r<0.6?' mid':'';
   if(isS){const t=MT(o);
-    h+=`<div class="ihead"><span class="iname">${unitLabel(o)}</span>${o.coNo?`<span class="muted">第${o.coNo}中隊</span>`:''}<span class="ist">${MODE_NAME[o.mode]||''}</span><span class="ir">兵 ${o.members}/${t.members}</span></div>`;
+    h+=`<div class="ihead"><span class="iname">${unitLabel(o)}</span>${o.coNo?`<span class="muted">第${o.coNo}中隊</span>`:''}<span class="ist">${MODE_NAME[o.mode]||''}</span><span class="ir">兵 ${o.members}/${t.members}</span></div></div>`;
     h+=`<div class="hpline"><span>体力</span><span id="iHp">${Math.round(r*100)}%</span></div><div class="hpbar${hc}"><i id="iHpBar" style="width:${Math.round(r*100)}%"></i></div>`;
     const sp=supOf(o);if(sp)h+=`<div class="hpline"><span>${sp.name}</span><span id="iSup">${supText(o)}</span></div><div class="hpbar sup"><i id="iSupBar" style="width:${Math.round(o.sup/sp.max*100)}%"></i></div>`;
     {const vb=vetBar(o);h+=`<div class="hpline"><span class="vetl">${vetIc(o,12)}熟練度 <b>${VET[vetLv(o)].n}</b></span><span id="iVet">${vb.txt}</span></div><div class="hpbar vet"><i id="iVetBar" style="width:${vb.pct}%"></i></div>`;}
@@ -6876,7 +7011,7 @@ function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
     h+=`<div class="stats"><div><small>火力</small><b>${Math.round(unitDmg(o)/t.rate)}<span>/秒</span></b></div><div><small>射程</small><b>${Math.round(unitRange(o)*U)}<span>マス${unitSplash(o)?'・範囲':''}</span></b></div><div><small>熟練度</small><b class="vetb">${vetIc(o,12)}${VET[vetLv(o)].n}</b></div></div>`;
     return h;}
   const d=B[o.type];
-  h+=`<div class="ihead"><span class="iname">${stageName(o)}</span>${d.grp?`<span class="ilv">${'◆'.repeat(o.lv||1)}</span>`:''}<span class="itype">${tag}</span></div>`;
+  h+=`<div class="ihead"><span class="iname">${stageName(o)}</span>${d.grp?`<span class="ilv">${'◆'.repeat(o.lv||1)}</span>`:''}<span class="itype">${tag}</span></div></div>`;
   h+=`<div class="hpline"><span>耐久</span><span id="iHp">${Math.ceil(o.hp)} / ${Math.ceil(o.maxhp)}</span></div><div class="hpbar${hc}"><i id="iHpBar" style="width:${Math.round(r*100)}%"></i></div>`;
   const tiles=[];
   if(gunOf(o))tiles.push(`<small>射程</small><b>${Math.round(rangeOf(o)*U)}<span>マス</span></b>`);
@@ -6888,6 +7023,13 @@ function infoHead(o){const isS=o.kind==='s',tag=catOf(o);
   h+=`<div class="stats">${tiles.slice(0,3).map(t=>t.startsWith('<div id="iCrew"')?t:`<div>${t}</div>`).join('')}</div>`;
   h+=flowHTML(o.type,o);   /* 施設の中身の小さなムービー（2026-11-15） */
   return h;}
+// よく使う操作（改築・城のレベル・作るもの・生産・部隊の編成・配置・つながった壁・修理）を、耐久のすぐ下の「操作」の箱にまとめる（2026-11-16 画面の整理）
+const QUICK_RE=[/改築|拠点レベル/,/作るもの|^生産$|砲弾/,/部隊の編成|配置中|がいません/,/つながった壁/];
+function infoQuick(el,o){const hb=el.querySelector(':scope > .hpbar');if(!hb)return;const kids=[...el.children],secs=kids.filter(x=>x.matches('details.isec'));
+  const pick=[];for(const re of QUICK_RE)for(const d of secs)if(re.test(d.dataset.k||'')&&!pick.includes(d))pick.push(d);
+  const rep=o&&damaged(o)?el.querySelector('.iact #iRep'):null;if(!pick.length&&!rep)return;   /* 修理は傷んでいるときだけ上へ（解体は下のまま） */
+  for(const d of pick){const sb=d.querySelector('.sb');if(!sb)continue;for(const m of [...sb.children])if(m.classList.contains('muted')&&m.textContent.length>40&&sb.querySelector(':scope > button, :scope > div > button'))sb.appendChild(m);}   /* 長い説明はボタンのあとへ */
+  const q=document.createElement('div');q.className='iquick';if(rep){const r=document.createElement('div');r.className='iact';r.appendChild(rep);q.appendChild(r);}pick.forEach(d=>q.appendChild(d));hb.after(q);}
 // .upg の箱を折りたたみ（details）にする。開閉は項目ごとに保存
 function detailsify(root){let st={};try{st=JSON.parse(localStorage.getItem('nd_info_open')||'{}');}catch(e){}
   root.querySelectorAll('.upg').forEach(u=>{const first=u.firstElementChild;if(!first)return;let title='',svHTML='',lead=[];
@@ -6898,7 +7040,7 @@ function detailsify(root){let st={};try{st=JSON.parse(localStorage.getItem('nd_i
     else if(first.classList.contains('row')&&first.querySelector('b')){const b=first.querySelector('b');title=b.innerHTML;b.remove();svHTML=first.innerHTML;first.remove();}
     else return;
     const key=title.replace(/<[^>]+>/g,'').replace(/[：:].*$/,'').trim();
-    const d=document.createElement('details');d.className='isec';d.open=key in st?!!st[key]:/改築|施設改修|拠点レベル|部隊の編成|配置中|がいません|つながった壁|買い物の目安|交易|作るもの/.test(key);
+    const d=document.createElement('details');d.className='isec';d.dataset.k=key;d.open=key in st?!!st[key]:/改築|施設改修|拠点レベル|部隊の編成|配置中|がいません|つながった壁|買い物の目安|交易|作るもの/.test(key);
     const sm=document.createElement('summary');sm.innerHTML=`<span class="st">${title}</span><span class="sv">${svHTML}</span>`;
     const body=document.createElement('div');body.className='sb';while(u.firstChild)body.appendChild(u.firstChild);
     d.append(sm,body);d.addEventListener('toggle',()=>{st[key]=d.open;try{localStorage.setItem('nd_info_open',JSON.stringify(st));}catch(e){}});u.replaceWith(d);});}
@@ -6908,7 +7050,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   if(!o&&S.heroView){const c=S.cmds.find(x=>x.id===S.heroView&&x.alive);if(c){const key='hv'+c.id+c.lv+Math.floor(c.xp)+c.assign+c.kills;if(!force&&key===lastInfoKey)return;lastInfoKey=key;el.innerHTML=heroDetail(c);const hc=document.getElementById('hvClose');if(hc)hc.onclick=closeHeroView;const g=document.getElementById('hvGo');if(g)g.onclick=()=>{const t=findObj(c.assign);if(t){S.sel=t;renderInfo(true);}};return;}S.heroView=null;}
   if(S.buildMode&&!o){
     const key='bm'+S.buildMode;if(!force&&key===lastInfoKey)return;lastInfoKey=key;
-    const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)}ターン　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。${IS_TOUCH?'「建設をやめる」で建設モードを終了':'右クリック・Escで建設モードを終了'}</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div>${flowHTML(S.buildMode,null)}<button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
+    const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)?buildTurns(S.buildMode)+'ターン':'すぐ完成'}　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。${IS_TOUCH?'「建設をやめる」で建設モードを終了':'右クリック・Escで建設モードを終了'}</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div>${flowHTML(S.buildMode,null)}<button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
   if(!o&&S.selTile){const {x,y}=S.selTile;const key='tile'+x+','+y+affordSig()+(S.grid[y][x]?1:0)+S.enemies.length%7+'r'+((S.ruins||[]).length);
     if(!force&&key===lastInfoKey)return;lastInfoKey=key;
     let h=`<div class="row"><b>マス（${x}, ${y}）</b><button id="tClose" style="padding:0 6px">×</button></div>`+tileDesc(x,y);
@@ -7057,13 +7199,13 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   /* 近衛兵の説明の箱はなくした（近衛兵はもう出ない。2026-11-16） */
   if(o.type==='hq'){const c=baseUpCost();h+=`<div class="upg"><div class="row"><b>拠点レベル ${S.baseLv}/${BASE_MAX}</b><span class="muted">英雄 ${S.cmds.length}/${maxCmd()}</span></div>
     <div class="muted" style="font-size:11px">レベルが上がると：英雄の上限 +2・領地の半径 +6マス・城館に住める人数 +10・施設の上限 +${FAC_PER_LV}・前哨砦 +1・罠の上限 ${trapCap()}→${TRAP_CAP[Math.min(TRAP_CAP.length-1,S.baseLv||1)]}。<b style="color:var(--text)">Lv2で施設のLv2と研究ランクⅡ、Lv3で施設のLv3と研究ランクⅢ</b>が解放。城の姿も 木→石→鉄→魔核合金 と変わり、<b style="color:#c48aff">Lv5で結界</b>（襲撃のたびに城への被害を1500まで防ぐ）。Lv3以上への強化には魔核が必要</div>
-    ${S.baseUp?`<div class="gd" style="margin-top:4px">Lv${S.baseUp.to}に強化中…　残り${S.baseUp.left}ターン（強化中も城は普段どおり働きます）</div>`:S.baseLv<BASE_MAX?`<button id="iBaseUp" style="margin-top:4px;width:100%" ${canAfford(c)&&!S.waveActive?'':'disabled'}>拠点をLv${S.baseLv+1}に（${costText(c)}・${baseUpTurns()}ターン）</button>`:'<div class="gd">最大レベル</div>'}</div>`;}
+    ${S.baseUp?`<div class="gd" style="margin-top:4px">Lv${S.baseUp.to}に強化中…　残り${S.baseUp.left}ターン（強化中も城は普段どおり働きます）</div>`:S.baseLv<BASE_MAX?`<button id="iBaseUp" class="on wide" ${canAfford(c)&&!S.waveActive?'':'disabled'}><span>城をLv${S.baseLv+1}に強化</span><span class="cost">${costText(c)}<span class="t">${baseUpTurns()}ターン</span></span></button>`:'<div class="gd">最大レベル</div>'}</div>`;}
   if(false)h+=`<div class="muted" style="margin-top:6px;font-size:11px">研究「城館防衛火器」で自衛火器を設置できます</div>`;
   if(!isS&&o.kind==='b'&&(WALL_TYPES.includes(o.type)||o.type==='gate'||o.type==='tower')&&ready(o)){const G=wallGroup(o);const dm=G.filter(damaged);const rc=dm.reduce((a,x)=>a+repairCost(x),0);
     const WR=WALL_TYPES,nx=WR[WR.indexOf(o.type)+1];const up=nx&&(!B[nx].req||has(B[nx].req))?G.filter(x=>x.type===o.type&&placeOK(nx,x.x,x.y)):[];const uc={};for(const k in costOf(nx||'fence'))uc[k]=(costOf(nx||'fence')[k]||0)*up.length;
     h+=`<div class="upg"><b>つながった壁</b><span>${G.length}枚・傷み${dm.length}</span><div><button id="wgRep" class="wide" ${dm.length&&S.steel>=rc&&!S.waveActive?'':'disabled'}><span>まとめて修理（${dm.length}枚）</span><span class="cost">${costText({steel:rc})}</span></button>${up.length?`<button id="wgUp" class="wide" ${canAfford(uc)&&!S.waveActive?'':'disabled'}><span>${B[o.type].name}を${B[nx].name}にまとめて建て替え（${up.length}枚）</span><span class="cost">${costText(uc)}</span></button>`:''}</div></div>`;}
   if(!isS)h+=`<div class="iact"><button id="iRep">修理</button>${o.type!=='hq'?`<button id="iDemo" class="danger" title="${o.bt>0&&!o.upg?'全額返還':'建設費の50%返還・人員復帰'}">${o.bt>0&&!o.upg?'建設を取り消す':'解体'}</button>`:''}</div>`;
-  el.innerHTML=h;detailsify(el);
+  el.innerHTML=h;detailsify(el);if(!isS)infoQuick(el,o);fdemoStart(el);
   el.querySelectorAll('[data-hpick]').forEach(b=>b.onclick=()=>{S.heroPick=S.heroPick===o.id?null:o.id;renderInfo(true);});
   el.querySelectorAll('[data-hero]').forEach(b=>b.onclick=()=>{const id=b.dataset.hero;if(id){const x=S.cmds.find(q=>q.id===id);if(x){assign(x,o);se('click');}}else if(c){assign(c,null);o.cmd=null;}S.heroPick=null;renderInfo(true);renderCmds(true);});
   const sel=document.getElementById('iCmd');
@@ -7188,7 +7330,11 @@ function recMeters(w){const r=recOf(w),c=curDev();
   const m=(lab,v,t,tip)=>`<div class="rec${v<t?' short':''}" title="${tip}"><div class="rt"><span>${lab}</span><b>${v} <small>/ ${t}</small></b></div><div class="ebar"><i style="width:${Math.round(Math.min(1,v/Math.max(1,t))*100)}%"></i></div></div>`;
   return `<span class="rtag">推奨</span>${m('人口',c.pop,r.pop,'住民と兵の合計')}${m('防衛施設',c.def,r.def,'バリスタ・投石機などの数（Lv2は160%、Lv3は230%として数える）')}${m('部隊',c.sq,r.sq,'編成した部隊の数')}`;}
 // 敵情の帯をたたむ（PC）。たたんだときは「第◯襲撃・規模・あと◯日」だけの1行
-function intelMin(){try{return localStorage.getItem('nd_intel_min')==='1';}catch(e){return false;}}
+// 通信ログをたためる（たたむと、いちばん新しい1行だけ。2026-11-16）
+function logMin(){try{return localStorage.getItem('nd_log_min')==='1';}catch(e){return false;}}
+function setLogMin(v){try{localStorage.setItem('nd_log_min',v?'1':'0');}catch(e){}document.body.classList.toggle('logMin',!!v);const a=document.querySelector('#logTg .lgar');if(a)a.textContent=v?'▸':'▾';const l=document.getElementById('log');if(l)l.scrollTop=l.scrollHeight;setTimeout(()=>{try{resizeView();}catch(e){}},0);}
+setTimeout(()=>{setLogMin(logMin());const t=document.getElementById('logTg');if(t)t.onclick=()=>{setLogMin(!logMin());se('click');};},0);
+function intelMin(){try{return localStorage.getItem('nd_intel_min')!=='0';}catch(e){return true;}}   /* はじめからたたんだ1行（2026-11-16 縦幅を取らないように） */
 function setIntelMin(v){try{localStorage.setItem('nd_intel_min',v?'1':'0');}catch(e){}document.body.classList.toggle('intelMin',!!v);}
 setTimeout(()=>document.body.classList.toggle('intelMin',intelMin()),0);
 function renderIntel(){
@@ -7208,7 +7354,7 @@ function renderIntel(){
     if(it.cnt)types=Object.keys(E).filter(k=>it.cnt[k]).map(k=>`<span class="et" title="${E[k].desc}">${eSpr(k,24)}×${it.cnt[k]}</span>`).join('');
     else if(it.types)types=Object.keys(E).filter(k=>it.types.includes(k)).map(k=>`<span class="et" title="${E[k].name}：${E[k].desc}">${eSpr(k,24)}</span>`).join('')+'<span class="muted">（数は不明）</span>';
     else types=`<span>不明</span><span class="muted">（偵察Lv${it.L}）</span>`;
-    h=`<div class="lbl"><span>敵情予測</span><b>第${w.n}襲撃</b></div><span class="imini">規模 <b>${it.total}</b>　あと ${S.turnsLeft} 日${w.blood?'　<span style="color:#ff7a6a">ブラッドムーン</span>':''}</span>${tags(w)}<div class="icell"><small>規模</small><b class="big">${it.total}</b></div><div class="icell"><small>襲撃元</small><span>${it.sides.map(sd=>sideSrc(sd)+campTag(sd)).join('・')}${it.hidden?' <span class="muted">ほか不明</span>':''}</span></div><div class="icell itypes"><small>敵の種類</small><span class="ets">${types}</span></div><div class="icell" title="敵の強さと、推奨に対する今の備えから出した目安"><small>危険度</small>${pipsHTML(dg,5,'danger-pips')}</div>`;   /* 推奨の目安（人口・防衛施設・部隊）は外した：足りない資源の警告に置き換え（2026-11-15） */
+    h=`<div class="lbl"><span>敵情予測</span><b>第${w.n}襲撃</b></div><span class="imini">規模 <b>${it.total}</b><span class="imsrc">${it.sides.map(sd=>sideSrc(sd)).join('・')}</span><span class="imet">${it.cnt?Object.keys(E).filter(k=>it.cnt[k]).map(k=>`<span title="${E[k].name}">${eSpr(k,18)}${it.cnt[k]}</span>`).join(''):it.types?Object.keys(E).filter(k=>it.types.includes(k)).map(k=>`<span title="${E[k].name}">${eSpr(k,18)}</span>`).join(''):''}</span>${pipsHTML(dg,5,'danger-pips')}${w.blood?'<span style="color:#ff7a6a">ブラッドムーン</span>':''}</span>${tags(w)}<div class="icell"><small>規模</small><b class="big">${it.total}</b></div><div class="icell"><small>襲撃元</small><span>${it.sides.map(sd=>sideSrc(sd)+campTag(sd)).join('・')}${it.hidden?' <span class="muted">ほか不明</span>':''}</span></div><div class="icell itypes"><small>敵の種類</small><span class="ets">${types}</span></div><div class="icell" title="敵の強さと、推奨に対する今の備えから出した目安"><small>危険度</small>${pipsHTML(dg,5,'danger-pips')}</div>`;   /* 推奨の目安（人口・防衛施設・部隊）は外した：足りない資源の警告に置き換え（2026-11-15） */
     const det=[];
     if(w.blood)det.push('<span style="color:#ff7a6a">赤い月が昇る……魔物が強く、レッドキャップが現れる</span>');
     if(it.tactic)det.push(`<span style="color:var(--amber)">戦術：${it.tactic}</span>`);
@@ -7261,11 +7407,10 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   if(bn.disabled!==S.waveActive)bn.disabled=S.waveActive;
   setHTML(bn,S.waveActive?`${ui('moon','red',24)}<span>襲撃中</span>`:S.phase==='night'?`${ui('sun','dark',24)}<span>朝へ</span><kbd>Enter</kbd>`:`${ui('moon','dark',24)}<span>${S.turnsLeft===1?'夜へ・襲撃':'夜へ'}</span><kbd>Enter</kbd>`);
   bn.classList.toggle('last',!S.waveActive&&S.phase!=='night'&&S.turnsLeft===1);renderPauseUI();
-  {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,sq.length?`一括補給 <span class="supc">${supCostHTML(sq)}</span><kbd>N</kbd>`:'一括補給');
-  {const ms=document.getElementById('mSup');if(ms)setHTML(ms,sq.length?`一括補給（${sq.length}部隊）<span class="supc">${supCostHTML(sq)}</span>`:'一括補給（必要なし）');}const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
-  const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${repWhat(ra2)}（${ic('steel',12)}${ra2.c}）<kbd>X</kbd>`:'一括修理');const dA=!ra2.n||S.steel<1||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
-  {const rb=document.getElementById('bRepB');if(rb){const l=S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${repWhat(ra2)}（木材${ra2.c}）`:'一括修理（壊れた施設なし）';if(rb.dataset.l!==l){rb.dataset.l=l;rb.textContent=l;}if(rb.disabled!==dA)rb.disabled=dA;}}
-  {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中は不可）':ra2.n?`一括修理 ${repWhat(ra2)}（木材${ra2.c}）`:'一括修理');mr.classList.toggle('dim',dA);}}
+  {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,`一括補給${sq.length?`<span class="bkn">${sq.length}</span>`:''}<kbd>N</kbd>`);
+  {const ms=document.getElementById('mSup');if(ms)setHTML(ms,sq.length?`一括補給（${sq.length}部隊）`:'一括補給（必要なし）');}const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
+  const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中）':`一括修理${ra2.n?`<span class="bkn">${ra2.n}</span>`:''}<kbd>X</kbd>`);const dA=!ra2.n||S.steel<1||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
+  {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中）':ra2.n?`一括修理（${repWhat(ra2)}）`:'一括修理');mr.classList.toggle('dim',dA);}}
   const bnv=document.getElementById('bNaval');bnv.style.display=has('naval')?'':'none';setText(bnv,S.aimNaval?'目標を指定…（Escで取消）':`艦砲射撃 残り${S.waveActive?S.navalLeft:(has('navalre')?2:1)} [V]`);
   {const dn=!S.waveActive||S.navalLeft<=0;if(bnv.disabled!==dn)bnv.disabled=dn;bnv.classList.toggle('on',!!S.aimNaval);}
 
@@ -7421,7 +7566,7 @@ function showResearch(){
       if(t.gate&&st==='locked')t.line=`ランク${RN[t.gate-1]}の研究 合計Lv${rankSum(cat,t.gate-1)}/${gateNeed(cat,t.gate)}`;else if(t.gate)t.line='';
       const outside=(t.pre||[]).filter(x=>!L.inTab(x));
       h+=`<div class="tnode ${st} ${t.excl?'excl':''} ${t.id===S.resSel?'sel':''} ${t.key||t.gate?'key':''} ${isPr(t)?'prio':''}" data-node="${t.id}" style="margin-left:${dep*18}px">
-        <div class="tt"><b>${t.icon?`<span class="tic">${icSvg(t.icon,16)}</span>`:''}${t.name}</b>${stTxt}${mx>1?`<span class="lv">Lv ${Lv}/${mx}</span>`:''}</div>
+        <div class="tt"><b>${t.icon?`<span class="tic">${icSvg(t.icon,16)}</span>`:''}${t.name}${techLine(t)?`<span class="tln${offPolicy(t)?' off':''}" title="${POLICY[techLine(t)].n}の研究${offPolicy(t)?'（街の方針と違う：費用2倍）':''}" style="--lc:${POLICY[techLine(t)].col}">${ic(POLICY[techLine(t)].ic,11)}</span>`:''}</b>${stTxt}${mx>1?`<span class="lv">Lv ${Lv}/${mx}</span>`:''}</div>
         <div class="te">${t.eff||''}</div>
         ${t.line||t.excl||outside.length?`<div class="tl">${t.line?t.line:''}${t.excl?' <span style="color:var(--amber)">分岐</span>':''}${outside.length?' 要：'+outside.map(x=>techOf(x).name).join('・'):''}</div>`:''}
         <div class="tm"><span class="cst">${st==='done'?'':costText(techCost(t))}</span><span class="tt2">${techTurns(t)}T</span></div>
@@ -7444,7 +7589,7 @@ function showResearch(){
   else act=`<span class="muted">前提：${(t.pre||[]).map(p=>`<span style="color:${has(p)?'var(--green)':'var(--red)'}">${techOf(p).name}${techOf(p).cat!==cat?`（${techOf(p).cat}）<button data-jump="${p}" style="padding:1px 8px">そこへ移動</button>`:''}</span>`).join('・')}${t.preSum?`${(t.pre||[]).length?'・':''}<span style="color:${preSumLv(t)>=t.preSum.n?'var(--green)':'var(--red)'}">${t.preSum.label}の合計Lv ${preSumLv(t)}/${t.preSum.n}</span>`:''}</span>`;
   const exo=t.excl?TECH.filter(o=>o.excl===t.excl&&o.id!==t.id).map(o=>o.name).join('・'):'';
   h+=`<div class="tdet"><div class="tdl"><div><b class="tdn" style="color:${CAT_COLOR[cat]}">${t.name}</b><span class="tdlv">${tMax(t)<=1?'':lvl(t.id)>=tMax(t)?`<b style="color:var(--green)">Lv ${lvl(t.id)}（最大）</b>`:`Lv ${lvl(t.id)} → ${lvl(t.id)+1} ／ 最大 ${tMax(t)}${t.lvRank?'（城のランク）':''}`}</span>${t.key?'<span style="color:var(--amber);margin-left:8px">重要</span>':''}</div>
-    <div class="tde">${t.eff}</div>${exo?`<div style="color:var(--amber);font-size:11px">分岐：「${exo}」とどちらか一方しか研究できません</div>`:''}</div>
+    <div class="tde">${t.eff}</div>${offPolicy(t)&&st!=='done'?`<div class="polw">${ic(POLICY[techLine(t)].ic,12)} ※注意！ 街の研究方針と違うので、多くのコストがかかります（費用2倍）</div>`:''}${exo?`<div style="color:var(--amber);font-size:11px">分岐：「${exo}」とどちらか一方しか研究できません</div>`:''}</div>
     <div class="tdr">${act}</div></div>`;
   const card=openOverlay('res',h,true);
   if(keep&&keep.tab===S.resTab){card.scrollTop=keep.top;card.querySelectorAll('.rcards').forEach((x,i)=>x.scrollTop=keep.cols[i]||0);const rc=card.querySelector('.rcols');if(rc){rc.scrollLeft=keep.sx;rc.scrollTop=keep.sy;}}
@@ -7478,7 +7623,7 @@ function showArmy(target){
   if(!target&&S.squads.length){const uts=[...new Set(S.squads.filter(u=>W_NAME[u.ut]&&u.ut!=='adv').map(u=>u.ut))];   // 装備をまとめて変える（兵科ごと）
     if(uts.length){h+=`<h3 style="margin:10px 0 4px">装備をまとめて変える</h3><div class="help" style="margin-bottom:4px">兵科ごとに、全部隊の武器・鎧の段を変えます。「最新（自動）」なら研究するたびに上がる。古い段にすると補給の資材を節約できる</div>`;
       for(const ut of uts){const r=S.squads.find(u=>u.ut===ut);h+=`<div class="row" style="align-items:center"><span>${icSvg(r.model||defModel(ut),18)} <b>${UT[ut].name}</b> <span class="muted" style="font-size:11px">${S.squads.filter(u=>u.ut===ut).length}部隊</span></span><span style="font-size:11px;display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">${eqIcon('w',wMat(r),14)}<select data-eqall="w:${ut}" style="font-size:11px;width:auto;max-width:170px">${eqOpts(Object.assign({},r,{wT:undefined}),'w').replace(/ selected/g,'').replace('<option value="auto"','<option value="" selected>まとめて変える…</option><option value="auto"')}</select>${armK(ut)?`${eqIcon(armK(ut),aMat(armK(ut)),14)}<select data-eqall="a:${ut}" style="font-size:11px;width:auto;max-width:170px">${eqOpts(Object.assign({},r,{aT:undefined}),'a').replace(/ selected/g,'').replace('<option value="auto"','<option value="" selected>まとめて変える…</option><option value="auto"')}</select>`:''}</span></div>`;}}}
-  if(!target){  h+=`<h3 style="margin:10px 0 4px">全部隊（${S.squads.length}）</h3><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px"><button data-all="sel">全部隊を選択</button><button data-all="sup">一括補給（${supCostText(supCost(S.squads))}）</button>${['guard','hold','return'].map(m=>`<button data-all="${m}">全部隊：${MODE_NAME[m]}</button>`).join('')}</div>`;
+  if(!target){  h+=`<h3 style="margin:10px 0 4px">全部隊（${S.squads.length}）</h3><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px"><button data-all="sel">全部隊を選択</button><button data-all="sup">一括補給</button>${['guard','hold','return'].map(m=>`<button data-all="${m}">全部隊：${MODE_NAME[m]}</button>`).join('')}</div>`;
   h+=S.squads.length?S.squads.map(u=>`<div class="row" style="align-items:center"><span>${icSvg(u.model||defModel(u.ut),18)} <b>${unitLabel(u)}</b> <span class="muted" style="font-size:11px">${u.members}/${MT(u).members}${UT[u.ut].unit}・体力${Math.round(u.hp/u.maxhp*100)}%${supT(u)?`・<span style="color:${u.sup/supT(u).max<0.25?'var(--red)':'inherit'}">${supT(u).name}${Math.round(supOf(u)&&u.sup/supT(u).max*100)}%</span>`:''}・${u.gar?'物見櫓':MODE_NAME[u.mode]}</span></span><span>${W_NAME[u.ut]&&u.ut!=='adv'?`<span style="margin-right:6px;font-size:11px">${eqSel(u,'w')}${armK(u.ut)?' '+eqSel(u,'a'):''}</span>`:''}<button data-pick="${u.id}" style="padding:2px 8px">選ぶ</button></span></div>`).join(''):'<div class="muted">部隊がいません</div>';
   }
   let card;if(target){target.innerHTML=h;card=target;}else{card=openOverlay('army',h,true);document.getElementById('ovClose').onclick=closeOverlay;}
@@ -7487,7 +7632,7 @@ function showArmy(target){
   card.querySelectorAll('[data-eqs]').forEach(b=>b.onchange=()=>{const [k,id]=b.dataset.eqs.split(':');const u=S.squads.find(x=>x.id==id);if(u)eqSet([u],k,b.value);showArmy(target);});
   card.querySelectorAll('[data-eqall]').forEach(b=>b.onchange=()=>{if(!b.value)return;const [k,ut]=b.dataset.eqall.split(':');eqSet(S.squads.filter(x=>x.ut===ut),k,b.value);log(`${UT[ut].name}の全部隊の${k==='w'?'武器':'鎧'}を変えた`);showArmy(target);});
   card.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{const u=S.squads.find(x=>x.id==b.dataset.pick);if(!u)return;closeOverlay();S.multi=[];S.sel=u.gar?S.blds.find(x=>x.id===u.gar)||u:u;cam.x=u.x-VW/cam.z/2;cam.y=u.y-VH/cam.z/2;clampCam();renderInfo(true);renderMode();});
-  card.querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{const m=b.dataset.all;if(m==='sup'){supplyAll();return;}if(m==='sel'){S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;closeOverlay();renderInfo(true);renderMode();return;}for(const u of S.squads)if(!u.gar)setMode(u,m,true);showArmy(target);});
+  card.querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{const m=b.dataset.all;if(m==='sup'){askSupplyAll(()=>showArmy(target));return;}if(m==='sel'){S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;closeOverlay();renderInfo(true);renderMode();return;}for(const u of S.squads)if(!u.gar)setMode(u,m,true);showArmy(target);});
 }
 function showHire(target,mode){
   const full=S.cmds.length>=maxCmd();const showH=mode!=='adv',showA=mode!=='hero';
@@ -7562,7 +7707,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.11.1',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.12',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7673,6 +7818,8 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.12（試作版だけ）','',['<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）','<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
+ ['1.12','2026-11-17',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>時間のバー</b>を地図の中から出して、敵情予測と地図のあいだの細い帯に（残りの時間も出る）','<b>ミニマップに小さな見出し</b>をつけた：「大・小」で大きさを切り替え、「－」でたたむ（たたむと見出しだけになり、「＋」で戻す）','<b>防衛施設の詳しい画面に、夜の実際の動き</b>：施設が、地図の上と同じ絵の弾（バリスタは重い矢、投石機は石、物見櫓は矢など）で、歩いてくる魔物を撃つ小さな場面','<b>弾がまったくなくて撃てない防衛施設</b>には、地図の上で施設の上に赤い「!!」を出すように（昼でも分かる）','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる','<b>木の柵は置いたらすぐ完成</b>（罠と同じ）','不具合の修正：建て終わった施設の耐久が少し減って見えることがあった']],
  ['1.11.1','2026-11-17',['不具合の修正：昼に建てた「1ターンで完成」の施設が、次の朝になっても完成していないことがあった（建てた時刻によって、同じ日に建てたのに片方だけ完成することも）。今は、昼のいつ建てても次の朝に完成する','城の説明などに残っていた、今はいない「近衛兵」の話を消した']],
  ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。生産は昼だけ、10秒ごとに少しずつ入る。時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める。残りは地図の上の横長のバーで（太陽・月が左から右へ進む）。昼の後半は夕方に。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
@@ -7695,10 +7842,11 @@ const UPDATES=[
  ['1.1','',['スマホ横持ちに対応、ホーム画面に追加してアプリとして遊べるように','タブを 建設・研究・軍事・街 に整理','城の強化・造り替えにターンがかかるように']],
  ['1.0','',['画面デザインとドット絵を一新','敵の駐屯地・斥候・モンスター図鑑']],
 ];
-function updSeen(){try{return localStorage.getItem('nd_upd_seen')===UPDATES[0][0];}catch(e){return true;}}
-function showUpdates(){try{localStorage.setItem('nd_upd_seen',UPDATES[0][0]);}catch(e){}
+function UPD(){return UPDATES.filter(u=>IS_PROTO||!u[0].includes('試作'));}   /* 「試作版だけ」の更新は本番では見せない */
+function updSeen(){try{return localStorage.getItem('nd_upd_seen')===UPD()[0][0];}catch(e){return true;}}
+function showUpdates(){try{localStorage.setItem('nd_upd_seen',UPD()[0][0]);}catch(e){}
   openOverlay('title',`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>アップデート情報</h2><button id="upBack">タイトルへ</button></div>
-  <div style="max-height:62vh;overflow:auto;line-height:1.8">${UPDATES.map(([v,d,L],i)=>`<div style="margin:0 0 12px"><h3 style="margin:0 0 4px;color:${i?'var(--dim)':'#f2b33d'}">ver ${v}${d?`<small class="muted" style="margin-left:8px">${d}</small>`:''}</h3><ul style="margin:0;padding-left:18px">${L.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('')}</div>`,true);
+  <div style="max-height:62vh;overflow:auto;line-height:1.8">${UPD().map(([v,d,L],i)=>`<div style="margin:0 0 12px"><h3 style="margin:0 0 4px;color:${i?'var(--dim)':'#f2b33d'}">ver ${v}${d?`<small class="muted" style="margin-left:8px">${d}</small>`:''}</h3><ul style="margin:0;padding-left:18px">${L.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('')}</div>`,true);
   document.getElementById('upBack').onclick=showTitle;}
 function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.add('off');}const sv=saveInfo();
   const dt=sv?new Date(sv.date):null;const when=dt?`${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`:'';
@@ -7826,7 +7974,16 @@ const RANK_SAY={
 function storyOn(){return S&&S.mode==='campaign'&&!S.ex&&(S.mapId==='f'||S.mapId==='7');}
 function storyQueue(k){if(!storyOn()||!(STORY[k]||(String(k).startsWith('r')&&RANK_SAY[+String(k).slice(1)])))return;S.storySeen=S.storySeen||[];if(S.storySeen.includes(k))return;S.storySeen.push(k);(S.storyQ=S.storyQ||[]).push(k);}
 // 画面が空いたとき（ほかの画面・襲撃中でないとき）に1つずつ出す（ゲームのループから呼ぶ）
-function storyTick(){if(!S||!S.storyQ||!S.storyQ.length||S.overlay||S.waveActive||S.over||TLP||FW)return;const k=S.storyQ.shift();showStory(k);}
+function storyTick(){if(POLICY_ON&&S&&!S.policy&&S.mode==='campaign'&&!S.ex&&!S.backdrop&&(S.baseLv||1)>=4&&!S.overlay&&!S.waveActive&&!S.over&&!TLP&&!FW){showPolicy();return;}
+  if(!S||!S.storyQ||!S.storyQ.length||S.overlay||S.waveActive||S.over||TLP||FW)return;const k=S.storyQ.shift();showStory(k);}
+// 街の研究方針を決める場面（城がランクⅣになったとき。閉じられない：どちらかを選ぶ）
+function showPolicy(pick){const L=k=>Object.keys(TECH_LINE).filter(id=>TECH_LINE[id]===k).map(id=>techOf(id)).filter(t=>t&&techRank(t)>=4).sort((a,b)=>techRank(a)-techRank(b));
+  const card=k=>{const P=POLICY[k];return `<button class="pol${pick===k?' on':''}" data-pol="${k}" style="--lc:${P.col}"><div class="polh">${ic(P.ic,28)}<b>${P.n}</b></div><div class="pold">${k==='ind'?'大砲と火薬、機械の力で戦う':'エーテルの魔法の力で戦う'}</div><div class="poll">${L(k).map(t=>`<span>${t.icon?icSvg(t.icon,18):''}<small>${t.name}</small></span>`).join('')}</div></button>`;};
+  openOverlay('policy',`<div class="lslow" style="max-width:300px;margin:0 auto 8px">${artPx('lilia_art','','')}</div><h2 style="margin:0 0 6px;text-align:center">街の研究方針を決める</h2>
+   ${lilSay('normal','城のランクが4になりました。ここからは、街をどちらの道で強くするかを決めましょう、領主様。選ばなかった道の研究もできますが、費用が2倍かかります')}
+   <div class="pols">${card('ind')}${card('mag')}</div><div class="nfoot"><button id="polOk" class="on" ${pick?'':'disabled'}>${pick?`「${POLICY[pick].n}」の道に決める`:'どちらかを選んでください'}</button></div>`,true);
+  document.querySelectorAll('[data-pol]').forEach(b=>b.onclick=()=>{se('click');showPolicy(b.dataset.pol);});
+  const ok=document.getElementById('polOk');if(ok)ok.onclick=()=>{if(!pick)return;S.policy=pick;se('upgrade');log(`街の研究方針を「${POLICY[pick].n}」に決めた`,'good');closeOverlay();toast(`街の研究方針：${POLICY[pick].n}（違う方針のランクⅣ以上の研究は費用2倍）`,'good',5000);renderAll();};}
 function showStory(k){const rk=String(k).startsWith('r')?+String(k).slice(1):0;
   const lilArtH=`<div class="lslow" style="max-width:320px;margin:0 auto 8px">${artPx('lilia_art','','')}</div>`;
   if(rk){const L=RANK_SAY[rk];   /* 城のランクが上がったとき：できるようになったことの案内 */
@@ -7851,7 +8008,7 @@ const LIL_NAME='書記官リリア';
 const MISSIONS=[
  {id:'prod',name:'生産施設の建設',
   say:['はじめまして、領主様！ 王都から参りました、領主様付きの書記官のリリアです。今日からお手伝いをします！','資材がないと、守りも街の発展もできません！ まずは木材と石材などの生産施設を建てましょう！{ART:miner,quarry}',
-   ()=>'ただし、<b>土地のレベル</b>で生産の効率が変わるので気をつけてください。たとえば森は、木が深いほど木材がたくさん採れます。'+lilForestImg()+'右上の「土地Lv」のボタンでも確かめられますよ。'],
+   ()=>'ただし、<b>土地のレベル</b>で生産の効率が変わるので気をつけてください。たとえば森は、木が深いほど木材がたくさん採れます。'+lilForestImg()+'右上の「表示」のボタンを押して「土地Lv」にすると、地図で確かめられますよ。'],
   steps:[
   {t:'伐採所を4つ建てる',b:'miner',n:4,d:'<b>森</b>のマスに建てると木材が採れます。森が深いほど多く採れます。'},
   {t:'石切り場を2つ建てる',b:'quarry',n:2,d:'<b>岩場</b>（灰色の岩があるマス）に建てると石材が採れます。'},
@@ -8294,7 +8451,7 @@ function renderArmyPanel(force){if(!S)return;const sub=S.armySub||'list';
 function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el)return;if((S.armySub||'list')!=='list')return;const box=el.closest('.box');if(box&&box.style.display==='none'&&!force)return;
   const sq=S.squads.filter(needsSupply);
   const key=S.squads.map(s=>s.id+':'+vetLv(s)+':'+Math.round(s.hp/s.maxhp*20)+':'+(supOf(s)?Math.round(s.sup/supOf(s).max*20):'')+':'+s.members+(s.gar?'g':'')+(s.mode||'')+(s.supPend?'s':'')).join()+'|'+sq.length+'|'+S.waveActive+'|'+(S.sel&&S.sel.kind==='s'?S.sel.id:'')+'|'+['sword','ammo','elec','powder','iron','fuel','pop'].map(k=>Math.floor(S[k]||0)).join(',')+'|'+S.blds.filter(b=>b.type==='ammo').map(b=>(b.mode||'a')+(b.bt>0?'b':'')).join('');if(key===armyKey&&!force)return;armyKey=key;
-  let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length&&!S.waveActive?'':'disabled'}>${sq.length?`一括補給（${sq.length}部隊）<span class="supc">${supCostHTML(sq)}</span>`:'一括補給（必要なし）'}</button></div>`;
+  let h=`<div class="abar"><button id="abSel">全部隊を選択</button><button id="abSup" ${sq.length&&!S.waveActive?'':'disabled'}>${sq.length?`一括補給（${sq.length}部隊）`:'一括補給（必要なし）'}</button></div>`;
   // 武器工房：何を作っているか・切り替え（建物を探さなくても変えられるように）
   {const ws=S.blds.filter(b=>b.type==='ammo');
    h+=`<div class="wsum"><div class="row" style="align-items:center"><b>武器工房</b><span class="muted" style="font-size:11px">在庫 ${ic('ammo',12)}矢 ${Math.floor(S.ammo||0)}　${ic('sword',12)}剣 ${Math.floor(S.sword||0)}</span></div>`+
@@ -8306,7 +8463,7 @@ function renderArmyBox(force){const el=document.getElementById('armyBox');if(!el
   el.innerHTML=h;el.querySelectorAll('[data-wsw]').forEach(b=>b.onclick=()=>{const w=S.blds.find(x=>x.id==b.dataset.wsw);if(!w)return;w.mode=w.mode==='sword'?null:'sword';se('click');renderArmyBox(true);if(S.sel===w)renderInfo(true);});
   el.querySelectorAll('[data-sq]').forEach(b=>b.onclick=()=>{const q0=S.squads.find(s=>s.id==b.dataset.sq);if(S.sel===q0){deselect();return;}S.sel=q0;S.multi=[];renderInfo(true);const q=S.sel;if(q&&!q.gar){cam.x=q.x-VW/2/cam.z;cam.y=q.y-VH/2/cam.z;clampCam();}});
   document.getElementById('abSel').onclick=()=>{S.multi=S.squads.filter(x=>!x.gar).map(x=>x.id);S.sel=null;renderInfo(true);renderMode();};
-  document.getElementById('abSup').onclick=()=>{supplyAll();renderArmyBox(true);};
+  document.getElementById('abSup').onclick=()=>askSupplyAll(()=>renderArmyBox(true));
 }
 function tabBadges(){const t=document.querySelector('#rtabs button[data-rt="econ"]');if(!t)return;let n=0;try{n=econWarnings(econ(),ammoForecast()).filter(w=>w[0]==='bd').length;}catch(e){}const lab='街'+(n?'<i class="ndot red"></i>':'');if(t.dataset.l!==lab){t.dataset.l=lab;t.innerHTML=lab;}
   const a=document.querySelector('#rtabs button[data-rt="army"]');const w=S.squads.filter(q=>q.hp/q.maxhp<0.4).length;const la='軍事'+(S.squads.length?`<span class="tcnt">${S.squads.length}</span>`:'')+(w?'<i class="ndot amber"></i>':'');if(a.dataset.l!==la){a.dataset.l=la;a.innerHTML=la;}}
@@ -8830,17 +8987,19 @@ function resizeView(){
   if(isFull()){
     const tb=document.getElementById('topbar').getBoundingClientRect(),it=document.getElementById('intel'),ct=document.getElementById('controls').getBoundingClientRect();
     let top=tb.bottom+2;if(getComputedStyle(it).display!=='none')top=Math.max(top,it.getBoundingClientRect().bottom+2);
+    {const rb=document.getElementById('rtBar');if(rb){rb.style.position='fixed';rb.style.left='0';rb.style.right='0';rb.style.top=Math.round(top)+'px';rb.style.zIndex='6';if(rb.classList.contains('on'))top+=rb.offsetHeight;}}
     const mb=document.getElementById('modeBar');mb.style.top=Math.round(top)+'px';top+=mb.offsetHeight+2;
     const bottom=isNarrow()?ct.top-2:innerHeight;
     const vw=Math.round(innerWidth),vh2=Math.max(200,Math.round(bottom-top));
     cv.style.top=Math.round(top)+'px';cv.style.height=vh2+'px';
     if(vw!==VW||vh2!==VH){VW=vw;VH=vh2;cv.width=VW;cv.height=VH;if(S)clampCam();}return;}
-  cv.style.top='';cv.style.height='';document.getElementById('modeBar').style.top='';
+  cv.style.top='';cv.style.height='';document.getElementById('modeBar').style.top='';{const rb=document.getElementById('rtBar');if(rb){rb.style.position='';rb.style.top='';rb.style.left='';rb.style.right='';}}
   if(VW!==32*TU){VW=32*TU;cv.width=VW;}
   let vh=20*TU;
   if(!isNarrow()){
     const ids=['topbar','intel','controls'];let used=24;for(const id of ids){const e=document.getElementById(id);if(e&&getComputedStyle(e).display!=='none')used+=e.offsetHeight+6;}
-    used+=76;   // 通信ログの高さ（62px）
+    {const rb=document.getElementById('rtBar');if(rb&&rb.classList.contains('on'))used+=rb.offsetHeight+4;}
+    used+=document.body.classList.contains('logMin')?42:76;   // 通信ログの高さ（62px。たたむと28px）
     const w=Math.max(300,cv.getBoundingClientRect().width||document.getElementById('left').clientWidth);const avail=Math.max(200,innerHeight-used);
     vh=Math.round(Math.max(12*TU,Math.min(40*TU,VW*avail/w)));
   }
@@ -8945,7 +9104,7 @@ function renderMode(){
   else if(S.sel&&S.sel.kind==='s')t=`${icSvg(S.sel.model||defModel(S.sel.ut),24)}<b class="mn">${unitLabel(S.sel)}</b><span class="ms">を指揮中・${tap}で移動</span>${X}`;
   else if(S.sel)t=`${icSvg(S.sel.type,24)}<b class="mn">${B[S.sel.type]?B[S.sel.type].name:''}</b><span class="ms">を選択中${gunOf(S.sel)?'・射程を表示':''}</span>${X}`;
   else if(S.boxMode)t=`<b class="mn">範囲選択</b><span class="ms">・選びたい部隊を囲むようにドラッグ</span><button id="mBoxX" class="ghost">やめる</button>`;
-  else t=(isNarrow()||IS_TOUCH)?'<span class="ms">指揮・タップで選択、2本指で拡大</span><button id="mBox" class="ghost">範囲選択</button>':(S.squads.length>1?'<span class="ms">Shift＋ドラッグで部隊を範囲選択</span>':'');
+  else t=(isNarrow()||IS_TOUCH)?'<span class="ms">指揮・タップで選択、2本指で拡大</span><button id="mBox" class="ghost">範囲選択</button>':'';
   // 取り消しボタンは、帯の中身が決まったあとに足す（2026-11-15 修正：前は「もし〜なら」のつながりの途中に入っていて、建設の帯が上書きされていた）
   if((S.buildMode||S.buildPick)&&S.undo&&S.undo.length&&!S.waveActive)t+=`<button id="mUndo" class="ghost" title="さっき置いたもの（一列ぶん）を取り消す。資源は全額戻る"><span>↶ 取り消し</span>${IS_TOUCH?'':'<kbd>Ctrl+Z</kbd>'}</button>`;
   bar.classList.toggle('idle',!t);bar.classList.toggle('hint',!S.buildMode&&!S.buildPick&&!S.sel&&!(S.multi&&S.multi.length)&&!S.aimNaval);
@@ -8956,7 +9115,7 @@ function renderMode(){
   if(!S.buildMode)bGhost=null;
   renderPad();
 }
-document.getElementById('mExit').onclick=exitBuild;
+document.getElementById('mExit').onclick=exitBuild;{const hd=document.getElementById('mmHead');if(hd){hd.onpointerdown=e=>e.stopPropagation();hd.onclick=e=>e.stopPropagation();}const sz=document.getElementById('mmSz');if(sz)sz.onclick=e=>{e.stopPropagation();mmSet(MM_MODE==='s'?'l':'s');se('click');};const mn=document.getElementById('mmMin');if(mn)mn.onclick=e=>{e.stopPropagation();mmCycle();se('click');};mmApply();}
 // ===== マップ全画面 =====
 function toggleFull(on){
   const b=document.body;on=on==null?!isFull():on;
