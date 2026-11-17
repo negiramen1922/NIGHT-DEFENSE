@@ -83,6 +83,20 @@ svg.lines path.hit{pointer-events:stroke;cursor:pointer}
  .side.none{display:none}
  .filt{margin-left:0}
 }
+.cols{display:block!important;gap:0!important;padding:0!important;min-height:0!important}
+.cols>.colh{position:absolute;top:4px;width:230px}
+.cols>.card{position:absolute;width:230px;height:102px;overflow:visible;z-index:1}
+.cols>.card .cn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:18px}
+.cols>.card .cm{flex-wrap:nowrap;overflow:hidden;position:absolute;left:8px;right:8px;bottom:6px}
+.cols .ce{-webkit-line-clamp:2}
+.card.k-fac{border-width:2px;border-left-width:6px;background:linear-gradient(180deg,#1d2418,#141a13)}
+.card.k-unit{border-left-width:6px;border-left-style:double}
+.card.k-mod{border-left-style:dotted;border-left-width:4px}
+.chip.kc{--pc:#e8dcb8;background:#2a2618}
+.slot{position:absolute;width:230px;height:102px;border:1px dashed transparent;background:transparent;color:transparent;border-radius:3px;font-size:12px;z-index:0}
+.slot:hover,.slot:focus-visible{border-color:#3e4c38;color:var(--mute)}
+@media (hover:none){.slot{border-color:#1e271c;color:#3e4c38}}
+.target{position:absolute;width:230px;height:102px;border:2px dashed var(--blue);border-radius:3px;z-index:2;pointer-events:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <div class="top">
@@ -138,24 +152,41 @@ function renderTabs(){
   document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;sel=null;render();$('board').scrollLeft=0;});
   $('fRm').onchange=e=>{hideRemoved=e.target.checked;render();};
 }
-function colList(cat,rk){return nodesIn(cat).filter(n=>n.rank===rk&&!(hideRemoved&&n.plan==='remove')).sort((a,b)=>a.ord-b.ord);}
-function cardHTML(n){const col=DATA.colors[n.cat],p=PL[n.plan||''];
+// ===== 置き場所：ランク（列）×段（行）のマス目。前提の線がまっすぐ横につながるように段をそろえる =====
+const CW=230,GAP=48,RH=118,CH=102,PADX=24,HEADH=34;
+const KINDS=[['tech','研究'],['fac','新しい施設'],['unit','新しい兵'],['mod','改造']];
+const KN=Object.fromEntries(KINDS);
+let LAYOUT={};   // id → {r:ランク,row:段}
+function kindOf(n){if(n.kind)return n.kind;if(/^「.+」を建設できる|を建設可能に|を建設できる|罠「.+」を置ける/.test(n.eff||''))return 'fac';if(/編成できる|訓練できる|育てられる|育成できる|作れる（/.test(n.eff||''))return 'unit';return 'tech';}
+// 元のデータの段（チェーンを横一列に）
+const BASEROW={};(function(){for(const c of DATA.tabs){const L=DATA.tech.filter(t=>t.cat===c);const used={};const take=(r,row)=>{(used[r]=used[r]||new Set()).add(row);};const free=(r,row)=>!(used[r]&&used[r].has(row));
+  for(let r=1;r<=7;r++){const inR=L.filter(t=>t.rank===r).sort((a,b)=>a.ord-b.ord);
+    const withP=inR.filter(t=>(t.pre||[]).some(p=>BASEROW[p]!=null&&BASE[p].cat===c&&BASE[p].rank<r)),rest=inR.filter(t=>!withP.includes(t));
+    for(const t of withP){const p=(t.pre||[]).find(p=>BASEROW[p]!=null&&BASE[p].cat===c&&BASE[p].rank<r);let row=BASEROW[p];while(!free(r,row))row++;BASEROW[t.id]=row;take(r,row);}
+    let row=0;for(const t of rest){while(!free(r,row))row++;BASEROW[t.id]=row;take(r,row);}}}})();
+function layout(cat){const L=nodesIn(cat).filter(n=>!(hideRemoved&&n.plan==='remove'));const used={};const occ=(r,row)=>used[r+':'+row];const put=(n,row)=>{while(occ(n.rank,row))row++;used[n.rank+':'+row]=n.id;LAYOUT[n.id]={r:n.rank,row};};
+  const ex=L.filter(n=>EDITS[n.id]&&EDITS[n.id].row!=null),bs=L.filter(n=>!ex.includes(n)&&BASEROW[n.id]!=null&&n.rank===BASE[n.id].rank),ot=L.filter(n=>!ex.includes(n)&&!bs.includes(n));
+  ex.sort((a,b)=>(EDITS[b.id].t||0)-(EDITS[a.id].t||0));   // 新しく動かしたものを優先
+  for(const n of ex)put(n,n.row);for(const n of bs)put(n,BASEROW[n.id]);for(const n of ot)put(n,0);
+  let maxRow=0;for(const n of L)maxRow=Math.max(maxRow,LAYOUT[n.id].row);return {L,maxRow,occ};}
+function cellXY(r,row){return {x:PADX+(r-1)*(CW+GAP),y:HEADH+row*RH};}
+function cardHTML(n){const col=DATA.colors[n.cat],p=PL[n.plan||''],k=kindOf(n),pos=LAYOUT[n.id],xy=cellXY(pos.r,pos.row);
   const outPre=(n.pre||[]).filter(x=>node(x)&&node(x).cat!==n.cat);
-  return `<div class="card${n.id===sel?' sel':''}${n.plan==='remove'?' removed':''}${n.added?' added':''}" data-id="${n.id}" style="--tc:${col}">
+  return `<div class="card k-${k}${n.id===sel?' sel':''}${n.plan==='remove'?' removed':''}${n.added?' added':''}" data-id="${n.id}" style="--tc:${col};left:${xy.x}px;top:${xy.y}px">
    <div class="ch">${n.icon&&DATA.icons[n.icon]?DATA.icons[n.icon]:'<i class="ic0"></i>'}<span class="cn">${esc(n.name)}</span></div>
    <div class="ce">${esc(n.eff)}</div>
-   <div class="cm"><span class="lv">最大Lv ${esc(n.max||'1')}</span>${n.line?`<span class="chip" style="--pc:${n.line==='工業'?'#d0a070':'#a890ff'}">${esc(n.line)}</span>`:''}${n.plan?`<span class="chip" style="--pc:${p[2]}">${p[1]}</span>`:''}${n.added?'<span class="chip" style="--pc:#ffd05a">追加</span>':changed(n.id)?'<span class="chip" style="--pc:#7ab4ff">変更</span>':''}${outPre.length?`<span class="lv">要：${outPre.map(x=>esc(nameOf(x))+'（'+node(x).cat+'）').join('・')}</span>`:''}</div>
-   ${n.memo?`<div class="memo">${esc(n.memo)}</div>`:''}
+   <div class="cm">${k!=='tech'?`<span class="chip kc">${KN[k]}</span>`:''}<span class="lv">Lv ${esc(n.max||'1')}</span>${n.line?`<span class="chip" style="--pc:${n.line==='工業'?'#d0a070':'#a890ff'}">${esc(n.line)}</span>`:''}${n.plan?`<span class="chip" style="--pc:${p[2]}">${p[1]}</span>`:''}${n.added?'<span class="chip" style="--pc:#ffd05a">追加</span>':changed(n.id)?'<span class="chip" style="--pc:#7ab4ff">変更</span>':''}${n.memo?'<span class="chip" style="--pc:#ffe2a0" title="'+esc(n.memo)+'">メモ</span>':''}${outPre.length?`<span class="lv">要：${outPre.map(x=>esc(nameOf(x))).join('・')}</span>`:''}</div>
    <span class="grip" data-grip="${n.id}" title="ドラッグで移動">⠿</span>
    <button class="port" data-port="${n.id}" title="ここから線をつなぐ（押してから、つなぐ先のブロックを押す）" aria-label="線をつなぐ"></button></div>`;}
-function renderBoard(){
-  const L=nodesIn(tab);const maxR=Math.max(7,...L.map(n=>n.rank));
-  let h='';for(let rk=1;rk<=maxR;rk++){const C=colList(tab,rk);
-    h+=`<div class="col" data-rank="${rk}"><div class="colh">ランク ${RN[rk]||rk}<small>${C.length}</small></div>${C.map(cardHTML).join('')}<button class="addb" data-add="${rk}">＋ ランク${RN[rk]||rk}に追加</button></div>`;}
-  $('cols').innerHTML=h+'<svg class="lines" id="svg"></svg>';
+function renderBoard(){LAYOUT={};const {L,maxRow,occ}=layout(tab);const maxR=Math.max(7,...L.map(n=>n.rank));const rows=maxRow+2;
+  let h='';for(let r=1;r<=maxR;r++){const x=cellXY(r,0).x;h+=`<div class="colh" style="left:${x}px">ランク ${RN[r]||r}<small>${L.filter(n=>n.rank===r).length}</small></div>`;
+    for(let row=0;row<rows;row++)if(!occ(r,row)){const xy=cellXY(r,row);h+=`<button class="slot" data-slot="${r}:${row}" style="left:${xy.x}px;top:${xy.y}px" aria-label="ランク${RN[r]}のここに追加">＋ ここに追加</button>`;}}
+  h+=L.map(cardHTML).join('');
+  const W=PADX*2+maxR*(CW+GAP),H=HEADH+rows*RH+40;
+  $('cols').style.width=W+'px';$('cols').style.height=H+'px';$('cols').innerHTML=h+'<svg class="lines" id="svg"></svg>';
   document.querySelectorAll('.card').forEach(c=>c.onclick=e=>{if(e.target.closest('.port,.grip'))return;cardClick(c.dataset.id);});
   document.querySelectorAll('[data-port]').forEach(b=>b.onclick=e=>{e.stopPropagation();startLink(b.dataset.port,'from');});
-  document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>addNode(+b.dataset.add));
+  document.querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{const [r,row]=b.dataset.slot.split(':').map(Number);addNode(r,row);});
   document.querySelectorAll('[data-grip]').forEach(g=>g.onpointerdown=e=>startDrag(e,g.dataset.grip));
   drawLines();
 }
@@ -187,27 +218,41 @@ function finishLink(id){const {id:s,dir}=linkMode;endLink();if(id===s)return;con
 function reaches(a,b){const seen=new Set(),st=[a];while(st.length){const x=st.pop();if(x===b)return true;if(seen.has(x))continue;seen.add(x);const n=node(x);if(n)st.push(...(n.pre||[]));}return false;}
 function askUnlink(a,b){const bar=$('bar');bar.innerHTML=`<span>「${esc(nameOf(a))}」→「${esc(nameOf(b))}」の線</span><button class="warn" id="ulY">線を外す</button><button id="ulN">やめる</button>`;bar.hidden=false;
   $('ulY').onclick=()=>{bar.hidden=true;patch(b,{pre:(node(b).pre||[]).filter(x=>x!==a)});};$('ulN').onclick=()=>bar.hidden=true;}
-// ===== 追加・並べ替え =====
-function addNode(rk){const id='n_'+Math.random().toString(36).slice(2,9);const C=colList(tab,rk);
-  EDITS[id]={added:true,name:'新しい研究',eff:'',cat:tab,rank:rk,ord:(C.length?C[C.length-1].ord:0)+1,pre:[],max:'1',plan:'new',t:Date.now()};save(id,EDITS[id]);sel=id;render();
-  setTimeout(()=>{const f=$('eName');if(f){f.focus();f.select();}},30);}
-function orderAt(cat,rk,idx,self){const C=colList(cat,rk).filter(n=>n.id!==self);const prev=C[idx-1],next=C[idx];
-  if(!prev&&!next)return 0;if(!prev)return next.ord-1;if(!next)return prev.ord+1;return (prev.ord+next.ord)/2;}
-function moveTo(id,rk,idx){const n=node(id);patch(id,{rank:rk,ord:orderAt(n.cat,rk,idx,id)});}
+// ===== 追加・移動 =====
+// 何列かにまたがって、みんな空いている段（チェーンをまっすぐ横に並べるため）
+function chainRow(cat,ranks,row,self){const {occ}=layout(cat);for(;;row++){if(ranks.every(r=>{const o=occ(r,row);return !o||o===self;}))return row;}}
+function freeRow(cat,r,row,self){const {occ}=layout(cat);while(occ(r,row)&&occ(r,row)!==self)row++;return row;}
+function newNode(o){const id='n_'+Math.random().toString(36).slice(2,9);EDITS[id]=Object.assign({added:true,name:'新しい研究',eff:'',cat:tab,rank:1,row:0,ord:0,pre:[],max:'1',plan:'new',kind:'tech',t:Date.now()},o);save(id,EDITS[id]);return id;}
+function addNode(r,row){const id=newNode({rank:r,row:freeRow(tab,r,row)});sel=id;render();setTimeout(()=>{const f=$('eName');if(f){f.focus();f.select();}},30);}
+// マスへ動かす。そこに別のブロックがあれば入れ替える
+function moveTo(id,r,row){const n=node(id),cur=LAYOUT[id];const {occ}=layout(n.cat);const other=occ(r,row);
+  if(other&&other!==id&&cur){const o=node(other);EDITS[other]=Object.assign({},EDITS[other]||{},{rank:cur.r,row:cur.row,t:Date.now()-1});
+    if(BASE[other]&&cur.r===BASE[other].rank&&cur.row===BASEROW[other])delete EDITS[other].row;if(BASE[other]&&EDITS[other].rank===BASE[other].rank)delete EDITS[other].rank;
+    if(BASE[other]&&Object.keys(EDITS[other]).length===1)drop(other);else save(other,EDITS[other]);}
+  patch(id,{rank:r,row});}
 let drag=null;
 function startDrag(e,id){e.preventDefault();const card=e.target.closest('.card');const r=card.getBoundingClientRect();
   const g=card.cloneNode(true);g.classList.add('ghost');g.style.left=r.left+'px';g.style.top=r.top+'px';document.body.appendChild(g);card.classList.add('drag');
+  const hl=document.createElement('div');hl.className='target';$('cols').appendChild(hl);
   drag={id,g,dx:e.clientX-r.left,dy:e.clientY-r.top,target:null};
   const mv=ev=>{g.style.left=(ev.clientX-drag.dx)+'px';g.style.top=(ev.clientY-drag.dy)+'px';
-    document.querySelectorAll('.ins').forEach(x=>x.remove());const el=document.elementFromPoint(ev.clientX,ev.clientY);const col=el&&el.closest('.col');
-    if(!col){drag.target=null;return;}const cards=[...col.querySelectorAll('.card')].filter(c=>c.dataset.id!==id);let idx=cards.length;
-    for(let i=0;i<cards.length;i++){const cr=cards[i].getBoundingClientRect();if(ev.clientY<cr.top+cr.height/2){idx=i;break;}}
-    const ins=document.createElement('div');ins.className='ins';if(cards[idx])col.insertBefore(ins,cards[idx]);else col.insertBefore(ins,col.querySelector('.addb'));
-    drag.target={rk:+col.dataset.rank,idx};
-    const bd=$('board'),br=bd.getBoundingClientRect();if(ev.clientX>br.right-40)bd.scrollLeft+=12;if(ev.clientX<br.left+40)bd.scrollLeft-=12;};
-  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);g.remove();document.querySelectorAll('.ins').forEach(x=>x.remove());
-    const t=drag.target;drag=null;if(t)moveTo(id,t.rk,t.idx);else render();};
+    const wr=$('cols').getBoundingClientRect();const x=ev.clientX-drag.dx+CW/2-wr.left,y=ev.clientY-drag.dy+CH/2-wr.top;
+    const rk=Math.max(1,Math.min(7,Math.floor((x-PADX+GAP/2)/(CW+GAP))+1)),row=Math.max(0,Math.floor((y-HEADH+(RH-CH)/2)/RH));
+    const xy=cellXY(rk,row);hl.style.left=xy.x+'px';hl.style.top=xy.y+'px';drag.target={rk,row};
+    const bd=$('board'),br=bd.getBoundingClientRect();if(ev.clientX>br.right-40)bd.scrollLeft+=12;if(ev.clientX<br.left+40)bd.scrollLeft-=12;if(ev.clientY>br.bottom-40)bd.scrollTop+=12;if(ev.clientY<br.top+40)bd.scrollTop-=12;};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);g.remove();hl.remove();
+    const t=drag.target;drag=null;if(t)moveTo(id,t.rk,t.row);else render();};
   addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up);}
+// Lvを分ける：伐採技術 → 伐採技術Ⅰ → Ⅱ → Ⅲ（次のランクへ、同じ段に、線でつないで）
+function splitLv(id,n){const a=node(id),pos=LAYOUT[id];const base=a.name.replace(/[ⅠⅡⅢⅣⅤⅥⅦ]+$/,'');let prev=id;
+  const ranks=[];for(let i=1;i<=n;i++)ranks.push(Math.min(7,a.rank+i-1));const R=chainRow(a.cat,[...new Set(ranks)],pos.row,id);
+  patch(id,R!==pos.row?{name:base+'Ⅰ',max:'1',row:R}:{name:base+'Ⅰ',max:'1'});pos.row=R;
+  for(let i=2;i<=n;i++){const r=Math.min(7,a.rank+i-1);const nid=newNode({name:base+RN[i],eff:a.eff,cat:a.cat,rank:r,row:freeRow(a.cat,r,pos.row),pre:[prev],max:'1',line:a.line||'',icon:a.icon||'',kind:'tech',plan:'new'});prev=nid;}
+  render();}
+// 次にブロックを足す（すぐ右のランク・同じ段・線でつなぐ）
+function addNext(id,kind){const a=node(id),pos=LAYOUT[id];const r=Math.min(7,a.rank+1);
+  const nid0=null;const nid=newNode({name:kind==='fac'?'新しい施設':kind==='unit'?'新しい兵':kind==='mod'?'新しい改造':'新しい研究',cat:a.cat,rank:r,row:freeRow(a.cat,r,pos.row),pre:[id],kind,plan:'new',icon:kind==='tech'?(a.icon||''):''});
+  sel=nid;render();setTimeout(()=>{const f=$('eName');if(f){f.focus();f.select();}},30);}
 // ===== 編集のパネル =====
 function renderSide(){const s=$('side');const n=sel&&node(sel);
   if(!n){s.classList.add('none');s.innerHTML=`<h2>使い方</h2><div class="empty">
@@ -231,22 +276,28 @@ function renderSide(){const s=$('side');const n=sel&&node(sel);
    <div class="fld"><span>効果</span><textarea id="eEff" rows="3">${esc(n.eff)}</textarea></div>
    <div class="row2"><div class="fld"><span>タブ</span><select id="eCat">${DATA.tabs.map(c=>`<option ${c===n.cat?'selected':''}>${c}</option>`).join('')}</select></div>
     <div class="fld"><span>ランク</span><select id="eRank">${[1,2,3,4,5,6,7].map(r=>`<option value="${r}" ${r===n.rank?'selected':''}>${RN[r]}</option>`).join('')}</select></div></div>
+   <div class="fld"><span>種類</span><div class="plans">${KINDS.map(([k,nm])=>`<button data-kind="${k}" class="${kindOf(n)===k?'on':''}" style="--pc:#cfc8b0">${nm}</button>`).join('')}</div></div>
    <div class="row2"><div class="fld"><span>最大Lv</span><input id="eMax" value="${esc(n.max||'1')}"></div>
     <div class="fld"><span>系統</span><select id="eLine">${['','工業','魔法'].map(v=>`<option value="${v}" ${(n.line||'')===v?'selected':''}>${v||'なし'}</option>`).join('')}</select></div></div>
    <div class="fld"><span>前提（この研究の前に要るもの）</span><div class="pres">${preL}</div><div style="display:flex;gap:6px;margin-top:5px"><button id="ePreAdd">＋ 前提をつなぐ</button><button id="eNext">＋ 次の研究へつなぐ</button></div></div>
    <div class="fld"><span>この研究が前提になっているもの</span><div class="pres">${nexts.map(x=>`<span class="chip" style="--pc:${DATA.colors[node(x).cat]}">${esc(nameOf(x))}</span>`).join('')||'<span class="lv">なし</span>'}</div></div>
-   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><button id="eUp">↑ 上へ</button><button id="eDn">↓ 下へ</button>
+   <div class="fld"><span>右へつなげて足す</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button data-next="tech">＋ 次の研究</button><button data-next="fac">＋ 新しい施設</button><button data-next="unit">＋ 新しい兵</button><button data-next="mod">＋ 改造</button></div></div>
+   <div class="fld"><span>Lvを分ける（${esc(n.name.replace(/[ⅠⅡⅢⅣⅤⅥⅦ]+$/,''))}Ⅰ → Ⅱ → … を右へ並べる）</span><div style="display:flex;gap:6px;flex-wrap:wrap">${[2,3,4,5,7].map(k=>`<button data-split="${k}">Ⅰ〜${RN[k]}</button>`).join('')}</div></div>
+   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><button id="eUp">↑ 上の段へ</button><button id="eDn">↓ 下の段へ</button>
     ${b?(EDITS[n.id]?'<button id="eReset" class="warn">元に戻す（変更とメモを消す）</button>':''):'<button id="eDel" class="warn">このブロックを消す</button>'}<button id="eClose">閉じる</button></div>`;
   s.querySelectorAll('[data-plan]').forEach(x=>x.onclick=()=>patch(n.id,{plan:x.dataset.plan||undefined}));
   s.querySelectorAll('[data-unpre]').forEach(x=>x.onclick=()=>patch(n.id,{pre:(n.pre||[]).filter(p=>p!==x.dataset.unpre)}));
   const deb=(el,key,ms)=>{let tm;el.oninput=()=>{clearTimeout(tm);tm=setTimeout(()=>patch(n.id,{[key]:el.value}),ms);};el.onchange=()=>{clearTimeout(tm);patch(n.id,{[key]:el.value});};};
   deb($('eMemo'),'memo',900);deb($('eName'),'name',700);deb($('eEff'),'eff',900);deb($('eMax'),'max',700);
-  $('eCat').onchange=e=>{tab=e.target.value;patch(n.id,{cat:e.target.value,ord:orderAt(e.target.value,n.rank,999,n.id)});};
-  $('eRank').onchange=e=>patch(n.id,{rank:+e.target.value,ord:orderAt(n.cat,+e.target.value,999,n.id)});
+  $('eCat').onchange=e=>{tab=e.target.value;patch(n.id,{cat:e.target.value,row:freeRow(e.target.value,n.rank,0,n.id)});};
+  $('eRank').onchange=e=>patch(n.id,{rank:+e.target.value,row:freeRow(n.cat,+e.target.value,(LAYOUT[n.id]||{row:0}).row,n.id)});
   $('eLine').onchange=e=>patch(n.id,{line:e.target.value});
   $('ePreAdd').onclick=()=>startLink(n.id,'to');$('eNext').onclick=()=>startLink(n.id,'from');
-  const C=colList(n.cat,n.rank),i=C.findIndex(x=>x.id===n.id);
-  $('eUp').onclick=()=>{if(i>0)moveTo(n.id,n.rank,i-1);};$('eDn').onclick=()=>{if(i<C.length-1)moveTo(n.id,n.rank,i+1);};
+  const P=LAYOUT[n.id]||{r:n.rank,row:0};
+  $('eUp').onclick=()=>{if(P.row>0)moveTo(n.id,n.rank,P.row-1);};$('eDn').onclick=()=>moveTo(n.id,n.rank,P.row+1);
+  s.querySelectorAll('[data-kind]').forEach(x=>x.onclick=()=>patch(n.id,{kind:x.dataset.kind}));
+  s.querySelectorAll('[data-next]').forEach(x=>x.onclick=()=>addNext(n.id,x.dataset.next));
+  s.querySelectorAll('[data-split]').forEach(x=>x.onclick=()=>splitLv(n.id,+x.dataset.split));
   if($('eReset'))$('eReset').onclick=()=>{drop(n.id);render();};
   if($('eDel'))$('eDel').onclick=()=>{for(const id of allIds()){const m=node(id);if((m.pre||[]).includes(n.id))patch(id,{pre:m.pre.filter(x=>x!==n.id)});}drop(n.id);sel=null;render();};
   $('eClose').onclick=()=>{sel=null;render();};
@@ -259,9 +310,9 @@ function exportText(){const L=[];L.push('# 研究の木 整理ボードの変更
     if(n.added)parts.push('【追加】効果：'+(n.eff||'（未記入）')+'／前提：'+((n.pre||[]).map(nameOf).join('・')||'なし'));
     if(e.plan)parts.push('方針：'+PL[e.plan][1]);
     if(b){if(e.name!==undefined)parts.push('名前「'+b.name+'」→「'+e.name+'」');if(e.eff!==undefined)parts.push('効果を変更：'+e.eff);
-      if(e.cat!==undefined)parts.push('タブ '+b.cat+' → '+e.cat);if(e.rank!==undefined)parts.push('ランク '+RN[b.rank]+' → '+RN[e.rank]);
+      if(e.cat!==undefined)parts.push('タブ '+b.cat+' → '+e.cat);if(e.rank!==undefined&&e.rank!==b.rank)parts.push('ランク '+RN[b.rank]+' → '+RN[e.rank]);
       if(e.pre!==undefined){const add=e.pre.filter(x=>!(b.pre||[]).includes(x)),rm=(b.pre||[]).filter(x=>!e.pre.includes(x));if(add.length)parts.push('前提を足す：'+add.map(nameOf).join('・'));if(rm.length)parts.push('前提を外す：'+rm.map(nameOf).join('・'));}
-      if(e.max!==undefined)parts.push('最大Lv '+b.max+' → '+e.max);if(e.line!==undefined)parts.push('系統 → '+(e.line||'なし'));if(e.ord!==undefined&&e.rank===undefined)parts.push('並び順を変更');}
+      if(e.max!==undefined)parts.push('最大Lv '+b.max+' → '+e.max);if(e.line!==undefined)parts.push('系統 → '+(e.line||'なし'));if(e.row!==undefined&&e.rank===undefined)parts.push('段を移動');if(e.kind)parts.push('種類：'+KN[e.kind]);}
     if(e.memo)parts.push('メモ：'+e.memo);
     if(parts.length)rows.push('- ランク'+RN[n.rank]+'「'+n.name+'」：'+parts.join('／'));}
    if(rows.length)L.push('','## '+c,...rows);}
