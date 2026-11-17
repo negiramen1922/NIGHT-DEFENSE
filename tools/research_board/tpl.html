@@ -1,0 +1,281 @@
+<title>研究の木 整理ボード</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;700&display=swap">
+<style>
+/* layout: the game's research screen as a board — rank columns left to right, blocks joined by prerequisite lines; editor docks right (bottom sheet on phones) */
+:root{--bg:#0c0f0b;--panel:#141a13;--panel2:#1b2319;--line:#2c3829;--fg:#ebe7d6;--mute:#929a88;--amber:#f2b33d;--red:#ff6e5a;--green:#7fdc8a;--blue:#7ab4ff;
+--disp:'DotGothic16',ui-monospace,monospace;--body:'Noto Sans JP',system-ui,sans-serif;color-scheme:dark}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:13px;line-height:1.5;display:flex;flex-direction:column;overflow:hidden}
+button,select,input,textarea{font:inherit;color:inherit}
+button{background:var(--panel2);border:1px solid var(--line);border-radius:3px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:#4a5a44}button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+button.pri{background:var(--amber);color:#1a1206;border-color:var(--amber);font-weight:700}
+button.warn{border-color:#6a2a22;color:#ffb0a4}
+select,input,textarea{background:#0a0d09;border:1px solid var(--line);border-radius:3px;padding:4px 6px;width:100%}
+textarea{resize:vertical}
+.top{padding-block:10px 6px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.tr1{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--disp);font-weight:400;font-size:22px;margin:0;color:var(--amber);text-wrap:balance}
+.sub{color:var(--mute);font-size:12px}
+.tr1 .sp{flex:1}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.tab{border-bottom:3px solid transparent;font-family:var(--disp);font-size:15px;padding:4px 12px}
+.tab.on{border-color:var(--tc);color:var(--tc);background:#10160f}
+.tab small{font-family:var(--body);color:var(--mute);margin-left:4px;font-size:11px}
+.filt{display:flex;gap:10px;align-items:center;margin-left:auto;color:var(--mute);font-size:12px;flex-wrap:wrap}
+.filt label{display:flex;gap:4px;align-items:center;cursor:pointer}.filt input{width:auto}
+.legend{display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--mute)}
+.chip{display:inline-flex;align-items:center;gap:3px;padding:0 6px;border-radius:2px;font-size:11px;line-height:18px;border:1px solid var(--pc,#444);color:var(--pc,#ccc);white-space:nowrap}
+.main{flex:1;display:flex;min-height:0}
+.board{flex:1;overflow:auto;position:relative;min-width:0}
+.cols{position:relative;display:flex;gap:44px;padding:14px 24px 80px;padding-left:max(24px,env(safe-area-inset-left,0px));width:max-content;min-height:100%}
+.col{width:230px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.colh{font-family:var(--disp);font-size:15px;color:var(--fg);display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:4px}
+.colh small{font-family:var(--body);color:var(--mute);font-size:11px}
+.card{position:relative;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--tc);border-radius:3px;padding:7px 8px 6px 8px;cursor:pointer;user-select:none}
+.card:hover{border-color:#506048;border-left-color:var(--tc)}
+.card.sel{outline:2px solid var(--amber);outline-offset:1px}
+.card.rel{background:#1a2218}
+.card.removed{opacity:.45}
+.card.removed .cn{text-decoration:line-through}
+.card.added{border-style:dashed;border-left-style:solid}
+.card.drag{opacity:.3}
+.card.cand{outline:2px dashed var(--blue);outline-offset:1px}
+.ch{display:flex;align-items:center;gap:5px;min-width:0}
+.ch svg,.ch .ic0{flex-shrink:0}
+.ic0{width:24px;height:24px;border:1px dashed var(--line);border-radius:2px}
+.cn{font-weight:700;font-size:13px;min-width:0;overflow-wrap:anywhere;flex:1}
+.ce{color:var(--mute);font-size:11px;margin:3px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cm{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;align-items:center}
+.lv{font-size:10px;color:var(--mute);letter-spacing:.04em}
+.memo{font-size:11px;color:#ffe2a0;background:#2a2412;border-radius:2px;padding:2px 5px;margin-top:5px;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.grip{position:absolute;right:4px;top:4px;width:20px;height:20px;display:grid;place-items:center;color:var(--mute);cursor:grab;touch-action:none;font-size:12px;border-radius:2px}
+.grip:hover{background:#26301f;color:var(--fg)}
+.port{position:absolute;right:-9px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:var(--bg);border:2px solid var(--tc);cursor:crosshair;padding:0}
+.port:hover{background:var(--tc)}
+.addb{border-style:dashed;color:var(--mute);background:transparent;width:100%}
+.ins{height:3px;background:var(--blue);border-radius:2px;margin:-6px 0}
+svg.lines{position:absolute;left:0;top:0;pointer-events:none;z-index:0;overflow:visible}
+svg.lines path.hit{pointer-events:stroke;cursor:pointer}
+.side{width:340px;flex-shrink:0;border-left:1px solid var(--line);background:var(--panel);overflow:auto;padding-block:12px 24px;padding-left:14px;padding-right:max(14px,env(safe-area-inset-right,0px))}
+.side h2{font-family:var(--disp);font-weight:400;font-size:18px;margin:0 0 8px;display:flex;gap:6px;align-items:center}
+.fld{display:flex;flex-direction:column;gap:3px;margin-bottom:9px}
+.fld>span{font-size:11px;color:var(--mute);letter-spacing:.04em}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.plans{display:flex;flex-wrap:wrap;gap:4px}
+.plans button{border-color:var(--pc);color:var(--pc);font-size:12px;padding:2px 8px}
+.plans button.on{background:var(--pc);color:#121410;font-weight:700}
+.pres{display:flex;flex-wrap:wrap;gap:4px}
+.pres .chip button{background:none;border:none;padding:0 0 0 3px;color:inherit;cursor:pointer}
+.empty{color:var(--mute);font-size:12px;line-height:1.7}
+.empty b{color:var(--fg)}
+.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:#1e2a3a;border:1px solid var(--blue);color:#d8e8ff;padding:8px 12px;border-radius:4px;display:flex;gap:10px;align-items:center;z-index:30;max-width:calc(100% - 32px)}
+.note{position:fixed;right:max(16px,env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px));background:#2a1e0e;border:1px solid #6a4a1a;color:#ffd890;padding:6px 10px;border-radius:3px;font-size:12px;z-index:40;max-width:min(360px,calc(100% - 32px))}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:50;padding:16px}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:4px;width:min(720px,100%);max-height:85vh;display:flex;flex-direction:column;gap:8px;padding:14px}
+.mbox textarea{flex:1;min-height:300px;font-size:12px;font-family:ui-monospace,monospace}
+.ghost{position:fixed;pointer-events:none;z-index:60;width:230px;opacity:.9;transform:rotate(-1.5deg)}
+@media (max-width:820px){
+ .side{position:fixed;left:0;right:0;bottom:0;width:auto;max-height:58vh;border-left:none;border-top:2px solid var(--amber);z-index:20;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+ .side.none{display:none}
+ .filt{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="top">
+  <div class="tr1"><h1>研究の木 整理ボード</h1><span class="sub" id="src"></span><span class="sp"></span>
+    <div class="acts"><button id="bMemo">全体メモ</button><button id="bExport">変更を書き出す</button></div></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="legend" id="legend"></div>
+</div>
+<div class="main"><div class="board" id="board"><div class="cols" id="cols"></div></div><aside class="side" id="side"></aside></div>
+<div id="bar" class="bar" hidden></div>
+<div id="note" class="note" hidden></div>
+<div id="modal" class="modal" hidden></div>
+<script>
+const DATA=__DATA__;
+const RN=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'];
+// 整理の方針（ブロックごとに選ぶ）
+const PLANS=[['','未定','#8f9586'],['keep','残す','#7fdc8a'],['remove','なくす','#ff6e5a'],['castle','城ランクで解放','#f2b33d'],['mod','改造に','#7ab4ff'],['merge','まとめる','#c79bff'],['move','別のタブへ','#5ad0c8'],['new','新しい案','#ffd05a']];
+const PL=Object.fromEntries(PLANS.map(p=>[p[0],p]));
+const BASE=Object.fromEntries(DATA.tech.map(t=>[t.id,t]));
+let EDITS={},GENERAL='',tab=DATA.tabs[0],sel=null,hideRemoved=false,linkMode=null,db=null,local=false;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function node(id){const b=BASE[id],e=EDITS[id];if(!b&&!e)return null;return Object.assign({id},b||{},e||{});}
+function allIds(){return [...new Set(Object.keys(BASE).concat(Object.keys(EDITS)))].filter(id=>node(id)&&!node(id).gone);}
+function nodesIn(cat){return allIds().map(node).filter(n=>n.cat===cat);}
+function nameOf(id){const n=node(id);return n?n.name:id;}
+function changed(id){const e=EDITS[id];return !!e&&Object.keys(e).some(k=>k!=='memo'&&k!=='plan');}
+
+// ===== 保存（db。使えないときはこのブラウザだけ）=====
+const queue={};
+function save(id,obj){EDITS[id]=obj;if(local){try{localStorage.setItem('rtree_edits',JSON.stringify(EDITS));}catch(e){}return;}
+  const run=()=>db.doc('edits/'+id).set(obj).catch(e=>showNote('保存できませんでした（'+(e&&e.code||'error')+'）。もう一度変えてみてください'));
+  queue[id]=(queue[id]||Promise.resolve()).then(run);}
+function drop(id){delete EDITS[id];if(local){try{localStorage.setItem('rtree_edits',JSON.stringify(EDITS));}catch(e){}return;}
+  queue[id]=(queue[id]||Promise.resolve()).then(()=>db.doc('edits/'+id).delete()).catch(()=>showNote('元に戻せませんでした'));}
+function patch(id,p){const cur=Object.assign({},EDITS[id]||{});for(const k in p){if(p[k]===undefined)delete cur[k];else cur[k]=p[k];}
+  // 元と同じ値は覚えない
+  const b=BASE[id];if(b)for(const k of Object.keys(cur)){if(k!=='memo'&&k!=='plan'&&JSON.stringify(cur[k])===JSON.stringify(b[k]))delete cur[k];}
+  if(!cur.memo)delete cur.memo;if(!cur.plan)delete cur.plan;
+  cur.t=Date.now();if(b&&Object.keys(cur).length===1)drop(id);else save(id,cur);render();}
+function saveGeneral(text){GENERAL=text;if(local){try{localStorage.setItem('rtree_general',text);}catch(e){}return;}
+  queue._g=(queue._g||Promise.resolve()).then(()=>db.doc('meta/general').set({text,t:Date.now()})).catch(()=>showNote('全体メモを保存できませんでした'));}
+function showNote(t,ms){const n=$('note');n.textContent=t;n.hidden=false;clearTimeout(showNote.tm);if(ms!==0)showNote.tm=setTimeout(()=>n.hidden=true,ms||5000);}
+
+// ===== 描く =====
+function render(){renderTabs();renderBoard();renderSide();}
+function renderTabs(){
+  $('src').textContent=`ゲームの研究：${DATA.ver.replace(' 試作版','')}（試作版）の ${DATA.tech.length} 個から`;
+  $('tabs').innerHTML=DATA.tabs.map(c=>{const L=nodesIn(c);const rm=L.filter(n=>n.plan==='remove').length;return `<button class="tab${c===tab?' on':''}" data-tab="${c}" style="--tc:${DATA.colors[c]}">${c}<small>${L.length-rm}${rm?`（なくす${rm}）`:''}</small></button>`;}).join('')+
+   `<div class="filt"><label><input type="checkbox" id="fRm" ${hideRemoved?'checked':''}>「なくす」を隠す</label></div>`;
+  const L=nodesIn(tab);
+  $('legend').innerHTML=PLANS.map(([k,n,c])=>{const m=L.filter(x=>(x.plan||'')===k).length;return `<span class="chip" style="--pc:${c}">${n} ${m}</span>`;}).join('')+'<span>　●を押して別のブロックを押すと線（前提）をつなぐ／外す。⠿ をドラッグで移動</span>';
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;sel=null;render();$('board').scrollLeft=0;});
+  $('fRm').onchange=e=>{hideRemoved=e.target.checked;render();};
+}
+function colList(cat,rk){return nodesIn(cat).filter(n=>n.rank===rk&&!(hideRemoved&&n.plan==='remove')).sort((a,b)=>a.ord-b.ord);}
+function cardHTML(n){const col=DATA.colors[n.cat],p=PL[n.plan||''];
+  const outPre=(n.pre||[]).filter(x=>node(x)&&node(x).cat!==n.cat);
+  return `<div class="card${n.id===sel?' sel':''}${n.plan==='remove'?' removed':''}${n.added?' added':''}" data-id="${n.id}" style="--tc:${col}">
+   <div class="ch">${n.icon&&DATA.icons[n.icon]?DATA.icons[n.icon]:'<i class="ic0"></i>'}<span class="cn">${esc(n.name)}</span></div>
+   <div class="ce">${esc(n.eff)}</div>
+   <div class="cm"><span class="lv">最大Lv ${esc(n.max||'1')}</span>${n.line?`<span class="chip" style="--pc:${n.line==='工業'?'#d0a070':'#a890ff'}">${esc(n.line)}</span>`:''}${n.plan?`<span class="chip" style="--pc:${p[2]}">${p[1]}</span>`:''}${n.added?'<span class="chip" style="--pc:#ffd05a">追加</span>':changed(n.id)?'<span class="chip" style="--pc:#7ab4ff">変更</span>':''}${outPre.length?`<span class="lv">要：${outPre.map(x=>esc(nameOf(x))+'（'+node(x).cat+'）').join('・')}</span>`:''}</div>
+   ${n.memo?`<div class="memo">${esc(n.memo)}</div>`:''}
+   <span class="grip" data-grip="${n.id}" title="ドラッグで移動">⠿</span>
+   <button class="port" data-port="${n.id}" title="ここから線をつなぐ（押してから、つなぐ先のブロックを押す）" aria-label="線をつなぐ"></button></div>`;}
+function renderBoard(){
+  const L=nodesIn(tab);const maxR=Math.max(7,...L.map(n=>n.rank));
+  let h='';for(let rk=1;rk<=maxR;rk++){const C=colList(tab,rk);
+    h+=`<div class="col" data-rank="${rk}"><div class="colh">ランク ${RN[rk]||rk}<small>${C.length}</small></div>${C.map(cardHTML).join('')}<button class="addb" data-add="${rk}">＋ ランク${RN[rk]||rk}に追加</button></div>`;}
+  $('cols').innerHTML=h+'<svg class="lines" id="svg"></svg>';
+  document.querySelectorAll('.card').forEach(c=>c.onclick=e=>{if(e.target.closest('.port,.grip'))return;cardClick(c.dataset.id);});
+  document.querySelectorAll('[data-port]').forEach(b=>b.onclick=e=>{e.stopPropagation();startLink(b.dataset.port,'from');});
+  document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>addNode(+b.dataset.add));
+  document.querySelectorAll('[data-grip]').forEach(g=>g.onpointerdown=e=>startDrag(e,g.dataset.grip));
+  drawLines();
+}
+function drawLines(){const svg=$('svg'),wrap=$('cols');if(!svg)return;const W=wrap.scrollWidth,H=wrap.scrollHeight;svg.setAttribute('width',W);svg.setAttribute('height',H);
+  const wr=wrap.getBoundingClientRect(),box={};document.querySelectorAll('.card').forEach(c=>{const r=c.getBoundingClientRect();box[c.dataset.id]={x:r.left-wr.left,y:r.top-wr.top,w:r.width,h:r.height};});
+  const rel=new Set();if(sel){const s=node(sel);if(s){(s.pre||[]).forEach(x=>rel.add(x));allIds().forEach(id=>{if((node(id).pre||[]).includes(sel))rel.add(id);});}}
+  document.querySelectorAll('.card').forEach(c=>c.classList.toggle('rel',rel.has(c.dataset.id)));
+  let h='';const col=DATA.colors[tab];
+  for(const id in box){const n=node(id);for(const p of (n.pre||[])){const a=box[p],b=box[id];if(!a)continue;
+    let d;const ax=a.x+a.w,ay=a.y+a.h/2,bx=b.x,by=b.y+b.h/2;
+    if(n.rank>node(p).rank){const m=(bx-ax)/2;d=`M${ax+8} ${ay} C${ax+8+m} ${ay},${bx-m} ${by},${bx} ${by}`;}
+    else if(n.rank===node(p).rank){const lx=a.x-14;d=`M${a.x} ${a.y+a.h/2} C${lx} ${a.y+a.h/2},${lx} ${by},${bx} ${by}`;}
+    else{const ex=a.x,dx=b.x+b.w;d=`M${ex} ${ay} C${ex-40} ${ay},${dx+40} ${by},${dx} ${by}`;}
+    const on=sel&&(sel===id||sel===p),pl=n.plan==='remove'||node(p).plan==='remove';
+    h+=`<path d="${d}" fill="none" stroke="${on?'#ffd27a':pl?'#5a3a34':col}" stroke-opacity="${on?1:sel?0.25:0.55}" stroke-width="${on?2.6:1.6}" ${n.rank<node(p).rank?'stroke-dasharray="5 4"':''}/>`+
+       `<path class="hit" d="${d}" fill="none" stroke="transparent" stroke-width="12" data-l="${p}>${id}"/>`;
+    h+=`<circle cx="${bx}" cy="${by}" r="3" fill="${on?'#ffd27a':col}" fill-opacity="${on?1:0.7}"/>`;}}
+  svg.innerHTML=h;
+  svg.querySelectorAll('[data-l]').forEach(pth=>pth.onclick=()=>{const [a,b]=pth.dataset.l.split('>');askUnlink(a,b);});
+}
+// ===== 選ぶ・線 =====
+function cardClick(id){if(linkMode){finishLink(id);return;}sel=sel===id?null:id;render();if(sel&&innerWidth<=820)$('side').scrollTop=0;}
+function startLink(id,dir){linkMode={id,dir};document.querySelectorAll('.card').forEach(c=>c.classList.toggle('cand',c.dataset.id!==id));
+  const b=$('bar');b.innerHTML=`<span>${dir==='from'?`「${esc(nameOf(id))}」から線をつなぐ先`:`「${esc(nameOf(id))}」の前提にするブロック`}を押してください（同じ線をもう一度つなぐと外れます）</span><button id="lkX">やめる</button>`;b.hidden=false;$('lkX').onclick=endLink;}
+function endLink(){linkMode=null;$('bar').hidden=true;document.querySelectorAll('.card.cand').forEach(c=>c.classList.remove('cand'));}
+function finishLink(id){const {id:s,dir}=linkMode;endLink();if(id===s)return;const from=dir==='from'?s:id,to=dir==='from'?id:s;
+  const n=node(to);let pre=(n.pre||[]).slice();if(pre.includes(from))pre=pre.filter(x=>x!==from);else{if(reaches(from,to)){showNote('つなぐと輪になってしまう（前提をたどると元に戻る）ので、つなげません');return;}pre.push(from);}
+  patch(to,{pre});}
+function reaches(a,b){const seen=new Set(),st=[a];while(st.length){const x=st.pop();if(x===b)return true;if(seen.has(x))continue;seen.add(x);const n=node(x);if(n)st.push(...(n.pre||[]));}return false;}
+function askUnlink(a,b){const bar=$('bar');bar.innerHTML=`<span>「${esc(nameOf(a))}」→「${esc(nameOf(b))}」の線</span><button class="warn" id="ulY">線を外す</button><button id="ulN">やめる</button>`;bar.hidden=false;
+  $('ulY').onclick=()=>{bar.hidden=true;patch(b,{pre:(node(b).pre||[]).filter(x=>x!==a)});};$('ulN').onclick=()=>bar.hidden=true;}
+// ===== 追加・並べ替え =====
+function addNode(rk){const id='n_'+Math.random().toString(36).slice(2,9);const C=colList(tab,rk);
+  EDITS[id]={added:true,name:'新しい研究',eff:'',cat:tab,rank:rk,ord:(C.length?C[C.length-1].ord:0)+1,pre:[],max:'1',plan:'new',t:Date.now()};save(id,EDITS[id]);sel=id;render();
+  setTimeout(()=>{const f=$('eName');if(f){f.focus();f.select();}},30);}
+function orderAt(cat,rk,idx,self){const C=colList(cat,rk).filter(n=>n.id!==self);const prev=C[idx-1],next=C[idx];
+  if(!prev&&!next)return 0;if(!prev)return next.ord-1;if(!next)return prev.ord+1;return (prev.ord+next.ord)/2;}
+function moveTo(id,rk,idx){const n=node(id);patch(id,{rank:rk,ord:orderAt(n.cat,rk,idx,id)});}
+let drag=null;
+function startDrag(e,id){e.preventDefault();const card=e.target.closest('.card');const r=card.getBoundingClientRect();
+  const g=card.cloneNode(true);g.classList.add('ghost');g.style.left=r.left+'px';g.style.top=r.top+'px';document.body.appendChild(g);card.classList.add('drag');
+  drag={id,g,dx:e.clientX-r.left,dy:e.clientY-r.top,target:null};
+  const mv=ev=>{g.style.left=(ev.clientX-drag.dx)+'px';g.style.top=(ev.clientY-drag.dy)+'px';
+    document.querySelectorAll('.ins').forEach(x=>x.remove());const el=document.elementFromPoint(ev.clientX,ev.clientY);const col=el&&el.closest('.col');
+    if(!col){drag.target=null;return;}const cards=[...col.querySelectorAll('.card')].filter(c=>c.dataset.id!==id);let idx=cards.length;
+    for(let i=0;i<cards.length;i++){const cr=cards[i].getBoundingClientRect();if(ev.clientY<cr.top+cr.height/2){idx=i;break;}}
+    const ins=document.createElement('div');ins.className='ins';if(cards[idx])col.insertBefore(ins,cards[idx]);else col.insertBefore(ins,col.querySelector('.addb'));
+    drag.target={rk:+col.dataset.rank,idx};
+    const bd=$('board'),br=bd.getBoundingClientRect();if(ev.clientX>br.right-40)bd.scrollLeft+=12;if(ev.clientX<br.left+40)bd.scrollLeft-=12;};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);g.remove();document.querySelectorAll('.ins').forEach(x=>x.remove());
+    const t=drag.target;drag=null;if(t)moveTo(id,t.rk,t.idx);else render();};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up);}
+// ===== 編集のパネル =====
+function renderSide(){const s=$('side');const n=sel&&node(sel);
+  if(!n){s.classList.add('none');s.innerHTML=`<h2>使い方</h2><div class="empty">
+   <p>ゲームの研究画面と同じ並び（タブ → ランクの列）で、前提を線でつないでいます。</p>
+   <p><b>ブロックを押す</b>：右に中身が出て、名前・効果・メモ・整理の方針を直せます。</p>
+   <p><b>右はしの ●</b>：押してから別のブロックを押すと、その研究の前提として線がつながります。もう一度同じ線をつなぐか、線を押すと外せます。</p>
+   <p><b>⠿ をドラッグ</b>：ほかのランクの列や、上下に動かせます。</p>
+   <p><b>列の下の「＋」</b>：その場所に新しいブロックを足せます。</p>
+   <p>点線の線は、後ろのランクから前のランクへつながっている（おかしい）線です。</p>
+   <p>変えたことは自動で保存され、Claude も読めます。「変更を書き出す」で一覧にもできます。</p></div>`;return;}
+  s.classList.remove('none');
+  const active=document.activeElement&&s.contains(document.activeElement)&&s.dataset.id===n.id;if(active)return;   // 入力中は描き直さない
+  s.dataset.id=n.id;const col=DATA.colors[n.cat];const b=BASE[n.id];
+  const preL=(n.pre||[]).map(x=>`<span class="chip" style="--pc:${DATA.colors[node(x)?node(x).cat:tab]}">${esc(nameOf(x))}<button data-unpre="${x}" aria-label="外す">×</button></span>`).join('')||'<span class="lv">なし</span>';
+  const nexts=allIds().filter(id=>(node(id).pre||[]).includes(n.id));
+  s.innerHTML=`<h2 style="color:${col}">${n.icon&&DATA.icons[n.icon]?DATA.icons[n.icon]:''}<span>${esc(n.name)}</span></h2>
+   ${b?`<div class="lv" style="margin:-4px 0 8px">元：${esc(b.cat)}・ランク${RN[b.rank]}${b.name!==n.name?'・「'+esc(b.name)+'」':''}　<code style="font-size:10px">${esc(n.id)}</code></div>`:'<div class="lv" style="margin:-4px 0 8px">このボードで足したブロック</div>'}
+   <div class="fld"><span>整理の方針</span><div class="plans">${PLANS.map(([k,nm,c])=>`<button data-plan="${k}" class="${(n.plan||'')===k?'on':''}" style="--pc:${c}">${nm}</button>`).join('')}</div></div>
+   <div class="fld"><span>メモ（直したいこと・考え）</span><textarea id="eMemo" rows="4" placeholder="例：城ランク3で解放にする／重弩とまとめる">${esc(n.memo||'')}</textarea></div>
+   <div class="fld"><span>名前</span><input id="eName" value="${esc(n.name)}"></div>
+   <div class="fld"><span>効果</span><textarea id="eEff" rows="3">${esc(n.eff)}</textarea></div>
+   <div class="row2"><div class="fld"><span>タブ</span><select id="eCat">${DATA.tabs.map(c=>`<option ${c===n.cat?'selected':''}>${c}</option>`).join('')}</select></div>
+    <div class="fld"><span>ランク</span><select id="eRank">${[1,2,3,4,5,6,7].map(r=>`<option value="${r}" ${r===n.rank?'selected':''}>${RN[r]}</option>`).join('')}</select></div></div>
+   <div class="row2"><div class="fld"><span>最大Lv</span><input id="eMax" value="${esc(n.max||'1')}"></div>
+    <div class="fld"><span>系統</span><select id="eLine">${['','工業','魔法'].map(v=>`<option value="${v}" ${(n.line||'')===v?'selected':''}>${v||'なし'}</option>`).join('')}</select></div></div>
+   <div class="fld"><span>前提（この研究の前に要るもの）</span><div class="pres">${preL}</div><div style="display:flex;gap:6px;margin-top:5px"><button id="ePreAdd">＋ 前提をつなぐ</button><button id="eNext">＋ 次の研究へつなぐ</button></div></div>
+   <div class="fld"><span>この研究が前提になっているもの</span><div class="pres">${nexts.map(x=>`<span class="chip" style="--pc:${DATA.colors[node(x).cat]}">${esc(nameOf(x))}</span>`).join('')||'<span class="lv">なし</span>'}</div></div>
+   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><button id="eUp">↑ 上へ</button><button id="eDn">↓ 下へ</button>
+    ${b?(EDITS[n.id]?'<button id="eReset" class="warn">元に戻す（変更とメモを消す）</button>':''):'<button id="eDel" class="warn">このブロックを消す</button>'}<button id="eClose">閉じる</button></div>`;
+  s.querySelectorAll('[data-plan]').forEach(x=>x.onclick=()=>patch(n.id,{plan:x.dataset.plan||undefined}));
+  s.querySelectorAll('[data-unpre]').forEach(x=>x.onclick=()=>patch(n.id,{pre:(n.pre||[]).filter(p=>p!==x.dataset.unpre)}));
+  const deb=(el,key,ms)=>{let tm;el.oninput=()=>{clearTimeout(tm);tm=setTimeout(()=>patch(n.id,{[key]:el.value}),ms);};el.onchange=()=>{clearTimeout(tm);patch(n.id,{[key]:el.value});};};
+  deb($('eMemo'),'memo',900);deb($('eName'),'name',700);deb($('eEff'),'eff',900);deb($('eMax'),'max',700);
+  $('eCat').onchange=e=>{tab=e.target.value;patch(n.id,{cat:e.target.value,ord:orderAt(e.target.value,n.rank,999,n.id)});};
+  $('eRank').onchange=e=>patch(n.id,{rank:+e.target.value,ord:orderAt(n.cat,+e.target.value,999,n.id)});
+  $('eLine').onchange=e=>patch(n.id,{line:e.target.value});
+  $('ePreAdd').onclick=()=>startLink(n.id,'to');$('eNext').onclick=()=>startLink(n.id,'from');
+  const C=colList(n.cat,n.rank),i=C.findIndex(x=>x.id===n.id);
+  $('eUp').onclick=()=>{if(i>0)moveTo(n.id,n.rank,i-1);};$('eDn').onclick=()=>{if(i<C.length-1)moveTo(n.id,n.rank,i+1);};
+  if($('eReset'))$('eReset').onclick=()=>{drop(n.id);render();};
+  if($('eDel'))$('eDel').onclick=()=>{for(const id of allIds()){const m=node(id);if((m.pre||[]).includes(n.id))patch(id,{pre:m.pre.filter(x=>x!==n.id)});}drop(n.id);sel=null;render();};
+  $('eClose').onclick=()=>{sel=null;render();};
+}
+// ===== 全体メモ・書き出し =====
+$('bMemo').onclick=()=>{const m=$('modal');m.innerHTML=`<div class="mbox"><h2 style="font-family:var(--disp);font-weight:400;margin:0">全体メモ</h2><div class="sub">研究の整理全体について考えていることを書いておけます（自動で保存）。</div><textarea id="gText">${esc(GENERAL)}</textarea><div style="display:flex;justify-content:flex-end"><button class="pri" id="gClose">閉じる</button></div></div>`;m.hidden=false;
+  let tm;$('gText').oninput=e=>{clearTimeout(tm);tm=setTimeout(()=>saveGeneral(e.target.value),900);};$('gClose').onclick=()=>{clearTimeout(tm);saveGeneral($('gText').value);m.hidden=true;};};
+function exportText(){const L=[];L.push('# 研究の木 整理ボードの変更（'+new Date().toLocaleString('ja-JP')+'）');if(GENERAL.trim())L.push('','## 全体メモ',GENERAL.trim());
+  for(const c of DATA.tabs){const rows=[];for(const n of nodesIn(c).sort((a,b)=>a.rank-b.rank||a.ord-b.ord)){const e=EDITS[n.id];if(!e)continue;const b=BASE[n.id];const parts=[];
+    if(n.added)parts.push('【追加】効果：'+(n.eff||'（未記入）')+'／前提：'+((n.pre||[]).map(nameOf).join('・')||'なし'));
+    if(e.plan)parts.push('方針：'+PL[e.plan][1]);
+    if(b){if(e.name!==undefined)parts.push('名前「'+b.name+'」→「'+e.name+'」');if(e.eff!==undefined)parts.push('効果を変更：'+e.eff);
+      if(e.cat!==undefined)parts.push('タブ '+b.cat+' → '+e.cat);if(e.rank!==undefined)parts.push('ランク '+RN[b.rank]+' → '+RN[e.rank]);
+      if(e.pre!==undefined){const add=e.pre.filter(x=>!(b.pre||[]).includes(x)),rm=(b.pre||[]).filter(x=>!e.pre.includes(x));if(add.length)parts.push('前提を足す：'+add.map(nameOf).join('・'));if(rm.length)parts.push('前提を外す：'+rm.map(nameOf).join('・'));}
+      if(e.max!==undefined)parts.push('最大Lv '+b.max+' → '+e.max);if(e.line!==undefined)parts.push('系統 → '+(e.line||'なし'));if(e.ord!==undefined&&e.rank===undefined)parts.push('並び順を変更');}
+    if(e.memo)parts.push('メモ：'+e.memo);
+    if(parts.length)rows.push('- ランク'+RN[n.rank]+'「'+n.name+'」：'+parts.join('／'));}
+   if(rows.length)L.push('','## '+c,...rows);}
+  return L.join('\n');}
+$('bExport').onclick=()=>{const t=exportText();const m=$('modal');m.innerHTML=`<div class="mbox"><h2 style="font-family:var(--disp);font-weight:400;margin:0">変更の一覧</h2><div class="sub">このボードで変えたことは自動で保存されていて、Claude にも「整理ボードを見て」と言えば読めます。ほかへ貼るときはコピーしてください。</div><textarea id="xText" readonly>${esc(t)}</textarea><div style="display:flex;gap:6px;justify-content:flex-end"><button id="xCopy">コピー</button><button class="pri" id="xClose">閉じる</button></div></div>`;m.hidden=false;
+  $('xCopy').onclick=()=>{const ta=$('xText');navigator.clipboard.writeText(ta.value).then(()=>showNote('コピーしました',2000)).catch(()=>{ta.focus();ta.select();showNote('選択しました。コピーしてください',3000);});};$('xClose').onclick=()=>m.hidden=true;};
+addEventListener('keydown',e=>{if(e.key==='Escape'){if(linkMode)endLink();else if(!$('modal').hidden)$('modal').hidden=true;}});
+let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(drawLines,100);});
+// ===== はじめ =====
+render();
+(async()=>{let d=null;try{d=window.claude&&await window.claude.use('db');}catch(e){d=null;}
+  if(!d){local=true;try{EDITS=JSON.parse(localStorage.getItem('rtree_edits')||'{}')||{};GENERAL=localStorage.getItem('rtree_general')||'';}catch(e){}render();showNote('保存先につながらないため、このブラウザの中だけに保存します（Claude からは読めません）',8000);return;}
+  db=d;const tm=setTimeout(()=>showNote('保存した内容をまだ読み込めていません。少し待ってください',0),10000);
+  db.collection('edits').onSnapshot(s=>{if(!s.metadata||!s.metadata.fromCache){clearTimeout(tm);$('note').hidden=true;}const m={};for(const x of s.docs)m[x.id]=x.data();EDITS=m;render();},e=>{clearTimeout(tm);showNote('保存した内容を読み込めませんでした（'+(e&&e.code||'error')+'）',0);});
+  db.doc('meta/general').onSnapshot(s=>{GENERAL=s.exists?(s.data().text||''):'';},()=>{});
+})();
+</script>
