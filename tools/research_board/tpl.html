@@ -54,7 +54,7 @@ h1{font-family:var(--disp);font-weight:400;font-size:22px;margin:0;color:var(--a
 .memo{font-size:11px;color:#ffe2a0;background:#2a2412;border-radius:2px;padding:2px 5px;margin-top:5px;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .grip{position:absolute;right:4px;top:4px;width:20px;height:20px;display:grid;place-items:center;color:var(--mute);cursor:grab;touch-action:none;font-size:12px;border-radius:2px}
 .grip:hover{background:#26301f;color:var(--fg)}
-.port{position:absolute;right:-6px;top:50%;width:11px;height:11px;margin-top:-5.5px;border-radius:50%;background:var(--bg);border:2px solid var(--tc);cursor:crosshair;padding:0}
+.port{position:absolute;right:-9px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:var(--bg);border:2px solid var(--tc);cursor:crosshair;padding:0}
 .port:hover{background:var(--tc)}
 .addb{border-style:dashed;color:var(--mute);background:transparent;width:100%}
 .ins{height:3px;background:var(--blue);border-radius:2px;margin:-6px 0}
@@ -178,7 +178,7 @@ function renderTabs(){
 let CW=230,GAP=48,RH=118,CH=102,PADX=24,HEADH=34,compact=false;
 // 小さく表示（スマホははじめから）：名前と札だけのブロックにして、たくさん見えるように
 function setCompact(on){compact=on;try{localStorage.setItem('rtree_compact',on?'1':'0');}catch(e){}
-  [CW,GAP,RH,CH,PADX]=on?[150,46,62,50,14]:[230,72,118,102,24];document.body.classList.toggle('compact',on);document.documentElement.style.setProperty('--cw',CW+'px');document.documentElement.style.setProperty('--ch',CH+'px');}
+  [CW,GAP,RH,CH,PADX]=on?[150,28,58,50,12]:[230,48,118,102,24];document.body.classList.toggle('compact',on);document.documentElement.style.setProperty('--cw',CW+'px');document.documentElement.style.setProperty('--ch',CH+'px');}
 {let v=null;try{v=localStorage.getItem('rtree_compact');}catch(e){}setCompact(v==null?innerWidth<=820:v==='1');}
 const KINDS=[['tech','研究'],['fac','新しい施設'],['unit','新しい兵'],['mod','改造']];
 const KN=Object.fromEntries(KINDS);
@@ -221,20 +221,15 @@ function drawLines(){const svg=$('svg'),wrap=$('cols');if(!svg)return;const W=wr
   const rel=new Set();if(sel){const s=node(sel);if(s){(s.pre||[]).forEach(x=>rel.add(x));allIds().forEach(id=>{if((node(id).pre||[]).includes(sel))rel.add(id);});}}
   document.querySelectorAll('.card').forEach(c=>c.classList.toggle('rel',rel.has(c.dataset.id)));
   let h='';const col=DATA.colors[tab];
-  // 線：黒いふちどりの上に色の線、行き先に矢じり。選んでいるときは関係する線だけ明るく
-  const arrow=(x,y,dir,c,o)=>`<path d="M${x} ${y} l${-8*dir} -5 l0 10 z" fill="${c}" fill-opacity="${o}"/>`;
-  let bk=0;const under=[],over=[];
   for(const id in box){const n=node(id);for(const p of (n.pre||[])){const a=box[p],b=box[id];if(!a)continue;
-    let d,ex,ey,dir=1;const ay=a.y+a.h/2,by=b.y+b.h/2;
-    if(n.rank>node(p).rank){const ax=a.x+a.w+6,bx=b.x-2,m=Math.max(14,(bx-ax)/2);d=`M${ax} ${ay} C${ax+m} ${ay},${bx-m} ${by},${bx} ${by}`;ex=bx;ey=by;}
-    else if(n.rank===node(p).rank){const lx=a.x-10-(bk++%3)*7;d=`M${a.x} ${ay} C${lx} ${ay},${lx} ${by},${b.x-2} ${by}`;ex=b.x-2;ey=by;}
-    else{const ax=a.x,bx=b.x+b.w+2;d=`M${ax} ${ay} C${ax-50} ${ay},${bx+50} ${by},${bx} ${by}`;ex=bx;ey=by;dir=-1;}
+    let d;const ax=a.x+a.w,ay=a.y+a.h/2,bx=b.x,by=b.y+b.h/2;
+    if(n.rank>node(p).rank){const m=(bx-ax)/2;d=`M${ax+8} ${ay} C${ax+8+m} ${ay},${bx-m} ${by},${bx} ${by}`;}
+    else if(n.rank===node(p).rank){const lx=a.x-14;d=`M${a.x} ${a.y+a.h/2} C${lx} ${a.y+a.h/2},${lx} ${by},${bx} ${by}`;}
+    else{const ex=a.x,dx=b.x+b.w;d=`M${ex} ${ay} C${ex-40} ${ay},${dx+40} ${by},${dx} ${by}`;}
     const on=sel&&(sel===id||sel===p),pl=n.plan==='remove'||node(p).plan==='remove';
-    const c=on?'#ffd27a':pl?'#8a5048':col,o=on?1:sel?0.28:0.9,w=on?3.2:2.4,dash=n.rank<node(p).rank?'stroke-dasharray="6 4"':'';
-    const s=`<path d="${d}" fill="none" stroke="#000" stroke-opacity="${sel&&!on?0.2:0.55}" stroke-width="${w+3}"/><path d="${d}" fill="none" stroke="${c}" stroke-opacity="${o}" stroke-width="${w}" ${dash}/>`+arrow(ex,ey,dir,c,o)+
-      `<path class="hit" d="${d}" fill="none" stroke="transparent" stroke-width="14" data-l="${p}>${id}"/>`;
-    (on?over:under).push(s);}}
-  h=under.join('')+over.join('');
+    h+=`<path d="${d}" fill="none" stroke="${on?'#ffd27a':pl?'#5a3a34':col}" stroke-opacity="${on?1:sel?0.25:0.55}" stroke-width="${on?2.6:1.6}" ${n.rank<node(p).rank?'stroke-dasharray="5 4"':''}/>`+
+       `<path class="hit" d="${d}" fill="none" stroke="transparent" stroke-width="12" data-l="${p}>${id}"/>`;
+    h+=`<circle cx="${bx}" cy="${by}" r="3" fill="${on?'#ffd27a':col}" fill-opacity="${on?1:0.7}"/>`;}}
   svg.innerHTML=h;
   svg.querySelectorAll('[data-l]').forEach(pth=>pth.onclick=()=>{const [a,b]=pth.dataset.l.split('>');askUnlink(a,b);});
 }
