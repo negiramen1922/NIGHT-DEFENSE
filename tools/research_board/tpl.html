@@ -144,7 +144,7 @@ function showNote(t,ms){const n=$('note');n.textContent=t;n.hidden=false;clearTi
 // ===== 描く =====
 function render(){renderTabs();renderBoard();renderSide();}
 function renderTabs(){
-  $('src').textContent=`ゲームの研究：${DATA.ver.replace(' 試作版','')}（試作版）の ${DATA.tech.length} 個から`;
+  $('src').textContent=`ゲームの研究：${DATA.ver.replace(' 試作版','')}（試作版）から。Lvのある研究はⅠ・Ⅱ…に分けて並べています（Lvの上限が城のランクのものは、そのLvを上げられるランクの列に）`;
   $('tabs').innerHTML=DATA.tabs.map(c=>{const L=nodesIn(c);const rm=L.filter(n=>n.plan==='remove').length;return `<button class="tab${c===tab?' on':''}" data-tab="${c}" style="--tc:${DATA.colors[c]}">${c}<small>${L.length-rm}${rm?`（なくす${rm}）`:''}</small></button>`;}).join('')+
    `<div class="filt"><label><input type="checkbox" id="fRm" ${hideRemoved?'checked':''}>「なくす」を隠す</label></div>`;
   const L=nodesIn(tab);
@@ -163,7 +163,7 @@ const BASEROW={};(function(){for(const c of DATA.tabs){const L=DATA.tech.filter(
   for(let r=1;r<=7;r++){const inR=L.filter(t=>t.rank===r).sort((a,b)=>a.ord-b.ord);
     const withP=inR.filter(t=>(t.pre||[]).some(p=>BASEROW[p]!=null&&BASE[p].cat===c&&BASE[p].rank<r)),rest=inR.filter(t=>!withP.includes(t));
     for(const t of withP){const p=(t.pre||[]).find(p=>BASEROW[p]!=null&&BASE[p].cat===c&&BASE[p].rank<r);let row=BASEROW[p];while(!free(r,row))row++;BASEROW[t.id]=row;take(r,row);}
-    let row=0;for(const t of rest){while(!free(r,row))row++;BASEROW[t.id]=row;take(r,row);}}}})();
+    for(const t of rest){const sp=(t.pre||[]).find(p=>BASEROW[p]!=null&&BASE[p].cat===c&&BASE[p].rank===r);let row=sp?BASEROW[sp]+1:0;while(!free(r,row))row++;BASEROW[t.id]=row;take(r,row);}}}})();   // 同じランクの前提（Lvの続き）はすぐ下の段に
 function layout(cat){const L=nodesIn(cat).filter(n=>!(hideRemoved&&n.plan==='remove'));const used={};const occ=(r,row)=>used[r+':'+row];const put=(n,row)=>{while(occ(n.rank,row))row++;used[n.rank+':'+row]=n.id;LAYOUT[n.id]={r:n.rank,row};};
   const ex=L.filter(n=>EDITS[n.id]&&EDITS[n.id].row!=null),bs=L.filter(n=>!ex.includes(n)&&BASEROW[n.id]!=null&&n.rank===BASE[n.id].rank),ot=L.filter(n=>!ex.includes(n)&&!bs.includes(n));
   ex.sort((a,b)=>(EDITS[b.id].t||0)-(EDITS[a.id].t||0));   // 新しく動かしたものを優先

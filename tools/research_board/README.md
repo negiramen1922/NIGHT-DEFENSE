@@ -6,6 +6,7 @@ claude.ai の Artifact「研究の木 整理ボード」（https://claude.ai/art
 作り直し：
 ```
 node tools/research_board/dump.js /tmp/tech.json      # 試作版から研究を書き出す（Playwright）
-python3 -c "t=open('tools/research_board/tpl.html').read();d=open('/tmp/tech.json').read().replace('</','<\\\\/');open('/tmp/rtree.html','w').write(t.replace('__DATA__',d,1))"
+python3 tools/research_board/split.py /tmp/tech.json /tmp/tech2.json   # Lvのある研究を Ⅰ→Ⅱ→… のブロックに分ける
+python3 -c "t=open('tools/research_board/tpl.html').read();d=open('/tmp/tech2.json').read().replace('</','<\\\\/');open('/tmp/rtree.html','w').write(t.replace('__DATA__',d,1))"
 ```
 → `/tmp/rtree.html` を同じ Artifact に publish する（db の中身は残る）。

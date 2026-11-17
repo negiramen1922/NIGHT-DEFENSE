@@ -263,6 +263,8 @@
 
 ---
 
+> 整理には claude.ai の「研究の木 整理ボード」（https://claude.ai/artifact/GxcgH92w1m5MFKyFqiyAKR ・オーナーだけが開ける。元は `tools/research_board/`）も使う。ブロックごとのメモ・方針・線のつなぎ直しはボードに入っていて、Claude は ArtifactData で読める
+
 ## 5. 案A（第3版・2026-11-17 相談中）：施設の種類で育て方を分ける
 
 ### 5-0. 決まりかけている考え方
