@@ -724,7 +724,7 @@ button.ghost:hover:not(:disabled){box-shadow:none;color:var(--amber)}
   body.intelMin:not(.land) #intel{min-height:30px!important;flex-wrap:nowrap}
   body.intelMin:not(.land) #intel>*:not(.lbl):not(.imini):not(#intelMin){display:none!important}
   body.intelMin:not(.land) #intel .lbl{min-height:30px!important;flex-direction:row;align-items:center;gap:8px}
-  body.intelMin:not(.land) #intel .imini{display:inline-flex;align-items:baseline;gap:4px;font-size:12px}
+  body.intelMin:not(.land) #intel .imini{display:inline-flex;align-items:center;gap:4px 10px;font-size:12px;min-width:0;overflow:hidden;white-space:nowrap}body.intelMin:not(.land) #intel .imsrc{color:var(--text)}body.intelMin:not(.land) #intel .imet{display:inline-flex;gap:6px;align-items:center}body.intelMin:not(.land) #intel .imet>span{display:inline-flex;align-items:center;gap:1px;font-family:var(--px-font);font-size:12px}
   body.intelMin:not(.land) #intel .imini b{font-family:var(--px-font);font-weight:400;font-size:15px;color:var(--red)}
   body.intelMin:not(.land) #intelMin{top:50%;transform:translateY(-50%)}
 }
@@ -794,7 +794,7 @@ body.night .dOnly{display:none!important}
 
 /* 通信ログ */
 body:not(.fullmap) .logbox{flex:0 0 62px!important;min-height:62px;height:62px;margin-top:8px!important}
-.logbox h3{display:flex;align-items:center;gap:6px;font-size:12px!important;color:var(--amber);background:var(--head);cursor:default}
+.logbox h3{display:flex;align-items:center;gap:6px;font-size:12px!important;color:var(--amber);background:var(--head);cursor:pointer}.logbox h3 .lgar{margin-left:auto;color:var(--dim);font-size:10px}body.logMin:not(.fullmap) .logbox{flex:0 0 28px!important;min-height:28px;height:28px}body.logMin .logbox h3{padding:4px 10px!important;align-items:center!important}body.logMin #log{overflow:hidden!important;height:22px!important;min-height:22px!important;margin-top:3px;flex:1 1 auto!important;padding-top:4px!important;padding-bottom:0!important;display:block!important}
 .logbox h3 .lgic{display:inline-flex}
 #log{display:flex;flex-direction:column;overflow-y:auto;height:auto!important}
 #log>div:first-child{margin-top:auto}
@@ -1657,7 +1657,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <span class="help">左クリック: 選択/建設　右クリック・Esc: 取消　部隊を選んで地図をクリック: 移動　Q: 部隊を順に選択</span>
       </div></details>
     </div>
-    <div class="box logbox" style="margin-top:6px"><h3><span class="lgic"></span>通信ログ</h3><div id="log"></div></div>
+    <div class="box logbox" style="margin-top:6px"><h3 id="logTg" title="通信ログをたたむ／ひらく"><span class="lgic"></span>通信ログ<span class="lgar">▾</span></h3><div id="log"></div></div>
   </div>
   <div id="right">
     <div id="sheetHandle"><span id="sheetSel"></span><span id="sheetLbl">▲ 詳細・建設</span></div>
@@ -4399,10 +4399,10 @@ function rtCol(f,ph){if(ph==='night')return '#7a8cff';return f<0.6?'#f2c94c':f<0
 const RT_IMG={};function rtIcon(k){if(!RT_IMG[k]){const im=new Image();im.src=piURL(k,k==='moon'?'light':'amber');RT_IMG[k]=im;}return RT_IMG[k];}
 let rtBarBox=null;
 function drawRtBar(){rtBarBox=null;if(!S||S.backdrop||S.over||S.waveActive||S.tlOn||!S.turnsLeft)return;
-  const ph=S.phase==='night'?'night':'day',f=rtFrac();const vs=document.getElementById('viewSeg'),cv=document.getElementById('cv')||ctx.canvas;let right=VW-12;try{if(vs&&vs.offsetParent){const r=vs.getBoundingClientRect(),c=cv.getBoundingClientRect();right=Math.min(right,r.left-c.left-16);}}catch(e){}
-  let top=16;try{const c=cv.getBoundingClientRect();for(const id of ['modeBar','modeTxt']){const e=document.getElementById(id);if(e&&e.offsetParent&&e.offsetHeight){const r=e.getBoundingClientRect();if(r.top-c.top<60)top=Math.max(top,r.bottom-c.top+14);}}if(top>16&&vs&&vs.offsetParent){const r=vs.getBoundingClientRect();if(r.top-c.top<top+20)right=VW-12;}}catch(e){}   // スマホは上の操作の帯の下に
-  const x0=30,w=Math.max(120,Math.min(520,right-x0-30)),y=top,h=8;   // 右上の表示切り替えと重ならないように
-  ctx.save();ctx.fillStyle='rgba(5,7,5,.75)';ctx.fillRect(x0-14,y-12,w+28,h+24);
+  const ph=S.phase==='night'?'night':'day',f=rtFrac();
+  /* 時間のバーは地図の真ん中の上ではなく、右下のミニマップのすぐ上に（ミニマップと同じ幅。2026-11-16 ユーザーの希望） */
+  const [mx,my]=mmPos(),x0=mx+12,w=MM.w-38,h=8,y=my-24;
+  ctx.save();ctx.fillStyle='rgba(5,7,5,.82)';ctx.fillRect(mx-2,y-12,MM.w+4,h+22);
   // 道のり（昼は黄色→だいだい→赤、夜は青）
   if(ph==='day'){const g=ctx.createLinearGradient(x0,0,x0+w,0);g.addColorStop(0,'#5a4a1c');g.addColorStop(0.6,'#5a3e1c');g.addColorStop(1,'#4a2418');ctx.fillStyle=g;}else ctx.fillStyle='#1c2240';
   ctx.fillRect(x0,y,w,h);
@@ -4413,8 +4413,7 @@ function drawRtBar(){rtBarBox=null;if(!S||S.backdrop||S.over||S.waveActive||S.tl
   // 終わりの印：昼は月（夜が来る）、夜は太陽（朝が来る）
   const ie=rtIcon(ph==='day'?'moon':'sun');if(ie.complete&&ie.naturalWidth){ctx.globalAlpha=0.7;ctx.imageSmoothingEnabled=false;ctx.drawImage(ie,x0+w+2,y+h/2-9,18,18);ctx.globalAlpha=1;}
   const im=rtIcon(ph==='day'?'sun':'moon');if(im.complete&&im.naturalWidth){ctx.imageSmoothingEnabled=false;ctx.drawImage(im,x0+w*f-14,y+h/2-14,28,28);}
-  if(S.paused){ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillStyle='#ffe08a';ctx.fillText('一時停止中',x0+w/2,y+h+11);}
-  ctx.restore();rtBarBox=[x0-14,y-12,w+28,h+24];}
+  ctx.restore();rtBarBox=[mx-2,y-12,MM.w+4,h+22];}
 // 昼の後半は夕方に（地図をだいだい色にして少し暗く）
 function drawDusk(){if(!S||S.backdrop||S.waveActive||S.phase==='night')return;const f=rtFrac();if(f<0.55)return;const a=Math.min(1,(f-0.55)/0.45);
   ctx.save();ctx.globalCompositeOperation='multiply';ctx.fillStyle=`rgb(255,${Math.round(255-105*a)},${Math.round(255-165*a)})`;ctx.fillRect(0,0,VW,VH);ctx.restore();}
@@ -7225,7 +7224,11 @@ function recMeters(w){const r=recOf(w),c=curDev();
   const m=(lab,v,t,tip)=>`<div class="rec${v<t?' short':''}" title="${tip}"><div class="rt"><span>${lab}</span><b>${v} <small>/ ${t}</small></b></div><div class="ebar"><i style="width:${Math.round(Math.min(1,v/Math.max(1,t))*100)}%"></i></div></div>`;
   return `<span class="rtag">推奨</span>${m('人口',c.pop,r.pop,'住民と兵の合計')}${m('防衛施設',c.def,r.def,'バリスタ・投石機などの数（Lv2は160%、Lv3は230%として数える）')}${m('部隊',c.sq,r.sq,'編成した部隊の数')}`;}
 // 敵情の帯をたたむ（PC）。たたんだときは「第◯襲撃・規模・あと◯日」だけの1行
-function intelMin(){try{return localStorage.getItem('nd_intel_min')==='1';}catch(e){return false;}}
+// 通信ログをたためる（たたむと、いちばん新しい1行だけ。2026-11-16）
+function logMin(){try{return localStorage.getItem('nd_log_min')==='1';}catch(e){return false;}}
+function setLogMin(v){try{localStorage.setItem('nd_log_min',v?'1':'0');}catch(e){}document.body.classList.toggle('logMin',!!v);const a=document.querySelector('#logTg .lgar');if(a)a.textContent=v?'▸':'▾';const l=document.getElementById('log');if(l)l.scrollTop=l.scrollHeight;setTimeout(()=>{try{resizeView();}catch(e){}},0);}
+setTimeout(()=>{setLogMin(logMin());const t=document.getElementById('logTg');if(t)t.onclick=()=>{setLogMin(!logMin());se('click');};},0);
+function intelMin(){try{return localStorage.getItem('nd_intel_min')!=='0';}catch(e){return true;}}   /* はじめからたたんだ1行（2026-11-16 縦幅を取らないように） */
 function setIntelMin(v){try{localStorage.setItem('nd_intel_min',v?'1':'0');}catch(e){}document.body.classList.toggle('intelMin',!!v);}
 setTimeout(()=>document.body.classList.toggle('intelMin',intelMin()),0);
 function renderIntel(){
@@ -7245,7 +7248,7 @@ function renderIntel(){
     if(it.cnt)types=Object.keys(E).filter(k=>it.cnt[k]).map(k=>`<span class="et" title="${E[k].desc}">${eSpr(k,24)}×${it.cnt[k]}</span>`).join('');
     else if(it.types)types=Object.keys(E).filter(k=>it.types.includes(k)).map(k=>`<span class="et" title="${E[k].name}：${E[k].desc}">${eSpr(k,24)}</span>`).join('')+'<span class="muted">（数は不明）</span>';
     else types=`<span>不明</span><span class="muted">（偵察Lv${it.L}）</span>`;
-    h=`<div class="lbl"><span>敵情予測</span><b>第${w.n}襲撃</b></div><span class="imini">規模 <b>${it.total}</b>　あと ${S.turnsLeft} 日${w.blood?'　<span style="color:#ff7a6a">ブラッドムーン</span>':''}</span>${tags(w)}<div class="icell"><small>規模</small><b class="big">${it.total}</b></div><div class="icell"><small>襲撃元</small><span>${it.sides.map(sd=>sideSrc(sd)+campTag(sd)).join('・')}${it.hidden?' <span class="muted">ほか不明</span>':''}</span></div><div class="icell itypes"><small>敵の種類</small><span class="ets">${types}</span></div><div class="icell" title="敵の強さと、推奨に対する今の備えから出した目安"><small>危険度</small>${pipsHTML(dg,5,'danger-pips')}</div>`;   /* 推奨の目安（人口・防衛施設・部隊）は外した：足りない資源の警告に置き換え（2026-11-15） */
+    h=`<div class="lbl"><span>敵情予測</span><b>第${w.n}襲撃</b></div><span class="imini">規模 <b>${it.total}</b><span class="imsrc">${it.sides.map(sd=>sideSrc(sd)).join('・')}</span><span class="imet">${it.cnt?Object.keys(E).filter(k=>it.cnt[k]).map(k=>`<span title="${E[k].name}">${eSpr(k,18)}${it.cnt[k]}</span>`).join(''):it.types?Object.keys(E).filter(k=>it.types.includes(k)).map(k=>`<span title="${E[k].name}">${eSpr(k,18)}</span>`).join(''):''}</span>${pipsHTML(dg,5,'danger-pips')}${w.blood?'<span style="color:#ff7a6a">ブラッドムーン</span>':''}</span>${tags(w)}<div class="icell"><small>規模</small><b class="big">${it.total}</b></div><div class="icell"><small>襲撃元</small><span>${it.sides.map(sd=>sideSrc(sd)+campTag(sd)).join('・')}${it.hidden?' <span class="muted">ほか不明</span>':''}</span></div><div class="icell itypes"><small>敵の種類</small><span class="ets">${types}</span></div><div class="icell" title="敵の強さと、推奨に対する今の備えから出した目安"><small>危険度</small>${pipsHTML(dg,5,'danger-pips')}</div>`;   /* 推奨の目安（人口・防衛施設・部隊）は外した：足りない資源の警告に置き換え（2026-11-15） */
     const det=[];
     if(w.blood)det.push('<span style="color:#ff7a6a">赤い月が昇る……魔物が強く、レッドキャップが現れる</span>');
     if(it.tactic)det.push(`<span style="color:var(--amber)">戦術：${it.tactic}</span>`);
@@ -7709,7 +7712,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）']],
+ ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）','<b>時間のバー</b>を地図の上から、右下のミニマップのすぐ上へ（選択中の帯などと重ならないように）','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる']],
  ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。生産は昼だけ、10秒ごとに少しずつ入る。時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める。残りは地図の上の横長のバーで（太陽・月が左から右へ進む）。昼の後半は夕方に。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
@@ -8876,7 +8879,7 @@ function resizeView(){
   let vh=20*TU;
   if(!isNarrow()){
     const ids=['topbar','intel','controls'];let used=24;for(const id of ids){const e=document.getElementById(id);if(e&&getComputedStyle(e).display!=='none')used+=e.offsetHeight+6;}
-    used+=76;   // 通信ログの高さ（62px）
+    used+=document.body.classList.contains('logMin')?42:76;   // 通信ログの高さ（62px。たたむと28px）
     const w=Math.max(300,cv.getBoundingClientRect().width||document.getElementById('left').clientWidth);const avail=Math.max(200,innerHeight-used);
     vh=Math.round(Math.max(12*TU,Math.min(40*TU,VW*avail/w)));
   }
