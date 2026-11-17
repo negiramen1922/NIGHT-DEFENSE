@@ -2178,8 +2178,8 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  // 内政
  set('housing',{cat:'内政',tier:1,name:'住居拡大',max:2,cost:{steel:60},t:2,pre:[],eff:'住居1棟あたりの住める人数 +3（Lvごと・最大2）'});
  set('brewing',{cat:'内政',tier:1,name:'醸造',cost:{steel:30,fuel:40},t:2,pre:[],eff:'「酒場」を建設できる（住民の幸福度 +10）'});
- set('overtime',{cat:'内政',tier:1,name:'延長シフト',cost:{steel:40,fuel:30},t:2,pre:[],eff:'静かな夜に「深夜残業」ができる：昼の50%を生産、幸福度 −8'});
- set('allnight',{cat:'内政',tier:2,name:'徹夜シフト',cost:{steel:80,fuel:60,gold:40},t:2,pre:['overtime'],icon:'lab',eff:'深夜残業が昼と同じ100%の生産になる（幸福度 −15）'});
+ set('overtime',{cat:'内政',tier:1,name:'延長シフト',cost:{steel:40,fuel:30},t:2,pre:[],eff:'夜の過ごし方に「夜なべ」が増える：夜も昼の50%を生産、幸福度 −8'});
+ set('allnight',{cat:'内政',tier:2,name:'徹夜シフト',cost:{steel:80,fuel:60,gold:40},t:2,pre:['overtime'],icon:'lab',eff:'夜なべが昼と同じ100%の生産になる（幸福度 −15）'});
  set('trade',{cat:'内政',tier:3,name:'交易路',cost:{gold:150,steel:100},t:3,pre:['brewing'],eff:'魔核の買い取り値 +3金貨'});
  del('drill');
  // 部隊
@@ -2205,7 +2205,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('hisousha',{cat:'防衛',tier:3,name:'風船爆弾',cost:{iron:60,gold:60},t:3,pre:['gunpowder'],icon:'hisou',eff:'「風船爆弾」を建設できる（風船のついた爆弾が魔物を追いかけて爆発する。空にも地上にも効く範囲攻撃。射程8。火薬を使う）'});
  set('catapult',{cat:'防衛',tier:1,name:'投石機',pre:[],eff:'「投石機」を建設できる（石材を撃つ曲射の範囲攻撃。味方の建物越しに撃てる）'});
  set('bighow',{cat:'防衛',tier:2,name:'大岩弾',pre:['catapult'],eff:'投石機の火力 125%・範囲 130%'});
- set('gunpowder',{cat:'防衛',tier:3,name:'火薬',pre:['bighow'],eff:'「大砲」を建設できる（鉄の砲弾で敵を4体まで貫く）'});
+ set('gunpowder',{cat:'防衛',tier:3,name:'火薬',pre:[],eff:'「大砲」を建設できる（鉄の砲弾で敵を4体まで貫く）'});
  set('tetsudan',{cat:'防衛',tier:3,name:'鉄弾',cost:{iron:120,gold:60},t:3,pre:['gunpowder'],icon:'cannon',eff:'大砲の火力 +30%'});
  set('masonry',{cat:'防衛',tier:1,name:'石積み',pre:[],eff:'「石の壁」を建設できる。門と物見櫓を石造りにできる'});
  set('castle',{cat:'防衛',tier:2,name:'築城術',pre:['masonry'],eff:'「城壁」を建設できる（上に防衛施設を置ける）。門を鉄の門、物見櫓を城塞の物見櫓にできる'});
@@ -2246,7 +2246,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('shieldwall',{cat:'部隊',tier:2,name:'盾陣',cost:{iron:60,steel:40},t:2,pre:['heavyinf'],icon:'heavy',eff:'重装歩兵が受ける被害 −25%。周り4マスの魔物を引きつける'});
  set('charge',{cat:'部隊',tier:2,name:'騎馬突撃',cost:{gold:40,fuel:60},t:2,pre:['cavalry'],icon:'rider',eff:'騎兵の移動 +20%。しばらく戦っていない騎兵の最初の一撃が3倍'});
  set('highmagic',{cat:'部隊',tier:4,name:'高等魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard',eff:'魔術師の杖が「樫の杖」から「エーテルの杖」になる（攻撃 140%）。魔法の範囲 +30%、魔力の消費 −30%'});
- set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館・前哨砦・所属施設の8マス以内にいる部隊は少しずつ補給される'});
+ set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城・前哨砦・所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
  set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'剣士・重装歩兵・騎兵の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
  set('aethert',{cat:'生産',tier:2,name:'エーテル採掘',cost:{steel:60,stone:30,gold:20},t:2,pre:[],icon:'well',eff:'「エーテル採掘所」を建設できる（龍脈の泉からエーテルを採る）'});   /* 2026-11-16：エーテル採掘所は初めからは建てられない */
@@ -2277,7 +2277,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('chainmail',{cat:'部隊',tier:2,name:'鎖帷子',cost:{iron:30,steel:20},t:2,pre:[],icon:'archer',eff:'弓兵・砲兵・魔術師のローブが「皮のローブ」から「鎖帷子」になる：体力 +15%（補給で鎧を使う）'});
  set('alloyarms',{cat:'部隊',tier:3,name:'合金の武具',cost:{iron:70,gold:50},t:3,pre:['heavyarms'],icon:'heavy',eff:'魔術師以外の武器が「合金」になる（鋼の剣→合金の剣など）：攻撃 190%（鉄の武器を100%として）。補給で「合金」（金と鉄から作る素材。精錬所はこれから）を使う'});
  set('battalion',{cat:'部隊',tier:3,name:'大隊',cost:{gold:80,fuel:60,sword:20},t:3,pre:['formation'],icon:'heavy',eff:'中隊3つまでを「大隊」にまとめられる。ほかの中隊が8マス以内にいると火力+10%・耐久+5%（中隊の効果と重なる）'});
- set('division',{cat:'部隊',tier:5,name:'師団',cost:{gold:160,fuel:120,iron:60},t:4,pre:['battalion'],icon:'heavy',eff:'大隊3つまでを「師団」にまとめられる。ほかの大隊が12マス以内にいると火力+10%・耐久+5%（今はランクⅢ。ランクを伸ばしたらⅥのつもり）'});
+ set('division',{cat:'部隊',tier:5,name:'師団',cost:{gold:160,fuel:120,iron:60},t:4,pre:['battalion'],icon:'heavy',eff:'大隊3つまでを「師団」にまとめられる。ほかの大隊が12マス以内にいると火力+10%・耐久+5%'});
  set('unit_r3',{cat:'部隊',gate:3,tier:3,name:'部隊強化Ⅲ',cost:{gold:120,fuel:80,iron:40},t:3,pre:[],icon:'dragon',eff:'部隊タブのランクⅢの研究を解放（竜騎兵など）'});
  set('dragon',{tier:4,pre:[]});
  set('dragonscale',{cat:'部隊',tier:4,name:'竜鱗',cost:{gold:80,mat:40,fuel:40},t:3,pre:['dragon'],icon:'dragon',eff:'竜騎兵が受ける被害 −30%'});
@@ -2295,7 +2295,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('bonearmor',{cat:'魔核',tier:2,name:'骨鎧',cost:{mat:40,iron:30},t:2,pre:[],icon:'heavy',eff:'魔物の甲殻で作った鎧。農兵・剣士・重装歩兵・騎兵の耐久 +25%'});
  set('poison',{cat:'魔核',tier:2,name:'毒の鏃',cost:{mat:40,ammo:40},t:2,pre:[],icon:'archer',eff:'魔物の毒腺を矢に塗る。弓兵隊・物見櫓・バリスタに撃たれた魔物は毒で3秒かけて追加の被害（与えた被害の30%・装甲無視）'});
  set('furnace',{cat:'魔核',tier:2,name:'精製炉',cost:{mat:30,stone:40},t:2,pre:[],icon:'furnace',eff:'「精製炉」を建設できる：魔核のエネルギーを取り出してエーテル結晶を精製（魔核 −2 → エーテル +4／T）'});
- set('carapace',{tier:2,pre:[],icon:'hq',eff:'生産施設と城館の耐久 +25%'});
+ set('carapace',{tier:2,pre:[],icon:'hq',eff:'生産施設と城の耐久 +25%'});
  set('totem',{cat:'魔核',tier:3,name:'呪骸の柱',cost:{mat:80,stone:60},t:3,pre:[],icon:'totem',eff:'「呪骸の柱」を建設できる：周り6マスの魔物の足を30%遅くし、攻撃の間隔を伸ばす（与える被害 −25%）'});
  set('mabou',{cat:'魔核',tier:3,name:'魔弾砲',cost:{mat:80,iron:60,elec:30},t:3,pre:['furnace'],icon:'mabou',eff:'「魔弾砲」を建設できる：エーテルを撃ち出す直射砲。射程内でいちばん硬い敵を狙って大ダメージ'});
  set('amulet',{cat:'魔核',tier:3,name:'英雄の護符',cost:{mat:60,gold:80},t:3,pre:[],icon:'h_守備',eff:'英雄のスキルの発動間隔 −30%'});
@@ -2318,10 +2318,10 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('poison',{eff:'魔物の毒腺を鏃に塗る。物見櫓・バリスタに撃たれた魔物は毒で3秒かけて追加の被害（与えた被害の30%・装甲無視）。弓兵隊は装備「毒矢」が使える'});
  set('charge',{eff:'騎兵の移動 +20%。突撃の1体目への一撃が×3→×4'});
  // ランクⅠにも前提をつける（防衛・部隊）
- set('catapult',{pre:['kougen']});set('spikes',{pre:['stakes']});set('yariana',{pre:['spikes']});
+ set('catapult',{pre:[]});   /* 前提の「鋼弦（バリスタの火力）」は不自然なので外した（2026-11-17 研究の整理・案5） */set('spikes',{pre:['stakes']});set('yariana',{pre:['spikes']});
  set('formation',{pre:['swordplay']});set('armcare',{pre:['swordplay']});set('polearm',{pre:['swordplay']});
  set('bigquiver',{pre:['archery']});set('firecraft',{pre:['archery']});set('nighthunt',{pre:['scout']});
- set('gunpowder',{eff:'「火薬工房」を建設できる（木材と魔核から火薬を作る。大砲・迫撃砲・砲兵隊が使う）'});
+ set('gunpowder',{eff:'「火薬工房」を建設できる（木材と魔核から火薬を作る。大砲・迫撃砲・風船爆弾・爆弾罠と、銃を持つ兵が使う）'});
  set('cannontech',{cat:'防衛',tier:3,name:'大砲',cost:{iron:100,gold:80},t:3,pre:['gunpowder'],icon:'cannon',eff:'「大砲」を建設できる（鉄の砲弾で敵を4体まで貫く。1発 鉄1・火薬1）'});
  set('tetsudan',{pre:['cannontech']});
  set('bombtrap',{cat:'防衛',tier:3,name:'爆弾罠',cost:{iron:40,powder:20,gold:40},t:2,pre:['gunpowder'],icon:'bomb',eff:'「爆弾罠」を建設できる（火薬の使い切りの罠。踏んだ魔物の周り4マスを吹き飛ばす）'});
@@ -7820,7 +7820,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.12.1（試作版だけ）','',['<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
+ ['1.12.1（試作版だけ）','',['研究の見直し：投石機・火薬の不自然な前提を外した。古い説明（師団・延長シフト・火薬工房・野戦補給・甲殻補強）を直した','<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
  ['1.12.1','2026-11-17',['不具合の修正：建て終わった施設の耐久が減ったままになっていた（前の版で建てた施設も、読み込んだときに満タンに戻す）','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）']],
  ['1.12','2026-11-17',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>時間のバー</b>を地図の中から出して、敵情予測と地図のあいだの細い帯に（残りの時間も出る）','<b>ミニマップに小さな見出し</b>をつけた：「大・小」で大きさを切り替え、「－」でたたむ（たたむと見出しだけになり、「＋」で戻す）','<b>防衛施設の詳しい画面に、夜の実際の動き</b>：施設が、地図の上と同じ絵の弾（バリスタは重い矢、投石機は石、物見櫓は矢など）で、歩いてくる魔物を撃つ小さな場面','<b>弾がまったくなくて撃てない防衛施設</b>には、地図の上で施設の上に赤い「!!」を出すように（昼でも分かる）','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる','<b>木の柵は置いたらすぐ完成</b>（罠と同じ）','不具合の修正：建て終わった施設の耐久が少し減って見えることがあった']],
  ['1.11.1','2026-11-17',['不具合の修正：昼に建てた「1ターンで完成」の施設が、次の朝になっても完成していないことがあった（建てた時刻によって、同じ日に建てたのに片方だけ完成することも）。今は、昼のいつ建てても次の朝に完成する','城の説明などに残っていた、今はいない「近衛兵」の話を消した']],
