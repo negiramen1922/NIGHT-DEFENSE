@@ -1879,7 +1879,7 @@ B.powder={name:'火薬工房',glyph:'薬',hp:220,heat:3,cost:{steel:80,stone:40,
 B.mortar={name:'迫撃砲',glyph:'迫',hp:280,heat:2,cost:{steel:100,iron:80,stone:40,gold:80},pop:4,power:0,spec:'守備',grp:'def',req:'mortar',desc:'投石機の上位。火薬で石の砲弾を高く打ち上げる曲射砲。射程がとても長く、着弾点を大きく吹き飛ばす。壁や味方の建物越しに撃てる（山は越えられない）。最低射程4マス。1発ごとに石材1・火薬1',range:9.5,minRange:2,dmg:120,rate:3.4,splash:1.9,ammoKey:'stone',ammoUse:1,ammo2:{powder:1}};
 B.cannon.req='cannontech';B.cannon.ammoUse=1;B.cannon.ammo2={powder:1};B.cannon.desc='火薬で鉄の砲弾を撃ち出す直射砲。射線上の敵を最大4体まで貫く。撃つと轟音とともに閃光が走る。1発ごとに鉄1・火薬1。城壁の上にも置ける';
 B.apart={name:'集合住宅',glyph:'集',hp:320,heat:1,cost:{steel:110,stone:50,gold:30},pop:0,power:0,spec:'内政',grp:'prod',req:'apart',desc:'何世帯も住める大きな家。1棟に36名まで住める（改築でLv2:54名・Lv3:72名）。毎ターン5名ずつ住民が増える'};
-B.hq.hp=3000;B.hq.cap=3;B.hq.name='城';B.hq.desc='街の中心の城（4×4マス）。失うと敗北。周囲を明るく照らす。農兵と近衛兵をここで集める';
+B.hq.hp=3000;B.hq.cap=3;B.hq.name='城';B.hq.desc='街の中心の城（4×4マス）。失うと敗北。周囲を明るく照らす。農兵をここで集める';
 const BUILD_ORDER=['outpost','miner','quarry','ironmine','farm','fishery','well','ammo','powder','barracks','apart','market','tavern','church','lab','furnace','fence','gate','swall','wall','bastion','brazier','spike','pit','bomb','totem','mg','how','cannon','mortar','mabou','hisou','tower','magetower','train','stable','magic','aerie'];
 // アップグレード倍率（Lv1〜3）
 const UP={prod:[1,1.5,2.0,2.4,2.8,3.2,3.6],dmg:[1,1.4,1.9,2.4,2.9,3.4,3.9],hp:[1,1.5,2.0,2.5,3.0,3.5,4.0],wallhp:[1,1.8,2.8,2.8,2.8,2.8,2.8],range:[0,0.5,1,1,1.5,1.5,2]};   // 改築の段ごと（2026-11-13 に7段まで）
@@ -2216,7 +2216,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('highmagic',{cat:'部隊',tier:4,name:'高等魔術',cost:{elec:40,gold:40},t:2,pre:['magic'],icon:'wizard',eff:'魔術師の杖が「樫の杖」から「エーテルの杖」になる（攻撃 140%）。魔法の範囲 +30%、魔力の消費 −30%'});
  set('fieldsup',{cat:'部隊',tier:2,name:'野戦補給',cost:{steel:60,fuel:60},t:2,pre:[],icon:'ammo',eff:'夜の戦闘中も、城館・前哨砦・所属施設の8マス以内にいる部隊は少しずつ補給される'});
  set('elite',{tier:2,pre:[],cost:{gold:60,fuel:40},icon:'heavy',eff:'熟練度の上限が「精鋭」になる（熟練 火力+10% → 精鋭 火力+20%・耐久+10%）'});
- set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'剣士・重装歩兵・騎兵・近衛の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
+ set('ironarmor',{cat:'部隊',tier:1,name:'鉄の鎧',cost:{iron:20,steel:15},t:2,pre:[],icon:'heavy',eff:'剣士・重装歩兵・騎兵の鎧が「革の鎧」から「鉄の鎧」になる：体力 +10%（補給で鎧を使う）'});
  set('aethert',{cat:'生産',tier:2,name:'エーテル採掘',cost:{steel:60,stone:30,gold:20},t:2,pre:[],icon:'well',eff:'「エーテル採掘所」を建設できる（龍脈の泉からエーテルを採る）'});   /* 2026-11-16：エーテル採掘所は初めからは建てられない */
  set('coalt',{cat:'生産',tier:2,name:'炭鉱',cost:{steel:60,stone:30},t:2,pre:[],icon:'coalmine',eff:'「炭鉱」を建設できる（石炭を掘る）'});
  set('goldt',{cat:'生産',tier:3,name:'金鉱',cost:{steel:80,stone:40,gold:40},t:3,pre:[],icon:'goldmine',eff:'「金鉱」を建設できる（素材の金を掘る。金貨ではない）'});
@@ -2258,7 +2258,7 @@ function techMul(type){const L=k=>lvl(k);switch(type){case 'miner':return 1+0.3*
  set('bonepick',{cat:'魔核',tier:1,name:'強化つるはし',cost:{mat:15,steel:30},t:2,pre:['analysis'],icon:'quarry',eff:'魔核の力を込めた採掘道具。石切り場・鉱山の産出 +25%'});
  set('boneaxe',{cat:'魔核',tier:1,name:'強化斧',cost:{mat:15,steel:30},t:2,pre:['analysis'],icon:'miner',eff:'魔核の力を込めた斧。伐採所の産出 +25%'});
  set('bonehoe',{cat:'魔核',tier:1,name:'強化農具',cost:{mat:15,steel:30},t:2,pre:['analysis'],icon:'farm',eff:'魔核の力を込めた鍬と鋤。農場・漁場の産出 +25%'});
- set('bonearmor',{cat:'魔核',tier:2,name:'骨鎧',cost:{mat:40,iron:30},t:2,pre:[],icon:'heavy',eff:'魔物の甲殻で作った鎧。農兵・剣士・重装歩兵・騎兵・近衛兵の耐久 +25%'});
+ set('bonearmor',{cat:'魔核',tier:2,name:'骨鎧',cost:{mat:40,iron:30},t:2,pre:[],icon:'heavy',eff:'魔物の甲殻で作った鎧。農兵・剣士・重装歩兵・騎兵の耐久 +25%'});
  set('poison',{cat:'魔核',tier:2,name:'毒の鏃',cost:{mat:40,ammo:40},t:2,pre:[],icon:'archer',eff:'魔物の毒腺を矢に塗る。弓兵隊・物見櫓・バリスタに撃たれた魔物は毒で3秒かけて追加の被害（与えた被害の30%・装甲無視）'});
  set('furnace',{cat:'魔核',tier:2,name:'精製炉',cost:{mat:30,stone:40},t:2,pre:[],icon:'furnace',eff:'「精製炉」を建設できる：魔核のエネルギーを取り出してエーテル結晶を精製（魔核 −2 → エーテル +4／T）'});
  set('carapace',{tier:2,pre:[],icon:'hq',eff:'生産施設と城館の耐久 +25%'});
@@ -4426,6 +4426,9 @@ function doEndTurn(){
   S.skipConfirm=false;
   se('turn');const t0=S.turn;S.rep=[];if(!S.before)rtWindow();S.doneCnt={};if(!S.gross)S.gross={steel:0,ammo:0,pop:0,used:0};
   rtRest('day');   // 昼の残りの時間の分をまとめて受け取る
+  /* 建設・改築は「ターン」単位で進める：昼のどの時間に建てても、1ターンの施設は次の朝に完成（2026-11-16 不具合の修正。
+     リアルタイムの昼で、建てた時刻ぶんしか進まず、朝になっても完成していない・同じ日に建てたのに片方だけ完成、が起きていた） */
+  {let fin=false;for(const b of S.blds)if(b.bt>0){const whole=Math.ceil(b.bt/TURN_SEC-1e-6);b.bt=Math.max(0.001,(whole-1)*TURN_SEC);if(whole<=1)fin=true;}if(fin)rtStep(1);}
   advanceResearch();
   tickBaseUp();
   // 欠員補充（防衛施設を優先）
@@ -7051,7 +7054,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     <div class="muted" style="font-size:11px;margin-top:3px">${cur==='ap'?'徹甲弾：火力170%・装甲無視・射線上の敵を最大4体まで貫く':cur==='can'?'キャニスター：射程65%、扇状の範囲の敵すべてに散弾':'榴弾：着弾点の周囲に爆風（群れ向け）'}</div></div>`;}
   if(!isS&&gunOf(o)&&o.type!=='hq')h+=`<div class="muted" style="font-size:11px;margin-top:4px">${isDirect(o)?(o.wall?'直射砲（城壁の上：壁越しでも威力が落ちない）':'直射：山脈の向こうは撃てない（建物や壁は越えて撃てる）'):'曲射砲：壁や岩場の向こうへも威力を落とさず撃てる'}${B[o.type].minRange?`。最低射程${B[o.type].minRange*U}マス`:''}</div>`;
   if(PROD_BT.includes(o.type)&&!['barracks','apart','lab'].includes(o.type)){h+=`<div class="upg"><b>生産</b> <span style="color:${o.off?'var(--red)':'var(--green)'}">${o.off?'停止中':'稼働中'}</span><div class="muted" style="font-size:11px">止めている間は産出も消費もしません（材料を使う施設の節約に）</div><button id="prodOff" style="margin-top:4px">${o.off?'生産を再開する':'生産を止める'}</button></div>`;}
-  if(o.type==='hq'){const gq=S.squads.filter(q=>q.ut==='guard');h+=`<div class="upg"><b>近衛兵</b><div class="muted" style="font-size:11px">城で編成できる精鋭（部隊画面 [K]）。城に駐屯し、城に近づいた魔物を打って出て迎え撃つ。城から14マス以内で火力2倍・被害半分</div>${gq.length?gq.map(q=>`<div class="row" style="align-items:center"><span>${unitLabel(q)} ${q.members}/${UT.guard.members}人・${q.gar?'駐屯中':'出撃中'}</span>${q.gar?`<button data-gdout="${q.id}" style="padding:2px 8px">外に出す</button>`:''}</div>`).join(''):'<div class="muted" style="font-size:11px">まだいません</div>'}</div>`;}
+  /* 近衛兵の説明の箱はなくした（近衛兵はもう出ない。2026-11-16） */
   if(o.type==='hq'){const c=baseUpCost();h+=`<div class="upg"><div class="row"><b>拠点レベル ${S.baseLv}/${BASE_MAX}</b><span class="muted">英雄 ${S.cmds.length}/${maxCmd()}</span></div>
     <div class="muted" style="font-size:11px">レベルが上がると：英雄の上限 +2・領地の半径 +6マス・城館に住める人数 +10・施設の上限 +${FAC_PER_LV}・前哨砦 +1・罠の上限 ${trapCap()}→${TRAP_CAP[Math.min(TRAP_CAP.length-1,S.baseLv||1)]}。<b style="color:var(--text)">Lv2で施設のLv2と研究ランクⅡ、Lv3で施設のLv3と研究ランクⅢ</b>が解放。城の姿も 木→石→鉄→魔核合金 と変わり、<b style="color:#c48aff">Lv5で結界</b>（襲撃のたびに城への被害を1500まで防ぐ）。Lv3以上への強化には魔核が必要</div>
     ${S.baseUp?`<div class="gd" style="margin-top:4px">Lv${S.baseUp.to}に強化中…　残り${S.baseUp.left}ターン（強化中も城は普段どおり働きます）</div>`:S.baseLv<BASE_MAX?`<button id="iBaseUp" style="margin-top:4px;width:100%" ${canAfford(c)&&!S.waveActive?'':'disabled'}>拠点をLv${S.baseLv+1}に（${costText(c)}・${baseUpTurns()}ターン）</button>`:'<div class="gd">最大レベル</div>'}</div>`;}
@@ -7559,7 +7562,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.11',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.11.1',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7670,6 +7673,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.11.1','2026-11-17',['不具合の修正：昼に建てた「1ターンで完成」の施設が、次の朝になっても完成していないことがあった（建てた時刻によって、同じ日に建てたのに片方だけ完成することも）。今は、昼のいつ建てても次の朝に完成する','城の説明などに残っていた、今はいない「近衛兵」の話を消した']],
  ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。生産は昼だけ、10秒ごとに少しずつ入る。時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める。残りは地図の上の横長のバーで（太陽・月が左から右へ進む）。昼の後半は夕方に。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
