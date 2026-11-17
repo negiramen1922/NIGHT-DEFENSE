@@ -764,6 +764,8 @@ button.ghost:hover:not(:disabled){box-shadow:none;color:var(--amber)}
 body:not(.fullmap) #modeBar,#modeBar{max-width:calc(100% - 330px)}
 @media (min-width:901px){#modeBar{top:auto;bottom:22px}}   /* 選択中・建設の帯は地図の左下に（上は昼夜のバーと表示の切り替えだけにする。2026-11-16 画面の整理） */
 @media (max-width:900px){#viewSeg{top:48px;right:8px;max-width:calc(100% - 16px)}#viewSeg button{padding:4px 8px;font-size:11px}#viewSeg kbd{display:none}#viewCap{display:none!important}#modeBar{max-width:calc(100% - 20px)}}
+#mmTg{position:absolute;z-index:5;padding:0 7px;height:20px;min-width:24px;font-size:11px;line-height:20px;background:rgba(14,20,16,.92);box-shadow:0 0 0 1px var(--frame)}
+#rtBar{display:none;align-items:center;gap:8px;height:22px;padding:0 10px;margin:0 0 4px;background:#0e130f;box-shadow:0 0 0 1px var(--frame)}#rtBar.on{display:flex}#rtBar img{width:16px;height:16px;image-rendering:pixelated;flex-shrink:0}#rtBar #rtIcB{opacity:.6}#rtBar .rtTrack{position:relative;flex:1;height:6px;background:#3a2e18}#rtBar.night .rtTrack{background:#1c2240}#rtBar #rtFill{position:absolute;left:0;top:0;bottom:0;width:0}#rtBar #rtSun{position:absolute;top:50%;width:20px;height:20px;transform:translate(-50%,-50%)}#rtBar #rtTxt{font-family:var(--px-font);font-size:12px;color:var(--text);min-width:7.5em;text-align:right;white-space:nowrap}
 #pauseMsg{display:none;position:absolute;left:0;right:0;top:42%;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:3;text-shadow:0 2px 0 #000,0 0 12px #000}
 #pauseMsg b{font-family:var(--px-font);font-weight:400;font-size:24px;letter-spacing:.2em;color:var(--amber)}
 #pauseMsg small{font-size:12px;color:var(--text);background:rgba(5,6,5,.6);padding:2px 10px}
@@ -1605,10 +1607,12 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
   <div id="main">
   <div id="left">
     <div id="intel"></div>
+    <div id="rtBar" title="昼と夜の残り時間"><img id="rtIcA" alt=""><div class="rtTrack"><i id="rtFill"></i><img id="rtSun" alt=""></div><img id="rtIcB" alt=""><span id="rtTxt"></span></div>
     <div id="mapWrap">
     <div id="modeBar"><span id="modeTxt"></span><button id="mExit" class="ghost"><span class="xic"></span><span>解除</span><kbd>Esc</kbd></button></div>
     <canvas id="cv"></canvas>
     <div id="viewSeg" title="押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（土地Lv は T、狙われやすさ は H でも）"><button id="vCyc"><small>表示</small><b id="vCycN">通常</b><span class="vnx">▸</span></button><span id="viewCap"></span></div>
+    <button id="mmTg" class="ghost">－</button>
     <div id="pauseMsg"><b>一時停止中</b><small>指示はそのまま出せます・Space で再開</small></div>
     </div>
     <div id="toasts" style="position:fixed;z-index:40;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;transform:translateX(-50%)"></div>
@@ -1708,7 +1712,12 @@ const IS_TOUCH=matchMedia('(pointer: coarse)').matches;
 // タブレット（iPad など）：画面が広くて指で操作する端末。PC 用の配置のまま、指で使いやすくする（キーの案内を隠す・ボタンを大きく・範囲選択ボタン）2026-11-15
 function tabUI(){return IS_TOUCH&&innerWidth>900;}
 function stripKeyHints(){if(!IS_TOUCH)return;for(const b of document.querySelectorAll('button,label.help')){for(const n of b.childNodes){if(n.nodeType===3&&/\s?\[[A-Z]\]/.test(n.nodeValue))n.nodeValue=n.nodeValue.replace(/\s?\[[A-Z]\]/g,'');}}}
-const MM={w:192,h:128};    // ミニマップ
+const MM={w:192,h:128};    // ミニマップ（絵の大きさ）
+// ミニマップの表示：大・小・隠す（右下のボタンで切り替え。2026-11-16 ユーザーの希望）
+const MMV={w:192,h:128};let MM_MODE='l';try{MM_MODE=localStorage.getItem('nd_mm')||'l';}catch(e){}
+function mmApply(){const k=MM_MODE==='s'?0.55:1;MMV.w=Math.round(MM.w*k);MMV.h=Math.round(MM.h*k);const b=document.getElementById('mmTg');if(b){b.textContent=MM_MODE==='h'?'地図':MM_MODE==='s'?'▢':'－';b.title=MM_MODE==='h'?'ミニマップを出す':MM_MODE==='s'?'ミニマップを隠す':'ミニマップを小さく';}}
+function mmCycle(){MM_MODE=MM_MODE==='l'?'s':MM_MODE==='s'?'h':'l';try{localStorage.setItem('nd_mm',MM_MODE);}catch(e){}mmApply();}
+mmApply();
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 cv.width=VW; cv.height=VH;
 const FOOD_PER=0.03;
@@ -4398,22 +4407,16 @@ function rtTick(dt){
 function rtCol(f,ph){if(ph==='night')return '#7a8cff';return f<0.6?'#f2c94c':f<0.85?'#f29a3a':'#e0603a';}
 const RT_IMG={};function rtIcon(k){if(!RT_IMG[k]){const im=new Image();im.src=piURL(k,k==='moon'?'light':'amber');RT_IMG[k]=im;}return RT_IMG[k];}
 let rtBarBox=null;
-function drawRtBar(){rtBarBox=null;if(!S||S.backdrop||S.over||S.waveActive||S.tlOn||!S.turnsLeft)return;
-  const ph=S.phase==='night'?'night':'day',f=rtFrac();
-  /* 時間のバーは地図の真ん中の上ではなく、右下のミニマップのすぐ上に（ミニマップと同じ幅。2026-11-16 ユーザーの希望） */
-  const [mx,my]=mmPos(),x0=mx+12,w=MM.w-38,h=8,y=my-24;
-  ctx.save();ctx.fillStyle='rgba(5,7,5,.82)';ctx.fillRect(mx-2,y-12,MM.w+4,h+22);
-  // 道のり（昼は黄色→だいだい→赤、夜は青）
-  if(ph==='day'){const g=ctx.createLinearGradient(x0,0,x0+w,0);g.addColorStop(0,'#5a4a1c');g.addColorStop(0.6,'#5a3e1c');g.addColorStop(1,'#4a2418');ctx.fillStyle=g;}else ctx.fillStyle='#1c2240';
-  ctx.fillRect(x0,y,w,h);
-  if(ph==='day'){const g=ctx.createLinearGradient(x0,0,x0+w,0);g.addColorStop(0,'#f2c94c');g.addColorStop(0.6,'#f2a03a');g.addColorStop(1,'#e0603a');ctx.fillStyle=g;}else ctx.fillStyle='#7a8cff';
-  ctx.fillRect(x0,y,w*f,h);
-  // 目盛り（1分ごと）
-  ctx.fillStyle='rgba(0,0,0,.45)';for(let i=1;i<6;i++)ctx.fillRect(x0+w*i/6-1,y,2,h);
-  // 終わりの印：昼は月（夜が来る）、夜は太陽（朝が来る）
-  const ie=rtIcon(ph==='day'?'moon':'sun');if(ie.complete&&ie.naturalWidth){ctx.globalAlpha=0.7;ctx.imageSmoothingEnabled=false;ctx.drawImage(ie,x0+w+2,y+h/2-9,18,18);ctx.globalAlpha=1;}
-  const im=rtIcon(ph==='day'?'sun':'moon');if(im.complete&&im.naturalWidth){ctx.imageSmoothingEnabled=false;ctx.drawImage(im,x0+w*f-14,y+h/2-14,28,28);}
-  ctx.restore();rtBarBox=[mx-2,y-12,MM.w+4,h+22];}
+/* 時間のバーは地図の中に描かず、敵情予測と地図のあいだの細い帯（#rtBar）に（2026-11-16 ユーザーの指定） */
+let rtKey='';
+function drawRtBar(){const el=document.getElementById('rtBar');if(!el)return;const show=!!(S&&!S.backdrop&&!S.over&&!S.waveActive&&!S.tlOn&&S.turnsLeft);
+  if(el.classList.contains('on')!==show){el.classList.toggle('on',show);setTimeout(()=>{try{resizeView();}catch(e){}},0);}if(!show)return;
+  const ph=S.phase==='night'?'night':'day',f=rtFrac(),pc=Math.round(f*1000)/10,k=ph+pc+rtLeft()+(S.paused?'p':'');if(k===rtKey)return;rtKey=k;
+  el.classList.toggle('night',ph==='night');
+  const fl=document.getElementById('rtFill');fl.style.width=pc+'%';fl.style.background=ph==='night'?'#7a8cff':`linear-gradient(90deg,#f2c94c,${rtCol(f,ph)})`;
+  const sun=document.getElementById('rtSun');sun.style.left=pc+'%';const a=piURL(ph==='day'?'sun':'moon',ph==='day'?'amber':'light'),b=piURL(ph==='day'?'moon':'sun',ph==='day'?'light':'amber');
+  if(sun.dataset.k!==a){sun.dataset.k=a;sun.src=a;document.getElementById('rtIcA').src=a;document.getElementById('rtIcB').src=b;}
+  document.getElementById('rtTxt').textContent=(ph==='day'?'昼':'夜')+' あと'+rtLeft()+(S.paused?'（停止中）':'');}
 // 昼の後半は夕方に（地図をだいだい色にして少し暗く）
 function drawDusk(){if(!S||S.backdrop||S.waveActive||S.phase==='night')return;const f=rtFrac();if(f<0.55)return;const a=Math.min(1,(f-0.55)/0.45);
   ctx.save();ctx.globalCompositeOperation='multiply';ctx.fillStyle=`rgb(255,${Math.round(255-105*a)},${Math.round(255-165*a)})`;ctx.fillRect(0,0,VW,VH);ctx.restore();}
@@ -5851,16 +5854,17 @@ function draw(){
     ctx.save();ctx.translate(sx,sy);ctx.rotate(a);ctx.beginPath();ctx.moveTo(5,0);ctx.lineTo(-4,-4);ctx.lineTo(-4,4);ctx.closePath();ctx.fill();ctx.restore();
   }
   // ミニマップ
-  const [mx,my]=mmPos(),ks=MM.w/W;
-  ctx.globalAlpha=0.92;ctx.fillStyle='#000';ctx.fillRect(mx-2,my-2,MM.w+4,MM.h+4);if(miniCv)ctx.drawImage(miniCv,mx,my);if(miniFog)ctx.drawImage(miniFog,mx,my);ctx.globalAlpha=1;
-  for(const h of (S.island?hiveSpots():[])){ctx.fillStyle='#ff5a8a';ctx.beginPath();ctx.arc(mx+bcx(h)*(MM.w/W),my+bcy(h)*(MM.h/H),3.5,0,7);ctx.fill();}
+  if(MM_MODE!=='h'){const [mx,my]=mmPos(),ks=MMV.w/W;
+  ctx.globalAlpha=0.92;ctx.fillStyle='#000';ctx.fillRect(mx-2,my-2,MMV.w+4,MMV.h+4);if(miniCv)ctx.drawImage(miniCv,mx,my,MMV.w,MMV.h);if(miniFog)ctx.drawImage(miniFog,mx,my,MMV.w,MMV.h);ctx.globalAlpha=1;
+  for(const h of (S.island?hiveSpots():[])){ctx.fillStyle='#ff5a8a';ctx.beginPath();ctx.arc(mx+bcx(h)*(MMV.w/W),my+bcy(h)*(MMV.h/H),3.5,0,7);ctx.fill();}
   if(S.camps&&!S.waveActive&&lvl('scout')>=1)for(const c of S.camps){if(c.found||c.state!=='idle')continue;ctx.save();ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(255,120,90,.8)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(mx+c.hx*ks,my+c.hy*ks,Math.max(4,c.hr*ks),0,7);ctx.stroke();ctx.restore();}   /* 斥候Lv1から：駐屯地のおおよその場所（ミニマップにも） */
   if(S.camps&&!S.waveActive)for(const c of S.camps){if(!c.found||c.state==='gone')continue;const x=mx+c.x*ks,y=my+c.y*ks;ctx.fillStyle='#ff9a3a';ctx.beginPath();ctx.moveTo(x,y-4);ctx.lineTo(x+4,y+3);ctx.lineTo(x-4,y+3);ctx.closePath();ctx.fill();}
   for(const b of S.blds){ctx.fillStyle=b.type==='hq'?'#f2b33d':gunOf(b)?'#9fe0a0':CWALL.has(b.type)?'#8a9a8c':'#4f9a62';ctx.fillRect(mx+b.x*T*ks,my+b.y*T*ks,3,3);}
   ctx.fillStyle='#62c6d9';for(const q of S.squads)ctx.fillRect(mx+q.x*ks-1.5,my+q.y*ks-1.5,3,3);
-  ctx.fillStyle='#ff5a4e';for(const e of S.enemies){const ex=mx+e.x*ks,ey=my+e.y*ks;if(ex>=mx&&ey>=my&&ex<mx+MM.w&&ey<my+MM.h&&isSeen(Math.floor(e.x/T),Math.floor(e.y/T)))ctx.fillRect(ex-1,ey-1,2,2);}
+  ctx.fillStyle='#ff5a4e';for(const e of S.enemies){const ex=mx+e.x*ks,ey=my+e.y*ks;if(ex>=mx&&ey>=my&&ex<mx+MMV.w&&ey<my+MMV.h&&isSeen(Math.floor(e.x/T),Math.floor(e.y/T)))ctx.fillRect(ex-1,ey-1,2,2);}
   ctx.strokeStyle='#f2b33d';ctx.strokeRect(mx+cam.x*ks+.5,my+cam.y*ks+.5,VW/cam.z*ks,VH/cam.z*ks);
-  ctx.strokeStyle='#2a3a2d';ctx.strokeRect(mx-2.5,my-2.5,MM.w+5,MM.h+5);
+  ctx.strokeStyle='#2a3a2d';ctx.strokeRect(mx-2.5,my-2.5,MMV.w+5,MMV.h+5);}
+  mmBtnPos();
   ctx.fillStyle='rgba(207,227,207,.55)';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText(IS_TOUCH?'ドラッグ:移動　2本指:拡大縮小　タップ:選択':'ドラッグ/WASD:移動　ホイール:拡大縮小'+(S.squads&&S.squads.length>1?'　Shift＋ドラッグ:部隊を範囲選択':''),8,VH-10);ctx.textAlign='center';
   // カーソル下の地形
   if(mouse.in){const gx=Math.floor(mouse.x/T),gy=Math.floor(mouse.y/T);if(gx>=0&&gy>=0&&gx<COLS&&gy<ROWS&&(S.ter[gy][gx]||S.oil[gy][gx]||S.ore[gy][gx])){const t=S.ter[gy][gx],lv=t===1?elevAt(gx,gy):t===2?forestAt(gx,gy):t===4?marshAt(gx,gy):0;
@@ -6367,8 +6371,11 @@ function artOf(o){{const k=artKey(o);if(k)return artPx(k,o.kind==='s'?unitLabel(
 const mouse={x:0,y:0,in:false};
 function toScreen(ev){const r=cv.getBoundingClientRect();return{x:(ev.clientX-r.left)*VW/r.width,y:(ev.clientY-r.top)*VH/r.height};}
 function toCanvas(ev){const p=toScreen(ev);return{x:cam.x+p.x/cam.z,y:cam.y+p.y/cam.z,sx:p.x,sy:p.y};}
-function mmPos(){if(typeof TLP!=='undefined'&&TLP)return [-9999,-9999];   /* タイムラプス中はミニマップを出さない */const off=document.body.classList.contains('fullmap')&&!isNarrow()&&document.getElementById('right').classList.contains('open')?350:0;return[VW-MM.w-8-off,VH-MM.h-8-(document.body.classList.contains('fullmap')&&!isNarrow()?46:0)];}
-function inMini(p){const [mx,my]=mmPos();return p.sx>=mx&&p.sy>=my&&p.sx<mx+MM.w&&p.sy<my+MM.h?{x:(p.sx-mx)/MM.w*W,y:(p.sy-my)/MM.h*H}:null;}
+function mmPos(){if((typeof TLP!=='undefined'&&TLP)||MM_MODE==='h')return [-9999,-9999];   /* タイムラプス中はミニマップを出さない */const off=document.body.classList.contains('fullmap')&&!isNarrow()&&document.getElementById('right').classList.contains('open')?350:0;return[VW-MMV.w-8-off,VH-MMV.h-8-(document.body.classList.contains('fullmap')&&!isNarrow()?46:0)];}
+// ミニマップの切り替えボタン：ミニマップの右上の角に（隠しているときは地図の右下）
+let mmBK='';function mmBtnPos(){const b=document.getElementById('mmTg');if(!b)return;const show=!!(S&&!S.backdrop&&!(typeof TLP!=='undefined'&&TLP));b.style.display=show?'':'none';if(!show)return;const r=cv.getBoundingClientRect(),w=document.getElementById('mapWrap').getBoundingClientRect(),k=r.width/VW;
+  let x,y;if(MM_MODE==='h'){x=VW-8;y=VH-8;}else{const [mx,my]=mmPos();x=mx+MMV.w+2;y=my-2;}const L=Math.round(r.left-w.left+x*k-b.offsetWidth),T0=Math.round(r.top-w.top+y*k-(MM_MODE==='h'?b.offsetHeight:b.offsetHeight-2));const key=L+','+T0;if(key!==mmBK){mmBK=key;b.style.left=L+'px';b.style.top=T0+'px';}}
+function inMini(p){if(MM_MODE==='h')return null;const [mx,my]=mmPos();return p.sx>=mx&&p.sy>=my&&p.sx<mx+MMV.w&&p.sy<my+MMV.h?{x:(p.sx-mx)/MMV.w*W,y:(p.sy-my)/MMV.h*H}:null;}
 const drag={mini:false};
 cv.addEventListener('mousemove',ev=>{const p=toCanvas(ev);mouse.x=p.x;mouse.y=p.y;mouse.in=true;});
 // ポインタ操作：タップ＝選択／ドラッグ＝地図移動／2本指＝ピンチで拡大縮小（マウス・タッチ共通）
@@ -7712,7 +7719,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）','<b>時間のバー</b>を地図の上から、右下のミニマップのすぐ上へ（選択中の帯などと重ならないように）','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる']],
+ ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）','<b>時間のバー</b>を地図の中から出して、敵情予測と地図のあいだの細い帯に（残りの時間も出る）','<b>ミニマップの大きさを切り替え</b>られるように：右上の角のボタンで 大 → 小 → 隠す','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる']],
  ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。生産は昼だけ、10秒ごとに少しずつ入る。時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める。残りは地図の上の横長のバーで（太陽・月が左から右へ進む）。昼の後半は夕方に。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
@@ -8869,16 +8876,18 @@ function resizeView(){
   if(isFull()){
     const tb=document.getElementById('topbar').getBoundingClientRect(),it=document.getElementById('intel'),ct=document.getElementById('controls').getBoundingClientRect();
     let top=tb.bottom+2;if(getComputedStyle(it).display!=='none')top=Math.max(top,it.getBoundingClientRect().bottom+2);
+    {const rb=document.getElementById('rtBar');if(rb){rb.style.position='fixed';rb.style.left='0';rb.style.right='0';rb.style.top=Math.round(top)+'px';rb.style.zIndex='6';if(rb.classList.contains('on'))top+=rb.offsetHeight;}}
     const mb=document.getElementById('modeBar');mb.style.top=Math.round(top)+'px';top+=mb.offsetHeight+2;
     const bottom=isNarrow()?ct.top-2:innerHeight;
     const vw=Math.round(innerWidth),vh2=Math.max(200,Math.round(bottom-top));
     cv.style.top=Math.round(top)+'px';cv.style.height=vh2+'px';
     if(vw!==VW||vh2!==VH){VW=vw;VH=vh2;cv.width=VW;cv.height=VH;if(S)clampCam();}return;}
-  cv.style.top='';cv.style.height='';document.getElementById('modeBar').style.top='';
+  cv.style.top='';cv.style.height='';document.getElementById('modeBar').style.top='';{const rb=document.getElementById('rtBar');if(rb){rb.style.position='';rb.style.top='';rb.style.left='';rb.style.right='';}}
   if(VW!==32*TU){VW=32*TU;cv.width=VW;}
   let vh=20*TU;
   if(!isNarrow()){
     const ids=['topbar','intel','controls'];let used=24;for(const id of ids){const e=document.getElementById(id);if(e&&getComputedStyle(e).display!=='none')used+=e.offsetHeight+6;}
+    {const rb=document.getElementById('rtBar');if(rb&&rb.classList.contains('on'))used+=rb.offsetHeight+4;}
     used+=document.body.classList.contains('logMin')?42:76;   // 通信ログの高さ（62px。たたむと28px）
     const w=Math.max(300,cv.getBoundingClientRect().width||document.getElementById('left').clientWidth);const avail=Math.max(200,innerHeight-used);
     vh=Math.round(Math.max(12*TU,Math.min(40*TU,VW*avail/w)));
@@ -8995,7 +9004,7 @@ function renderMode(){
   if(!S.buildMode)bGhost=null;
   renderPad();
 }
-document.getElementById('mExit').onclick=exitBuild;
+document.getElementById('mExit').onclick=exitBuild;{const mb=document.getElementById('mmTg');if(mb){mb.onclick=e=>{e.stopPropagation();mmCycle();se('click');};mb.onpointerdown=e=>e.stopPropagation();}mmApply();}
 // ===== マップ全画面 =====
 function toggleFull(on){
   const b=document.body;on=on==null?!isFull():on;
