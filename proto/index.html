@@ -5646,6 +5646,7 @@ function draw(){
   drawRuins();
   for(const b of S.blds){{const m=3*TU,bx=b.x*T,by=b.y*T,bs=bsz(b)*T;if(bx+bs<VR[0]-m||by+bs<VR[1]-m||bx>VR[0]+VR[2]+m||by>VR[1]+VR[3]+m)continue;}drawBuilding(b,an);if(b.ench){const n=bsz(b);for(let i=0;i<b.ench;i++){const sx=b.x*T+3+i*5,sy=b.y*T+3;ctx.fillStyle='#1a0e2a';ctx.fillRect(sx-1,sy-1,5,5);ctx.fillStyle='#c48aff';ctx.fillRect(sx,sy,3,3);}}}
   drawUpgBadges(an);
+  if(!S.backdrop)for(const b of S.blds)if(outOfAmmo(b))drawNoAmmo(b);
   if(S.viewProd&&!S.waveActive)drawProdView();
   drawClusters(an);
   drawMills(an);
@@ -6026,7 +6027,7 @@ function drawBldV2(b,an){const r=bldSpr(b);if(!r||!r[0])return false;const [sp,a
   if(!building)drawResBar(b,x+2,y-1,S2-4,2);
   if(b.hp<b.maxhp-0.5&&!building){ctx.fillStyle='#300';ctx.fillRect(x+2,y-1,S2-4,2);ctx.fillStyle=b.hp/b.maxhp>.4?'#6fe08a':'#ff5a4e';ctx.fillRect(x+2,y-1,(S2-4)*b.hp/b.maxhp,2);}
   if(b.wall&&b.wall.hp<b.wall.maxhp){ctx.fillStyle='#222';ctx.fillRect(x+2,y+S2-2,S2-4,2);ctx.fillStyle='#b8c8b8';ctx.fillRect(x+2,y+S2-2,(S2-4)*b.wall.hp/b.wall.maxhp,2);}
-  if((b.starved||b.noFuel||b.noAmmo)&&!building){ctx.fillStyle='#ff5a4e';ctx.font='bold 11px sans-serif';ctx.fillText('!',x+S2-4,y+8);}
+  if((b.starved||b.noFuel)&&!building){ctx.fillStyle='#ff5a4e';ctx.font='bold 11px sans-serif';ctx.fillText('!',x+S2-4,y+8);}
   if(d.pop&&b.crew<crewNeed(b)&&!building){ctx.fillStyle=b.crew?'#f2b33d':'#ff5a4e';ctx.font='bold 8px sans-serif';ctx.fillText(b.crew+'/'+crewNeed(b),x+S2-8,y+S2-4);}
   if(b.off){ctx.fillStyle='rgba(20,16,28,.45)';ctx.fillRect(x,y,S2,S2);ctx.fillStyle='#e0d0b0';ctx.fillRect(cx-4,cy-5,2,10);ctx.fillRect(cx+2,cy-5,2,10);}
   if(b.bt>0&&b.upg){ctx.fillStyle='rgba(0,0,0,.4)';ctx.fillRect(x+1,y+1,S2-2,S2-2);}   /* 札と進み具合は drawUpgBadges で上に描く */
@@ -6535,10 +6536,16 @@ function flowHTML(type,b){const d=B[type];if(!d)return '';const g=(b?gunOf(b):nu
     const lack=per.filter(([k,x])=>(S[k]||0)<x).map(([k])=>RES_NAME[k]||k);const dry=lack.length>0;
     const perTxt=([k,x])=>x<1?`${Math.max(2,Math.round(1/x))}発で${ic(k,12)}${RES_NAME[k]||k}1`:`1発ごとに${ic(k,12)}${RES_NAME[k]||k}${Math.round(x)}`;
     /* 防衛施設は、夜の実際の動きを見せる（固定の場面。地図の上の絵と同じ絵・同じ弾で撃つ。2026-11-16 ユーザーの指定） */
-    return `<div class="fbox"><div class="fdwrap"><canvas class="fdemo" width="600" height="200" data-t="${type}" data-id="${b?b.id:''}" data-dry="${dry?1:''}"></canvas>${dry?`<span class="fdry2">${lack.join('・')}がないので撃てない</span>`:''}</div>
+    return `<div class="fbox"><div class="fdwrap"><canvas class="fdemo" width="600" height="200" data-t="${type}" data-id="${b?b.id:''}"></canvas></div>
       <div class="ftxt"><span class="bd">${per.map(perTxt).join('・')}</span><span class="muted">（弾が尽きると撃てない。${g.splash?'範囲攻撃':'1体ずつ'}・射程${Math.round((g.range||0)*U)}マス）</span></div></div>`;}
   return '';}
 // 防衛施設の夜の動き（詳しい画面の小さな場面）：左に施設、右から魔物が歩いてきて、施設が本物の弾を撃つ
+// 弾がまったくなくて撃てない防衛施設：地図の上で、施設の上に赤い「!!」（2026-11-16 ユーザーの希望）
+function outOfAmmo(b){if(!b||b.bt>0||b.type==='hq')return false;const g=gunOf(b);if(!g)return false;const ak=g.ammoKey||'ammo';if((S[ak]||0)<(g.ammoUse||1)*USE_MUL)return true;return !!g.ammo2&&Object.entries(g.ammo2).some(([k,v])=>(S[k]||0)<v);}
+function drawNoAmmo(b){const n=bsz(b),x=(b.x+n/2)*T,y=b.y*T-2,z=Math.max(0.6,Math.min(2,1/(cam.z||1))),w=20*z,h=14*z,pu=0.75+0.25*Math.sin(performance.now()/180);
+  ctx.save();ctx.globalAlpha=pu;ctx.fillStyle='#c0201a';ctx.strokeStyle='#ffd0c8';ctx.lineWidth=1.2*z;ctx.beginPath();ctx.rect(x-w/2,y-h-4*z,w,h);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x-3*z,y-4*z);ctx.lineTo(x,y);ctx.lineTo(x+3*z,y-4*z);ctx.closePath();ctx.fillStyle='#c0201a';ctx.fill();
+  ctx.fillStyle='#fff';ctx.font=`bold ${Math.round(11*z)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('!!',x,y-h/2-4*z+0.5);ctx.restore();}
 function fdemoStart(root){root.querySelectorAll('canvas.fdemo').forEach(c=>{if(!c._run){c._run=true;fdemoRun(c);}});}
 function fdemoRun(c){const g2=c.getContext('2d'),type=c.dataset.t,d=B[type]||{},dry=!!c.dataset.dry,P=SPR.projectiles||{},SPE=SPR.enemies||{};
   const b=S.blds.find(x=>String(x.id)===c.dataset.id)||{type,lv:1,x:0,y:0,id:-1,kind:'b'};
@@ -7779,7 +7786,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）','<b>時間のバー</b>を地図の中から出して、敵情予測と地図のあいだの細い帯に（残りの時間も出る）','<b>ミニマップに小さな見出し</b>をつけた：「大・小」で大きさを切り替え、「－」でたたむ（たたむと見出しだけになり、「＋」で戻す）','<b>防衛施設の詳しい画面に、夜の実際の動き</b>：施設が、地図の上と同じ絵の弾（バリスタは重い矢、投石機は石、物見櫓は矢など）で、歩いてくる魔物を撃つ小さな場面。弾がないときは撃たない','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる']],
+ ['1.12','2026-11-16',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）','<b>時間のバー</b>を地図の中から出して、敵情予測と地図のあいだの細い帯に（残りの時間も出る）','<b>ミニマップに小さな見出し</b>をつけた：「大・小」で大きさを切り替え、「－」でたたむ（たたむと見出しだけになり、「＋」で戻す）','<b>防衛施設の詳しい画面に、夜の実際の動き</b>：施設が、地図の上と同じ絵の弾（バリスタは重い矢、投石機は石、物見櫓は矢など）で、歩いてくる魔物を撃つ小さな場面','<b>弾がまったくなくて撃てない防衛施設</b>には、地図の上で施設の上に赤い「!!」を出すように（昼でも分かる）','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる']],
  ['1.11','2026-11-16',['<b>昼と夜が時間で進む</b>：昼6分・夜6分。生産は昼だけ、10秒ごとに少しずつ入る。時間がたつと自動で次へ。「夜へ」「朝へ」を押すと、残りの時間の分をまとめて受け取ってすぐ進める。残りは地図の上の横長のバーで（太陽・月が左から右へ進む）。昼の後半は夕方に。画面を開いているあいだ・一時停止中は止まる','<b>英雄の候補を内政と戦闘に分けた</b>（内政2人・戦闘3人）。まだ育てられない部隊（竜騎兵など）の英雄は出ない','<b>リリアは領主様付きの書記官</b>：王都から来て、領主様がどの街を治めてもついて行って帳簿をつける。世界の歴史は、リリアの帳簿の棚']],
  ['1.10','2026-11-16',['<b>軽いストーリー</b>（ステージ1 グレイヴェル平原）：王都から辺境の街を任された領主の物語。始めに書記官リリアが街のこと・アビスのことを話す','大きな襲撃の節目（第10・15・20・25・30・35襲撃を守りきった朝）に、リリアがアビスの様子を伝える。先へ進むほど、何が起きているのかがはっきりしていく','城のランクが上がったときは、リリアが「街をもっと大きくできますね！」と、そのランクで新しくできること（石炭なら炭鉱の研究 → 炭鉱を建てる）を案内する。「研究を開く」ボタンつき','最後の結果の画面と世界の歴史に、リリアの終わりのことば']],
  ['1.9','2026-11-16',['<b>夜の出来事をポップアップで</b>：旅人・行商人・流れ星などの訪問は、夜の画面より先に大きく出て、リリアがひとこと言う。選ぶ前に「金貨 347 → 317」のように、今どれだけあって、使うとどうなるかが見える','夜中の事件（火事・ネズミなど）も、朝の報告の前にポップアップで。何がどれだけ減ったかを「前 → 後」で出す','夜の画面の「使う量」に、今の量（いま○○）も出すように','<b>祭りの花火を地図の上の街で</b>：城の前に住民が集まって、跳ねたり手を振ったりする。祭りの夜のあいだは、地図を見るといつでも人が集まっている','<b>世界の歴史</b>（タイトル）：これまでに治めた街の記録を、リリアが読み上げる。街ごとに日数・撃破・英雄・襲撃ごとの記録を見られる','「記録」を開くとき、リリアが帳簿をまとめる読み込み画面を出すように','画面の上のお知らせを、画面全体のまんなかに','研究画面：新しい素材を集める研究（炭鉱・エーテル採掘・金鉱・精錬所・聖銀鉱）と斥候の研究を、各ランクのいちばん上に黄色の枠で','<b>街の成長（タイムラプス）</b>：新しく建った施設には青い波紋、強化（改築）された施設には金色の波紋と昇る光が出るように','チュートリアルの最後のリリアのせりふ：残りの襲撃の回数を、実際の残りで言うように（前は「あと6回」と決まっていた）']],
