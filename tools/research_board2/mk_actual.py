@@ -66,6 +66,9 @@ for tid,src in REL.items():
 for c in cards:
   if c['id'].startswith('g_tool_'):c['top']=1
 # 大きな生産施設は研究のカード（t_big*）で出るので案は消した
+# 壁は木の柵から横に並べる（2026-11-18）
+for a2,b2 in [('b_swall','b_fence'),('b_wall','b_swall'),('b_wall3','b_wall'),('b_wall5','b_wall3')]:
+  if a2 in byid and b2 in byid and b2 not in byid[a2]['pre']:byid[a2]['pre']=[b2]+byid[a2]['pre']
 for c in cards:
   if c['id'].startswith('g_t_big'):c['e']+='（道具は小さい施設と同じ段を使う）'
 for k,src in [('t_bigfarm','b_farm'),('t_bigminer','b_miner'),('t_bigquarry','b_quarry'),('t_bigfish','b_fishery')]:
