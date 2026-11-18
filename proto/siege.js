@@ -100,7 +100,7 @@ function openSiege(){
   root.style.display='flex';document.body.classList.add('siegeOn');renderSetup();
 }
 // ---------- 本編とつなぐ：駐屯地襲撃モード β（2026-11-13）。本編の駐屯地に近づくと、本編から openSiegeCamp(c) を呼ぶ ----------
-const MODEL_SU={pawn:'sword',silver:'sword',guard:'sword',farmer:'sword',advSword:'sword',heavy:'heavy',aether_golem:'heavy',archer:'archer',sniper:'archer',scout:'archer',advBow:'archer',rider:'cav',griffon:'cav',dragon:'drake',wizard:'mage',advMage:'mage',cannoneer:'gun'};
+const MODEL_SU={pawn:'sword',silver:'sword',guard:'sword',farmer:'sword',advSword:'sword',heavy:'heavy',aether_golem:'heavy',archer:'archer',sniper:'archer',scout:'archer',advBow:'archer',rider:'cav',griffon:'cav',dragon:'drake',wizard:'mage',advMage:'mage',cannoneer:'gun',engineer:'eng',ram:'ram',mcat:'cat'};
 function suOf(sq){return MODEL_SU[sq.model]||({inf:'sword',arch:'archer',cav:'cav',drake:'drake',mage:'mage',art:'gun',mil:'sword',guard:'sword',adv:'sword'})[sq.ut]||null;}
 function campSquads(){return (S.squads||[]).filter(q=>q.hp>0&&!q.gar&&suOf(q));}
 function openSiegeCamp(c){const n=S.wave+1,w=S.next||{};
@@ -251,6 +251,7 @@ function spawnSquad(k,x,y,noHero){const d=SU[k];const u={id:nid++,t:k,x,y,hp:d.h
 function linkSquad(u,sq){const d=SU[u.t];u.sq=sq.id;u.name=typeof unitLabel==='function'?unitLabel(sq):'';
   let rk=1;try{rk=Math.max(1,memberHp(sq)/MT(sq).hpEach);}catch(e){}u.hpMul=rk;u.dmul=rk;
   const fr=Math.max(0.05,Math.min(1,sq.hp/sq.maxhp));u.maxhp=d.hp*d.m*rk;u.hp=u.maxhp*fr;
+  if(u.t==='ram'&&typeof has==='function'&&has('ironram')){u.maxhp*=1.5;u.hp*=1.5;u.iron=true;}   /* 鉄張りの破城槌 */
   const c=typeof cmdOf==='function'?cmdOf(sq):null;if(c&&c.spec!=='内政')applyHero(u,c);}
 
 // ---------- 戦場の画面 ----------
@@ -729,7 +730,7 @@ function draw(tt){const g=cx;if(!g||!G||!G.blds)return;g.setTransform(1,0,0,1,0,
   // こちらの部隊
   for(const u of G.units){if(!alive(u))continue;const d=SU[u.t],n=mem(u),sel=G.sel.has(u.id);
     if(sel){g.strokeStyle='#62c6d9';g.lineWidth=1.5;g.beginPath();g.ellipse(u.x,u.y+4,d.isBld?20:16,d.isBld?9:7,0,0,7);g.stroke();}
-    if(d.draw){const au=u.atkT!=null&&G.t-u.atkT<0.4?G.t-u.atkT:null;const im=sprFrame('siege',d.draw==='ram'?'ram':'mcat',u.walk||0,au);if(im){g.save();g.imageSmoothingEnabled=false;g.translate(u.x,u.y);if(u.face<0)g.scale(-1,1);g.drawImage(im,-24,-34,48,48);g.restore();}else (d.draw==='ram'?drawRam:drawCat)(g,u.x,u.y,1.4,u.face);}
+    if(d.draw){const au=u.atkT!=null&&G.t-u.atkT<0.4?G.t-u.atkT:null;const im=sprFrame('siege',d.draw==='ram'?(u.iron?'ram_iron':'ram'):'mcat',u.walk||0,au);if(im){g.save();g.imageSmoothingEnabled=false;g.translate(u.x,u.y);if(u.face<0)g.scale(-1,1);g.drawImage(im,-24,-34,48,48);g.restore();}else (d.draw==='ram'?drawRam:drawCat)(g,u.x,u.y,1.4,u.face);}
     else{const au=u.atkT!=null&&G.t-u.atkT<0.4?G.t-u.atkT:null;const im=sprFrame('units',d.spr,u.walk,au);const off=[[0,0],[-9,4],[9,4],[-5,-6],[6,-6],[0,8]];const z=d.fly?30:20;for(let i=n-1;i>=0;i--){const [ox,oy]=off[i%off.length];g.save();g.translate(u.x+ox*(d.fly?1.6:1),u.y+oy-(d.fly?10+Math.sin(tt*4+u.id)*2:0));if(u.face<0)g.scale(-1,1);if(im)g.drawImage(im,-z/2,-z+2,z,z);g.restore();}
       if(d.fly){g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(u.x,u.y+6,14,4,0,0,7);g.fill();}}
     const r=u.hp/u.maxhp;g.fillStyle='#000';g.fillRect(u.x-12,u.y+(d.isBld?14:9),24,3);g.fillStyle=r<0.3?'#ff5a4e':r<0.6?'#f2b33d':'#6fe08a';g.fillRect(u.x-12,u.y+(d.isBld?14:9),24*r,3);

@@ -1577,6 +1577,8 @@ body.tabUI #viewSeg button{min-height:40px;padding-left:12px;padding-right:12px}
 body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font-size:14px}
 /* 帯のボタンは縮めない・折り返さない（「解除」が2行になっていた）2026-11-15 */
 #modeBar button,#modeTxt button{white-space:nowrap;flex-shrink:0}
+.ovfoot{position:sticky;bottom:0;display:flex;justify-content:flex-end;padding:10px 0 2px;margin-top:8px;z-index:4;pointer-events:none}.ovfoot button{pointer-events:auto;box-shadow:0 0 0 4px #000a}
+.tnode .tcancel{position:absolute;top:4px;right:4px;z-index:2;border:2px solid #e04848!important;box-shadow:none!important;color:#ff8a7a!important;background:#2a0e0e!important;font-size:11px;padding:2px 8px!important;font-weight:700;line-height:1.3}.tnode .tcancel:hover{background:#4a1414!important}
 </style>
 </head>
 <body>
@@ -7418,11 +7420,16 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
 
 // ===== オーバーレイ =====
 // 同じ画面の描き直し（ボタンを押したあとなど）は、スクロール位置を保つ。別の画面を開いたときだけ上から
+// 閉じるボタンはどの画面でも右下にそろえる（2026-11-18 ユーザーの指定：研究画面で右下の「中止」を押しそうになる）
+function moveCloseBR(card){const b=card.querySelector('#ovClose');if(!b)return;const tdr=card.querySelector('.tdr');if(tdr){tdr.appendChild(b);b.style.float='none';return;}
+  if(!(b.closest('h2')||b.closest('.rhead')||b.parentElement===card.firstElementChild))return;
+  const f=document.createElement('div');f.className='ovfoot';b.style.float='none';f.appendChild(b);card.appendChild(f);}
 function openOverlay(kind,html,wide){
   const card0=document.getElementById('ovCard'),same=S.overlay===kind&&document.getElementById('overlay').style.display==='flex';
   const keep=same?{top:card0.scrollTop,inner:[...card0.querySelectorAll('*')].filter(e=>e.scrollTop>0||e.scrollLeft>0).map(e=>[innerKey(e,card0),e.scrollTop,e.scrollLeft])}:null;
   S.overlay=kind;document.getElementById('overlay').classList.toggle('home',kind==='title'||kind==='intro'||(kind==='help'&&/タイトルへ/.test(html)));
   {const ov=document.getElementById('overlay');let v=document.getElementById('ovBg');const home=ov.classList.contains('home');if(home&&!v){v=document.createElement('video');v.id='ovBg';v.src='tut/title.mp4';v.muted=true;v.loop=true;v.autoplay=true;v.playsInline=true;v.setAttribute('playsinline','');ov.insertBefore(v,ov.firstChild);}if(v){if(home){try{v.play().catch(()=>{});}catch(e){}}else{try{v.pause();}catch(e){}}}}const card=document.getElementById('ovCard');card.className='card'+(wide?' wide':'')+' ov-'+kind;card.innerHTML=html;
+  moveCloseBR(card);
   document.getElementById('overlay').style.display='flex';document.body.classList.add('ov');card.scrollTop=keep?keep.top:0;
   if(keep)for(const [k,t,l] of keep.inner){const e=findInner(k,card);if(e){e.scrollTop=t;e.scrollLeft=l;}}   // 中の一覧（図鑑・研究の列など）も
   return card;
@@ -7570,7 +7577,7 @@ function showResearch(){
         <div class="te">${t.eff||''}</div>
         ${t.line||t.excl||outside.length?`<div class="tl">${t.line?t.line:''}${t.excl?' <span style="color:var(--amber)">分岐</span>':''}${outside.length?' 要：'+outside.map(x=>techOf(x).name).join('・'):''}</div>`:''}
         <div class="tm"><span class="cst">${st==='done'?'':costText(techCost(t))}</span><span class="tt2">${techTurns(t)}T</span></div>
-        ${r?resPips(r):st==='done'?'<div class="tbar"><i style="width:100%"></i></div>':''}</div>`;
+        ${r?resPips(r):st==='done'?'<div class="tbar"><i style="width:100%"></i></div>':''}${st==='active'?`<button class="tcancel" data-cancel="${t.id}">中止（費用の半分を回収）</button>`:''}</div>`;
     }
     h+=`</div></div>`;
   }
@@ -7579,7 +7586,7 @@ function showResearch(){
   const t=techOf(S.resSel),st=techState(t),r=S.research.find(x=>x.id===t.id),c=techCost(t),turns=r?r.total:techTurns(t);
   let act='';
   if(st==='done')act=`<span style="color:var(--green);font-weight:bold">${ui('check','green',12)} ${t.lvRank&&(S.baseLv||1)<BASE_MAX?`${t.name}${RNUM[lvl(t.id)]}まで研究済み。${t.name}${RNUM[lvl(t.id)+1]}は城Lv${lvl(t.id)+1}で解放`:`最大レベル（Lv${tMax(t)}）・研究完了`}</span>`;
-  else if(st==='active')act=`<span style="color:var(--cyan)">研究中 残り${r.left}ターン</span> <button data-cancel="${t.id}">中止（費用の半分を回収）</button>`;
+  else if(st==='active')act=`<span style="color:var(--cyan)">研究中 残り${r.left}ターン</span><span class="muted" style="font-size:11px">中止はカードの上の赤いボタン</span>`;
   else if(st==='ready'){const need=techRes(t),rok=resBusy()+need<=resCap();const ok=canAfford(c)&&rok&&!S.waveActive;
     act=(!ok?`<span class="muted" style="font-size:11px">${S.waveActive?'夜・襲撃中は開始できません':!rok?'研究員が足りません（研究室を増やす・改築する）':'資源が足りません'}</span>${rok?mktBtn(c):''}`:'')+(turns>S.turnsLeft&&!S.waveActive?' <span style="color:var(--amber);font-size:11px">襲撃後に完了</span>':'')+`<span class="dc">${costText(c)}</span><span class="dm">研究員 ${need}人・${turns}ターン</span><button class="primary" data-start="${t.id}" ${ok?'':'disabled'}>${lvl(t.id)>0?'強化する':'研究を開始'}</button>`;}
   else if(st==='excluded')act='<span class="muted">もう一方の分岐を選んだため研究できません</span>';
@@ -7599,7 +7606,7 @@ function showResearch(){
   card.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>gotoTech(b.dataset.goto));
   card.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{startResearch(b.dataset.start);showResearch();renderResBox();});
   card.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{const tj=techOf(b.dataset.jump);S.resTab=tj.cat;S.resSel=tj.id;showResearch();const nd=card.querySelector(`[data-node="${tj.id}"]`);if(nd)nd.scrollIntoView({block:'nearest',inline:'center'});});
-  card.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{cancelResearch(b.dataset.cancel);showResearch();renderResBox();});
+  card.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=e=>{e.stopPropagation();cancelResearch(b.dataset.cancel);showResearch();renderResBox();});   /* 中止は研究中のカードの上の赤いボタン（2026-11-18） */
 }
 // ===== 部隊：編成・訓練の順番待ち・全部隊の一覧と一括指示 =====
 function trainSlots(){const o={};for(const bt in UNIT_HOME){const bs=S.blds.filter(b=>b.type===bt&&!(b.bt>0&&!b.upg));let cap=0,used=0;for(const b of bs){cap+=capOf(b);used+=unitsOf(b).length+(b.queue||0);}o[bt]={n:bs.length,cap,used};}return o;}
