@@ -2097,7 +2097,7 @@ function modelsAt(bt){return Object.keys(MODEL).filter(k=>UT[MODEL[k].ut].home==
 const SQUAD_CAP=[12,20,30,40,52,65,80];
 function squadCap(){return SQUAD_CAP[Math.max(0,Math.min(SQUAD_CAP.length-1,(S.baseLv||1)-1))];}
 function squadCount(){return S.squads.filter(q=>(q.hp==null||q.hp>0)&&!q.hero).length+S.blds.reduce((a,b)=>a+(b.queue||0),0);}
-function capOf(b){return B[b.type].cap||UT[UNIT_HOME[b.type]].cap;}
+function capOf(b){return (B[b.type].cap||UT[UNIT_HOME[b.type]].cap)+(IS_PROTO&&UNIT_HOME[b.type]?(b.lv||1)-1:0);}   /* 試作：兵舎などはアップグレード1段ごとに部隊の枠 +1（2026-11-18） */
 function MT(u){return MTC[typeof u==='string'?(MODEL[u]?u:defModel(u)):(u.model||defModel(u.ut))];}
 function modelsFor(ut){return Object.keys(MODEL).filter(k=>MODEL[k].ut===ut&&!MODEL[k].buy&&(!MODEL[k].req||has(MODEL[k].req)));}
 function buyModels(ut){return Object.keys(MODEL).filter(k=>MODEL[k].ut===ut&&MODEL[k].buy);}
@@ -3531,7 +3531,8 @@ function kcStat(b){const L=[],lv=b.lv||1,d=B[b.type],n=lv+1;   // 改築でど�
   if(d.dmg&&d.grp==='def')L.push(`火力 ${Math.round(d.dmg*(1+LV_DMG_ADD[lv-1]))} → ${Math.round(d.dmg*(1+LV_DMG_ADD[n-1]))}`);
   if(d.grp==='def'&&d.range){const a=UP.range[lv-1],c=UP.range[n-1];if(c>a)L.push(`射程 +${Math.round((c-a)*U)}マス`);}
   if(d.grp==='def'){const m0=b.mat||0,m1=MAT_HP[b.type]?Math.min(2,n-1):m0;L.push(`耐久 ${Math.round(hpOf(b.type,lv,m0))} → ${Math.round(hpOf(b.type,n,m1))}`);}
-  if(d.grp==='prod'&&!d.range){const P=i=>isTool(b)?TOOL_MUL[i-1]:UP.prod[i-1];L.push(`生産 ${Math.round(P(lv)*100)}% → ${Math.round(P(n)*100)}%`);if(isTool(b)&&TOOL_WEAR[n-1])L.push(`道具の消耗 毎ターン ${Object.entries(TOOL_WEAR[n-1]).map(([k,v])=>RES_NAME[k]+v).join('・')}`);}
+  if(IS_PROTO&&UNIT_HOME[b.type])L.push(`部隊の枠 ${capOf(b)} → ${capOf(b)+1}`);
+  if(d.grp==='prod'&&!d.range&&!(IS_PROTO&&UNIT_HOME[b.type])){const P=i=>isTool(b)?TOOL_MUL[i-1]:UP.prod[i-1];L.push(`生産 ${Math.round(P(lv)*100)}% → ${Math.round(P(n)*100)}%`);if(isTool(b)&&TOOL_WEAR[n-1])L.push(`道具の消耗 毎ターン ${Object.entries(TOOL_WEAR[n-1]).map(([k,v])=>RES_NAME[k]+v).join('・')}`);}
   return L;}
 function stageName(b){const k=KC[b.type];return k&&k.st[(b.lv||1)-1]?k.st[(b.lv||1)-1][1]:B[b.type].name;}
 /* 改築の費用（2026-11-13）：建設費 × 段（2段目100%・3段目150%・4段目200%…）＋その段のランクの素材。金貨は半分 */
@@ -8006,7 +8007,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.18（試作版だけ）','2026-11-18',['<b>大きな生産施設</b>（研究で建てる・4×4）：大農場・大伐採所・養殖場（ランクⅢ）、大採掘場（ランクⅣ・鉄3・石炭2・金1も取れる）。小さい施設4つ分より多く作る（4.5倍）。建てる資材は5倍、働き手は3倍。土地は4分の3が合っていれば建てられる。道具の段も使える。絵はまだないので小さい施設の絵を大きくして借りている','研究「魔核加工」をなくした']],
+ ['1.18（試作版だけ）','2026-11-18',['<b>大きな生産施設</b>（研究で建てる・4×4）：大農場・大伐採所・養殖場（ランクⅢ）、大採掘場（ランクⅣ・鉄3・石炭2・金1も取れる）。小さい施設4つ分より多く作る（4.5倍）。建てる資材は5倍、働き手は3倍。土地は4分の3が合っていれば建てられる。道具の段も使える。絵はまだないので小さい施設の絵を大きくして借りている','研究「魔核加工」をなくした','兵舎・馬小屋・竜舎・魔導院は、アップグレード1段ごとに入れられる部隊が1つ増える']],
  ['1.17（試作版だけ）','2026-11-18',['<b>道具の段は研究で開く</b>：はじめは木の道具。「石の道具」（Ⅰ）「鉄の道具」（Ⅱ）…「聖銀の道具」（Ⅵ）の研究で、全部の生産施設のその段が使えるようになる（鍛冶の心得はまとめた）','あとから建てる施設は、建てられるランクの道具を持って建つ（炭鉱なら鉄のつるはし）','<b>生産の技術</b>（%ではなく施設ごとの便利な効果）：石運びの道・輪作・網の繕い（Ⅰ）、植林・炭焼き・坑木の補強・夜釣り・魔矢づくり（Ⅱ）、発破・選鉱（Ⅲ）、換気坑（Ⅳ）','<b>魔矢</b>：武器工房で、矢と小さな魔核から作る。あるあいだは物見櫓とバリスタが先に使い、威力 +30%','<b>今夜のエンチャント</b>（研究「一夜の付与」）：小さな魔核で、防衛施設と部隊をその夜だけ強くする（火力 +30%・受ける被害 −15%）。朝にはがれる。まとめてかけるボタンもある','蒼い炎の篝火は、夜ごとに小さな魔核を燃やす','研究の費用に小さな魔核（ランクⅡから）と魔核（ランクⅣから）を使う','小さな魔核を魔核にまとめる仕組みは外した','道具の研究は、研究画面の各ランクのいちばん上に（黄色の枠）','研究「呪骸の柱」「夜狩り術」をなくした']],
  ['1.16（試作版だけ）','2026-11-18',['<b>魔物の種類で取れる素材が違う</b>：小型＝小さな魔核・大型＝魔核・竜型＝龍鱗・空を飛ぶ魔物＝飛膜・ボス＝巨大魔核','<b>巨大魔核の使い道を3つから1つ選ぶ</b>（城の画面）：竜哮砲（城に据える巨大な大砲。夜、20秒ごとに空へ撃ち上げて、いちばん魔物の多いところに落とす。龍鱗5も使う）・知恵の結晶（使うと5ターン研究が2倍の速さ）・英雄の目覚め（英雄1人が大きく強くなる）','<b>竜晶</b>：精錬所をランクⅦにすると、エーテル2・聖銀1・龍鱗1から竜晶を作れる。竜晶の武器と防具（ランクⅦ）に使う','龍鱗の壁は龍鱗を、風船爆弾とグリフォン騎兵は飛膜を、ランクⅦのアップグレードは龍鱗を使う','<b>占い師</b>：ブラッドムーンの3日前の夜に来て、不吉な予言を残す（幸福度 −10・3日間）','<b>まとめて建てる・替えるときは端から順番に</b>：柵や罠をドラッグで並べたとき、施設をまとめて替えたとき（施設の画面の「同じ施設をまとめて替える」）、パパパッと順番に出る。音の高さも少しずつ違う','英雄を付けられる生産施設は、資源を作る施設だけ（住居・研究室・酒場などはなし）']],
  ['1.15（試作版だけ）','2026-11-18',['<b>戦いの英雄は1人で1部隊</b>：歩兵・弓兵・騎兵・魔導・竜騎の英雄は、雇うと城から英雄本人の部隊として出てくる（部隊の上限には数えない）。強さはレベルで上がる。ほかの部隊や施設には付けられない。内政と守備の英雄は今までどおり施設に付ける','<b>英雄の家</b>（建設 → 領地）：英雄を雇うのに要る。1軒で3人まで（城のランクの上限もある）。絵はまだないので集合住宅の絵を借りている','<b>英雄の訓練</b>：英雄の詳しい画面の「訓練する」。食料を使って経験が入る。訓練した日は、その英雄は働かず、夜も戦わない（明日の朝まで休み）','部隊を失っても生き残った英雄は、次の朝に城から出直す','<b>英雄を付けられるのは生産施設と防衛施設だけ</b>（部隊・城・英雄の家には付けない）','英雄の部隊は、ほかの兵より少し大きく描く','<b>鍛冶の心得</b>（領地・ランクⅠ）：鉄の道具を、城のランクⅡを待たずに使える','ランクⅠの「魔核研究」「英雄教練」「武具の手入れ」をなくした','集合住宅は、研究で建てる新しい建物のまま（住居のアップグレードの段からは外した）']],
