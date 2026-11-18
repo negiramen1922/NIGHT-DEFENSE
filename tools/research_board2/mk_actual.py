@@ -56,10 +56,10 @@ for k,v in D['kc'].items():
 # equipment
 for key,lab,icp in [('w','武器','w.'),('a','鎧','a.'),('r','ローブ',None)]:
   prev=[]
-  W=['iron','steel','alloy','magic','holy','dragon'];A=['leather','iron','steel','alloy','magic','holy']
+  W=['iron','alloy','magic','holy','dragon'];A=['leather','iron','alloy','magic','holy','dragon']   # 鋼はなくした（2026-11-18）
   for e in D['eq'][key]:
     if e['rank'] is None:continue
-    icn=(icp+(W if key=='w' else A)[e['i']]) if icp and e['i']<6 else None
+    icn=(icp+(W if key=='w' else A)[e['i']]) if icp and e['i']<len(W if key=='w' else A) else None
     N(f'e_{key}_{e["i"]}','N部隊',e['rank'],e['n'],'ランクで開く' if e['rank'] else 'はじめから','部隊を選んで替える（すぐ・資材）' if e['rank'] else 'はじめの装備',prev,icn);prev=[f'e_{key}_{e["i"]}']
 for u in D['base']:
   k,n=u.split(':');N('u_'+k,'N部隊',0,n,'はじめから','はじめから編成できる',[],'u.'+('pawn' if k=='pawn' else k))
