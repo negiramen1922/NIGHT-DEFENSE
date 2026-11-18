@@ -1780,7 +1780,7 @@ function bigKind(w){if(!w)return null;const b=(w.q||[]).find(e=>E[e.type]&&E[e.t
 // 山場の予告：準備の始めと、前の日に上に出す
 function bigAhead(){if(!S||S.mode!=='campaign'||S.backdrop)return;const n=S.wave+1;if(!bigNight(n))return;const L=S.turnsLeft;if(!(L===1||L===S.prepTotal-1))return;
   const k=bigKind(S.next);if(!k)return;const T=BIG_SAY[k];alertTop(L===1?T.near:T.far(L),k==='blood'?'moon':'boss',6000);}
-function maxCmd(){return 2+2*((S&&S.baseLv)||1);}
+function maxCmd(){const bl=(S&&S.baseLv)||1;if(IS_PROTO){const n=S?S.blds.filter(b=>b.type==='herohouse'&&!(b.bt>0)).length:0;return Math.min(1+2*bl,3*n);}return 2+2*bl;}   /* 試作：英雄の家1軒で3人まで（城のランクの上限 1＋2×ランク） */
 const BASE_MAX=7;
 // 施設の大きさ（マス）。古いセーブの施設は sz を持たないので、城2×2・その他1×1のまま扱う
 // 大きさ（マス）：基本は2×2、大きい施設は3×3、城は4×4
@@ -2064,6 +2064,21 @@ if(IS_PROTO){MODEL.gunner={ut:'arch',wage:3,name:'銃兵',role:'銃兵（マス�
 MODEL.chariot={ut:'cav',wage:5,name:'チャリオット',role:'チャリオット（戦車）',color:'#d0a060',req:'chariott',members:3,hpEach:150,dmg:15,rate:0.8,time:20,cost:{gold:30,steel:30,sword:5,fuel:20},chariot:true,desc:'馬に引かせた戦車。突撃すると魔物の群れの中を突っ切り、通った道の魔物すべてに強い一撃を与える。大きな魔物にぶつかっても止まらない'};
 if(MODEL.rider)MODEL.rider.until='chariott';   /* チャリオットの研究のあとは騎兵は編成できない（今いる騎兵はチャリオットになる） */
 Object.assign(MODEL.sniper,{range:12,mag:3,magRate:0.7,reload:7,desc:'魔法と火薬のライフルで、とても遠くから撃ち抜く（いちばん硬い敵を狙う）。続けて3発撃ったあと、長い装填に入る'});}   /* 大きな魔物に1.6倍は外した（相性は騎兵・チャリオット・ハープーンランチャーだけ：2026-11-18） */
+/* 試作（2026-11-18）：戦いの英雄は1人で1部隊（英雄の絵 h_*）。強さはレベルで上がる（bonus0）。部隊の上限には数えない */
+const HERO_UNIT={'歩兵':'h_inf','弓兵':'h_arch','騎兵':'h_cav','魔導':'h_mage','竜騎':'h_drake'};
+if(IS_PROTO){Object.assign(MODEL,{
+  h_inf:{ut:'inf',buy:true,hero:true,name:'英雄',role:'英雄（剣）',color:'#f2b33d',members:1,hpEach:320,dmg:34,wage:0,desc:'英雄本人。レベルが上がると強くなる'},
+  h_arch:{ut:'arch',buy:true,hero:true,name:'英雄',role:'英雄（弓）',color:'#f2b33d',members:1,hpEach:170,dmg:28,wage:0,desc:'英雄本人。レベルが上がると強くなる'},
+  h_cav:{ut:'cav',buy:true,hero:true,name:'英雄',role:'英雄（騎兵）',color:'#f2b33d',members:1,hpEach:340,dmg:34,wage:0,desc:'英雄本人。レベルが上がると強くなる'},
+  h_mage:{ut:'mage',buy:true,hero:true,name:'英雄',role:'英雄（魔導）',color:'#f2b33d',members:1,hpEach:160,dmg:52,wage:0,desc:'英雄本人。レベルが上がると強くなる'},
+  h_drake:{ut:'drake',buy:true,hero:true,name:'英雄',role:'英雄（竜騎）',color:'#f2b33d',members:1,hpEach:420,dmg:46,wage:0,desc:'英雄本人。レベルが上がると強くなる'}});
+ B.herohouse={name:'英雄の家',glyph:'英',hp:260,heat:2,cost:{steel:80,stone:60,gold:40},pop:0,power:0,spec:'内政',grp:'prod',desc:'英雄が暮らす家。英雄を雇うのに要る（1軒で3人まで。城のランクの上限もある）'};
+ BUILD_ORDER.push('herohouse');}
+function unitHero(c){return IS_PROTO&&!!c&&!!HERO_UNIT[c.spec];}   /* 1人で1部隊になる英雄か */
+function sqBusy(s){if(!IS_PROTO||!s.hero)return false;const c=S.cmds.find(x=>x.id===s.cmd);return !!(c&&c.busy);}   /* 訓練中の英雄の部隊は、その日の夜は戦わない（城の中） */
+function heroSquad(c){return S.squads.find(q=>q.hero&&q.cmd===c.id);}
+function spawnHero(c){const hq=S.blds.find(b=>b.type==='hq');if(!hq||!unitHero(c))return null;const m=HERO_UNIT[c.spec];if(c.assign){const o=findObj(c.assign);if(o)o.cmd=null;}
+  spawnUnit(hq,MODEL[m].ut,m,c.id);const q=S.squads[S.squads.length-1];c.assign=q.id;q.hp=q.maxhp=unitMaxHp?unitMaxHp(q):q.hp;return q;}
 const MTC={};for(const k in MODEL)MTC[k]=Object.assign({},UT[MODEL[k].ut],MODEL[k],{key:k});
 function defModel(ut){return {art:'cannoneer',guard:'guard',mil:'farmer',cav:'rider',drake:'dragon',mage:'wizard',inf:'pawn',arch:'archer',tank:'t10',ship:'dd',air:'heli'}[ut]||'geki';}
 const UNIT_HOME={hq:'mil',train:'inf',stable:'cav',aerie:'drake',magic:'mage'};
@@ -2071,7 +2086,7 @@ function modelsAt(bt){return Object.keys(MODEL).filter(k=>UT[MODEL[k].ut].home==
 // 試作：城のレベルごとに持てる部隊の上限（2026-11-11 ユーザー案）
 const SQUAD_CAP=[12,20,30,40,52,65,80];
 function squadCap(){return SQUAD_CAP[Math.max(0,Math.min(SQUAD_CAP.length-1,(S.baseLv||1)-1))];}
-function squadCount(){return S.squads.filter(q=>q.hp==null||q.hp>0).length+S.blds.reduce((a,b)=>a+(b.queue||0),0);}
+function squadCount(){return S.squads.filter(q=>(q.hp==null||q.hp>0)&&!q.hero).length+S.blds.reduce((a,b)=>a+(b.queue||0),0);}
 function capOf(b){return B[b.type].cap||UT[UNIT_HOME[b.type]].cap;}
 function MT(u){return MTC[typeof u==='string'?(MODEL[u]?u:defModel(u)):(u.model||defModel(u.ut))];}
 function modelsFor(ut){return Object.keys(MODEL).filter(k=>MODEL[k].ut===ut&&!MODEL[k].buy&&(!MODEL[k].req||has(MODEL[k].req)));}
@@ -3332,6 +3347,7 @@ const STAGE_ART={mg:['mg','mg_iron','mg_alloy','mg_magic','mg_holy'],how:['how',
  brazier:['brazier','coalbrazier','brazier_blue'],bastion:['gunbase','gunbase_magic'],coalmine:['coalmine'],goldmine:['goldmine'],mithmine:['holymine'],smelter:['smelter','magicsmelter'],church:['church','chapel'],
  tower:['tower1','tower2','tower3','tower_holy'],gate:['gate1','gate2','gate3','gate_magic','gate_scale'],wall3:['wall_magic'],wall5:['wall_dragon'],
  aebomb:['trap_aether'],gravity:['trap_gravity'],stake:['trap_holystake'],meteor:['trap_meteor']};
+if(IS_PROTO)STAGE_ART.herohouse=['apart'];
 function stageArt(b){const L=STAGE_ART[b.type];if(!L)return null;return L[Math.min(L.length,(b.lv||1))-1];}
 const SPR={};
 // 試作（2026-11-12）：兵士たちの見た目を装備の段で変える。絵の中の「武器の色」と「鎧（ローブ）の色」だけを、段の色に塗り替える（明るさの差は残す）。描き直しまでの仮
@@ -3369,6 +3385,7 @@ for(const k in PXS)if(!k.startsWith('e_')&&k!=='gunbase')WICON[k]=pxSvg(k);
 
 for(const k of ['spike','pit','bomb','bastion','hq','miner','quarry','ironmine','farm','fishery','well','ammo','barracks','lab','outpost','train','fence','swall','wall','tower','market','tavern','stable','aerie','magic','rider','dragon','wizard']){const im=new Image();im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">${WICON[k]}</svg>`);ICIMG[k]=im;}
 for(const k in PXS)ICIMG[k]=pxCanvas(k);
+if(IS_PROTO&&ICIMG.apart&&!ICIMG.herohouse)ICIMG.herohouse=ICIMG.apart;   /* 英雄の家の絵はまだない（集合住宅の絵を借りる） */
 const PXI={};for(const k in PXS)PXI[k]=ICIMG[k];
 for(const [a,b] of [['e_shogre','ogre_shield'],['e_golem','e_golem'],['e_mole','mole'],['e_bat','bat'],['e_treant','e_troll'],['e_maneater','e_spitter'],['e_werewolf','e_wolf'],['e_eltreant','e_elder_treant'],['e_eltreant_burn','e_elder_treant_burn'],['e_grove','boss_shade'],['e_grove_rage','boss_shade2'],['e_grove_burn','boss_shade_burn'],['e_grove_rage_burn','boss_shade2_burn'],['e_grove','e_troll'],['e_grove_rage','e_grove']]){if(SPR.enemies&&!SPR.enemies[a]&&SPR.enemies[b])SPR.enemies[a]=SPR.enemies[b];if(!ICIMG[a]&&ICIMG[b])ICIMG[a]=ICIMG[b];}   /* トレント・マンイーター・ワーウルフは絵ができるまで代わり */
 for(const [k,,,,col] of WALL_UP){const src=ICIMG.wall;const c=document.createElement('canvas');c.width=src.width||48;c.height=src.height||48;const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(src,0,0,c.width,c.height);g.globalCompositeOperation='source-atop';g.globalAlpha=0.5;g.fillStyle=col;g.fillRect(0,0,c.width,c.height);ICIMG[k]=c;PXI[k]=c;
@@ -3451,7 +3468,7 @@ function unitRange0(u){const t=MT(u);return Math.max(1.2,t.range+0.5*elevPx(u.x,
 const SPLASH_EDGE=0.4;function splashFall(d,r){return r>0?1-(1-SPLASH_EDGE)*Math.min(1,d/r):1;}
 function unitSplash(u){const t=MT(u);if(u.kind==='s'){if(eqHas(u,'nosplash'))return 0;const es=eqS(u,'splash');if(es)return es;}return (t.splash||0)*(u.ut==='mage'&&has('highmagic')?1.3:1);}
 function unitsOf(b){return S.squads.filter(u=>u.home===b.id);}
-function unitLabel(u){if(u.ut==='adv')return `${MT(u).name}${u.no}`;if(['inf','arch','cav','drake','mage','mil','art','guard'].includes(u.ut))return `${MT(u).name}隊${u.no}`;return u.ut==='tank'?`${MT(u).name} ${u.no}号`:u.ut==='ship'?`${MT(u).name} ${u.no}番艦`:u.ut==='air'?`第${u.no}飛行隊（${MT(u).name}）`:`部隊${u.no}（${MT(u).name}）`;}
+function unitLabel(u){if(u&&u.hero){const c=S.cmds.find(x=>x.id===u.cmd)||(S.fallen||[]).find(x=>x.id===u.cmd);return c?c.name:'英雄';}if(u.ut==='adv')return `${MT(u).name}${u.no}`;if(['inf','arch','cav','drake','mage','mil','art','guard'].includes(u.ut))return `${MT(u).name}隊${u.no}`;return u.ut==='tank'?`${MT(u).name} ${u.no}号`:u.ut==='ship'?`${MT(u).name} ${u.no}番艦`:u.ut==='air'?`第${u.no}飛行隊（${MT(u).name}）`:`部隊${u.no}（${MT(u).name}）`;}
 // 試作（2026-11-11）：小隊（1部隊）3つで中隊、中隊3つで大隊（研究「大隊」）、大隊3つで師団（研究「師団」）。co／bn／dv はまとまりの番号
 function coFix(u){if(typeof u.co==='number'){const p=S.squads.find(x=>x.id===u.co);const g='c'+(u.coNo||nextNo('coNo'));u.co=g;if(p&&p.co===u.id)p.co=g;}}   // 前の保存（2部隊の中隊）を新しい形に
 function coMates(u){coFix(u);return u.co?S.squads.filter(x=>x!==u&&(coFix(x),x.co===u.co)):[];}
@@ -3777,10 +3794,12 @@ function skillTick(dt){
   }
 }
 
-function cmdOf(o){return o.cmd?S.cmds.find(c=>c.id===o.cmd&&c.alive):null;}
+function cmdOf(o){const c=o.cmd?S.cmds.find(c=>c.id===o.cmd&&c.alive):null;if(c&&IS_PROTO&&c.busy&&!o.hero)return null;return c;}   /* 試作：訓練中の英雄は、そのターンは働かない */
 const NO_HERO=['fence','swall','wall','wall3','wall5','gate','bastion','brazier','market'];   // 市場は英雄の配属なし（詳細は売り買いの情報に使う）
 function canHostHero(o){return !o||o.kind==='s'||(!NO_HERO.includes(o.type)&&!(B[o.type]&&B[o.type].isMine));}
 function assign(c,target){
+  if(IS_PROTO&&target&&unitHero(c)&&!(target.hero&&target.cmd===c.id)){toast('この英雄は1人で1部隊として戦います（部隊や施設には付けられません）','warn');return;}
+  if(IS_PROTO&&target&&target.hero&&target.cmd!==c.id)return;
   if(target&&!canHostHero(target)){toast('壁・門・柵・篝火には英雄を置けません','warn');return;}
   if(c.assign){const o=findObj(c.assign);if(o)o.cmd=null;}
   if(target){
@@ -3844,7 +3863,7 @@ function hire(id){
   if(!canAfford(cost,3)||S.cmds.length>=maxCmd())return;
   for(const k in cost)S[k]-=cost[k];S.pop-=3;
   S.cands=S.cands.filter(x=>x!==c);S.cmds.push(c);se('hire');
-  log(`${cmdName(c)}（${c.spec}）着任`,'good');
+  log(`${cmdName(c)}（${c.spec}）着任`,'good');if(unitHero(c))spawnHero(c);
 }
 
 // ===== ログ =====
@@ -4024,7 +4043,7 @@ function endSkirm(c,why){
 }
 // 駐屯兵が狙う部隊：駐屯地から CAMP_LEASH 以内にいる部隊のうち、いちばん近いもの
 function campHunt(e,air){const c=campById(e.camp);if(!c)return null;let best=null,bd=1e9;
-  for(const s of S.squads){if(s.gar||s.ut==='ship')continue;if(!air&&UT[s.ut].fly&&s.ut!=='mech')continue;if(Math.hypot(s.x-c.x,s.y-c.y)>CAMP_LEASH*TU)continue;const d=Math.hypot(s.x-e.x,s.y-e.y);if(d<bd){bd=d;best=s;}}return best;}
+  for(const s of S.squads){if(s.gar||sqBusy(s)||s.ut==='ship')continue;if(!air&&UT[s.ut].fly&&s.ut!=='mech')continue;if(Math.hypot(s.x-c.x,s.y-c.y)>CAMP_LEASH*TU)continue;const d=Math.hypot(s.x-e.x,s.y-e.y);if(d<bd){bd=d;best=s;}}return best;}
 // 空の駐屯兵：部隊へまっすぐ飛んでいく。いなければ陣の上空へ
 function campFly(e,d,dt){e.cd-=dt*(e.curse?0.75:1);const s=campHunt(e,true),c=campById(e.camp);if(!c)return;
   const tx=s?s.x:c.x+(e.hx||0),ty=s?s.y:c.y+(e.hy||0),dx=tx-e.x,dy=ty-e.y,dd=Math.hypot(dx,dy)||1;
@@ -4044,7 +4063,7 @@ function skirmTick(dt){
 function campWatch(){
   campSync();if(S.waveActive||!S.camps||!S.camps.length)return;
   for(const c of S.camps){if(c.state!=='idle')continue;
-    for(const s of S.squads){if(s.gar)continue;const d=Math.hypot(s.x-c.x,s.y-c.y);
+    for(const s of S.squads){if(s.gar||sqBusy(s))continue;const d=Math.hypot(s.x-c.x,s.y-c.y);
       if(!c.found&&MT(s).scoutEye&&d<=((MT(s).vision||6)+lvl('scout'))*T){c.found=true;S.campFoundN=(S.campFoundN||0)+1;s.tx=null;s.ax=s.x;s.ay=s.y;
         const {u,n}=campUnits(c);se('upgrade');toast(`${unitLabel(s)}が${campName(c)}を発見！（約${n}体）`,'good',4500);
         log(`${unitLabel(s)}が${campName(c)}を発見：${Object.keys(u).map(k=>E[k].name+'×'+u[k]).join('・')}。${CAMP_TRIG*U}マス以内に近づくと戦闘になる`,'good');}
@@ -4356,6 +4375,7 @@ function morning(){
   // 気分（何日か続く幸福度）の日数を減らす
   S.moods=(S.moods||[]).map(m=>({...m,d:m.d-1})).filter(m=>m.d>0);
   if(S.seedT>0)S.seedT--;
+  if(IS_PROTO){for(const c of S.cmds){c.busy=false;if(unitHero(c)&&!heroSquad(c))spawnHero(c);}}   /* 試作：訓練の休みを終える・部隊を失って生き残った英雄は城から出直す */
   if(IS_PROTO){const use={};let bad=0;for(const b of S.blds){if(!isTool(b)||(b.bt>0&&!b.upg)||b.off)continue;const w=TOOL_WEAR[Math.min(TOOL_WEAR.length,b.lv||1)-1];if(canAfford(w)){for(const k in w){S[k]-=w[k];use[k]=(use[k]||0)+w[k];}b.worn=false;}else{b.worn=true;bad++;}}   /* 試作：道具は毎ターン少しずつ減る（2026-11-18） */
     const u=Object.entries(use);if(u.length)log(`道具の消耗：${u.map(([k,v])=>RES_NAME[k]+' −'+v).join('・')}`);if(bad)log(`道具の資材が足りず、${bad}つの施設の生産が半分になっています`,'bad');}
   if(S.starBoost>0)S.starBoost--;
@@ -4929,6 +4949,7 @@ function update(dt,sim){
     S.roots=S.roots.filter(r=>!r.done||r.t>-0.5);}
   // 部隊
   for(const s of S.squads){
+    if(sqBusy(s))continue;
     if(s.ut==='guard'&&!sim){const hq=hqOf();if(hq){const [qx,qy]=castleC(hq);
       const threat=S.waveActive&&S.enemies.some(e=>!isFly(e)&&e.hp>0&&Math.hypot(e.x-qx,e.y-qy)<6*TU);
       if(s.gar===hq.id){s.hp=Math.min(s.maxhp,s.hp+30*dt);if(threat&&!s.stayIn){s.gar=null;s.x=qx;s.y=qy+1.4*TU;s.mode='guard';s.ax=qx;s.ay=qy+1.4*TU;s.tx=null;}}
@@ -5050,7 +5071,7 @@ function update(dt,sim){
     // 近くの部隊を追う（喰付型・格闘型）
     let hunt=(e.tauntT>0&&S.squads.includes(e.taunt)&&!isFly(e))?e.taunt:null;
     if(e.camp&&!hunt)hunt=campHunt(e,false);
-    if(!hunt&&!e.camp){let hd=(d.hunt||(d.laser||d.ranged?0:4))*TU;for(const s of S.squads){if(s.gar||s.ut==='ship'||(UT[s.ut].fly&&s.ut!=='mech'))continue;const dd=Math.hypot(s.x-e.x,s.y-e.y);if(dd<hd){hd=dd;hunt=s;}}}
+    if(!hunt&&!e.camp){let hd=(d.hunt||(d.laser||d.ranged?0:4))*TU;for(const s of S.squads){if(s.gar||sqBusy(s)||s.ut==='ship'||(UT[s.ut].fly&&s.ut!=='mech'))continue;const dd=Math.hypot(s.x-e.x,s.y-e.y);if(dd<hd){hd=dd;hunt=s;}}}
     if(d.laser&&!e.sub&&!e.wp0){
       // 光線：部隊（跳躍中）と高所の施設は遠くから狙える
       let best=null,bs=1e9;
@@ -5076,7 +5097,7 @@ function update(dt,sim){
       if(rt)e.target=rt;
     }
     let melee=null;
-    for(const s of S.squads){if(s.gar||(UT[s.ut].fly&&s.ut!=='mech'))continue;if(Math.hypot(s.x-e.x,s.y-e.y)<d.r+(s.ut==='ship'?18:10)){melee=s;break;}}
+    for(const s of S.squads){if(s.gar||sqBusy(s)||(UT[s.ut].fly&&s.ut!=='mech'))continue;if(Math.hypot(s.x-e.x,s.y-e.y)<d.r+(s.ut==='ship'?18:10)){melee=s;break;}}
     if(melee){if(e.cd<=0){e.cd=d.rate;e.atkT=S.waveT;e.atkX=melee.x;const m0=melee.members,dm=d.dmg*(d.vsS||1)*(e.buff?1.3:1);damageSquad(melee,dm);if(d.poison){melee.psnT=3;melee.psnD=dm/3;}
       if(d.vampire&&melee.members<m0){for(let i=0;i<m0-Math.max(0,melee.members);i++)S.enemies.push({type:'ghoul',x:melee.x+(Math.random()-.5)*TU,y:melee.y+(Math.random()-.5)*TU,hp:E.ghoul.hp,maxhp:E.ghoul.hp,cd:0,target:null,retarget:0});log('吸血鬼に倒された兵がグールになった','bad');}}continue;}
     let tx,ty;
@@ -5490,9 +5511,9 @@ function damageSquad(s,dmg){if(s.invT>0)return;
   }
 }
 let squadNo=1,tankNo=1;
-function spawnUnit(h,ut,model){
+function spawnUnit(h,ut,model,heroId){
   const t=UT[ut];model=model||defModel(ut);const tm=MT(model);
-  const s={id:S.nextId++,kind:'s',ut,model,no:ut==='tank'||ut==='ship'?tankNo++:squadNo++,home:h.id,members:tm.members,x:bcx(h),y:(h.y+bsz(h))*T+0.5*TU,cd:0,tx:null,ty:null,cmd:null,mode:'guard',ang:0};
+  const s={id:S.nextId++,kind:'s',ut,model,no:heroId?0:ut==='tank'||ut==='ship'?tankNo++:squadNo++,home:h.id,members:tm.members,x:bcx(h),y:(h.y+bsz(h))*T+0.5*TU,cd:0,tx:null,ty:null,cmd:heroId||null,mode:'guard',ang:0};if(heroId)s.hero=true;
   s.hp=s.maxhp=memberHp(s)*tm.members;
   if(s.y>H-10)s.y=h.y*T-0.5*TU;
   if(t.naval){const p=nearestSea(h.x,h.y,4);if(p){s.x=(p[0]+.5)*T;s.y=(p[1]+.5)*T;}}
@@ -5747,7 +5768,7 @@ function draw(){
   drawPorters(an);drawLilia(an);drawFestCrowd(an);
   drawGuidePing(an);
   for(const s of S.squads){
-    if(s.gar)continue;
+    if(s.gar||sqBusy(s))continue;
     if(S.multi&&S.multi.includes(s.id)){ctx.strokeStyle='#62c6d9';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(s.x,s.y,15,0,7);ctx.stroke();ctx.lineWidth=1;}
     const c=cmdOf(s);
     ctx.save();ctx.translate(s.x,s.y);
@@ -6585,7 +6606,7 @@ function handleTap(ev,shift){
   if(S.buildPick){S.buildPick=false;renderBuild();renderMode();}
   const hitR=Math.max(20,(IS_TOUCH?34:24)/cam.z);
   if(S.sel&&S.sel.kind==='s'&&Math.hypot(S.sel.x-p.x,S.sel.y-p.y)<hitR*1.3){deselect();return;}
-  {let best=null,bd=hitR;for(const s of S.squads){if(s.gar)continue;const d=Math.hypot(s.x-p.x,s.y-p.y);if(d<bd){bd=d;best=s;}}
+  {let best=null,bd=hitR;for(const s of S.squads){if(s.gar||sqBusy(s))continue;const d=Math.hypot(s.x-p.x,s.y-p.y);if(d<bd){bd=d;best=s;}}
    if(best&&(shift||S.multi.length)){const i=S.multi.indexOf(best.id);if(i>=0)S.multi.splice(i,1);else S.multi.push(best.id);if(S.sel&&S.sel.kind==='s'&&!S.multi.includes(S.sel.id)&&S.sel!==best)S.multi.push(S.sel.id);S.sel=null;renderInfo(true);renderMode();return;}
    if(best){const s=best;if(S.sel===s){deselect();return;}S.sel=s;S.selTile=null;renderInfo(true);renderMode();return;}}
   if(S.multi.length&&!(S.grid[gy]&&S.grid[gy][gx])){const us=S.squads.filter(x=>S.multi.includes(x.id)&&!x.gar);us.forEach((u,i)=>{const a=i*2.4,r=i?TU*(0.8+0.25*i):0;orderMove(u,p.x+Math.cos(a)*r,p.y+Math.sin(a)*r,true);});S.fx.push({x:p.x,y:p.y,r:14,t:0,dur:0.4,c:'#62c6d9'});se('click');return;}
@@ -6903,6 +6924,7 @@ function setText(el,v){if(el&&el.textContent!==v)el.textContent=v;}
 const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','wall3','wall5','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','barrier','tesla','harpoon','mray','dbreath','spike','pit','bomb','aebomb','gravity','stake','meteor','brazier','totem','outpost']},
   {id:'prod',name:IS_PROTO?'領地':'生産・街',keys:'⇧',list:['coalmine','goldmine','mithmine','smelter','miner','quarry','ironmine','farm','fishery','well','ammo','powder','furnace','barracks','apart','market','tavern','church','lab']},
   {id:'unit',name:'部隊',keys:'-',list:['train','stable','magic','aerie']}];
+if(IS_PROTO){const g=BUILD_GROUPS.find(x=>x.id==='prod');if(g&&!g.list.includes('herohouse'))g.list.push('herohouse');}
 // 建設の分類タブ（防衛・生産・街・部隊）。押すとその見出しまで一覧をスクロールする
 function buildScroller(el){for(let p=el.parentElement;p;p=p.parentElement){const o=getComputedStyle(p).overflowY;if((o==='auto'||o==='scroll')&&p.scrollHeight>p.clientHeight+1)return p;}return document.scrollingElement;}
 function buildJump(id){const el=document.getElementById('build'),h=el&&el.querySelector(`.bh[data-g="${id}"]`);if(!h)return;
@@ -6978,20 +7000,24 @@ function bindTileBuild(el,x,y){
 }
 function affordSig(){return BUILD_ORDER.map(k=>canAfford(costOf(k),B[k].pop)?1:0).join('');}
 let lastInfoKey='';
+function trainCost(c){return {fuel:20+10*c.lv};}   /* 試作（2026-11-18）：英雄の訓練は食料をおもに使う */
+function trainXp(c){return Math.max(10,Math.round(xpNeed(c)*0.3));}
+function trainHero(c){const tc=trainCost(c);if(!IS_PROTO||c.busy||c.lv>=HERO_MAX||!canAfford(tc)||S.waveActive||S.phase==='night')return;for(const k in tc)S[k]-=tc[k];c.busy=true;gainXp(c,trainXp(c)/((has('doctrine')?1.5:1)*(c.trait==='叩き上げ'?1.3:1)));se('upgrade');log(`${cmdName(c)}、訓練（経験 +${trainXp(c)}）。明日の朝まで休み`,'good');renderInfo(true);renderCmds(true);}
 function heroDetail(c){
   const sp=SPECS[c.spec],a=c.assign?findObj(c.assign):null,tr=TRAITS.find(t=>t.n===c.trait);
   let h=`<div class="row" style="margin-bottom:4px"><b>英雄の詳細</b><button id="hvClose" style="padding:4px 14px;font-size:14px">× 閉じる</button></div><div style="display:flex;gap:10px;align-items:center"><div style="background:#14110c;border:1px solid #5a4a2a;padding:4px;line-height:0">${icSvg('h_'+c.spec,64)}</div>
     <div><b style="font-size:15px">${cmdName(c)}</b><div><span class="spec" style="color:${sp.color};border-color:${sp.color}">${c.spec}</span> <span class="muted">Lv${c.lv}</span></div>
     <div class="xpbar" style="width:140px;margin-top:4px"><i style="width:${c.lv>=HERO_MAX?100:Math.round(c.xp/xpNeed(c)*100)}%"></i></div><div class="muted" style="font-size:10px">${c.lv>=HERO_MAX?'最大レベル':`経験 ${Math.floor(c.xp)} / ${xpNeed(c)}`}</div></div></div>`;
-  h+=`<div class="muted" style="margin:6px 0">${sp.desc}</div>`;
+  h+=`<div class="muted" style="margin:6px 0">${unitHero(c)?'1人で1部隊として戦う英雄。レベルが上がると強くなる':sp.desc}</div>`;
   h+=`<div class="row"><span class="muted">攻（火力）</span><span>${c.atk}</span></div><div class="row"><span class="muted">防（耐久・被害軽減）</span><span>${c.def}</span></div><div class="row"><span class="muted">技（連射・生産）</span><span>${c.tec}</span></div>`;
   for(const k of heroSkills(c))h+=`<div style="margin-top:8px;padding:6px;border:1px solid ${sp.color}55;background:#14110c"><div style="display:flex;align-items:center;gap:6px">${skillIcon(k.id,28)}<b style="color:${sp.color};font-size:14px">${k.name}</b>${k.cd?`<span class="muted" style="font-size:11px">${k.cd}秒ごとに自動</span>`:'<span class="muted" style="font-size:11px">常時</span>'}</div>
     <div style="margin-top:4px;font-size:12px">${k.desc}</div><div class="muted" style="font-size:11px;margin-top:2px">威力 ${100+10*(c.lv-1)}%（Lvで上がる）・<b>適任の配属先でだけ</b>使える</div></div>`;
   h+=`<div class="row" style="margin-top:8px"><span class="muted">特性</span><span>${c.trait?`<b>${c.trait}</b>`:'なし'}</span></div>${tr&&tr.d?`<div class="muted" style="font-size:11px;text-align:right">${tr.d}</div>`:''}`;
   h+=`<div class="row"><span class="muted">撃破</span><span>${c.kills||0}</span></div>`;
-  h+=`<div class="row"><span class="muted">配属</span><span>${a?objName(a)+(match(c,a)===1?' <span style="color:var(--green)">★適任</span>':' <span class="muted">（不得意：効果40%・スキルなし）</span>'):'<span style="color:var(--amber)">待機中</span>'}</span></div>`;
-  h+=`<div class="muted" style="font-size:11px">向いている配属先：${{'歩兵':'農兵・剣士・重装歩兵の部隊','弓兵':'弓兵隊','騎兵':'騎兵隊','魔導':'魔術師隊','竜騎':'竜騎兵隊','守備':'防衛施設・壁・門・城館','内政':'生産施設'}[c.spec]||''}</div>`;
-  if(a)h+=`<button id="hvGo" style="margin-top:6px;width:100%">配属先を見る</button>`;
+  if(!unitHero(c))h+=`<div class="row"><span class="muted">配属</span><span>${a?objName(a)+(match(c,a)===1?' <span style="color:var(--green)">★適任</span>':' <span class="muted">（不得意：効果40%・スキルなし）</span>'):'<span style="color:var(--amber)">待機中</span>'}</span></div>`;
+  if(!unitHero(c))h+=`<div class="muted" style="font-size:11px">向いている配属先：${{'歩兵':'農兵・剣士・重装歩兵の部隊','弓兵':'弓兵隊','騎兵':'騎兵隊','魔導':'魔術師隊','竜騎':'竜騎兵隊','守備':'防衛施設・壁・門・城館','内政':'生産施設'}[c.spec]||''}</div>`;
+  if(a)h+=`<button id="hvGo" style="margin-top:6px;width:100%">${a.hero?'英雄の部隊を見る':'配属先を見る'}</button>`;
+  if(IS_PROTO){const tc=trainCost(c);h+=c.lv>=HERO_MAX?'':c.busy?`<div class="muted" style="margin-top:6px">訓練中（明日の朝まで休み）</div>`:`<button id="hvTrain" class="on" style="margin-top:6px;width:100%" ${canAfford(tc)&&!S.waveActive&&S.phase!=='night'?'':'disabled'}>訓練する（${costText(tc)}・経験 +${trainXp(c)}）<span class="muted" style="display:block;font-size:10.5px">訓練した日は、この英雄は働かず、夜も戦いません</span></button>`;}
   return h;
 }
 function closeHeroView(){S.heroView=null;S.selCmd=null;renderInfo(true);renderCmds(true);}
@@ -7042,12 +7068,13 @@ function marketHTML(o){let h='';
      <div class="mksum" id="mkSum">${mktSum(md,it,n)}</div>
      <button id="mkGo" class="primary wide" ${n>0?'':'disabled'}>${md==='sell'?'売る':'買う'}</button></div></div>`;}
   return h;}
-function heroBlock(o){const c=cmdOf(o),isS=o.kind==='s',want=specOfTarget(o);const cur=c?heroFx(o,c.id):null;
+function heroBlock(o){if(IS_PROTO&&o.hero){const c=cmdOf(o);return c?`<div class="hsec"><div class="hhd"><span>英雄</span><small>${c.spec}・Lv${c.lv}</small></div><div class="muted" style="font-size:11px">英雄本人の部隊です。レベルが上がると強くなります。訓練は「軍事」の「英雄」から</div></div>`:'';}
+  const c=cmdOf(o),isS=o.kind==='s',want=specOfTarget(o);const cur=c?heroFx(o,c.id):null;
   let h=`<div class="hsec"><div class="hhd"><span>配属英雄</span><small>向いている：${want}</small></div>`;
   if(c){const m=match(c,o)===1;
     h+=`<div class="hcur">${heroIc(c,40)}<div class="hm"><div class="hn"><b>${cmdName(c)}</b><span class="spec" style="color:${SPECS[c.spec].color};border-color:${SPECS[c.spec].color}">${c.spec}</span><span class="${m?'gd':'wn'}">${m?'適任':'不得意（効果30%）'}</span></div><div class="hfxs">${fxHTML(cur)}</div>${m?`<div class="hsk">${skillLine(c,false)}${heroSkills(c).some(k=>k.cd)?`<span id="hcd" class="hcd">${hcdText(c)}</span>`:''}</div>`:''}</div></div>`;}
   else h+=`<div class="hnone">英雄が配属されていません</div>`;
-  const others=S.cmds.filter(x=>x.alive!==false&&x.id!==o.cmd);
+  const others=S.cmds.filter(x=>x.alive!==false&&x.id!==o.cmd&&!unitHero(x));
   if(others.length){h+=`<button class="hpick${S.heroPick===o.id?' on':''}" data-hpick="1">${S.heroPick===o.id?'▴ 閉じる':`▾ ${c?'英雄を替える':'英雄を配属する'}（${others.length}人）`}</button>`;
     if(S.heroPick===o.id){h+=`<div class="hlist">`;
       const sorted=others.slice().sort((a,b)=>(match(b,o)-match(a,o))||(!!a.assign-!!b.assign)||(b.lv-a.lv));
@@ -7109,7 +7136,7 @@ function detailsify(root){let st={};try{st=JSON.parse(localStorage.getItem('nd_i
 function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel||S.selTile||S.heroView||(S.multi&&S.multi.length)));
   const el=document.getElementById('infoBody');const o=S.sel;
   if(o)S.heroView=null;
-  if(!o&&S.heroView){const c=S.cmds.find(x=>x.id===S.heroView&&x.alive);if(c){const key='hv'+c.id+c.lv+Math.floor(c.xp)+c.assign+c.kills;if(!force&&key===lastInfoKey)return;lastInfoKey=key;el.innerHTML=heroDetail(c);const hc=document.getElementById('hvClose');if(hc)hc.onclick=closeHeroView;const g=document.getElementById('hvGo');if(g)g.onclick=()=>{const t=findObj(c.assign);if(t){S.sel=t;renderInfo(true);}};return;}S.heroView=null;}
+  if(!o&&S.heroView){const c=S.cmds.find(x=>x.id===S.heroView&&x.alive);if(c){const key='hv'+c.id+c.lv+Math.floor(c.xp)+c.assign+c.kills+(c.busy?1:0)+Math.floor(S.fuel/10)+S.phase;if(!force&&key===lastInfoKey)return;lastInfoKey=key;el.innerHTML=heroDetail(c);const hc=document.getElementById('hvClose');if(hc)hc.onclick=closeHeroView;const g=document.getElementById('hvGo');if(g)g.onclick=()=>{const t=findObj(c.assign);if(t){S.sel=t;renderInfo(true);}};const tr=document.getElementById('hvTrain');if(tr)tr.onclick=()=>trainHero(c);return;}S.heroView=null;}
   if(S.buildMode&&!o){
     const key='bm'+S.buildMode;if(!force&&key===lastInfoKey)return;lastInfoKey=key;
     const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)?buildTurns(S.buildMode)+'ターン':'すぐ完成'}　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。${IS_TOUCH?'「建設をやめる」で建設モードを終了':'右クリック・Escで建設モードを終了'}</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div>${flowHTML(S.buildMode,null)}<button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
@@ -7712,9 +7739,9 @@ function showHire(target,mode){
   let h=target?'':`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="margin:0 0 6px">人事・英雄の雇用</h2><button id="ovClose">閉じる [J]</button></div>`;
   if(showH){h+=`<h3 style="margin:0 0 4px">英雄の候補者</h3>
   <div class="help" style="margin-bottom:8px">候補者は襲撃を撃退するたびに入れ替わります。雇用には人員3名が必要です（副官・幕僚として）。在籍 <b style="color:var(--text)">${S.cmds.length}/${maxCmd()}</b>　／　木材 ${Math.floor(S.steel)}　人員 ${S.pop}
-  ${full?'<br><span style="color:var(--amber)">定員に達しています</span>':''}</div>`;
+  ${full?(IS_PROTO&&!S.blds.some(b=>b.type==='herohouse'&&!(b.bt>0))?'<br><span style="color:var(--amber)">英雄を雇うには「英雄の家」が要ります（建設 → 領地）</span>':'<br><span style="color:var(--amber)">定員に達しています</span>'+(IS_PROTO?'（英雄の家1軒で3人まで）':'')):''}</div>`;
   fixCands();
-  for(const [side,note] of [['内政','生産施設に配属して、生産を上げる'],['戦闘','部隊か防衛施設に配属して、戦いを強くする']]){const L=S.cands.filter(c=>candSide(c)===side);
+  for(const [side,note] of [['内政','生産施設に配属して、生産を上げる'],['戦闘',IS_PROTO?'1人で1部隊として戦う（守備の英雄は防衛施設に付ける）':'部隊か防衛施設に配属して、戦いを強くする']]){const L=S.cands.filter(c=>candSide(c)===side);
   h+=`<h4 style="margin:8px 0 4px">${side}の英雄 <span class="muted" style="font-weight:normal;font-size:11px">${note}</span></h4><div class="cands">`;
   if(!L.length)h+=`<div class="muted">${side}の候補者はいません（雇った・次の撃退後に補充）</div>`;
   for(const c of L){const sp=SPECS[c.spec];const cost=hireCost(c);const tr=TRAITS.find(t=>t.n===c.trait);
@@ -7780,7 +7807,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.14 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.15 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7803,6 +7830,7 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   for(const b of S.blds){delete b.fireT;}for(const q of S.squads||[]){delete q.atkT;}S.vfx=[];
   if(S.skirm||!S.waveActive){S.skirm=null;if(!S.waveActive)S.enemies=[];if(S.camps)for(const c of S.camps)if(c.state==='fight')c.state='idle';}for(const k in AF)delete AF[k];S.grid=Array.from({length:ROWS},()=>new Array(COLS).fill(null));
   for(const b of S.blds)gridSet(b,true);
+  if(IS_PROTO&&!S.hero1){S.hero1=1;for(const c of S.cmds)if(unitHero(c)&&!heroSquad(c))spawnHero(c);}   /* 試作：前のセーブの戦いの英雄を1人で1部隊に */
   if(IS_PROTO&&!S.rsv1){S.rsv1=1;S.research=(S.research||[]).filter(r=>techOf(r.id));for(const q of S.squads||[]){if(q.wHave==null)q.wHave=wMat(q);if(q.aHave==null&&armK(q.ut))q.aHave=aMat(armK(q.ut));}}   /* 試作：研究の作り直しの前のセーブ（やめた研究は外す・今の装備はそのまま） */
   if(!S.hpFix1){S.hpFix1=1;for(const b of S.blds)if(!(b.bt>0)&&b.hp<b.maxhp)b.hp=b.maxhp;}   /* ver 1.11.1〜1.12 で建て終わった施設は耐久が減ったまま残っていたので、読み込んだとき一度だけ満タンに（2026-11-17） */
   for(const b of S.blds)if(b.cmd&&!canHostHero(b)){const c=S.cmds.find(x=>x.id===b.cmd);if(c)c.assign=null;b.cmd=null;}
@@ -7893,6 +7921,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.15（試作版だけ）','2026-11-18',['<b>戦いの英雄は1人で1部隊</b>：歩兵・弓兵・騎兵・魔導・竜騎の英雄は、雇うと城から英雄本人の部隊として出てくる（部隊の上限には数えない）。強さはレベルで上がる。ほかの部隊や施設には付けられない。内政と守備の英雄は今までどおり施設に付ける','<b>英雄の家</b>（建設 → 領地）：英雄を雇うのに要る。1軒で3人まで（城のランクの上限もある）。絵はまだないので集合住宅の絵を借りている','<b>英雄の訓練</b>：英雄の詳しい画面の「訓練する」。食料を使って経験が入る。訓練した日は、その英雄は働かず、夜も戦わない（明日の朝まで休み）','部隊を失っても生き残った英雄は、次の朝に城から出直す']],
  ['1.14（試作版だけ）','2026-11-18',['<b>小数をなくした</b>：施設ごとの1ターンの生産と消費は整数に（伐採所 木材+10、武器工房 矢+30・木材−4・鉄−2 など）。食料・税・給金は、その日のはじめの人数で1日分を決めるので、途中で人が増えても端数が出ない','兵士の給金は「2人で1」に。税の説明から小数を外した','市場の値段は「4つ → 銀貨1」のように整数で見せる','補給は端数をためて、1つ分になったら1ずつ使う（資材が整数で減る）','<b>道具を使う施設の生産を2割増やした</b>：道具の消耗と、なくした生産の研究の分（伐採所 木材+10 → +12、農場 食料+8 → +10、武器工房 矢+30 → +36 など）','使っていない古い施設（発電所）のデータを消した']],
  ['1.13（試作版だけ）','2026-11-18',['<b>研究の作り直し（1回目）</b>：研究は「領地・防衛・部隊」の3つに。生産の%の研究（伐採技術など）・防衛の%の研究（鋼弦・強弓・壁補強・巻き上げ機など）・剣術・弓術・精鋭・改築の研究はなくした','<b>城のランクで開く</b>：炭鉱・金鉱・精錬所・聖銀鉱・エーテル採掘所・石の壁・城壁・魔金属の壁・龍鱗の壁・投石機、施設のアップグレード、兵士の装備は、研究しなくても城のランクが上がると使える。城のランクが上がったときに、使えるようになったものをアイコン付きで並べる','<b>生産施設は「道具」</b>：施設を選んで道具を替える（石→鉄→鋼→合金→魔金属→聖銀）。すぐ終わる。道具は毎ターン少しずつ減る（石の道具は木材1、鉄の道具は鉄1…）。足りないとその施設の生産が半分','<b>アップグレード</b>：「改築」は「アップグレード」に。領地の施設・門・壁はすぐ終わる。防衛施設はターンがかかる。%の研究をなくしたぶん、防衛施設のアップグレードの伸びを大きく','<b>兵士の装備</b>：部隊を選んで武器と防具を替える。上の段に替えるときは資材を払う（一度買った段までは自由に替えられる）。もっとよい装備に替えられる部隊は、軍事のタブで「↑」','<b>熟練度をなくした</b>','<b>改造</b>：「貫く矢」（バリスタの矢が後ろの2体まで貫く）・「割れる岩」（投石機の岩が割れて破片が飛ぶ）','<b>相性</b>：騎兵・チャリオットは大型の魔物に、ハープーンランチャーは竜型の魔物に2倍。狙撃兵の「大きな魔物に1.6倍」は外した']],
  ['1.12.1（試作版だけ）','',['研究の見直し：投石機・火薬の不自然な前提を外した。古い説明（師団・延長シフト・火薬工房・野戦補給・甲殻補強）を直した','<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
