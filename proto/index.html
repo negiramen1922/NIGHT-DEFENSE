@@ -1823,7 +1823,6 @@ const B={
   hq:     {name:'城館',glyph:'司',hp:1800,heat:2,cost:{},pop:0,power:5,spec:'工兵',desc:'失うと敗北'},
   miner:  {name:'採掘機',glyph:'採',hp:160,heat:1,cost:{steel:30},pop:2,power:-2,spec:'兵站',grp:'prod',desc:'鉱脈の上に建設。木材を産出'},
   well:   {name:'油井',glyph:'油',hp:180,heat:3,cost:{steel:50},pop:2,power:-1,spec:'兵站',grp:'prod',desc:'油田の上に建設。食料を産出（+10/T）。燃えやすく狙われやすい'},
-  power:  {name:'発電所',glyph:'発',hp:220,heat:4,cost:{steel:50},pop:2,power:10,spec:'兵站',grp:'prod',desc:'食料を燃やして電力を供給（食料 −2.5/T）。食料切れで出力20%'},
   ammo:   {name:'武器工房',glyph:'弾',hp:220,heat:4,cost:{steel:60},pop:4,power:-4,spec:'兵站',grp:'prod',desc:'木材と食料から矢を製造（木材 −6、食料 −4 → 矢 +22/T）'},
   elecf:  {name:'電子工場',glyph:'基',hp:200,heat:3,cost:{steel:100},pop:3,power:-5,spec:'技術',grp:'prod',desc:'木材と電力からエーテル結晶を製造（木材 −5 → エーテル結晶 +3/T）。改修・上位研究・兵に必要'},
   barracks:{name:'兵舎',glyph:'兵',hp:200,heat:1,cost:{steel:50},pop:0,power:-1,spec:'兵站',grp:'prod',desc:'兵士の住居。1棟に12名まで住める（改修でLv2:20名・Lv3:30名）。毎ターン3名を補充。施設の要員・部隊・待機中の全員が住居の上限に数えられる'},
@@ -6706,7 +6705,8 @@ function resFrac(b){const m=resMax(b);return m?Math.max(0,Math.min(1,b.res/m)):0
 function resRowHTML(b){const f=resFrac(b);return `<div><b class="muted">埋蔵</b><span class="rbar${f<0.25?' lo':''}"><i style="width:${(f*100).toFixed(1)}%"></i></span><span class="${b.dep?'bd':f<0.25?'wn':'muted'}">${b.dep?'枯渇':`残り ${Math.floor(b.res)}（${Math.round(f*100)}%）`}</span></div>`;}
 // 地図の埋蔵量バー：耐久が満タンのときだけ、耐久バーの場所に出す（襲撃中は出さない）
 function drawResBar(b,x,y,w,h){if(S.waveActive||b.res==null||b.res===Infinity||b.dep||b.hp<b.maxhp-0.5)return;const f=resFrac(b);ctx.fillStyle='#2a2218';ctx.fillRect(x,y,w,h);ctx.fillStyle=f<0.25?'#ff6e5a':'#d8a85a';ctx.fillRect(x,y,w*f,h);}
-function prodOf(b){const f=prodOf0(b);if(!f||!IS_PROTO)return f;const o={};for(const x in f)o[x]=Math.round(f[x]);return o;}   /* 試作：1ターンあたり整数 */
+const TOOL_BOOST=1.2;   /* 試作：道具の消耗と、なくした生産の研究の分、道具を使う施設の生産を2割増やす（2026-11-18） */
+function prodOf(b){const f=prodOf0(b);if(!f||!IS_PROTO)return f;const o={},bo=isTool(b)?TOOL_BOOST:1;for(const x in f)o[x]=Math.round(f[x]>0?f[x]*bo:f[x]);return o;}   /* 試作：1ターンあたり整数 */
 function prodOf0(b){const k=TURN_SEC,bn=bonus(b),um=upProd(b)*eff(b)*happyMul();if(b.bt>0||b.dep||b.off)return null;
   switch(b.type){case 'miner':return {steel:1.0*um*(b.ym||1)*(techMul('miner')+bn.prod-1)*k};case 'quarry':return {stone:0.6*um*(b.ym||1)*(techMul('quarry')+bn.prod-1)*k};
   case 'ironmine':return {iron:0.6*um*RICH[richAt(b.x,b.y)]*(techMul('ironmine')+bn.prod-1)*k};case 'farm':return {fuel:0.8*um*(techMul('farm')+bn.prod-1)*k};
@@ -7893,7 +7893,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.14（試作版だけ）','2026-11-18',['<b>小数をなくした</b>：施設ごとの1ターンの生産と消費は整数に（伐採所 木材+10、武器工房 矢+30・木材−4・鉄−2 など）。食料・税・給金は、その日のはじめの人数で1日分を決めるので、途中で人が増えても端数が出ない','兵士の給金は「2人で1」に。税の説明から小数を外した','市場の値段は「4つ → 銀貨1」のように整数で見せる','補給は端数をためて、1つ分になったら1ずつ使う（資材が整数で減る）']],
+ ['1.14（試作版だけ）','2026-11-18',['<b>小数をなくした</b>：施設ごとの1ターンの生産と消費は整数に（伐採所 木材+10、武器工房 矢+30・木材−4・鉄−2 など）。食料・税・給金は、その日のはじめの人数で1日分を決めるので、途中で人が増えても端数が出ない','兵士の給金は「2人で1」に。税の説明から小数を外した','市場の値段は「4つ → 銀貨1」のように整数で見せる','補給は端数をためて、1つ分になったら1ずつ使う（資材が整数で減る）','<b>道具を使う施設の生産を2割増やした</b>：道具の消耗と、なくした生産の研究の分（伐採所 木材+10 → +12、農場 食料+8 → +10、武器工房 矢+30 → +36 など）','使っていない古い施設（発電所）のデータを消した']],
  ['1.13（試作版だけ）','2026-11-18',['<b>研究の作り直し（1回目）</b>：研究は「領地・防衛・部隊」の3つに。生産の%の研究（伐採技術など）・防衛の%の研究（鋼弦・強弓・壁補強・巻き上げ機など）・剣術・弓術・精鋭・改築の研究はなくした','<b>城のランクで開く</b>：炭鉱・金鉱・精錬所・聖銀鉱・エーテル採掘所・石の壁・城壁・魔金属の壁・龍鱗の壁・投石機、施設のアップグレード、兵士の装備は、研究しなくても城のランクが上がると使える。城のランクが上がったときに、使えるようになったものをアイコン付きで並べる','<b>生産施設は「道具」</b>：施設を選んで道具を替える（石→鉄→鋼→合金→魔金属→聖銀）。すぐ終わる。道具は毎ターン少しずつ減る（石の道具は木材1、鉄の道具は鉄1…）。足りないとその施設の生産が半分','<b>アップグレード</b>：「改築」は「アップグレード」に。領地の施設・門・壁はすぐ終わる。防衛施設はターンがかかる。%の研究をなくしたぶん、防衛施設のアップグレードの伸びを大きく','<b>兵士の装備</b>：部隊を選んで武器と防具を替える。上の段に替えるときは資材を払う（一度買った段までは自由に替えられる）。もっとよい装備に替えられる部隊は、軍事のタブで「↑」','<b>熟練度をなくした</b>','<b>改造</b>：「貫く矢」（バリスタの矢が後ろの2体まで貫く）・「割れる岩」（投石機の岩が割れて破片が飛ぶ）','<b>相性</b>：騎兵・チャリオットは大型の魔物に、ハープーンランチャーは竜型の魔物に2倍。狙撃兵の「大きな魔物に1.6倍」は外した']],
  ['1.12.1（試作版だけ）','',['研究の見直し：投石機・火薬の不自然な前提を外した。古い説明（師団・延長シフト・火薬工房・野戦補給・甲殻補強）を直した','<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
  ['1.12.1','2026-11-17',['不具合の修正：建て終わった施設の耐久が減ったままになっていた（前の版で建てた施設も、読み込んだときに満タンに戻す）','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）']],
