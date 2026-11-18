@@ -74,6 +74,8 @@ d['tabs']=['N領地','N防衛','N部隊','生産','内政','防衛','部隊','�
 d['TABL']={'N領地':'領地','N防衛':'防衛','N部隊':'部隊','生産':'前：生産','内政':'前：内政','防衛':'前：防衛','部隊':'前：部隊','魔核':'前：魔核'}
 used={t['ic'] for t in d['T'] if t.get('ic')}|{k for k in IC if k.startswith('r.')}
 d['IC']={k:IC[k] for k in used if k in IC}
+import os
+if os.path.exists('fix.json'):d['FIX']=json.load(open('fix.json'))   # 前の並び（作り直してもずれないように）
 json.dump(d,open('data.json','w'),ensure_ascii=False)
 from collections import Counter
 for c in ['N領地','N防衛','N部隊']:

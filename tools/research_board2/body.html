@@ -62,6 +62,10 @@ function layout(L,E){const ids=new Set(L.map(t=>t.id));const kids={},hasPar=new 
     for(const c of ks){const same=Math.max(c.r,col)===col;if(!first||same)r=next;place(c,r,col);first=false;}next=Math.max(next,row+1);}
   for(const t of roots)place(t,next,0);
   for(const t of L)if(!pos[t.id]){pos[t.id]={row:next++,col:t.r};}
+  // 前の並び（FIX）があるカードはそこに置く。新しいカードは空いているマスへ（作り直しても並びがずれないように）
+  {const F=D.FIX||{};const fx=new Set();for(const t of L){const f=F[t.id];if(f&&f.cat===tab){pos[t.id]={row:f.row,col:f.col};fx.add(t.id);}}
+   const occ=new Set();for(const t of L)if(fx.has(t.id))occ.add(pos[t.id].col+':'+pos[t.id].row);
+   for(const t of L){if(fx.has(t.id))continue;const p=pos[t.id];while(occ.has(p.col+':'+p.row))p.row++;occ.add(p.col+':'+p.row);}}
   // 動かしていないカードは動かない。動かしたカードは、空いているマスに置く
   const used=new Set();for(const t of L)if(!(posO[t.id]&&posO[t.id].cat===tab))used.add(pos[t.id].col+':'+pos[t.id].row);
   for(const t of L){const o=posO[t.id];if(!(o&&o.cat===tab))continue;let r=o.row;while(used.has(o.col+':'+r))r++;pos[t.id]={row:r,col:o.col,moved:true};used.add(o.col+':'+r);}
