@@ -1750,7 +1750,12 @@ function happyParts(){
   for(const m of (S.moods||[]))P.push([`${m.n}（あと${m.d}日）`,m.v]);
   return P;
 }
-function wages(){let w=S.cmds.length*3;for(const s of S.squads)w+=MT(s).wage!=null?MT(s).wage:s.members*0.5;return w;}
+function wages(){let w=S.cmds.length*3;for(const s of S.squads)w+=MT(s).wage!=null?MT(s).wage:IS_PROTO?Math.ceil(s.members*0.5):s.members*0.5;return w;}
+/* 試作（2026-11-18）：1ターンあたりの生産・消費は整数（小数をなくす） */
+function IR(v){return IS_PROTO?Math.round(v):v;}
+function dayFlow(tot){if(!IS_PROTO)return {food:foodTurn(tot),tax:taxTurn(tot),wage:wages()};if(!S.ft||S.ft.turn!==S.turn)S.ft={turn:S.turn,food:foodTurn(tot),tax:taxTurn(tot),wage:wages()};return S.ft;}   /* 試作：食料・税・給金は、その日のはじめの人数で1日分を決める（途中で人が増えても端数が出ない） */
+function foodTurn(tot){return IR(tot*FOOD_PER*foodMul()*TURN_SEC);}
+function taxTurn(tot){return IR(tot*TAX[S.tax].g)+HQ_GOLD;}
 const TRADE=[['steel',1.5],['stone',2],['iron',3],['fuel',1.5]];
 // 資材の売り買いは銀貨（S.silver）。資材を売ると銀貨が入り、資材は銀貨で買う。1日に買える量にも上限
 function buyLimit(){const n=S.blds.filter(b=>b.type==='market'&&!(b.bt>0)).length;return 100+60*Math.max(0,n-1);}
@@ -2048,6 +2053,7 @@ const TOOL_MUL=[1,1.8,2.8,3.4,4.0,4.6];   /* 道具の段ごとの産出（石�
 const TOOL_WEAR=[{steel:1},{iron:1},{iron:1,coal:1},{alloy:1},{mmetal:1},{mithril:1}];   /* 毎ターン1施設あたり使う資材 */
 const TOOL_COST=[null,{iron:10},{iron:15,coal:10},{alloy:12},{mmetal:10},{mithril:8}];   /* その段の道具に替えるとき */
 if(IS_PROTO)for(const k in TOOL){if(!KC[k]||!B[k])continue;const s0=KC[k].st[0][0],bn=B[k].name;KC[k].st=TOOL_T.map(([r,m],i)=>[Math.max(r,s0),i===0?bn:`${bn}（${m}の${TOOL[k]}）`]);}
+const FLOW_T=new Set(['miner','quarry','ironmine','farm','fishery','well','market','ammo','coalmine','goldmine','mithmine','smelter','powder','tavern']);   /* 試作：1ターンの出入りを prodOf でまとめて扱う施設 */
 function isTool(b){return IS_PROTO&&!!TOOL[b.type];}
 function upProd(b){return isTool(b)?TOOL_MUL[Math.min(TOOL_MUL.length,b.lv||1)-1]*(b.worn?0.5:1):UP.prod[(b.lv||1)-1];}
 function upgNow(b){return IS_PROTO&&(B[b.type].grp!=='def'||b.type==='gate');}   /* 領地の施設と門はアップグレードがすぐ終わる */
@@ -3850,7 +3856,7 @@ function resTxt(o,big){return Object.entries(o).filter(([k,v])=>v).map(([k,v])=>
 function useRes(src,k,v,b){S[k]-=v;if(!S.waveActive||!(v>0))return;const L=S.wled||(S.wled={});const o=L[src]||(L[src]={});o[k]=(o[k]||0)+v;if(b){const u=b.wuse||(b.wuse={});u[k]=(u[k]||0)+v;}}
 function supCosts(sp){return sp.costs||{[sp.key]:sp.per};}
 function supAvail(sp){let m=1e9;const c=supCosts(sp);for(const k in c)m=Math.min(m,(S[k]||0)/c[k]);return m;}
-function supPay(sp,n,src){const c=supCosts(sp);for(const k in c)useRes(src,k,n*c[k]);}
+function supPay(sp,n,src){const c=supCosts(sp);if(IS_PROTO){const C=S._sc=S._sc||{};for(const k in c){const t=(C[k]||0)+n*c[k],w=Math.floor(t+1e-9);if(w>0)useRes(src,k,w);C[k]=t-w;}return;}for(const k in c)useRes(src,k,n*c[k]);}   /* 試作：補給は端数をためて、1つ分になったら1ずつ使う（資材が整数で減る） */
 function wledHTML(){const L=S.wled||{};const rows=Object.entries(L).map(([src,o])=>[src,o,Object.values(o).reduce((a,v)=>a+v,0)]).sort((a,b)=>b[2]-a[2]);if(!rows.length)return '';
   const tot={};for(const [,o] of rows)for(const k in o)tot[k]=(tot[k]||0)+o[k];
   return `<div style="margin-top:8px"><b>消費</b> <span style="margin-left:6px">${resTxt(Object.fromEntries(Object.entries(tot).map(([k,v])=>[k,-v])))}</span></div><div style="font-size:11.5px;margin-top:2px">`+rows.map(([src,o])=>`<div class="row" style="padding:1px 0"><span class="muted">${src}</span><span>${resTxt(Object.fromEntries(Object.entries(o).map(([k,v])=>[k,-v])))}</span></div>`).join('')+`</div>`;}
@@ -4754,8 +4760,8 @@ function update(dt,sim){
   S.popCap=popCapOf();const tot=popTotal();
   // 夜は住民が避難：生産・税・食料・人口の増加はすべて止まる（昼のターンでだけ進む）
   const NIGHT=(S.waveActive||DAYF)&&!sim;
-  if(!NIGHT){S.fuel-=tot*FOOD_PER*foodMul()*dt;if(S.fuel<0)S.fuel=0;S.hungry=S.fuel<=0;
-  S.gold+=(tot*TAX[S.tax].g+HQ_GOLD)/TURN_SEC*dt-wages()/TURN_SEC*dt;if(S.gold<0){S.gold=0;S.unpaid=true;}else S.unpaid=false;
+  if(!NIGHT){const FT=dayFlow(tot);S.fuel-=FT.food/TURN_SEC*dt;if(S.fuel<0)S.fuel=0;S.hungry=S.fuel<=0;
+  S.gold+=FT.tax/TURN_SEC*dt-FT.wage/TURN_SEC*dt;if(S.gold<0){S.gold=0;S.unpaid=true;}else S.unpaid=false;
   S.happy+=(happyTarget()-S.happy)*Math.min(1,0.02*dt);}
   if(!NIGHT&&barr.length&&tot<S.popCap&&!S.hungry&&S.happy>=35){
     let rate=0;for(const b of barr)rate+=bonus(b).prod*(b.type==='apart'?5/3:1);
@@ -4787,6 +4793,8 @@ function update(dt,sim){
       for(const o of S.blds){if(o===b||Math.abs(o.x-b.x)>2||Math.abs(o.y-b.y)>2)continue;if(CWALL.has(o.type)&&o.hp<o.maxhp)o.hp=Math.min(o.maxhp,o.hp+bn.regen*0.5*dt);if(o.wall&&o.wall.hp<o.wall.maxhp)o.wall.hp=Math.min(o.wall.maxhp,o.wall.hp+bn.regen*0.5*dt);}
     }
     if((b.dep&&YIELD[b.type])||(NIGHT&&NIGHT_STOP.has(b.type))||b.off){}
+    else if(IS_PROTO&&FLOW_T.has(b.type)){const f=prodOf(b);if(f){const sl=dt/TURN_SEC;let ok=true;for(const x in f)if(f[x]<0&&(S[x]||0)<-f[x]*sl)ok=false;   /* 試作：1ターンの出入り（整数）を時間で割って足す */
+      if(ok){const MD=S.made=S.made||{};for(const x in f){const v=f[x]*sl;S[x]=(S[x]||0)+v;if(v>0){if(x in S.gross)S.gross[x]+=v;if(b.type==='ammo')MD[x]=(MD[x]||0)+v;if(YIELD[b.type]===x)depleteTick(b,v);}}b.starved=false;tickProdXp(b,dt);}else b.starved=true;}}
     else if(b.type==='miner'){const v=1.0*um*(b.ym||1)*(techMul('miner')+bn.prod-1)*dt;S.steel+=v;S.gross.steel+=v;depleteTick(b,v);tickProdXp(b,dt);}
     else if(b.type==='quarry'){const v=0.6*um*(b.ym||1)*(techMul('quarry')+bn.prod-1)*dt;S.stone+=v;depleteTick(b,v);tickProdXp(b,dt);}
     else if(b.type==='fishery'){S.fuel+=1.0*um*(techMul('fishery')+bn.prod-1)*dt;tickProdXp(b,dt);}
@@ -5532,6 +5540,10 @@ function econ(){
   let powP=0,steelPow=0,steelP=0,stoneP=0,ironP=0,fuelP=0,ammoP=0,steelAmmo=0,ironAmmo=0,elecP=0,pop=0,goldP=0,tavernUse=0,swordP=0;
   for(const b of S.blds){
     if(b.bt>0||(b.dep&&YIELD[b.type])||b.off)continue;r.cnt[b.type]=(r.cnt[b.type]||0)+1;
+    if(IS_PROTO&&FLOW_T.has(b.type)){const f=prodOf(b)||{};const g=x=>f[x]||0;   /* 試作：施設ごとの1ターンの出入り（整数）を足す */
+      switch(b.type){case 'miner':steelP+=g('steel');break;case 'quarry':stoneP+=g('stone');break;case 'ironmine':ironP+=g('iron');break;case 'farm':case 'fishery':fuelP+=g('fuel');break;case 'well':elecP+=g('elec');break;case 'market':goldP+=g('gold');break;case 'tavern':tavernUse+=-g('fuel');break;
+        case 'ammo':ammoP+=g('ammo');swordP+=g('sword');steelAmmo+=-g('steel');ironAmmo+=-g('iron');break;case 'powder':powP+=g('powder');steelPow+=-g('steel');break;}
+      continue;}
     const bn=bonus(b),um=upProd(b)*eff(b)*happyMul(),k=TURN_SEC;
     if(b.type==='miner')steelP+=1.0*um*(b.ym||1)*(techMul('miner')+bn.prod-1)*k;
     if(b.type==='fishery')fuelP+=1.0*um*(techMul('fishery')+bn.prod-1)*k;
@@ -5550,9 +5562,9 @@ function econ(){
   const Hh=S.waveActive?1:Math.max(1,S.turnsLeft);
   const fk=Math.min(1,(ironP+S.iron/Hh)/Math.max(0.001,ironAmmo));
   ammoP*=fk;swordP*=fk;steelAmmo*=fk;ironAmmo*=fk;r.fk=fk;
-  const foodUse=popTotal()*FOOD_PER*foodMul()*TURN_SEC+tavernUse;const taxP=popTotal()*TAX[S.tax].g+HQ_GOLD;
+  const FT0=IS_PROTO&&S.ft&&S.ft.turn===S.turn&&!S.waveActive?S.ft:null;const foodUse=(FT0?FT0.food:foodTurn(popTotal()))+tavernUse;const taxP=FT0?FT0.tax:taxTurn(popTotal());
   r.raw={steelP,stoneP,ironP,fuelP,elecP,ammoP,steelAmmo,ironAmmo,foodUse,goldP,taxP,swordP,powP,steelPow};
-  r.net={gold:goldP+taxP-wages(),sword:swordP,steel:steelP-steelAmmo-steelPow,powder:powP,stone:stoneP,iron:ironP-ironAmmo,fuel:fuelP-foodUse,ammo:ammoP,elec:elecP,pop:S.fuel<=0&&fuelP<foodUse?0:Math.min(pop,Math.max(0,S.popCap-popTotal()))};
+  r.net={gold:goldP+taxP-(FT0?FT0.wage:wages()),sword:swordP,steel:steelP-steelAmmo-steelPow,powder:powP,stone:stoneP,iron:ironP-ironAmmo,fuel:fuelP-foodUse,ammo:ammoP,elec:elecP,pop:S.fuel<=0&&fuelP<foodUse?0:Math.min(pop,Math.max(0,S.popCap-popTotal()))};
   r.gross={gold:goldP+taxP,steel:steelP,stone:stoneP,iron:ironP,fuel:fuelP,ammo:ammoP,sword:swordP,elec:elecP,powder:powP};   /* 生産だけの量（使う分を引く前）。街の記録で使う */
   r.ammo=ammoP;r.ammoF=r.cnt.ammo||0;r.pop=r.net.pop;S._econ=r;
   return r;
@@ -5637,7 +5649,7 @@ function renderEcon(){
   const row=(k,detail)=>{const d=n[k];const t=runOut(k,e);const cls=d<0?(t<=Math.max(1,S.turnsLeft)?'bd':'wn'):d>0?'gd':'muted';
     return `<div class="rrow" title="${detail}">${ic(k)}<span class="muted">${RES_NAME[k]}</span><b>${Math.floor(S[k])}</b><span class="${cls}">${sg(d)}/T${t<99?` <span style="font-size:10px">（あと${Math.floor(t)}T）</span>`:''}</span></div>`+brk(k);};
   let h='';
-  h+=row('gold',`税 +${Math.round(R.taxP)}（住民${popTotal()}人×${TAX[S.tax].g}）／市場 +${Math.round(R.goldP)}／給金 −${Math.round(wages())}（兵士1人0.5・英雄5・冒険者8〜12）`);
+  h+=row('gold',IS_PROTO?`税 +${Math.round(R.taxP)}（住民${popTotal()}人・城${HQ_GOLD}）／市場 +${Math.round(R.goldP)}／給金 −${Math.round(wages())}（兵士2人で1・英雄3・冒険者8〜12）`:`税 +${Math.round(R.taxP)}（住民${popTotal()}人×${TAX[S.tax].g}）／市場 +${Math.round(R.goldP)}／給金 −${Math.round(wages())}（兵士1人0.5・英雄5・冒険者8〜12）`);
   h+=row('steel',`伐採所${c.miner||0}棟 +${Math.round(R.steelP)}／武器工房 −${Math.round(R.steelAmmo)}`);
   h+=row('stone',`石切り場${c.quarry||0}棟 +${Math.round(R.stoneP)}（壁・投石機の弾・改修）`);
   h+=row('fuel',`農場${c.farm||0}棟 +${Math.round(R.fuelP)}／住民の食事 −${Math.round(R.foodUse)}`);
@@ -6694,7 +6706,8 @@ function resFrac(b){const m=resMax(b);return m?Math.max(0,Math.min(1,b.res/m)):0
 function resRowHTML(b){const f=resFrac(b);return `<div><b class="muted">埋蔵</b><span class="rbar${f<0.25?' lo':''}"><i style="width:${(f*100).toFixed(1)}%"></i></span><span class="${b.dep?'bd':f<0.25?'wn':'muted'}">${b.dep?'枯渇':`残り ${Math.floor(b.res)}（${Math.round(f*100)}%）`}</span></div>`;}
 // 地図の埋蔵量バー：耐久が満タンのときだけ、耐久バーの場所に出す（襲撃中は出さない）
 function drawResBar(b,x,y,w,h){if(S.waveActive||b.res==null||b.res===Infinity||b.dep||b.hp<b.maxhp-0.5)return;const f=resFrac(b);ctx.fillStyle='#2a2218';ctx.fillRect(x,y,w,h);ctx.fillStyle=f<0.25?'#ff6e5a':'#d8a85a';ctx.fillRect(x,y,w*f,h);}
-function prodOf(b){const k=TURN_SEC,bn=bonus(b),um=upProd(b)*eff(b)*happyMul();if(b.bt>0||b.dep||b.off)return null;
+function prodOf(b){const f=prodOf0(b);if(!f||!IS_PROTO)return f;const o={};for(const x in f)o[x]=Math.round(f[x]);return o;}   /* 試作：1ターンあたり整数 */
+function prodOf0(b){const k=TURN_SEC,bn=bonus(b),um=upProd(b)*eff(b)*happyMul();if(b.bt>0||b.dep||b.off)return null;
   switch(b.type){case 'miner':return {steel:1.0*um*(b.ym||1)*(techMul('miner')+bn.prod-1)*k};case 'quarry':return {stone:0.6*um*(b.ym||1)*(techMul('quarry')+bn.prod-1)*k};
   case 'ironmine':return {iron:0.6*um*RICH[richAt(b.x,b.y)]*(techMul('ironmine')+bn.prod-1)*k};case 'farm':return {fuel:0.8*um*(techMul('farm')+bn.prod-1)*k};
   case 'fishery':return {fuel:1.0*um*(techMul('fishery')+bn.prod-1)*k};case 'well':return {elec:0.5*um*RICH[richAt(b.x,b.y)]*bn.prod*k};   /* エーテル 3→5/T（2026-11-13・ランクⅣで足りなかった） */case 'market':return {gold:0.6*um*bn.prod*k};
@@ -6997,6 +7010,7 @@ function fxHTML(L,base){return L.map(([k,v])=>{const b0=base&&base.find(x=>x[0]=
 function hcdText(c){const k=heroSkills(c).find(q=>q.cd);if(!k)return '';const left=(c.cdk&&c.cdk[k.id])||0;if(c.fired&&nowS()-c.fired<1.2)return '発動！';return left>0.05?`あと${Math.ceil(left)}秒`:'準備完了';}
 // 交易の品と値段（1つあたり）。売る：資材→銀貨（買う値の1/4）、魔核→金貨。買う：銀貨→資材
 function mktItems(md){const L=TRADE.map(([k,bp])=>({k,rate:md==='sell'?bp*0.25:bp,pay:'silver'}));if(md==='sell')L.push({k:'mat',rate:matPrice(),pay:'gold'});return L;}
+function mktN(r){if(Number.isInteger(r))return 1;for(let n=2;n<=20;n++)if(Math.abs(n*r-Math.round(n*r))<0.001)return n;return Math.max(1,Math.ceil(1/r));}   /* 値段を整数で見せる：「4つ → 銀貨1」 */
 function mktMax(md,it){if(md==='sell')return Math.max(0,Math.floor(S[it.k]||0));return Math.max(0,Math.min(buyLeft(it.k),Math.floor((S.silver||0)/it.rate)));}
 function mktVal(md,it,n){return md==='sell'?Math.floor(n*it.rate):Math.ceil(n*it.rate);}
 function fmtRate(r){return Number.isInteger(r)?String(r):r.toFixed(r<1?3:2).replace(/0+$/,'').replace(/\.$/,'');}
@@ -7023,7 +7037,7 @@ function marketHTML(o){let h='';
    h+=`<div class="upg"><b>交易</b><span class="muted" style="font-size:11px">資材は銀貨で売り買い・魔核は金貨で売る・1日に各${buyLimit()}まで買える</span>
      <div class="mkt"><div class="mkm"><button data-mkm="sell" class="${md==='sell'?'on':''}">売る</button><button data-mkm="buy" class="${md==='buy'?'on':''}">買う</button></div>
      <div class="mkr">${L.map(x=>`<button data-mkr="${x.k}" class="${x.k===it.k?'on':''}">${ic(x.k,14)}${RES_NAME[x.k]}</button>`).join('')}</div>
-     <div class="mkrate muted">${md==='sell'?`${RES_NAME[it.k]} 1つ → ${ic(it.pay,10)}${RES_NAME[it.pay]} ${fmtRate(it.rate)}`:`${RES_NAME[it.k]} 1つ ← ${ic('silver',10)}銀貨 ${fmtRate(it.rate)}`}${md==='buy'?`　今日あと ${buyLeft(it.k)}`:''}</div>
+     <div class="mkrate muted">${md==='sell'?`${RES_NAME[it.k]} ${mktN(it.rate)}つ → ${ic(it.pay,10)}${RES_NAME[it.pay]} ${Math.round(mktN(it.rate)*it.rate)}`:`${RES_NAME[it.k]} ${mktN(it.rate)}つ ← ${ic('silver',10)}銀貨 ${Math.round(mktN(it.rate)*it.rate)}`}${md==='buy'?`　今日あと ${buyLeft(it.k)}`:''}</div>
      <div class="mks"><button data-mka="-10" title="−10">«</button><button data-mka="-1" title="−1">‹</button><input type="range" id="mkN" min="0" max="${mx}" step="1" value="${n}" ${mx?'':'disabled'}><button data-mka="1" title="+1">›</button><button data-mka="10" title="+10">»</button></div>
      <div class="mksum" id="mkSum">${mktSum(md,it,n)}</div>
      <button id="mkGo" class="primary wide" ${n>0?'':'disabled'}>${md==='sell'?'売る':'買う'}</button></div></div>`;}
@@ -7766,7 +7780,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.13 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.14 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7879,6 +7893,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.14（試作版だけ）','2026-11-18',['<b>小数をなくした</b>：施設ごとの1ターンの生産と消費は整数に（伐採所 木材+10、武器工房 矢+30・木材−4・鉄−2 など）。食料・税・給金は、その日のはじめの人数で1日分を決めるので、途中で人が増えても端数が出ない','兵士の給金は「2人で1」に。税の説明から小数を外した','市場の値段は「4つ → 銀貨1」のように整数で見せる','補給は端数をためて、1つ分になったら1ずつ使う（資材が整数で減る）']],
  ['1.13（試作版だけ）','2026-11-18',['<b>研究の作り直し（1回目）</b>：研究は「領地・防衛・部隊」の3つに。生産の%の研究（伐採技術など）・防衛の%の研究（鋼弦・強弓・壁補強・巻き上げ機など）・剣術・弓術・精鋭・改築の研究はなくした','<b>城のランクで開く</b>：炭鉱・金鉱・精錬所・聖銀鉱・エーテル採掘所・石の壁・城壁・魔金属の壁・龍鱗の壁・投石機、施設のアップグレード、兵士の装備は、研究しなくても城のランクが上がると使える。城のランクが上がったときに、使えるようになったものをアイコン付きで並べる','<b>生産施設は「道具」</b>：施設を選んで道具を替える（石→鉄→鋼→合金→魔金属→聖銀）。すぐ終わる。道具は毎ターン少しずつ減る（石の道具は木材1、鉄の道具は鉄1…）。足りないとその施設の生産が半分','<b>アップグレード</b>：「改築」は「アップグレード」に。領地の施設・門・壁はすぐ終わる。防衛施設はターンがかかる。%の研究をなくしたぶん、防衛施設のアップグレードの伸びを大きく','<b>兵士の装備</b>：部隊を選んで武器と防具を替える。上の段に替えるときは資材を払う（一度買った段までは自由に替えられる）。もっとよい装備に替えられる部隊は、軍事のタブで「↑」','<b>熟練度をなくした</b>','<b>改造</b>：「貫く矢」（バリスタの矢が後ろの2体まで貫く）・「割れる岩」（投石機の岩が割れて破片が飛ぶ）','<b>相性</b>：騎兵・チャリオットは大型の魔物に、ハープーンランチャーは竜型の魔物に2倍。狙撃兵の「大きな魔物に1.6倍」は外した']],
  ['1.12.1（試作版だけ）','',['研究の見直し：投石機・火薬の不自然な前提を外した。古い説明（師団・延長シフト・火薬工房・野戦補給・甲殻補強）を直した','<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
  ['1.12.1','2026-11-17',['不具合の修正：建て終わった施設の耐久が減ったままになっていた（前の版で建てた施設も、読み込んだときに満タンに戻す）','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）']],
