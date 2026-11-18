@@ -3799,18 +3799,19 @@ function setHTML(el,v){if(el&&el.dataset.h!==v){el.dataset.h=v;el.innerHTML=v;}}
 // ===== 英雄 =====
 function usedNames(){const u=new Set(S?S.cmds.concat(S.fallen,S.cands).map(c=>c.name):[]);if(IS_PROTO)for(const sp in HERO_ROSTER)for(const r of HERO_ROSTER[sp])u.add(r[1]);return u;}   /* 試作：名簿の英雄の名前はほかの英雄に使わない */
 /* 試作（2026-11-18）：戦いの英雄は、兵科ごとに見た目の違う3人ずつの名簿から出る。同じ英雄は2人出ない（雇っている・候補に出ている英雄は出さない）。2人目・3人目の絵（h_inf_2 など）ができるまでは兵科の絵 */
-const HERO_ROSTER={'歩兵':[['inf1','アルト・ヴァルト','h_inf'],['inf2','レオン・ブラント','h_inf_2'],['inf3','オルガ・ハーゲン','h_inf_3']],
- '弓兵':[['arch1','リーネ・グレイ','h_arch'],['arch2','カイル・ノルド','h_arch_2'],['arch3','シエラ・リンド','h_arch_3']],
- '騎兵':[['cav1','ガレス・ケスラー','h_cav'],['cav2','フィーナ・ベルク','h_cav_2'],['cav3','ジーク・ハイム','h_cav_3']],
- '魔導':[['mage1','ミラ・ローレン','h_mage'],['mage2','ユーリ・ヴェイン','h_mage_2'],['mage3','エリス・ザイン','h_mage_3']],
- '竜騎':[['drake1','ヴォルフ・アッシュ','h_drake'],['drake2','イリア・クレイ','h_drake_2'],['drake3','ダリオ・オスト','h_drake_3']]};
+const HERO_ROSTER={'歩兵':[['inf1','アルト','h_inf'],['inf2','レオン','h_inf_2'],['inf3','オルガ','h_inf_3']],
+ '弓兵':[['arch1','リーネ','h_arch'],['arch2','カイル','h_arch_2'],['arch3','シエラ','h_arch_3']],
+ '騎兵':[['cav1','ガレス','h_cav'],['cav2','フィーナ','h_cav_2'],['cav3','ジーク','h_cav_3']],
+ '魔導':[['mage1','ミラ','h_mage'],['mage2','ユーリ','h_mage_2'],['mage3','エリス','h_mage_3']],
+ '竜騎':[['drake1','ヴォルフ','h_drake'],['drake2','イリア','h_drake_2'],['drake3','ダリオ','h_drake_3']]};
 function rosterFree(spec){const R=IS_PROTO&&HERO_ROSTER[spec];if(!R)return null;const used=new Set([...(S.cmds||[]),...(S.cands||[])].map(c=>c.hid).filter(Boolean));return R.filter(r=>!used.has(r[0]));}
 function makeCmd(spec,lv){const c=withSkill(makeCmd0(spec,lv));const F=rosterFree(c.spec);if(F&&F.length){const r=F[Math.floor(Math.random()*F.length)];c.hid=r[0];c.name=r[1];c.art=r[2];}return c;}
 function withSkill(c){heroSkills(c);return c;}
+const GIVEN2=GIVEN.concat(['ロウェナ','バルド','エミル','ティナ','グラン','セリオ','ニーナ','ラウル','カミラ','オスカー','ヘレナ','ルーファス','イザベル','マルコ','ソフィア','ギルバート','リディア','トマス','ノエル','ベアトリス']);
 function makeCmd0(spec,lv){
   spec=spec||Object.keys(SPECS)[Math.floor(Math.random()*Object.keys(SPECS).length)];
   let name;const used=usedNames();
-  for(let i=0;i<60;i++){name=GIVEN[Math.floor(Math.random()*GIVEN.length)]+'・'+SURN[Math.floor(Math.random()*SURN.length)];if(!used.has(name))break;}
+  for(let i=0;i<60;i++){name=IS_PROTO?GIVEN2[Math.floor(Math.random()*GIVEN2.length)]:GIVEN[Math.floor(Math.random()*GIVEN.length)]+'・'+SURN[Math.floor(Math.random()*SURN.length)];if(!used.has(name))break;}   /* 試作：英雄は名前だけ（2026-11-18） */
   const tr=TRAITS[Math.floor(Math.random()*TRAITS.length)];
   const c={id:Math.random().toString(36).slice(2),name,spec,lv:1,xp:0,
     atk:2+Math.floor(Math.random()*3),def:2+Math.floor(Math.random()*3),tec:2+Math.floor(Math.random()*3),
