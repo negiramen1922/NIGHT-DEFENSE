@@ -64,9 +64,11 @@ for tid,src in REL.items():
   if c and src and src in byid and src not in c['pre'] and byid[src]['cat']==c['cat']:c['pre']=[src]+c['pre']
 for c in cards:
   if c['id'].startswith('g_tool_'):c['top']=1
-# 大きな生産施設（案）
-for id,r,n,src,e in [('big_farm',3,'大農場','b_farm','農場の大きい版（案）'),('big_miner',3,'大伐採所','b_miner','伐採所の大きい版（案）'),('big_mine',4,'大採掘場','b_quarry','石切り場・鉱山の大きい版（案）'),('big_fish',3,'養殖場','b_fishery','漁場の大きい版（案）')]:
-  N('a_'+id,'N領地',r,n,'案',e,[src] if src in byid else [],src[2:]+'.1')
+# 大きな生産施設は研究のカード（t_big*）で出るので案は消した
+for k,src in [('t_bigfarm','b_farm'),('t_bigminer','b_miner'),('t_bigquarry','b_quarry'),('t_bigfish','b_fishery')]:
+  c=byid.get('g_'+k)
+  if c and src in byid and src not in c['pre']:c['pre']=[src]+c['pre']
+
 d['T']+=cards
 d['tabs']=['N領地','N防衛','N部隊','生産','内政','防衛','部隊','魔核']
 d['TABL']={'N領地':'領地','N防衛':'防衛','N部隊':'部隊','生産':'前：生産','内政':'前：内政','防衛':'前：防衛','部隊':'前：部隊','魔核':'前：魔核'}
