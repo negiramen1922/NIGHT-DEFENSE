@@ -29,6 +29,7 @@ for x in D['rb']:
 # KC stage chains
 TT=D['TOOL_T']
 for k,v in D['kc'].items():
+  if k.startswith('big'):continue   # 大きな施設の道具の段は小さい施設と同じなので、カードは出さない（線が遠くへ伸びて見づらいため）
   st=v['st'];base='b_'+k
   if base not in ids:
     t=techOfB.get(k)
@@ -65,6 +66,8 @@ for tid,src in REL.items():
 for c in cards:
   if c['id'].startswith('g_tool_'):c['top']=1
 # 大きな生産施設は研究のカード（t_big*）で出るので案は消した
+for c in cards:
+  if c['id'].startswith('g_t_big'):c['e']+='（道具は小さい施設と同じ段を使う）'
 for k,src in [('t_bigfarm','b_farm'),('t_bigminer','b_miner'),('t_bigquarry','b_quarry'),('t_bigfish','b_fishery')]:
   c=byid.get('g_'+k)
   if c and src in byid and src not in c['pre']:c['pre']=[src]+c['pre']
