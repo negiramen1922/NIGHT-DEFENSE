@@ -2051,6 +2051,7 @@ const TOOL_T=[[1,'石'],[2,'鉄'],[3,'鋼'],[4,'合金'],[5,'魔金属'],[6,'聖
 const TOOL_MUL=[1,1.8,2.8,3.4,4.0,4.6];   /* 道具の段ごとの産出（石を1として） */
 const TOOL_WEAR=[{steel:1},{iron:1},{iron:1,coal:1},{alloy:1},{mmetal:1},{mithril:1}];   /* 毎ターン1施設あたり使う資材 */
 const TOOL_COST=[null,{iron:10},{iron:15,coal:10},{alloy:12},{mmetal:10},{mithril:8}];   /* その段の道具に替えるとき */
+if(IS_PROTO&&KC.barracks)KC.barracks.st=KC.barracks.st.filter(x=>x[1]!=='集合住宅');   /* 試作：集合住宅は研究で建てる新しい建物（住居の段にはしない） */
 if(IS_PROTO)for(const k in TOOL){if(!KC[k]||!B[k])continue;const s0=KC[k].st[0][0],bn=B[k].name;KC[k].st=TOOL_T.map(([r,m],i)=>[Math.max(r,s0),i===0?bn:`${bn}（${m}の${TOOL[k]}）`]);}
 const FLOW_T=new Set(['miner','quarry','ironmine','farm','fishery','well','market','ammo','coalmine','goldmine','mithmine','smelter','powder','tavern']);   /* 試作：1ターンの出入りを prodOf でまとめて扱う施設 */
 function isTool(b){return IS_PROTO&&!!TOOL[b.type];}
@@ -2376,7 +2377,7 @@ if(IS_PROTO){const T=id=>TECH.find(t=>t.id===id),del=id=>{const i=TECH.findIndex
  for(const id of ['coalt','aethert','goldt','smeltt','mitht','masonry','castle','mwall','dragwall'])if(T(id))RANK_OPEN[id]=T(id).tier||1;
  Object.assign(RANK_OPEN,{catapult:1,spikes:1,ironarmor:1,heavyarms:2,steelarmor:2,chainmail:2,alloyarms:3,alloyarmor:3,eqw_3:5,eqw_4:6,eqa_4:5,eqa_5:6,eqr_2:4,eqr_3:6,eqm_1:4,eqm_2:5,eqm_3:6});
  /* やめる研究：%の研究・改築の研究（まとめ）・城のランクで開くもの */
- const drop=[...Object.keys(RANK_OPEN),'mine','quarrying','farming','fishing','smelt','autoammo','craft','housing','kougen','goukyu','autoload','wallplus','fcs','tetsudan','pitch','swordplay','archery','elite','trade','scouting','carapace','bonepick','boneaxe','bonehoe','abysslamp',...TECH.filter(t=>/^kc_/.test(t.id)).map(t=>t.id)];
+ const drop=[...Object.keys(RANK_OPEN),'mine','quarrying','farming','fishing','smelt','autoammo','craft','housing','kougen','goukyu','autoload','wallplus','fcs','tetsudan','pitch','swordplay','archery','elite','trade','scouting','carapace','bonepick','boneaxe','bonehoe','abysslamp','analysis','doctrine','armcare',...TECH.filter(t=>/^kc_/.test(t.id)).map(t=>t.id)];
  for(const id of drop)del(id);for(const k of Object.keys(RANK_OPEN))DROPPED.add(k);
  for(const t of TECH)if(t.pre)t.pre=t.pre.filter(p=>T(p));
  /* 研究の分類は「領地・防衛・部隊」の3つ。魔核の研究はほかに混ぜる */
@@ -2386,13 +2387,14 @@ if(IS_PROTO){const T=id=>TECH.find(t=>t.id===id),del=id=>{const i=TECH.findIndex
  set('heavymg',{name:'貫く矢',eff:'改造：バリスタの矢が、狙った魔物の後ろの2体まで貫く'});
  set('bighow',{name:'割れる岩',eff:'改造：投石機の岩が着弾すると割れて、まわりに破片が飛ぶ'});
  set('refine',{max:1,eff:'魔核の回収量 +50%'});
+ TECH.push({id:'kaji',cat:'領地',tier:1,name:'鍛冶の心得',t:2,cost:{steel:60,stone:30,iron:10},pre:[],icon:'ammo',eff:'鉄の道具を、城のランクⅡを待たずに使えるようになる（生産施設を選んで道具を替える）'});   /* 2026-11-18 ユーザーの指定 */
 }
 (function(){const rnd=v=>Math.max(5,Math.round(v/5)*5);
  for(const t of TECH){const ks=Object.keys(t.cost).filter(k=>k!=='pop');const sum=ks.reduce((a,k)=>a+t.cost[k],0);if(!sum)continue;
   const tr=t.tier||1;const lo=[0,30,100,200,300,420,560,720][tr],hi=[0,60,180,320,460,620,800,1000][tr];let f=1;if(sum<lo)f=(lo+hi)/2/sum*0.85;else if(sum>hi)f=hi/sum;
   if(f!==1)for(const k of ks)t.cost[k]=rnd(t.cost[k]*f);
   t.t=Math.min([0,2,3,4,5,6,6,6][tr],Math.max([0,1,2,3,4,5,5,5][tr],t.t||1));}})();
-techOf('analysis').cost={mat:10};
+if(techOf('analysis'))techOf('analysis').cost={mat:10};
 for(const t of TECH)for(const k in t.cost)t.cost[k]=Math.max(5,Math.round(t.cost[k]*0.5/5)*5);
 const CAT_COLOR={'生産':'#9be06f','内政':'#c79bff','防衛':'#f2b33d','部隊':'#d86a5a','魔核':'#c8c0b0'};
 const RES_TABS=['生産','内政','防衛','部隊','魔核'];
@@ -3500,7 +3502,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 function lackNames(c,pop){const L=[];for(const k in (c||{}))if((c[k]||0)-(S[k]||0)>0.5)L.push(RES_NAME[k]||k);if(pop&&S.pop<pop)L.push('住民');return L.length?L.join('・')+'が足りません':'';}
 function costOf(type){return B[type].cost;}
 /* 改築（2026-11-13）：施設を一段ずつ上げる（前の段が無いと次へ行けない）。段は施設ごとに違い、ランクごとの「〇〇の改築」の研究で開く */
-function maxLvOf(type){const k=KC[type];if(!k)return 1;let m=1;for(let i=1;i<k.st.length;i++){if(has(kcId(k.g,k.st[i][0])))m++;else break;}return m;}
+function maxLvOf(type){const k=KC[type];if(!k)return 1;let m=1;for(let i=1;i<k.st.length;i++){if(has(kcId(k.g,k.st[i][0]))||(i===1&&isTool({type})&&has('kaji')&&((S&&S.baseLv)||1)>=k.st[0][0]))m++;else break;}return m;}   /* 鍛冶の心得：鉄の道具はランクⅠから */
 function kcMax(type){const k=KC[type];return k?k.st.length:1;}
 function upgNeed(type,lv){const k=KC[type];return k&&k.st[lv]?kcId(k.g,k.st[lv][0]):null;}
 function kcImg(type){const im=ICIMG[type]||PXI[type];if(!im)return '';try{return im.toDataURL?im.toDataURL():im.src;}catch(e){return '';}}
@@ -3796,7 +3798,8 @@ function skillTick(dt){
 
 function cmdOf(o){const c=o.cmd?S.cmds.find(c=>c.id===o.cmd&&c.alive):null;if(c&&IS_PROTO&&c.busy&&!o.hero)return null;return c;}   /* 試作：訓練中の英雄は、そのターンは働かない */
 const NO_HERO=['fence','swall','wall','wall3','wall5','gate','bastion','brazier','market'];   // 市場は英雄の配属なし（詳細は売り買いの情報に使う）
-function canHostHero(o){return !o||o.kind==='s'||(!NO_HERO.includes(o.type)&&!(B[o.type]&&B[o.type].isMine));}
+function canHostHero(o){if(IS_PROTO){if(!o)return true;if(o.kind==='s'||o.type==='hq'||o.type==='herohouse')return false;const d=B[o.type];if(!d||d.isMine||NO_HERO.includes(o.type))return false;return d.grp==='def'||PROD_BT.includes(o.type);}   /* 試作（2026-11-18）：英雄を付けられるのは生産施設と防衛施設だけ（部隊・城・英雄の家はなし） */
+  return !o||o.kind==='s'||(!NO_HERO.includes(o.type)&&!(B[o.type]&&B[o.type].isMine));}
 function assign(c,target){
   if(IS_PROTO&&target&&unitHero(c)&&!(target.hero&&target.cmd===c.id)){toast('この英雄は1人で1部隊として戦います（部隊や施設には付けられません）','warn');return;}
   if(IS_PROTO&&target&&target.hero&&target.cmd!==c.id)return;
@@ -5787,7 +5790,7 @@ function draw(){
         if(s.lx!=null&&Math.abs(s.x-s.lx)>0.05)s.face=s.x<s.lx?-1:1;const moving=s.lx!=null&&Math.hypot(s.x-s.lx,s.y-s.ly)>0.05;s.lx=s.x;s.ly=s.y;
         const atk=nowS()-(s.atkT||-9)<0.8,fl=(s.face||1)<0;
         for(const i of ord){const [px,py]=n===1?[0,-1]:P[i];const sp=(hs&&i===0&&!one)?hs:base;
-          if(sp){const L=atk&&sp.img.attack?sp.img.attack:sp.img.walk,im=L[(atk||moving)?(Math.floor(an/(atk?0.2:0.15))+i)%L.length:0],z=one?2:1;
+          if(sp){const L=atk&&sp.img.attack?sp.img.attack:sp.img.walk,im=L[(atk||moving)?(Math.floor(an/(atk?0.2:0.15))+i)%L.length:0],z=one?2:s.hero?1.5:1;   /* 試作：英雄の部隊は少し大きく */
             ctx.save();ctx.translate(px,py-2);if(fl)ctx.scale(-1,1);ctx.drawImage(im,-im.width*z/2,-im.height*z/2,im.width*z,im.height*z);ctx.restore();}
           else{const im=sqSprite(s);ctx.drawImage(im,px-sz/2,py-sz/2-2,sz,sz);}}
         if(c){const tw=Math.sin(an*4+s.no)>0;ctx.fillStyle=SPECS[c.spec].color;const sy=one?-17:-15;ctx.fillRect(-1,sy-2,2,6);ctx.fillRect(-3,sy,6,2);if(tw){ctx.fillStyle='#fff8d0';ctx.fillRect(-1,sy,2,2);}}
@@ -7179,7 +7182,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
   lastInfoKey=key;
   const d=isS?null:B[o.type];
   let h=infoHead(o);
-  if(isS||canHostHero(o))h+=heroBlock(o);
+  if(IS_PROTO?(o.hero||canHostHero(o)):(isS||canHostHero(o)))h+=heroBlock(o);
   if(!isS&&o.type==='market'&&!(o.bt>0))h+=marketHTML(o);
   if(!isS&&gunOf(o)&&o.type!=='hq'&&!(o.bt>0&&!o.upg))h+=brkHTML('火力（1発）',dmgBaseB(o),dmgPctB(o));
   if(!isS&&!gunOf(o)&&!(o.bt>0)){const po=prodOf(o);if(po){const k=Object.keys(po).find(x=>po[x]>0&&x!=='pop');if(k){const L=prodPctB(o);const base=po[k]/(1+pctSum(L));h+=brkHTML(`生産（${RES_NAME[k]||k}）`,base,L,'/T');}}}
@@ -7830,6 +7833,7 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   for(const b of S.blds){delete b.fireT;}for(const q of S.squads||[]){delete q.atkT;}S.vfx=[];
   if(S.skirm||!S.waveActive){S.skirm=null;if(!S.waveActive)S.enemies=[];if(S.camps)for(const c of S.camps)if(c.state==='fight')c.state='idle';}for(const k in AF)delete AF[k];S.grid=Array.from({length:ROWS},()=>new Array(COLS).fill(null));
   for(const b of S.blds)gridSet(b,true);
+  if(IS_PROTO&&!S.hero2){S.hero2=1;for(const c of S.cmds){if(unitHero(c))continue;const o=c.assign?findObj(c.assign):null;if(o&&!canHostHero(o)){o.cmd=null;c.assign=null;}}}   /* 試作：部隊・城に付いていた英雄を外す */
   if(IS_PROTO&&!S.hero1){S.hero1=1;for(const c of S.cmds)if(unitHero(c)&&!heroSquad(c))spawnHero(c);}   /* 試作：前のセーブの戦いの英雄を1人で1部隊に */
   if(IS_PROTO&&!S.rsv1){S.rsv1=1;S.research=(S.research||[]).filter(r=>techOf(r.id));for(const q of S.squads||[]){if(q.wHave==null)q.wHave=wMat(q);if(q.aHave==null&&armK(q.ut))q.aHave=aMat(armK(q.ut));}}   /* 試作：研究の作り直しの前のセーブ（やめた研究は外す・今の装備はそのまま） */
   if(!S.hpFix1){S.hpFix1=1;for(const b of S.blds)if(!(b.bt>0)&&b.hp<b.maxhp)b.hp=b.maxhp;}   /* ver 1.11.1〜1.12 で建て終わった施設は耐久が減ったまま残っていたので、読み込んだとき一度だけ満タンに（2026-11-17） */
@@ -7921,7 +7925,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.15（試作版だけ）','2026-11-18',['<b>戦いの英雄は1人で1部隊</b>：歩兵・弓兵・騎兵・魔導・竜騎の英雄は、雇うと城から英雄本人の部隊として出てくる（部隊の上限には数えない）。強さはレベルで上がる。ほかの部隊や施設には付けられない。内政と守備の英雄は今までどおり施設に付ける','<b>英雄の家</b>（建設 → 領地）：英雄を雇うのに要る。1軒で3人まで（城のランクの上限もある）。絵はまだないので集合住宅の絵を借りている','<b>英雄の訓練</b>：英雄の詳しい画面の「訓練する」。食料を使って経験が入る。訓練した日は、その英雄は働かず、夜も戦わない（明日の朝まで休み）','部隊を失っても生き残った英雄は、次の朝に城から出直す']],
+ ['1.15（試作版だけ）','2026-11-18',['<b>戦いの英雄は1人で1部隊</b>：歩兵・弓兵・騎兵・魔導・竜騎の英雄は、雇うと城から英雄本人の部隊として出てくる（部隊の上限には数えない）。強さはレベルで上がる。ほかの部隊や施設には付けられない。内政と守備の英雄は今までどおり施設に付ける','<b>英雄の家</b>（建設 → 領地）：英雄を雇うのに要る。1軒で3人まで（城のランクの上限もある）。絵はまだないので集合住宅の絵を借りている','<b>英雄の訓練</b>：英雄の詳しい画面の「訓練する」。食料を使って経験が入る。訓練した日は、その英雄は働かず、夜も戦わない（明日の朝まで休み）','部隊を失っても生き残った英雄は、次の朝に城から出直す','<b>英雄を付けられるのは生産施設と防衛施設だけ</b>（部隊・城・英雄の家には付けない）','英雄の部隊は、ほかの兵より少し大きく描く','<b>鍛冶の心得</b>（領地・ランクⅠ）：鉄の道具を、城のランクⅡを待たずに使える','ランクⅠの「魔核研究」「英雄教練」「武具の手入れ」をなくした','集合住宅は、研究で建てる新しい建物のまま（住居のアップグレードの段からは外した）']],
  ['1.14（試作版だけ）','2026-11-18',['<b>小数をなくした</b>：施設ごとの1ターンの生産と消費は整数に（伐採所 木材+10、武器工房 矢+30・木材−4・鉄−2 など）。食料・税・給金は、その日のはじめの人数で1日分を決めるので、途中で人が増えても端数が出ない','兵士の給金は「2人で1」に。税の説明から小数を外した','市場の値段は「4つ → 銀貨1」のように整数で見せる','補給は端数をためて、1つ分になったら1ずつ使う（資材が整数で減る）','<b>道具を使う施設の生産を2割増やした</b>：道具の消耗と、なくした生産の研究の分（伐採所 木材+10 → +12、農場 食料+8 → +10、武器工房 矢+30 → +36 など）','使っていない古い施設（発電所）のデータを消した']],
  ['1.13（試作版だけ）','2026-11-18',['<b>研究の作り直し（1回目）</b>：研究は「領地・防衛・部隊」の3つに。生産の%の研究（伐採技術など）・防衛の%の研究（鋼弦・強弓・壁補強・巻き上げ機など）・剣術・弓術・精鋭・改築の研究はなくした','<b>城のランクで開く</b>：炭鉱・金鉱・精錬所・聖銀鉱・エーテル採掘所・石の壁・城壁・魔金属の壁・龍鱗の壁・投石機、施設のアップグレード、兵士の装備は、研究しなくても城のランクが上がると使える。城のランクが上がったときに、使えるようになったものをアイコン付きで並べる','<b>生産施設は「道具」</b>：施設を選んで道具を替える（石→鉄→鋼→合金→魔金属→聖銀）。すぐ終わる。道具は毎ターン少しずつ減る（石の道具は木材1、鉄の道具は鉄1…）。足りないとその施設の生産が半分','<b>アップグレード</b>：「改築」は「アップグレード」に。領地の施設・門・壁はすぐ終わる。防衛施設はターンがかかる。%の研究をなくしたぶん、防衛施設のアップグレードの伸びを大きく','<b>兵士の装備</b>：部隊を選んで武器と防具を替える。上の段に替えるときは資材を払う（一度買った段までは自由に替えられる）。もっとよい装備に替えられる部隊は、軍事のタブで「↑」','<b>熟練度をなくした</b>','<b>改造</b>：「貫く矢」（バリスタの矢が後ろの2体まで貫く）・「割れる岩」（投石機の岩が割れて破片が飛ぶ）','<b>相性</b>：騎兵・チャリオットは大型の魔物に、ハープーンランチャーは竜型の魔物に2倍。狙撃兵の「大きな魔物に1.6倍」は外した']],
  ['1.12.1（試作版だけ）','',['研究の見直し：投石機・火薬の不自然な前提を外した。古い説明（師団・延長シフト・火薬工房・野戦補給・甲殻補強）を直した','<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
@@ -8162,10 +8166,10 @@ const MISSIONS=[
   {t:'兵舎を建てる',b:'train',n:1,d:'剣士や弓兵など、農兵のほかの部隊を招集できる施設です。'}],
   done:'頼もしい兵たちです！'},
  {id:'hero',name:IS_PROTO?'英雄':'英雄と熟練度',
-  say:['街には<b>英雄</b>がいます。いま街にいる英雄は、右の「<b>軍事</b>」のタブの「<b>英雄</b>」で見られます。{IMG:hero}','英雄を部隊や施設に<b>配属</b>すると、その部隊や施設を強くしてくれます。配属のしかたは、施設か部隊をクリックして、選択中パネルの「<b>配属英雄</b>」から英雄を選ぶだけ。英雄の一覧からも配属できますよ。{ART:h_guard,h_admin}','英雄には、それぞれ<b>スキル</b>があります。防衛施設の連射を上げる「速射」、生産を上げる「指導」など、英雄ごとに違います。英雄を選んで確かめてみてください。向いている配属先に置くと、もっと力を発揮しますよ。',...(IS_PROTO?['兵士の強さは、部隊ごとの<b>武器と防具</b>で決まります。城のランクが上がると、よい装備に替えられるようになりますよ。']:['それから、部隊には<b>熟練度</b>があります。戦いを経験するほど熟練度が上がって、強くなっていきます。熟練の部隊は大事にしてくださいね！'])],
+  say:['街には<b>英雄</b>がいます。いま街にいる英雄は、右の「<b>軍事</b>」のタブの「<b>英雄</b>」で見られます。{IMG:hero}',IS_PROTO?'英雄を<b>生産施設</b>や<b>防衛施設</b>に<b>配属</b>すると、その施設を強くしてくれます。配属のしかたは、施設をクリックして、選択中パネルの「<b>配属英雄</b>」から英雄を選ぶだけ。戦いの英雄は、自分ひとりで部隊として戦います。{ART:h_guard,h_admin}':'英雄を部隊や施設に<b>配属</b>すると、その部隊や施設を強くしてくれます。配属のしかたは、施設か部隊をクリックして、選択中パネルの「<b>配属英雄</b>」から英雄を選ぶだけ。英雄の一覧からも配属できますよ。{ART:h_guard,h_admin}','英雄には、それぞれ<b>スキル</b>があります。防衛施設の連射を上げる「速射」、生産を上げる「指導」など、英雄ごとに違います。英雄を選んで確かめてみてください。向いている配属先に置くと、もっと力を発揮しますよ。',...(IS_PROTO?['兵士の強さは、部隊ごとの<b>武器と防具</b>で決まります。城のランクが上がると、よい装備に替えられるようになりますよ。']:['それから、部隊には<b>熟練度</b>があります。戦いを経験するほど熟練度が上がって、強くなっていきます。熟練の部隊は大事にしてくださいね！'])],
   steps:[
   {t:'「軍事」→「英雄」で、街にいる英雄を見る',c:()=>S.heroSeen||0,n:1,rt:'army',hi:'#armySubs [data-asub="hero"]',d:'右の「軍事」のタブを開いて、上の「英雄」を押します。英雄ごとの得意な配属先とスキルが見られます。'},
-  {t:'英雄を部隊か施設に配属する',c:()=>S.assignN||0,n:1,hi:'#bArmy',d:'施設か部隊をクリックして、選択中パネルの「配属英雄」から英雄を選びます。下の「軍事」→「英雄」からも配属できます。英雄を選ぶと、スキルと向いている配属先が見られます。'}],
+  {t:IS_PROTO?'英雄を施設に配属する':'英雄を部隊か施設に配属する',c:()=>S.assignN||0,n:1,hi:'#bArmy',d:'施設か部隊をクリックして、選択中パネルの「配属英雄」から英雄を選びます。下の「軍事」→「英雄」からも配属できます。英雄を選ぶと、スキルと向いている配属先が見られます。'}],
   done:'これで、英雄の力も借りられます！ 次は、戦うための武器です。'},
  {id:'arms',name:'軍需',
   say:['街を守るには武器が必要です。防衛施設や弓兵は矢を、剣士たちは剣と防具を使います。','武器工房を建てると、矢・剣・防具を作れます。何を作るかは、武器工房に指示を出してあげてください。{ART:ammo}'],
