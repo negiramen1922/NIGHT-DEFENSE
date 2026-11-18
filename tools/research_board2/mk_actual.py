@@ -43,6 +43,7 @@ for k,v in D['kc'].items():
     R0=next((x['rank'] for x in D['rb'] if x['k']==k and x.get('rank')),1) or 1
     if R0>1:s0=max(j for j in range(len(TT)) if TT[j][0]<=R0)
     if k=='mithmine':s0=min(s0,5)
+    if k=='goldmine':s0=min(s0,2)
     if s0:
       bc=next(c for c in cards if c['id']==base);bc['e']=(bc['e']+'。' if bc['e'] else '')+f'{TT[s0][1]}の{v["tool"]}で建つ'
   for i in range(1,len(st)):
