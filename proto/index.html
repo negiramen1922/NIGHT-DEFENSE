@@ -3745,7 +3745,7 @@ function placeB(type,x,y,free,szo){
       if(urec)urec.replaced=occ.slice();
       S.blds=S.blds.filter(o=>!occ.includes(o));}
   }
-  if(IS_PROTO&&isTool(b)){const R0=(d.req&&RANK_OPEN[d.req])||1;if(R0>1){let i=0;TOOL_T.forEach((x,j)=>{if(x[0]<=R0)i=j;});if(b.type==='mithmine')i=Math.min(i,4);if(b.type==='goldmine')i=Math.min(i,2);b.lv=i+1;}}   /* 聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ（その上の段は替えられる。2026-11-18） */   /* 試作：あとから建てる施設は、建てられるランクの道具を持って建つ */
+  if(IS_PROTO&&isTool(b)){const R0=(d.req&&(RANK_OPEN[d.req]||(techOf(d.req)&&techRank(techOf(d.req)))))||1;if(R0>1){let i=0;TOOL_T.forEach((x,j)=>{if(x[0]<=R0)i=j;});if(b.type==='mithmine')i=Math.min(i,4);if(b.type==='goldmine')i=Math.min(i,2);b.lv=i+1;}}   /* 聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ（その上の段は替えられる。2026-11-18） */   /* 試作：あとから建てる施設は、建てられるランクの道具を持って建つ */
   if(!free&&buildTurns(type)>0){b.bt=b.btTotal=buildTurns(type)*TURN_SEC;b.hp=Math.round(hp*0.4);}
   if(urec){urec.b=b;urec.type=type;addUndo(urec);}
   S.blds.push(b);gridSet(b,true);if(S.ruins){const n=b.sz;S.ruins=S.ruins.filter(r=>{const rn=r.sz||newSz(r.type);return r.x+rn<=x||r.x>=x+n||r.y+rn<=y||r.y>=y+n;});}
