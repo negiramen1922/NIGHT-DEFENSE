@@ -92,9 +92,11 @@ function render(){renderTabs();const AN=allNodes();
   const X=c=>12+(c-C0())*(W+G),Y=r=>12+r*(CH+VG);
   $('ranks').innerHTML=Array.from({length:maxCol+2-C0()},(_,i)=>{const c=i+C0();const first=c===C0();const m=(D.RANKMAT||{})[c===0?1:(C0()===0&&c===1?-1:c)]||[];
     return `<div style="width:${W+G}px">${c<=7?(c===0?'ランク 0（はじめから）':'ランク '+RN[c]):''}${c<=7&&m.length?`<span class="rmat" title="このランクで使えるようになる素材">${first?'':'＋'}${m.map(k=>`<span><img src="${D.IC['r.'+k]}" alt="">${D.RESN[k]}</span>`).join('')}</span>`:''}</div>`;}).join('');
+  const SAMEL={};{const se=E.filter(e=>pos[e.a]&&pos[e.b]&&pos[e.a].col===pos[e.b].col).map(e=>({k:e.a+'>'+e.b,c:pos[e.a].col,lo:Math.min(pos[e.a].row,pos[e.b].row),hi:Math.max(pos[e.a].row,pos[e.b].row)})).sort((a,b)=>a.lo-b.lo);const used={};for(const s of se){const L=used[s.c]=used[s.c]||[];let l=0;while(L.some(o=>o.l===l&&!(o.hi<s.lo||o.lo>s.hi)))l++;L.push({l,lo:s.lo,hi:s.hi});SAMEL[s.k]=l;}}   // 同じ列のつなぎ線が重ならないように、少しずつ左へずらす
+  const DIFL={};{const de=E.filter(e=>pos[e.a]&&pos[e.b]&&pos[e.b].col>pos[e.a].col).map(e=>({k:e.a+'>'+e.b,a:e.a,c:pos[e.b].col,lo:Math.min(pos[e.a].row,pos[e.b].row),hi:Math.max(pos[e.a].row,pos[e.b].row)})).sort((a,b)=>a.lo-b.lo);const used={};for(const s of de){const L=used[s.c]=used[s.c]||[];const same=L.find(o=>o.a===s.a);let l=same?same.l:0;if(!same)while(L.some(o=>o.l===l&&o.a!==s.a&&!(o.hi<s.lo||o.lo>s.hi)))l++;L.push({l,a:s.a,lo:s.lo,hi:s.hi});DIFL[s.k]=Math.min(l,3);}}   // 別の親から同じ列に入る線は、縦の線を少しずつずらす（同じ親はまとめる）
   let paths='';for(const e of E){const q=pos[e.a],p=pos[e.b];if(!q||!p)continue;const x1=X(q.col)+W,y1=Y(q.row)+CH/2,x2=X(p.col),y2=Y(p.row)+CH/2;
-    if(q.col===p.col){const x0=X(q.col);paths+=`<path class="${e.kind}" d="M${x0} ${y1} H${x0-9} V${y2} H${x0}"/>`;}
-    else if(x2>x1+12){const mx=x2-G/2;paths+=`<path class="${e.kind}" d="M${x1} ${y1} H${mx} V${y2} H${x2}"/>`;}
+    if(q.col===p.col){const x0=X(q.col),lane=(SAMEL[e.a+'>'+e.b]||0),xo=x0-6-lane*6;paths+=`<path class="${e.kind}" d="M${x0} ${y1} H${xo} V${y2} H${x0}"/>`;}
+    else if(x2>x1+12){const mx=x2-G/2+12-(DIFL[e.a+'>'+e.b]||0)*6;paths+=`<path class="${e.kind}" d="M${x1} ${y1} H${mx} V${y2} H${x2}"/>`;}
     else{const ym=Y(Math.max(q.row,p.row))+CH+VG/2,xa=x1+G/3,xb=x2-G/3;paths+=`<path class="${e.kind}" d="M${x1} ${y1} H${xa} V${ym} H${xb} V${y2} H${x2}"/>`;}}
   const w=X(maxCol+1)+W+12,h=Y(maxRow+3);
   $('tree').style.width=w+'px';$('tree').style.height=h+'px';
