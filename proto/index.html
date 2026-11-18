@@ -2377,7 +2377,7 @@ function techMul(type){if(IS_PROTO)return 1+(type==='farm'&&S.seedT>0?0.2:0);   
 if(IS_PROTO){const T=id=>TECH.find(t=>t.id===id),del=id=>{const i=TECH.findIndex(t=>t.id===id);if(i>=0){DROPPED.add(id);TECH.splice(i,1);}},set=(id,o)=>{const t=T(id);if(t)Object.assign(t,o);};
  /* なくてはならない施設と装備は、城のランクで開く */
  for(const id of ['coalt','aethert','goldt','smeltt','mitht','masonry','castle','mwall','dragwall'])if(T(id))RANK_OPEN[id]=T(id).tier||1;
- Object.assign(RANK_OPEN,{eqw_5:7,eqa_6:7,spikes:1,ironarmor:1,heavyarms:2,steelarmor:2,chainmail:2,alloyarms:3,alloyarmor:3,eqw_3:5,eqw_4:6,eqa_4:5,eqa_5:6,eqr_2:4,eqr_3:6,eqm_1:4,eqm_2:5,eqm_3:6});
+ Object.assign(RANK_OPEN,{eqw_5:7,eqa_6:7,catapult:1,spikes:1,ironarmor:1,heavyarms:2,steelarmor:2,chainmail:2,alloyarms:3,alloyarmor:3,eqw_3:5,eqw_4:6,eqa_4:5,eqa_5:6,eqr_2:4,eqr_3:6,eqm_1:4,eqm_2:5,eqm_3:6});
  /* やめる研究：%の研究・改築の研究（まとめ）・城のランクで開くもの */
  const drop=[...Object.keys(RANK_OPEN),'mine','quarrying','farming','fishing','smelt','autoammo','craft','housing','kougen','goukyu','autoload','wallplus','fcs','tetsudan','pitch','swordplay','archery','elite','trade','scouting','carapace','bonepick','boneaxe','bonehoe','abysslamp','analysis','doctrine','armcare',...TECH.filter(t=>/^kc_/.test(t.id)).map(t=>t.id)];
  for(const id of drop)del(id);for(const k of Object.keys(RANK_OPEN))DROPPED.add(k);
