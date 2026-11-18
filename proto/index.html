@@ -2096,7 +2096,10 @@ if(IS_PROTO){Object.assign(MODEL,{
   h_arch:{ut:'arch',buy:true,hero:true,name:'英雄',role:'英雄（弓）',color:'#f2b33d',members:1,hpEach:170,dmg:28,wage:0,desc:'英雄本人。レベルが上がると強くなる'},
   h_cav:{ut:'cav',buy:true,hero:true,name:'英雄',role:'英雄（騎兵）',color:'#f2b33d',members:1,hpEach:340,dmg:34,wage:0,desc:'英雄本人。レベルが上がると強くなる'},
   h_mage:{ut:'mage',buy:true,hero:true,name:'英雄',role:'英雄（魔導）',color:'#f2b33d',members:1,hpEach:160,dmg:52,wage:0,desc:'英雄本人。レベルが上がると強くなる'},
-  h_drake:{ut:'drake',buy:true,hero:true,name:'英雄',role:'英雄（竜騎）',color:'#f2b33d',members:1,hpEach:420,dmg:46,wage:0,desc:'英雄本人。レベルが上がると強くなる'}});
+  h_drake:{ut:'drake',buy:true,hero:true,name:'英雄',role:'英雄（竜騎）',color:'#f2b33d',members:1,hpEach:420,dmg:46,wage:0,desc:'英雄本人。レベルが上がると強くなる'},
+  h_art:{ut:'art',buy:true,hero:true,name:'英雄',role:'英雄（砲兵）',color:'#f2b33d',members:1,hpEach:200,dmg:70,wage:0,desc:'英雄本人。レベルが上がると強くなる'},
+  h_gun:{ut:'arch',buy:true,hero:true,name:'英雄',role:'英雄（銃兵）',color:'#f2b33d',members:1,hpEach:190,dmg:60,rate:2.2,range:7,wage:0,desc:'英雄本人。レベルが上がると強くなる'}});
+ Object.assign(HERO_UNIT,{'砲兵':'h_art','銃兵':'h_gun'});Object.assign(SPECS,{'砲兵':{color:'#c8b0a0',stat:'atk',desc:'1人で砲兵として戦う'},'銃兵':{color:'#c0a070',stat:'atk',desc:'1人で銃兵として戦う'}});   /* 試作：砲兵・銃兵の英雄（2026-11-18） */
  B.herohouse={name:'英雄の家',glyph:'英',hp:260,heat:2,cost:{steel:80,stone:60,gold:40},pop:0,power:0,spec:'内政',grp:'prod',desc:'英雄が暮らす家。英雄を雇うのに要る（1軒で3人まで。城のランクの上限もある）'};
  BUILD_ORDER.push('herohouse');}
 function unitHero(c){return IS_PROTO&&!!c&&!!HERO_UNIT[c.spec];}   /* 1人で1部隊になる英雄か */
@@ -3420,6 +3423,7 @@ Object.assign(NDSPR.effects,{"fx_root_spike":{"size":32,"pal":{"a":"#1c1824","b"
 /* 施設の段ごとの絵（改築・2026-11-13）：[1段目, 2段目, …]。無い段は前の段の絵 */
 for(const [a,b] of [['gunner','sniper'],['chariot','rider']])if(NDSPR.units&&!NDSPR.units[a]&&NDSPR.units[b])NDSPR.units[a]=NDSPR.units[b];   /* 銃兵・チャリオットの絵ができるまで借りる */
 for(const [a,b] of [['gunner','sniper'],['chariot','rider']])if(!NDART[a]&&NDART[b])NDART[a]=NDART[b];
+if(IS_PROTO){for(const [a,b] of [['h_art','cannoneer'],['h_gun','gunner']]){if(NDSPR.units&&!NDSPR.units[a]&&NDSPR.units[b])NDSPR.units[a]=NDSPR.units[b];if(!NDART[a]&&NDART[b])NDART[a]=NDART[b];}}   /* 砲兵・銃兵の英雄の絵ができるまで */
 for(const [a,b] of [['gunner','sniper'],['chariot','rider']])if(!WICON[a]&&WICON[b])WICON[a]=WICON[b];
 try{if(NDSPR.units&&NDSPR.units.engineer_b&&!NDSPR.units.engineer)NDSPR.units.engineer=NDSPR.units.engineer_b;const SG=NDSPR.siege||{};for(const [a,b,f] of [['ram','ram','hit'],['mcat','mcat','fire']])if(SG[b]&&!NDSPR.units[a])NDSPR.units[a]=Object.assign({},SG[b],{anims:{walk:SG[b].anims.move,attack:SG[b].anims[f]}});}catch(e){}   /* 攻城兵器の絵は攻城戦の絵を使う */
 for(const k of ['griffon','griffon_dragon'])if(NDSPR.units[k]&&!NDSPR.units[k].anims.walk)NDSPR.units[k].anims.walk=NDSPR.units[k].anims.fly;
@@ -3464,6 +3468,7 @@ function sprTinted(cat,key,wt,at,ut){const base=SPR[cat]&&SPR[cat][key];const mk
 // 新しいスキルのアイコンは、近いスキルの絵を流用（描き直しまでの仮）
 for(const [a,b] of [['sk_rensha','sk_sokusha'],['sk_shoumei','sk_taka'],['sk_moutotsu','sk_totsu']])if(PXS[b]&&!PXS[a])PXS[a]=PXS[b];
 for(const k in PXS)if(!k.startsWith('e_')&&k!=='gunbase')WICON[k]=pxSvg(k);
+if(IS_PROTO){WICON['h_砲兵']=WICON['h_砲兵']||WICON.cannoneer;WICON['h_銃兵']=WICON['h_銃兵']||WICON.gunner||WICON.sniper;}   /* 砲兵・銃兵の英雄のアイコン（仮） */
 
 for(const k of ['spike','pit','bomb','bastion','hq','miner','quarry','ironmine','farm','fishery','well','ammo','barracks','lab','outpost','train','fence','swall','wall','tower','market','tavern','stable','aerie','magic','rider','dragon','wizard']){const im=new Image();im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">${WICON[k]}</svg>`);ICIMG[k]=im;}
 for(const k in PXS)ICIMG[k]=pxCanvas(k);
@@ -3803,6 +3808,7 @@ const HERO_ROSTER={'歩兵':[['inf1','アルト','h_inf','nagi'],['inf2','レオ
  '弓兵':[['arch1','リーネ','h_arch','ame'],['arch2','カイル','h_arch_2','sokusha'],['arch3','シエラ','h_arch_3','shoumei']],
  '騎兵':[['cav1','ガレス','h_cav','moutotsu'],['cav2','フィーナ','h_cav_2','yuugeki']],
  '魔導':[['mage1','ミラ','h_mage','kaen'],['mage2','ユーリ','h_mage_2','rai'],['mage3','エリス','h_mage_3','inseki']],
+ '砲兵':[['art1','バルド','h_art','kouka']],'銃兵':[['gun1','ノエル','h_gun','sogeki']],
  '竜騎':[['drake1','ヴォルフ','h_drake','ibuki'],['drake2','イリア','h_drake_2','houkou']]};
 function rosterFree(spec){const R=IS_PROTO&&HERO_ROSTER[spec];if(!R)return null;const used=new Set([...(S.cmds||[]),...(S.cands||[])].map(c=>c.hid).filter(Boolean));return R.filter(r=>!used.has(r[0]));}
 function makeCmd(spec,lv){const c=withSkill(makeCmd0(spec,lv));const F=rosterFree(c.spec);if(F&&F.length){const r=F[Math.floor(Math.random()*F.length)];c.hid=r[0];c.name=r[1];c.art=r[2];if(r[3])c.skill=r[3];}return c;}
@@ -3841,7 +3847,7 @@ function match(c,target){return specOfTarget(target)===c.spec?1:0.3;}
 const SPEC_OF_UT={mil:'歩兵',inf:'歩兵',arch:'弓兵',cav:'騎兵',mage:'魔導',drake:'竜騎'};
 const DEF_BT=['hq','outpost','fence','gate','swall','wall','brazier','spike','pit','mg','how','cannon','tower'];
 const PROD_BT=['tport','tair','bigfarm','bigminer','bigquarry','bigfish','coalmine','goldmine','mithmine','smelter','miner','quarry','ironmine','farm','fishery','well','ammo','market','tavern','powder','barracks','apart','furnace','lab'];
-function specOfTarget(o){if(o.kind==='s')return SPEC_OF_UT[o.ut]||'歩兵';if(DEF_BT.includes(o.type))return '守備';if(PROD_BT.includes(o.type))return '内政';return {train:'歩兵',stable:'騎兵',aerie:'竜騎',magic:'魔導'}[o.type]||'内政';}
+function specOfTarget(o){if(IS_PROTO&&o.kind==='s'&&o.hero){const c=S.cmds.find(x=>x.id===o.cmd);if(c)return c.spec;}if(o.kind==='s')return SPEC_OF_UT[o.ut]||'歩兵';if(DEF_BT.includes(o.type))return '守備';if(PROD_BT.includes(o.type))return '内政';return {train:'歩兵',stable:'騎兵',aerie:'竜騎',magic:'魔導'}[o.type]||'内政';}
 const SKILLS={
   '歩兵':[{id:'nagi',name:'薙払',cd:8,desc:'8秒ごと、周り3マスの敵をまとめて斬る（部隊の火力×3）'},
           {id:'kobu',name:'鼓舞',cd:16,dur:6,desc:'16秒ごと、6秒間 6マス以内の味方部隊の火力+30%・体力10%回復'},
@@ -3859,6 +3865,8 @@ const SKILLS={
   '守備':[{id:'rensha',name:'速射',cd:10,dur:3,desc:'10秒ごと、3秒間 配属先の連射+100%'},
           {id:'gourei',name:'号令',cd:15,dur:4,desc:'15秒ごと、4秒間 6マス以内の防衛施設すべての連射+50%'},
           {id:'oukyu',name:'修繕',cd:20,desc:'20秒ごと、6マス以内の施設・壁を20%修理（戦闘中も）'}],
+  '砲兵':[{id:'kouka',name:'砲撃',cd:12,desc:'12秒ごと、6マス以内でいちばん硬い敵に大きな砲弾（250・2秒スタン）'}],
+  '銃兵':[{id:'sogeki',name:'狙撃',cd:10,desc:'10秒ごと、射程より遠くまで届く一発で、いちばん体力の多い敵を撃ち抜く（300）'}],
   '内政':[{id:'shidou',name:'指導',desc:'配属先の生産+25%、4マス以内の同じ種類の施設も+25%'},
           {id:'kenyaku',name:'倹約',desc:'配属先の材料の消費−40%・生産+15%（武器工房などで効く）'}],
 };
@@ -3984,7 +3992,7 @@ function prodNeighborMul(b){for(const o of S.blds){if(o===b||o.type!==b.type||Ma
 function hireCost(c){return {gold:60+(c.lv-1)*80+(c.trait?20:0)};}
 // 英雄の候補（2026-11-16）：内政2人・戦闘3人に分ける。戦闘は、今の街で使える分類だけ（竜騎兵を育てられないのに竜騎の英雄は出さない）
 const CAND_N={内政:2,戦闘:3};
-function specUsable(sp){if(sp==='内政'||sp==='守備'||sp==='歩兵')return true;const uts=Object.keys(SPEC_OF_UT).filter(u=>SPEC_OF_UT[u]===sp);return uts.some(u=>modelsFor(u).length>0);}
+function specUsable(sp){if(IS_PROTO&&sp==='銃兵')return has('musket');if(IS_PROTO&&sp==='砲兵')return has('artillery');if(sp==='内政'||sp==='守備'||sp==='歩兵')return true;const uts=Object.keys(SPEC_OF_UT).filter(u=>SPEC_OF_UT[u]===sp);return uts.some(u=>modelsFor(u).length>0);}
 function battleSpecs(){return Object.keys(SPECS).filter(sp=>sp!=='内政'&&specUsable(sp));}
 function candLv(){let lv=1;const r=Math.random();const w=S.wave;if(r<0.15+w*0.04)lv=2;if(r<0.04+w*0.02)lv=3;if(w>=6&&r<0.03)lv=4;return lv;}
 function candSide(c){return c.spec==='内政'?'内政':'戦闘';}
@@ -8126,7 +8134,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.19（試作版だけ）','2026-11-18',['<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・弓・魔導は3人、騎兵・竜騎は2人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
+ ['1.19（試作版だけ）','2026-11-18',['<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・弓・魔導は3人、騎兵・竜騎は2人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
  ['1.18（試作版だけ）','2026-11-18',['<b>大きな生産施設</b>（研究で建てる・4×4）：大農場・大伐採所・養殖場（ランクⅢ）、大採掘場（ランクⅣ・鉄3・石炭2・金1も取れる）。小さい施設4つ分より多く作る（4.5倍）。建てる資材は5倍、働き手は3倍。土地は4分の3が合っていれば建てられる。道具の段も使える。絵はまだないので小さい施設の絵を大きくして借りている','研究「魔核加工」をなくした','兵舎・馬小屋・竜舎・魔導院は、アップグレード1段ごとに入れられる部隊が1つ増える']],
  ['1.17（試作版だけ）','2026-11-18',['<b>道具の段は研究で開く</b>：はじめは木の道具。「石の道具」（Ⅰ）「鉄の道具」（Ⅱ）…「聖銀の道具」（Ⅵ）の研究で、全部の生産施設のその段が使えるようになる（鍛冶の心得はまとめた）','あとから建てる施設は、建てられるランクの道具を持って建つ（炭鉱なら鉄のつるはし）','<b>生産の技術</b>（%ではなく施設ごとの便利な効果）：石運びの道・輪作・網の繕い（Ⅰ）、植林・炭焼き・坑木の補強・夜釣り・魔矢づくり（Ⅱ）、発破・選鉱（Ⅲ）、換気坑（Ⅳ）','<b>魔矢</b>：武器工房で、矢と小さな魔核から作る。あるあいだは物見櫓とバリスタが先に使い、威力 +30%','<b>今夜のエンチャント</b>（研究「一夜の付与」）：小さな魔核で、防衛施設と部隊をその夜だけ強くする（火力 +30%・受ける被害 −15%）。朝にはがれる。まとめてかけるボタンもある','蒼い炎の篝火は、夜ごとに小さな魔核を燃やす','研究の費用に小さな魔核（ランクⅡから）と魔核（ランクⅣから）を使う','小さな魔核を魔核にまとめる仕組みは外した','道具の研究は、研究画面の各ランクのいちばん上に（黄色の枠）','研究「呪骸の柱」「夜狩り術」をなくした']],
  ['1.16（試作版だけ）','2026-11-18',['<b>魔物の種類で取れる素材が違う</b>：小型＝小さな魔核・大型＝魔核・竜型＝龍鱗・空を飛ぶ魔物＝飛膜・ボス＝巨大魔核','<b>巨大魔核の使い道を3つから1つ選ぶ</b>（城の画面）：竜哮砲（城に据える巨大な大砲。夜、20秒ごとに空へ撃ち上げて、いちばん魔物の多いところに落とす。龍鱗5も使う）・知恵の結晶（使うと5ターン研究が2倍の速さ）・英雄の目覚め（英雄1人が大きく強くなる）','<b>竜晶</b>：精錬所をランクⅦにすると、エーテル2・聖銀1・龍鱗1から竜晶を作れる。竜晶の武器と防具（ランクⅦ）に使う','龍鱗の壁は龍鱗を、風船爆弾とグリフォン騎兵は飛膜を、ランクⅦのアップグレードは龍鱗を使う','<b>占い師</b>：ブラッドムーンの3日前の夜に来て、不吉な予言を残す（幸福度 −10・3日間）','<b>まとめて建てる・替えるときは端から順番に</b>：柵や罠をドラッグで並べたとき、施設をまとめて替えたとき（施設の画面の「同じ施設をまとめて替える」）、パパパッと順番に出る。音の高さも少しずつ違う','英雄を付けられる生産施設は、資源を作る施設だけ（住居・研究室・酒場などはなし）']],
