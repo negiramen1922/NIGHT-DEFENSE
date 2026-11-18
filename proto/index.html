@@ -3431,6 +3431,44 @@ const STAGE_ART={mg:['mg','mg_iron','mg_alloy','mg_magic','mg_holy'],how:['how',
  aebomb:['trap_aether'],gravity:['trap_gravity'],stake:['trap_holystake'],meteor:['trap_meteor']};
 if(IS_PROTO){STAGE_ART.herohouse=['apart'];for(const k in BIG)STAGE_ART[k]=STAGE_ART[BIG[k]]||[BIG[k]];}   /* 大きな施設の絵はまだない（小さい施設の絵を大きくして借りる） */
 function stageArt(b){const L=STAGE_ART[b.type];if(!L)return null;return L[Math.min(L.length,(b.lv||1))-1];}
+/* 試作（2026-11-18）：英雄の見た目クリエイト。服と肌の色を塗り替える（地図の絵はパレット、立ち絵は画像の色を1つずつ）。男女はなし。髪は今の絵では見えない */
+const HERO_KEY={'歩兵':'h_inf','弓兵':'h_arch','工兵':'h_eng','騎兵':'h_cav','魔導':'h_mage','内政':'h_admin','守備':'h_guard','竜騎':'h_drake'};
+const LOOK_CLOTH=[['赤','#c83a3a'],['橙','#d8782a'],['黄','#d8b030'],['緑','#3e8a3a'],['水色','#3aa0c0'],['青','#3a62b0'],['紫','#7a3aa8'],['黒','#3a3640'],['白','#e4e4ec']];
+const LOOK_SKIN=['#ffe2c8','#f6cfa6','#dcab7c','#b07a4c','#7a5032'];
+const LOOK_HUE={h_inf:[[195,250]],h_arch:[[75,165]],h_cav:[[348,360],[0,8]],h_mage:[[225,265]],h_drake:[[0,22]],h_guard:[[200,235]],h_admin:[[265,320]],h_eng:[[15,32]]};
+function lkHsl(hex){const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2;let h=0,s=0;
+  if(mx!==mn){const d=mx-mn;s=l>0.5?d/(2-mx-mn):d/(mx+mn);h=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;}return [h,s,l];}
+function lkHex(h,s,l){const f=n=>{const k=(n+h/30)%12,a=s*Math.min(l,1-l);const c=l-a*Math.max(-1,Math.min(k-3,9-k,1));return Math.round(c*255).toString(16).padStart(2,'0');};return '#'+f(0)+f(8)+f(4);}
+const LOOK_SAT={h_inf:0.25,h_guard:0.25};   /* 鎧の銀色を塗らないように */
+function lkCloth(key,h,s,l){return s>=(LOOK_SAT[key]||0.12)&&l>0.12&&l<0.85&&(LOOK_HUE[key]||[]).some(([a,b])=>h>=a&&h<=b);}
+function lkSkin(h,s,l){return h>=20&&h<=40&&l>0.72&&s>0.4;}
+const LK_REF={};function lkRef(key){if(LK_REF[key]!=null)return LK_REF[key];const sp=NDSPR.units[key];let t=0,n=0;if(sp)for(const c in sp.pal){const v=sp.pal[c];if(!/^#[0-9a-f]{6}/i.test(v))continue;const [h,s,l]=lkHsl(v.slice(0,7));if(lkCloth(key,h,s,l)){t+=l;n++;}}return LK_REF[key]=n?t/n:0.45;}
+function lkColor(hex,key,look){const base=hex.slice(0,7),tail=hex.slice(7);const [h,s,l]=lkHsl(base);const cl=v=>Math.max(0.06,Math.min(0.94,v));
+  if(look.cloth&&lkCloth(key,h,s,l)){const [th,ts,tl]=lkHsl(look.cloth);return lkHex(th,ts,cl(l+(tl-lkRef(key))))+tail;}
+  if(look.skin&&lkSkin(h,s,l)){const [th,ts,tl]=lkHsl(look.skin);return lkHex(th,ts,cl(l+(tl-0.81)))+tail;}return hex;}
+const LK_SPR={};function heroSpr(look,key){if(!look||!(look.cloth||look.skin))return null;const id=key+'|'+look.cloth+'|'+look.skin;if(LK_SPR[id])return LK_SPR[id];const sp=NDSPR.units[key];if(!sp)return null;
+  const pal={};for(const c in sp.pal)pal[c]=/^#[0-9a-f]{6}/i.test(sp.pal[c])?lkColor(sp.pal[c],key,look):sp.pal[c];
+  const o={size:sp.size,pal,img:{}};for(const a in sp.anims)o.img[a]=sp.anims[a].map(rows=>{const c=document.createElement('canvas');c.width=rows[0].length;c.height=rows.length;const g=c.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=pal[r[x]];if(!col)continue;g.fillStyle=col;g.fillRect(x,y,1,1);}});return c;});
+  return LK_SPR[id]=o;}
+const LK_ART={};function heroArtURL(look,key,done){if(!look||!(look.cloth||look.skin)||!NDART[key])return null;const id=key+'|'+look.cloth+'|'+look.skin;if(LK_ART[id]&&LK_ART[id]!=='wait')return LK_ART[id];if(LK_ART[id]==='wait')return null;LK_ART[id]='wait';
+  const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const g=c.getContext('2d');g.drawImage(im,0,0);const d=g.getImageData(0,0,c.width,c.height),p=d.data,memo={};
+    for(let i=0;i<p.length;i+=4){if(p[i+3]<200)continue;const hx='#'+[p[i],p[i+1],p[i+2]].map(v=>v.toString(16).padStart(2,'0')).join('');let nx=memo[hx];if(nx==null)nx=memo[hx]=lkColor(hx,key,look);if(nx!==hx){p[i]=parseInt(nx.slice(1,3),16);p[i+1]=parseInt(nx.slice(3,5),16);p[i+2]=parseInt(nx.slice(5,7),16);}}
+    g.putImageData(d,0,0);LK_ART[id]=c.toDataURL();if(done)done();else if(S&&S.sel&&S.sel.hero)renderInfo(true);};im.src=NDART[key][0];return null;}
+function showLook(c){const key=HERO_KEY[c.spec]||'h_inf';c.look=c.look||{};const lk=c.look;
+  const sw=(kind,val,lab,col)=>`<button data-lk="${kind}:${val}" title="${lab}" style="width:34px;height:34px;padding:0;${(lk[kind]||'')===val?'outline:2px solid var(--amber);outline-offset:2px;':''}background:${col||'transparent'};${col?'':'font-size:10px'}">${col?'':lab}</button>`;
+  const art=heroArtURL(lk,key,()=>{if(S.overlay==='look')showLook(c);})||(NDART[key]?NDART[key][0]:'');
+  const h=`<h2 style="margin:0 0 8px">英雄の見た目</h2><div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><canvas id="lkPrev" width="96" height="96" style="width:96px;height:96px;flex:0 0 auto;image-rendering:pixelated;background:#2a3a2e;box-shadow:0 0 0 1px var(--line)"></canvas>
+    ${art?`<div class="artpx n4" style="background-image:url(${art});width:300px;height:120px;flex:0 0 auto"></div>`:''}</div>
+    <div style="margin-top:12px"><b>名前</b><br><input id="lkName" maxlength="10" value="${(c.name||'').replace(/"/g,'&quot;')}" style="font-size:15px;padding:4px 8px;width:12em"></div>
+    <div style="margin-top:12px"><b>服の色</b><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">${sw('cloth','','もとの色')}${LOOK_CLOTH.map(([n,v])=>sw('cloth',v,n,v)).join('')}</div></div>
+    <div style="margin-top:12px"><b>肌の色</b> <span class="muted" style="font-size:11px">（顔が見える絵だけ変わる）</span><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">${sw('skin','','もとの色')}${LOOK_SKIN.map((v,i)=>sw('skin',v,'肌'+(i+1),v)).join('')}</div></div>
+    <div style="margin-top:14px;display:flex;justify-content:flex-end"><button id="ovClose" class="primary">決める</button></div>`;
+  const card=openOverlay('look',h,false);
+  const sp=heroSpr(lk,key)||SPR.units[key];const cv=card.querySelector('#lkPrev');if(cv&&sp){const g=cv.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(sp.img.walk[0],8,8,80,80);}
+  const nm=card.querySelector('#lkName');const saveName=()=>{const v=nm.value.trim();if(v)c.name=v;};
+  card.querySelectorAll('[data-lk]').forEach(b=>b.onclick=()=>{saveName();const [k,v]=b.dataset.lk.split(':');lk[k]=v||null;showLook(c);});
+  card.querySelector('#ovClose').onclick=()=>{saveName();closeOverlay();renderCmds(true);renderInfo&&renderInfo(true);};}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-look]');if(!b)return;e.stopPropagation();const c=S.cmds.find(x=>String(x.id)===b.dataset.look);if(c)showLook(c);},true);
 const SPR={};
 // 試作（2026-11-12）：兵士たちの見た目を装備の段で変える。絵の中の「武器の色」と「鎧（ローブ）の色」だけを、段の色に塗り替える（明るさの差は残す）。描き直しまでの仮
 const TINT={pawn:{w:'h',a:'ef',g:'f'},heavy:{w:'d',a:'bcfgiklmqr',g:'c'},rider:{w:'c',a:'efh',g:'h'},archer:{w:'c',r:c=>c[1]>c[0]+10&&c[1]>c[2]},guard:{w:'j',a:'efgkl',g:'f'},wizard:{w:'degh',r:c=>c[2]>c[1]+30&&c[0]>c[1]}};
@@ -5934,7 +5972,8 @@ function draw(){
         const P=[[0,-3],[-6,2],[6,2]],ord=n===3?[1,2,0]:n===2?[1,0]:[0];
         // ドット絵 v2：歩く・攻撃のコマ送り。左へ進む時は反転
         const HK={'歩兵':'h_inf','弓兵':'h_arch','工兵':'h_eng','騎兵':'h_cav','魔導':'h_mage','内政':'h_admin','守備':'h_guard','竜騎':'h_drake'};
-        const base=(s.ut==='art'&&typeof wTier==='function'&&wTier(s)?SPR.units['cannoneer_w'+wTier(s)]:null)||(SPR.equipment[sqKey(s)]?sprTinted('equipment',sqKey(s),wTier(s),aTier(s),s.ut):sprTinted('units',mt.key,wTier(s),aTier(s),s.ut))||SPR.units[mt.key],hs=c&&SPR.units[HK[c.spec]];
+        let base=(s.ut==='art'&&typeof wTier==='function'&&wTier(s)?SPR.units['cannoneer_w'+wTier(s)]:null)||(SPR.equipment[sqKey(s)]?sprTinted('equipment',sqKey(s),wTier(s),aTier(s),s.ut):sprTinted('units',mt.key,wTier(s),aTier(s),s.ut))||SPR.units[mt.key],hs=c&&SPR.units[HK[c.spec]];
+        if(IS_PROTO&&s.hero){const hc=S.cmds.find(x=>x.id===s.cmd);const hb=hc&&heroSpr(hc.look,mt.key);if(hb)base=hb;}   /* 英雄の見た目 */
         if(s.lx!=null&&Math.abs(s.x-s.lx)>0.05)s.face=s.x<s.lx?-1:1;const moving=s.lx!=null&&Math.hypot(s.x-s.lx,s.y-s.ly)>0.05;s.lx=s.x;s.ly=s.y;
         const atk=nowS()-(s.atkT||-9)<0.8,fl=(s.face||1)<0;
         for(const i of ord){const [px,py]=n===1?[0,-1]:P[i];const sp=(hs&&i===0&&!one)?hs:base;
@@ -6506,11 +6545,11 @@ function artWrap(inner,label,sub){
 }
 const smoke=(x,y,c)=>`<circle cx="${x}" cy="${y}" r="5" fill="${c||'#8a948c'}" class="sm"/><circle cx="${x}" cy="${y}" r="5" fill="${c||'#8a948c'}" class="sm d1"/><circle cx="${x}" cy="${y}" r="5" fill="${c||'#8a948c'}" class="sm d2"/>`;
 // 立ち絵 v2（100×40 のドット絵を3倍。4コマ・8コマのものはコマ送り）
-function artPx(key,label,sub){const a=NDART[key];if(!a)return '';const [url,n]=a;
+function artPx(key,label,sub,u2){const a=NDART[key];if(!a)return '';let [url,n]=a;if(u2)url=u2;
   return `<div class="artpx n${n}" style="background-image:url(${url})"><span class="al">${label||''}</span><span class="as">${sub||''}</span></div>`;}
 function artKey(o){if(o.kind==='s'){const c=cmdOf(o);const mk=MT(o).key;return NDART[mk]?mk:null;}
   const t=o.type;if(t==='hq')return 'castle'+Math.max(1,Math.min(7,S.baseLv||1));{const k=stageArt(o);if(k&&NDART[k])return k;}if(t==='mg')return 'mg_side';return NDART[t]?t:null;}
-function artOf(o){{const k=artKey(o);if(k)return artPx(k,o.kind==='s'?unitLabel(o):B[o.type].name,o.kind==='s'?MT(o).role:stageName(o));}
+function artOf(o){{const k=artKey(o);if(k&&IS_PROTO&&o.kind==='s'&&o.hero){const hc=S.cmds.find(x=>x.id===o.cmd);const u=hc&&heroArtURL(hc.look,k);if(u)return artPx(k,unitLabel(o),MT(o).role,u);}if(k)return artPx(k,o.kind==='s'?unitLabel(o):B[o.type].name,o.kind==='s'?MT(o).role:stageName(o));}
   {const hc=o.kind==='s'?cmdOf(o):null;const k=o.kind==='s'?(hc&&WICON['h_'+hc.spec]&&o.ut!=='drake'?'h_'+hc.spec:sqKey(o)):o.type;
    if(WICON[k]&&(o.kind!=='s'||['inf','arch','cav','drake','mage','mil','art','guard','adv'].includes(o.ut)))return artWrap(`<rect x="0" y="96" width="300" height="24" fill="#1c1a10"/><ellipse cx="150" cy="100" rx="70" ry="6" fill="#000" opacity=".45"/><g transform="translate(106,10) scale(3.7)">${WICON[k]}</g>`,o.kind==='s'?unitLabel(o):B[o.type].name,o.kind==='s'?MT(o).role:`Lv${o.lv||1}`);}
   if(o.kind==='s'&&o.ut==='tank'){
@@ -7525,7 +7564,7 @@ function renderCmds(force){
     let h='';
     for(const c of S.cmds){const sp=SPECS[c.spec];const a=c.assign?findObj(c.assign):null;
       h+=`<div class="cmd ${S.selCmd===c.id?'sel':''}" data-id="${c.id}">
-        <div class="t"><b style="display:flex;align-items:center;gap:4px">${icSvg('h_'+c.spec,24)}${cmdName(c)}</b><span class="spec" style="color:${sp.color};border-color:${sp.color}">${c.spec}</span></div>
+        <div class="t"><b style="display:flex;align-items:center;gap:4px">${icSvg('h_'+c.spec,24)}${cmdName(c)}</b><span class="spec" style="color:${sp.color};border-color:${sp.color}">${c.spec}</span>${IS_PROTO?`<button data-look="${c.id}" style="font-size:10px;padding:0 6px;margin-left:4px">見た目</button>`:''}</div>
         <div class="muted" style="font-size:11px" data-f="st"></div>
         <div class="muted" style="font-size:11px">${a?'配属：'+objName(a)+(match(c,a)===1?' ★':''):'<span style="color:var(--amber)">待機中</span>'}${c.trait?'　<span style="color:var(--text)">'+c.trait+'</span>':''}</div>
         <div style="font-size:11px">${skillLine(c)}</div>
@@ -7952,7 +7991,7 @@ function showHire(target,mode){
   let card;if(target){target.innerHTML=h;card=target;}else{card=openOverlay('hire',h,true);document.getElementById('ovClose').onclick=closeOverlay;}
   const again=()=>{if(target&&mode)renderArmyPanel(true);else showHire(target,mode);};
   card.querySelectorAll('[data-adv]').forEach(b=>b.onclick=()=>{const m=MTC[b.dataset.adv];if(!canAfford(m.cost)||S.waveActive)return;for(const k in m.cost)S[k]-=m.cost[k];const hq=S.blds.find(x=>x.type==='hq');spawnUnit(hq,'adv',b.dataset.adv);log(`冒険者ギルドから${m.name}を雇った`,'good');again();});
-  card.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{hire(b.dataset.hire);again();renderCmds(true);});
+  card.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>{const n0=S.cmds.length;hire(b.dataset.hire);again();renderCmds(true);if(IS_PROTO&&S.cmds.length>n0)showLook(S.cmds[S.cmds.length-1]);});
   {const rr=card.querySelector('#hReroll');if(rr)rr.onclick=()=>{S.gold-=30;genCands();again();};}
 }
 // ===== 街の記録（2026-11-15）：ターンごとの施設の数・人口・資源・生産量と、タイムラプス用の施設の出入り =====
@@ -8117,7 +8156,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.19（試作版だけ）','2026-11-18',['<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
+ ['1.19（試作版だけ）','2026-11-18',['<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','<b>英雄の見た目</b>：服の色・肌の色・名前を選べる（雇ったときと、英雄の一覧の「見た目」ボタンから）。地図の絵と立ち絵の両方が変わる','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
  ['1.18（試作版だけ）','2026-11-18',['<b>大きな生産施設</b>（研究で建てる・4×4）：大農場・大伐採所・養殖場（ランクⅢ）、大採掘場（ランクⅣ・鉄3・石炭2・金1も取れる）。小さい施設4つ分より多く作る（4.5倍）。建てる資材は5倍、働き手は3倍。土地は4分の3が合っていれば建てられる。道具の段も使える。絵はまだないので小さい施設の絵を大きくして借りている','研究「魔核加工」をなくした','兵舎・馬小屋・竜舎・魔導院は、アップグレード1段ごとに入れられる部隊が1つ増える']],
  ['1.17（試作版だけ）','2026-11-18',['<b>道具の段は研究で開く</b>：はじめは木の道具。「石の道具」（Ⅰ）「鉄の道具」（Ⅱ）…「聖銀の道具」（Ⅵ）の研究で、全部の生産施設のその段が使えるようになる（鍛冶の心得はまとめた）','あとから建てる施設は、建てられるランクの道具を持って建つ（炭鉱なら鉄のつるはし）','<b>生産の技術</b>（%ではなく施設ごとの便利な効果）：石運びの道・輪作・網の繕い（Ⅰ）、植林・炭焼き・坑木の補強・夜釣り・魔矢づくり（Ⅱ）、発破・選鉱（Ⅲ）、換気坑（Ⅳ）','<b>魔矢</b>：武器工房で、矢と小さな魔核から作る。あるあいだは物見櫓とバリスタが先に使い、威力 +30%','<b>今夜のエンチャント</b>（研究「一夜の付与」）：小さな魔核で、防衛施設と部隊をその夜だけ強くする（火力 +30%・受ける被害 −15%）。朝にはがれる。まとめてかけるボタンもある','蒼い炎の篝火は、夜ごとに小さな魔核を燃やす','研究の費用に小さな魔核（ランクⅡから）と魔核（ランクⅣから）を使う','小さな魔核を魔核にまとめる仕組みは外した','道具の研究は、研究画面の各ランクのいちばん上に（黄色の枠）','研究「呪骸の柱」「夜狩り術」をなくした']],
  ['1.16（試作版だけ）','2026-11-18',['<b>魔物の種類で取れる素材が違う</b>：小型＝小さな魔核・大型＝魔核・竜型＝龍鱗・空を飛ぶ魔物＝飛膜・ボス＝巨大魔核','<b>巨大魔核の使い道を3つから1つ選ぶ</b>（城の画面）：竜哮砲（城に据える巨大な大砲。夜、20秒ごとに空へ撃ち上げて、いちばん魔物の多いところに落とす。龍鱗5も使う）・知恵の結晶（使うと5ターン研究が2倍の速さ）・英雄の目覚め（英雄1人が大きく強くなる）','<b>竜晶</b>：精錬所をランクⅦにすると、エーテル2・聖銀1・龍鱗1から竜晶を作れる。竜晶の武器と防具（ランクⅦ）に使う','龍鱗の壁は龍鱗を、風船爆弾とグリフォン騎兵は飛膜を、ランクⅦのアップグレードは龍鱗を使う','<b>占い師</b>：ブラッドムーンの3日前の夜に来て、不吉な予言を残す（幸福度 −10・3日間）','<b>まとめて建てる・替えるときは端から順番に</b>：柵や罠をドラッグで並べたとき、施設をまとめて替えたとき（施設の画面の「同じ施設をまとめて替える」）、パパパッと順番に出る。音の高さも少しずつ違う','英雄を付けられる生産施設は、資源を作る施設だけ（住居・研究室・酒場などはなし）']],
