@@ -53,6 +53,20 @@ for key,lab,icp in [('w','武器','w.'),('a','鎧','a.'),('r','ローブ',None)]
     N(f'e_{key}_{e["i"]}','N部隊',e['rank'],e['n'],'ランクで開く' if e['rank'] else 'はじめから','部隊を選んで替える（すぐ・資材）' if e['rank'] else 'はじめの装備',prev,icn);prev=[f'e_{key}_{e["i"]}']
 for u in D['base']:
   k,n=u.split(':');N('u_'+k,'N部隊',0,n,'はじめから','はじめから編成できる',[],'u.'+('pawn' if k=='pawn' else k))
+# 研究の流れが分かるように、関係のある施設・兵から研究へ線を引く（ゲームの前提ではない・ボードの見やすさ用）
+REL={'stakes':'b_fence','yariana':'b_pit','resetpit':None,'heavymg':'b_mg','bighow':'b_how','tower':'b_tower','poison':'b_tower','thorn':'b_swall',
+ 'p_plant':'b_miner','p_charcoal':'b_miner','p_road':'b_quarry','p_blast':'b_quarry','p_prop':'b_ironmine','p_sort':'b_ironmine','p_rot':'b_farm',
+ 'p_nightfish':'b_fishery','p_net':'b_fishery','p_marrow':'b_ammo','p_vent':'b_coalmine','brewing':'b_barracks','overtime':'b_barracks','prefab':'b_train','refine':'b_hq',
+ 'heavyinf':'u_pawn','cavalry':'u_pawn','bigquiver':'u_archer','musket':'u_archer','formation':'u_pawn','scout':'u_archer','p_ench':'b_tower','gunpowder':'b_ammo','magetower':'g_magic','furnace':'b_well'}
+byid={c['id']:c for c in cards}
+for tid,src in REL.items():
+  c=byid.get('g_'+tid)
+  if c and src and src in byid and src not in c['pre'] and byid[src]['cat']==c['cat']:c['pre']=[src]+c['pre']
+for c in cards:
+  if c['id'].startswith('g_tool_'):c['top']=1
+# 大きな生産施設（案）
+for id,r,n,src,e in [('big_farm',3,'大農場','b_farm','農場の大きい版（案）'),('big_miner',3,'大伐採所','b_miner','伐採所の大きい版（案）'),('big_mine',4,'大採掘場','b_quarry','石切り場・鉱山の大きい版（案）'),('big_fish',3,'養殖場','b_fishery','漁場の大きい版（案）')]:
+  N('a_'+id,'N領地',r,n,'案',e,[src] if src in byid else [],src[2:]+'.1')
 d['T']+=cards
 d['tabs']=['N領地','N防衛','N部隊','生産','内政','防衛','部隊','魔核']
 d['TABL']={'N領地':'領地','N防衛':'防衛','N部隊':'部隊','生産':'前：生産','内政':'前：内政','防衛':'前：防衛','部隊':'前：部隊','魔核':'前：魔核'}

@@ -54,7 +54,7 @@ function edgesOf(L){const ids=new Set(L.map(t=>t.id));const E=[];
   return E;}
 function layout(L,E){const ids=new Set(L.map(t=>t.id));const kids={},hasPar=new Set();
   for(const t of L)for(const p of t.pre){if(!ids.has(p)||hasPar.has(t.id))continue;(kids[p]=kids[p]||[]).push(t);hasPar.add(t.id);}
-  const roots=L.filter(t=>!hasPar.has(t.id)).sort((a,b)=>a.r-b.r);
+  const roots=L.filter(t=>!hasPar.has(t.id)).sort((a,b)=>((b.top?1:0)-(a.top?1:0))||a.r-b.r);
   for(const k in kids)kids[k].sort((a,b)=>((b.lvk?1:0)-(a.lvk?1:0))||a.r-b.r);
   const pos={};let next=0;const seen=new Set();
   function place(t,row,pc){if(seen.has(t.id))return;seen.add(t.id);const col=Math.max(t.r,pc);pos[t.id]={row,col};next=Math.max(next,row+1);let r=row,first=true;
