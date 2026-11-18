@@ -1577,6 +1577,7 @@ body.tabUI #viewSeg button{min-height:40px;padding-left:12px;padding-right:12px}
 body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font-size:14px}
 /* 帯のボタンは縮めない・折り返さない（「解除」が2行になっていた）2026-11-15 */
 #modeBar button,#modeTxt button{white-space:nowrap;flex-shrink:0}
+.ovfoot{position:sticky;bottom:0;display:flex;justify-content:flex-end;padding:10px 0 2px;margin-top:8px;z-index:4;pointer-events:none}.ovfoot button{pointer-events:auto;box-shadow:0 0 0 4px #000a}
 </style>
 </head>
 <body>
@@ -7418,11 +7419,16 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
 
 // ===== オーバーレイ =====
 // 同じ画面の描き直し（ボタンを押したあとなど）は、スクロール位置を保つ。別の画面を開いたときだけ上から
+// 閉じるボタンはどの画面でも右下にそろえる（2026-11-18 ユーザーの指定：研究画面で右下の「中止」を押しそうになる）
+function moveCloseBR(card){const b=card.querySelector('#ovClose');if(!b)return;const tdr=card.querySelector('.tdr');if(tdr){tdr.appendChild(b);b.style.float='none';return;}
+  if(!(b.closest('h2')||b.closest('.rhead')||b.parentElement===card.firstElementChild))return;
+  const f=document.createElement('div');f.className='ovfoot';b.style.float='none';f.appendChild(b);card.appendChild(f);}
 function openOverlay(kind,html,wide){
   const card0=document.getElementById('ovCard'),same=S.overlay===kind&&document.getElementById('overlay').style.display==='flex';
   const keep=same?{top:card0.scrollTop,inner:[...card0.querySelectorAll('*')].filter(e=>e.scrollTop>0||e.scrollLeft>0).map(e=>[innerKey(e,card0),e.scrollTop,e.scrollLeft])}:null;
   S.overlay=kind;document.getElementById('overlay').classList.toggle('home',kind==='title'||kind==='intro'||(kind==='help'&&/タイトルへ/.test(html)));
   {const ov=document.getElementById('overlay');let v=document.getElementById('ovBg');const home=ov.classList.contains('home');if(home&&!v){v=document.createElement('video');v.id='ovBg';v.src='tut/title.mp4';v.muted=true;v.loop=true;v.autoplay=true;v.playsInline=true;v.setAttribute('playsinline','');ov.insertBefore(v,ov.firstChild);}if(v){if(home){try{v.play().catch(()=>{});}catch(e){}}else{try{v.pause();}catch(e){}}}}const card=document.getElementById('ovCard');card.className='card'+(wide?' wide':'')+' ov-'+kind;card.innerHTML=html;
+  moveCloseBR(card);
   document.getElementById('overlay').style.display='flex';document.body.classList.add('ov');card.scrollTop=keep?keep.top:0;
   if(keep)for(const [k,t,l] of keep.inner){const e=findInner(k,card);if(e){e.scrollTop=t;e.scrollLeft=l;}}   // 中の一覧（図鑑・研究の列など）も
   return card;
