@@ -38,7 +38,15 @@ for k,v in D['kc'].items():
       N(base,btab(k,v.get('grp')),0,k,'はじめから','',[],k+'.1')
   cat=next(c['cat'] for c in cards if c['id']==base)
   prev=base
+  s0=0   # あとから建てる施設は、建てられるランクの道具を持って建つ（その段より下のカードは出さない・2026-11-18）
+  if v['tool']:
+    R0=next((x['rank'] for x in D['rb'] if x['k']==k and x.get('rank')),1) or 1
+    if R0>1:s0=max(j for j in range(len(TT)) if TT[j][0]<=R0)
+    if k=='mithmine':s0=min(s0,5)
+    if s0:
+      bc=next(c for c in cards if c['id']==base);bc['e']=(bc['e']+'。' if bc['e'] else '')+f'{TT[s0][1]}の{v["tool"]}で建つ'
   for i in range(1,len(st)):
+    if i<=s0:continue
     r,n=st[i]
     nm=(TT[i][1]+'の'+v['tool']) if v['tool'] else n
     e=(f"道具を替える（すぐ・資材）。{n}") if v['tool'] else ('アップグレード（'+('ターンと資材' if v.get('grp')=='def' and k!='gate' else 'すぐ・資材')+'）')
@@ -55,16 +63,18 @@ for key,lab,icp in [('w','武器','w.'),('a','鎧','a.'),('r','ローブ',None)]
 for u in D['base']:
   k,n=u.split(':');N('u_'+k,'N部隊',0,n,'はじめから','はじめから編成できる',[],'u.'+('pawn' if k=='pawn' else k))
 # 研究の流れが分かるように、関係のある施設・兵から研究へ線を引く（ゲームの前提ではない・ボードの見やすさ用）
-REL={'stakes':'b_fence','yariana':'b_pit','resetpit':None,'heavymg':'b_mg','bighow':'b_how','tower':'b_tower','poison':'b_tower','thorn':'b_swall',
+REL={'stakes':'b_fence','yariana':'b_pit','resetpit':None,'heavymg':'b_mg','bighow':'b_how','tower':'b_tower','thorn':'b_swall',
  'p_plant':'b_miner','p_charcoal':'b_miner','p_road':'b_quarry','p_blast':'b_quarry','p_prop':'b_ironmine','p_sort':'b_ironmine','p_rot':'b_farm',
- 'p_nightfish':'b_fishery','p_net':'b_fishery','p_marrow':'b_ammo','p_vent':'b_coalmine','brewing':'b_barracks','overtime':'b_barracks','prefab':'b_train','refine':'b_hq',
- 'heavyinf':'u_pawn','cavalry':'u_pawn','bigquiver':'u_archer','musket':'u_archer','formation':'u_pawn','scout':'u_archer','p_ench':'b_tower','gunpowder':'b_ammo','magetower':'g_magic','furnace':'b_well'}
+ 'p_nightfish':'b_fishery','p_net':'b_fishery','p_marrow':'b_ammo','p_vent':'b_coalmine','brewing':'b_barracks','overtime':'b_barracks','prefab':'b_miner','refine':'b_hq',
+ 'heavyinf':'u_pawn','bigquiver':'u_archer','musket':'u_archer','p_ench':'b_tower','gunpowder':'b_ammo','magetower':'g_magic','furnace':'b_well','firerock':'k_how_1','tportt':'k_market_1'}
 byid={c['id']:c for c in cards}
 for tid,src in REL.items():
   c=byid.get('g_'+tid)
   if c and src and src in byid and src not in c['pre'] and byid[src]['cat']==c['cat']:c['pre']=[src]+c['pre']
 for c in cards:
   if c['id'].startswith('g_tool_'):c['top']=1
+for a2,b2 in [('k_mortar_1','g_incend')]:   # 焼夷砲弾のあとに魔金属の迫撃砲（ゲームの決まり）
+  if a2 in byid and b2 in byid and b2 not in byid[a2]['pre']:byid[a2]['pre']=[b2]+byid[a2]['pre']
 # 大きな生産施設は研究のカード（t_big*）で出るので案は消した
 # 壁は木の柵から横に並べる（2026-11-18）
 for a2,b2 in [('b_swall','b_fence'),('b_wall','b_swall'),('b_wall3','b_wall'),('b_wall5','b_wall3')]:
