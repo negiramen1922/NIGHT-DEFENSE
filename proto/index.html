@@ -5364,7 +5364,7 @@ function update(dt,sim){
   if(S.fireZ&&S.fireZ.length){for(const z of S.fireZ){z.t-=dt;for(const e of S.enemies){if(e.hp<=0||isFly(e))continue;if(Math.hypot(e.x-z.x,e.y-z.y)<z.r)hitEnemy(e,z.dps*dt,z.src,false);}if(Math.random()<dt*8){const a=Math.random()*7,rr=Math.random()*z.r;S.fx.push({x:z.x+Math.cos(a)*rr,y:z.y+Math.sin(a)*rr,r:TU*0.35,t:0,dur:0.35,c:'#ff8a3a'});}}S.fireZ=S.fireZ.filter(z=>z.t>0&&S.waveActive);}
   for(const f of S.fx)f.t+=dt;S.fx=S.fx.filter(f=>f.t<f.dur);
   const dead=S.enemies.filter(e=>e.hp<=0);
-  for(const e of dead){if(e.camp&&!e.extra)campLoss(e);if(e.fled)continue;se(E[e.type].r>=10?'bigkill':'kill');S.kills++;S.waveKills++;S.fx.push({x:e.x,y:e.y,r:E[e.type].r*1.6,t:0,dur:0.25,c:'#ff5a4e'});
+  for(const e of dead){if(e.camp&&!e.extra)campLoss(e);if(e.fled)continue;addCorpse(e._im,e.x,e.y+(e._bob||0),e._sz,e._sz,(e.face||1)<0);se(E[e.type].r>=10?'bigkill':'kill');S.kills++;S.waveKills++;S.fx.push({x:e.x,y:e.y,r:E[e.type].r*1.6,t:0,dur:0.25,c:'#ff5a4e'});
     const sp=E[e.type].spill;if(sp&&!e.sub)spawnAt(sp.type,e.x,e.y,sp.n,E[e.type].r);if(E[e.type].boss)log(`${E[e.type].name}を討ち取った！`,'good');}
   if(dead.length)S.enemies=S.enemies.filter(e=>e.hp>0||(e.hp<=0&&false));
 }
@@ -5685,6 +5685,7 @@ function damageSquad(s,dmg){if(s.invT>0)return;
   s.hp-=dmg;
   // 1機ぶんの耐久を割り込むごとに兵（と衛士）を失う
   const m=Math.max(0,Math.ceil(s.hp/(memberHp(s)*bonus(s).hp)-1e-6));
+  if(IS_PROTO&&s._im&&(m<s.members||s.hp<=0))addCorpse(s._im,s.x+(Math.random()*10-5),s.y+(Math.random()*6-3),s._im.width*s._z,s._im.height*s._z,s._fl);   /* 兵が倒れる */
   if(m<s.members&&s.hp>0){const lost=s.members-m;s.members=m;S.kia+=lost*(t.popEach||(s.ut==='adv'?1:0));log(`${unitLabel(s)} ${lost}${t.unit}撃破される（残り${m}${t.unit}）`,'kia');}
   if(s.hp<=0){
     S.squads=S.squads.filter(x=>x!==s);S.kia+=s.members*(t.popEach||(s.ut==='adv'?1:0));
@@ -5978,7 +5979,7 @@ function draw(){
         const atk=nowS()-(s.atkT||-9)<0.8,fl=(s.face||1)<0;
         for(const i of ord){const [px,py]=n===1?[0,-1]:P[i];const sp=(hs&&i===0&&!one)?hs:base;
           if(sp){const L=atk&&sp.img.attack?sp.img.attack:sp.img.walk,im=L[(atk||moving)?(Math.floor(an/(atk?0.2:0.15))+i)%L.length:0],z=one?2:s.hero?1.5:1;   /* 試作：英雄の部隊は少し大きく */
-            ctx.save();ctx.translate(px,py-2);if(fl)ctx.scale(-1,1);ctx.drawImage(im,-im.width*z/2,-im.height*z/2,im.width*z,im.height*z);ctx.restore();}
+            if(i===0){s._im=im;s._z=z;s._fl=fl;}ctx.save();ctx.translate(px,py-2);if(fl)ctx.scale(-1,1);ctx.drawImage(im,-im.width*z/2,-im.height*z/2,im.width*z,im.height*z);ctx.restore();}
           else{const im=sqSprite(s);ctx.drawImage(im,px-sz/2,py-sz/2-2,sz,sz);}}
         if(c){const tw=Math.sin(an*4+s.no)>0;ctx.fillStyle=SPECS[c.spec].color;const sy=one?-17:-15;ctx.fillRect(-1,sy-2,2,6);ctx.fillRect(-3,sy,6,2);if(tw){ctx.fillStyle='#fff8d0';ctx.fillRect(-1,sy,2,2);}}
         ctx.imageSmoothingEnabled=true;const M=MT(s).members;for(let i=0;i<M;i++){ctx.fillStyle=i<s.members?mt.color:'#2a3a3a';ctx.fillRect(-M*2+i*4,11,3,2);}}
@@ -6017,6 +6018,7 @@ function draw(){
     ctx.fillStyle=m.armed?'#3a3020':'#222';ctx.beginPath();ctx.arc(mx,my,5,0,7);ctx.fill();ctx.strokeStyle=m.armed?'#8a7040':'#444';ctx.stroke();
     if(m.armed&&Math.sin(an*3+m.x)>0.6){ctx.fillStyle='#ff5a4e';ctx.beginPath();ctx.arc(mx,my,1.6,0,7);ctx.fill();}}}
   for(const rt of (S.roots||[])){if(rt.done)continue;const k=1-rt.t/2;ctx.fillStyle=`rgba(30,18,8,${0.25+0.4*k})`;ctx.beginPath();ctx.arc(rt.x,rt.y,rt.r*(0.5+0.5*k),0,7);ctx.fill();ctx.strokeStyle='rgba(200,120,60,.6)';ctx.beginPath();ctx.arc(rt.x,rt.y,rt.r,0,7);ctx.stroke();}   /* 森の抱擁の前ぶれ */
+  if(IS_PROTO)drawCorpses();
   for(const e of S.enemies){if(e.sub){ctx.globalAlpha=0.35;drawEnemy(e);ctx.globalAlpha=1;}else drawEnemy(e);}
   for(const n of S.navShells){if(n.t<n.delay){const k=n.t/n.delay;ctx.strokeStyle=`rgba(255,227,138,${0.3+0.5*k})`;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(n.x-30*(1-k),n.y-160*(1-k));ctx.lineTo(n.x-30*(1-k)+4,n.y-160*(1-k)+20);ctx.stroke();ctx.lineWidth=1;
     ctx.strokeStyle='rgba(255,90,78,.35)';ctx.beginPath();ctx.arc(n.x,n.y,6,0,7);ctx.stroke();}}
@@ -6473,6 +6475,10 @@ function enemyPath(e,d){
     default:ctx.rect(x-r,y-r*0.8,r*2,r*1.6);
   }
 }
+/* 試作（2026-11-19）：倒れた魔物と兵は、その場で横に倒れてから消える */
+const CORPSES=[];function addCorpse(im,x,y,w,h,fl){if(!IS_PROTO||!im||!w)return;if(CORPSES.length>80)CORPSES.shift();CORPSES.push({im,x,y,w,h,fl:!!fl,t0:nowS()});}
+function drawCorpses(){if(!CORPSES.length)return;const now=nowS();ctx.imageSmoothingEnabled=false;for(let i=CORPSES.length-1;i>=0;i--){const c=CORPSES[i],a=now-c.t0;if(a>1.7||a<0){CORPSES.splice(i,1);continue;}
+  const k=Math.min(1,a/0.3),e=k*k,ang=(c.fl?1:-1)*Math.PI/2*e;ctx.save();ctx.globalAlpha=a>1.2?Math.max(0,1-(a-1.2)/0.5):1;ctx.translate(c.x,c.y+c.h*0.3*e);ctx.rotate(ang);if(c.fl)ctx.scale(-1,1);ctx.drawImage(c.im,-c.w/2,-c.h/2,c.w,c.h);ctx.restore();}ctx.globalAlpha=1;ctx.imageSmoothingEnabled=true;}
 function drawEnemy(e){
   const d=E[e.type],r=d.r;const ratio=Math.max(0,e.hp/e.maxhp);
   if(d.shade){const R0=d.shade*TU,g=ctx.createRadialGradient(e.x,e.y,r,e.x,e.y,R0);g.addColorStop(0,'rgba(6,10,4,.55)');g.addColorStop(1,'rgba(6,10,4,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(e.x,e.y,R0,0,7);ctx.fill();
@@ -6492,7 +6498,7 @@ function drawEnemy(e){
     const sz=SP?16*Math.max(1,Math.round(r*2.7*(d.drawMul||1)/16)):Math.round(Math.max(14,r*2.7)),bob=d.fly?Math.sin(nowS()*6+e.x*0.1)*2-4:0;
     if(d.fly){ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(e.x+4,e.y+sz*0.45,sz*0.35,sz*0.12,0,0,7);ctx.fill();}
     if(e.buff){ctx.strokeStyle='rgba(255,200,60,.7)';ctx.beginPath();ctx.ellipse(e.x,e.y+sz*0.4,sz*0.45,sz*0.16,0,0,7);ctx.stroke();}
-    ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(e.x,e.y+bob);if((e.face||1)<0)ctx.scale(-1,1);ctx.drawImage(im,-sz/2,-sz/2,sz,sz);ctx.restore();
+    e._im=im;e._sz=sz;e._bob=bob;ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(e.x,e.y+bob);if((e.face||1)<0)ctx.scale(-1,1);ctx.drawImage(im,-sz/2,-sz/2,sz,sz);ctx.restore();
     if(ratio<0.999&&e.type!=='swarm'&&e.type!=='king'){const w=Math.max(10,sz*0.7);ctx.fillStyle='rgba(30,0,0,.8)';ctx.fillRect(e.x-w/2,e.y-sz/2-3+bob,w,2);ctx.fillStyle=ratio>0.5?'#e0c040':'#e04030';ctx.fillRect(e.x-w/2,e.y-sz/2-3+bob,w*ratio,2);}
     return;}}
   if(e.type==='heavy'){ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(e.x+3,e.y+5,r*1.5,r*0.8,0,0,7);ctx.fill();for(let i=-1;i<=1;i++){ctx.fillStyle='#8ac060';ctx.beginPath();ctx.arc(e.x+i*r*0.5,e.y-r*0.7,2.6,0,7);ctx.fill();}}
@@ -8157,7 +8163,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.19（試作版だけ）','2026-11-18',['<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
+ ['1.19（試作版だけ）','2026-11-18',['<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','倒れた魔物と兵は、その場で横に倒れてから消える','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
  ['1.18（試作版だけ）','2026-11-18',['<b>大きな生産施設</b>（研究で建てる・4×4）：大農場・大伐採所・養殖場（ランクⅢ）、大採掘場（ランクⅣ・鉄3・石炭2・金1も取れる）。小さい施設4つ分より多く作る（4.5倍）。建てる資材は5倍、働き手は3倍。土地は4分の3が合っていれば建てられる。道具の段も使える。絵はまだないので小さい施設の絵を大きくして借りている','研究「魔核加工」をなくした','兵舎・馬小屋・竜舎・魔導院は、アップグレード1段ごとに入れられる部隊が1つ増える']],
  ['1.17（試作版だけ）','2026-11-18',['<b>道具の段は研究で開く</b>：はじめは木の道具。「石の道具」（Ⅰ）「鉄の道具」（Ⅱ）…「聖銀の道具」（Ⅵ）の研究で、全部の生産施設のその段が使えるようになる（鍛冶の心得はまとめた）','あとから建てる施設は、建てられるランクの道具を持って建つ（炭鉱なら鉄のつるはし）','<b>生産の技術</b>（%ではなく施設ごとの便利な効果）：石運びの道・輪作・網の繕い（Ⅰ）、植林・炭焼き・坑木の補強・夜釣り・魔矢づくり（Ⅱ）、発破・選鉱（Ⅲ）、換気坑（Ⅳ）','<b>魔矢</b>：武器工房で、矢と小さな魔核から作る。あるあいだは物見櫓とバリスタが先に使い、威力 +30%','<b>今夜のエンチャント</b>（研究「一夜の付与」）：小さな魔核で、防衛施設と部隊をその夜だけ強くする（火力 +30%・受ける被害 −15%）。朝にはがれる。まとめてかけるボタンもある','蒼い炎の篝火は、夜ごとに小さな魔核を燃やす','研究の費用に小さな魔核（ランクⅡから）と魔核（ランクⅣから）を使う','小さな魔核を魔核にまとめる仕組みは外した','道具の研究は、研究画面の各ランクのいちばん上に（黄色の枠）','研究「呪骸の柱」「夜狩り術」をなくした']],
  ['1.16（試作版だけ）','2026-11-18',['<b>魔物の種類で取れる素材が違う</b>：小型＝小さな魔核・大型＝魔核・竜型＝龍鱗・空を飛ぶ魔物＝飛膜・ボス＝巨大魔核','<b>巨大魔核の使い道を3つから1つ選ぶ</b>（城の画面）：竜哮砲（城に据える巨大な大砲。夜、20秒ごとに空へ撃ち上げて、いちばん魔物の多いところに落とす。龍鱗5も使う）・知恵の結晶（使うと5ターン研究が2倍の速さ）・英雄の目覚め（英雄1人が大きく強くなる）','<b>竜晶</b>：精錬所をランクⅦにすると、エーテル2・聖銀1・龍鱗1から竜晶を作れる。竜晶の武器と防具（ランクⅦ）に使う','龍鱗の壁は龍鱗を、風船爆弾とグリフォン騎兵は飛膜を、ランクⅦのアップグレードは龍鱗を使う','<b>占い師</b>：ブラッドムーンの3日前の夜に来て、不吉な予言を残す（幸福度 −10・3日間）','<b>まとめて建てる・替えるときは端から順番に</b>：柵や罠をドラッグで並べたとき、施設をまとめて替えたとき（施設の画面の「同じ施設をまとめて替える」）、パパパッと順番に出る。音の高さも少しずつ違う','英雄を付けられる生産施設は、資源を作る施設だけ（住居・研究室・酒場などはなし）']],
