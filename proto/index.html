@@ -1538,7 +1538,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .dxi.big .dxcv{width:300px;height:120px;image-rendering:pixelated;display:block}
 @media (max-width:900px){.dxi.big{width:100%;max-width:300px;height:auto}}
 .kcnext{display:flex;gap:8px;align-items:center;margin:4px 0}.kcnext img{width:32px;height:32px;image-rendering:pixelated;background:#0003;border-radius:4px}
-#nShort{position:absolute;bottom:calc(100% + 4px);left:0;z-index:30;background:#3a0d0a;border:1px solid #ff6a5a;color:#ffd0c8;font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none}#controls{position:relative}
+#depChip{position:absolute;bottom:calc(100% + 4px);right:0;z-index:30;font-size:12px;padding:3px 10px;border-radius:3px;white-space:nowrap;cursor:pointer}#depChip.dep{background:#2a2420;border:1px solid #b8b0a0;color:#e8e0d0}#depChip.soon{background:#2a2004;border:1px solid #f2b33d;color:#f2d080}#nShort{position:absolute;bottom:calc(100% + 4px);left:0;z-index:30;background:#3a0d0a;border:1px solid #ff6a5a;color:#ffd0c8;font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none}#controls{position:relative}
 .dhints{font-size:13px;line-height:1.8;margin:2px 0 8px}.dhints b{color:var(--amber,#f2b33d)}
 /* 施設の中身の小さなムービー（2026-11-15） */
 .fbox{margin:6px 0 8px;border:1px solid var(--line,#33402f);background:rgba(0,0,0,.25);border-radius:3px}
@@ -4608,6 +4608,7 @@ function morning(){
   S.moods=(S.moods||[]).map(m=>({...m,d:m.d-1})).filter(m=>m.d>0);
   if(S.seedT>0)S.seedT--;
   if(IS_PROTO&&S.wisT>0)S.wisT--;
+  if(IS_PROTO)for(const b of S.blds){if(!YIELD[b.type]||b.res==null||b.res===Infinity)continue;b.resRate=b.resPrev!=null?Math.max(0,b.resPrev-b.res):0;b.resPrev=b.res;}   /* 枯渇の見込み（1日に減った量） */
   if(IS_PROTO&&S.mods)for(const k in S.mods){const m=S.mods[k];if(m.t>0){m.t--;if(!m.t){const o=modOpt(k,m.id);log(`街の${B[k].name}の改造「${o?o[1]:''}」が付いた`,'good');}}}   /* 改造の付け替え */
   if(IS_PROTO){for(const b of S.blds)if(b.nEnch){const k=nEnchKind(b);b.nEnch=false;if(k!=='p')nEnchHp(b);}for(const q of S.squads)if(q.nEnch){q.nEnch=false;nEnchHp(q);}}   /* 今夜のエンチャントは朝にはがれる */
   if(IS_PROTO){for(const c of S.cmds){c.busy=false;if(unitHero(c)&&!heroSquad(c))spawnHero(c);}}   /* 試作：訓練の休みを終える・部隊を失って生き残った英雄は城から出直す */
@@ -5866,7 +5867,18 @@ function ammoForecast(){
 }
 // 次の夜に使う資源の見込み（2026-11-15）：今夜の敵を倒し切るまでに、防衛施設（弾の種類ごと）と部隊（補給）と篝火が使う量。
 // 手持ち＋夜までの生産（差し引き）と比べて、足りないものを返す。[{k,need,have}]
-function nightShortChip(){const bn=document.getElementById('bNext');if(!bn)return;let c=document.getElementById('nShort');if(!c){c=document.createElement('div');c.id='nShort';bn.parentElement.insertBefore(c,bn);}
+/* 試作（2026-11-19）：枯渇した・もうすぐ枯渇する生産施設 */
+function depLeft(b){if(!YIELD[b.type]||b.dep||!(b.resRate>0)||b.res==null)return null;return Math.ceil(b.res/b.resRate);}
+function depList(){return {dep:S.blds.filter(b=>b.dep&&YIELD[b.type]),soon:S.blds.filter(b=>{const t=depLeft(b);return t!=null&&t<=3;})};}
+function camFocus(b){cam.z=Math.max(cam.z||1,1.4);cam.x=bcx(b)-VW/cam.z/2;cam.y=bcy(b)-VH/cam.z/2;try{clampCam();}catch(e){}S.sel=b;S.selTile=null;renderInfo(true);}
+function depChip(){const bn=document.getElementById('bNext');if(!bn||!IS_PROTO)return;let c=document.getElementById('depChip');if(!c){c=document.createElement('button');c.id='depChip';bn.parentElement.insertBefore(c,bn);c.onclick=()=>{const D=depList(),L=[...D.dep,...D.soon];if(!L.length)return;S._depI=((S._depI||0)+1)%L.length;camFocus(L[S._depI]);se('click');};}
+  let D={dep:[],soon:[]};try{if(S&&S.mode==='campaign'&&!S.over)D=depList();}catch(e){}
+  const h=D.dep.length||D.soon.length?`${D.dep.length?`枯渇 ${D.dep.length}軒`:''}${D.dep.length&&D.soon.length?'・':''}${D.soon.length?`もうすぐ枯渇 ${D.soon.length}軒`:''}`:'';if(c.textContent!==h)c.textContent=h;c.hidden=!h;c.className=D.dep.length?'dep':'soon';c.title='押すと、その施設へ移動します（押すたびに次へ）';}
+function drawDepMarks(an){const z=cam.z||1;for(const b of S.blds){if(!YIELD[b.type])continue;const t=b.dep?0:depLeft(b);if(t==null||t>3)continue;const n=bsz(b),x=b.x*T+n*T/2,y=b.y*T-4;
+  ctx.save();if(b.dep){ctx.globalAlpha=0.55+0.45*Math.abs(Math.sin(an*2.5+b.id));const w=14,h=9;ctx.fillStyle='rgba(20,18,24,.85)';ctx.fillRect(x-w/2-2,y-h-4,w+4,h+4);ctx.strokeStyle='#b8b0a0';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x-w/2,y-h);ctx.lineTo(x-w/2+2,y-2);ctx.lineTo(x+w/2-2,y-2);ctx.lineTo(x+w/2,y-h);ctx.stroke();ctx.beginPath();ctx.moveTo(x-w/2+2,y-h+3);ctx.lineTo(x+w/2-2,y-h+3);ctx.stroke();ctx.beginPath();ctx.arc(x,y-h,w/2-1,Math.PI,0);ctx.stroke();}   /* 空のかご（点滅） */
+  else{const lab='残り'+t+'T',fs=Math.max(8,10/z);ctx.font=`bold ${fs}px sans-serif`;const tw=ctx.measureText(lab).width+6;ctx.fillStyle='rgba(40,30,4,.9)';ctx.fillRect(x-tw/2,y-fs-4,tw,fs+4);ctx.strokeStyle='#f2b33d';ctx.lineWidth=1;ctx.strokeRect(x-tw/2+.5,y-fs-3.5,tw-1,fs+3);ctx.fillStyle='#f2b33d';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lab,x,y-fs/2-2);}
+  ctx.restore();}}
+function nightShortChip(){if(IS_PROTO)depChip();const bn=document.getElementById('bNext');if(!bn)return;let c=document.getElementById('nShort');if(!c){c=document.createElement('div');c.id='nShort';bn.parentElement.insertBefore(c,bn);}
   let L=[];try{if(S&&S.mode==='campaign'&&!S.waveActive&&!S.over&&S.turnsLeft<=2)L=nightNeeds().filter(r=>r.have<r.need);}catch(e){}
   const h=L.length?`⚠ 次の襲撃で足りない：${L.map(r=>`${RES_NAME[r.k]||r.k} −${r.need-r.have}`).join('・')}`:'';if(c.textContent!==h)c.textContent=h;c.hidden=!L.length;}
 function nightNeeds(){const w=S.waveActive?S.cur:S.next;if(!w)return [];
@@ -6018,7 +6030,7 @@ function draw(){
   drawRuins();
   for(const b of S.blds){{const m=3*TU,bx=b.x*T,by=b.y*T,bs=bsz(b)*T;if(bx+bs<VR[0]-m||by+bs<VR[1]-m||bx>VR[0]+VR[2]+m||by>VR[1]+VR[3]+m)continue;}drawBuilding(b,an);if(b.ench){const n=bsz(b);for(let i=0;i<b.ench;i++){const sx=b.x*T+3+i*5,sy=b.y*T+3;ctx.fillStyle='#1a0e2a';ctx.fillRect(sx-1,sy-1,5,5);ctx.fillStyle='#c48aff';ctx.fillRect(sx,sy,3,3);}}}
   drawUpgBadges(an);
-  if(IS_PROTO)drawWanderHeroes(an);
+  if(IS_PROTO){drawWanderHeroes(an);drawDepMarks(an);}
   if(!S.backdrop)for(const b of S.blds)if(outOfAmmo(b))drawNoAmmo(b);
   if(!S.backdrop)drawNEnch();
   if(S.viewProd&&!S.waveActive)drawProdView();
