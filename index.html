@@ -4938,6 +4938,7 @@ function update(dt,sim){
         if((q[S.qi].sub||0)>(S.subShown??-1)){const nm=['第一','第二','第三','第四'][q[S.qi].sub]||'次';log(`敵を全滅させた — ${nm}波がまもなく来る`,'good');}}}
     if(S.qi>=q.length&&S.enemies.length===0){
       S.waveActive=false;se('clear');auMusicFor();
+      S.skfx=[];S.ftx=[];S.flares=[];for(const b of S.blds){b.boostT=0;}for(const q of S.squads){q.yugT=q.buffT=q.invT=q.shieldT=q.rapidT=0;}   /* 襲撃が終わったらスキルの演出と効き目を消す（号令の途中で終わると残っていた・2026-11-19） */
       log(`第${S.wave}襲撃 撃退（撃破${S.waveKills}）`,'good');
       const ws=S.waveStart||{};
       if(S.wave===finalWave()&&!S.endless){recordWave(ws,true);S.won=true;S.over=true;showEnd(true);return;}
@@ -7075,8 +7076,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
       <button id="ruinOne" style="margin-top:4px" ${!S.waveActive&&canAfford(c)?'':'disabled'}>建て直す（${costText(c)}）</button>
       ${all.length>1?`<button id="ruinAll" style="margin-top:4px" ${!S.waveActive?'':'disabled'}>廃墟をまとめて建て直す（${all.length}件・${costText(ac)}）</button>`:''}
       <button id="ruinClr" style="margin-top:4px">片付ける（建て直さない）</button></div>`;}
-    const tb=tileBuildHTML(x,y,'このマスに建設');
-    h+=tb||`<div class="muted" style="margin-top:8px">${S.ter[y][x]===3||S.ter[y][x]===4?'このマスには建設できません':'建てられる施設がありません'}</div>`;
+    /* 土地を選んだときの建設リストはなくした（建設は下の建設タブから・2026-11-19） */
     el.innerHTML=h;bindTileBuild(el,x,y);document.getElementById('tClose').onclick=()=>{S.selTile=null;renderInfo(true);};
     {const a=document.getElementById('ruinOne');if(a)a.onclick=()=>{if(rebuildRuin(rn)){log(`${B[rn.type].name}を建て直した`,'good');S.sel=S.grid[y][x];S.selTile=null;}renderInfo(true);};
      const b2=document.getElementById('ruinAll');if(b2)b2.onclick=()=>{let n=0;for(const r of [...(S.ruins||[])].sort((p,q)=>(WALL_TYPES.includes(p.type)?1:0)-(WALL_TYPES.includes(q.type)?1:0)))if(rebuildRuin(r,true))n++;if(n){se('upgrade');log(`廃墟 ${n}件を建て直した`,'good');}else se('error');renderInfo(true);};
@@ -7840,7 +7840,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.12.2','2026-11-19',['倒れた魔物と兵が、その場で横に倒れて少しつぶれてから消えるように','閉じるボタンをどの画面でも右下にそろえた','研究の中止ボタンを、研究中のカードの上の赤い枠のボタンに移した（まちがえて押さないように）','下の一括のところに「廃墟を建て直す」ボタンを追加（壊された施設をまとめて建て直す）']],
+ ['1.12.2','2026-11-19',['倒れた魔物と兵が、その場で横に倒れて少しつぶれてから消えるように','閉じるボタンをどの画面でも右下にそろえた','研究の中止ボタンを、研究中のカードの上の赤い枠のボタンに移した（まちがえて押さないように）','下の一括のところに「廃墟を建て直す」ボタンを追加（壊された施設をまとめて建て直す）','英雄の号令などのスキルの途中で襲撃が終わると、光や文字が残ったままになるのを直した','土地を選んだときの建設リストをなくした（建設は下の建設タブから）']],
  ['1.12.1（試作版だけ）','',['<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
  ['1.12.1','2026-11-17',['不具合の修正：建て終わった施設の耐久が減ったままになっていた（前の版で建てた施設も、読み込んだときに満タンに戻す）','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）']],
  ['1.12','2026-11-17',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>時間のバー</b>を地図の中から出して、敵情予測と地図のあいだの細い帯に（残りの時間も出る）','<b>ミニマップに小さな見出し</b>をつけた：「大・小」で大きさを切り替え、「－」でたたむ（たたむと見出しだけになり、「＋」で戻す）','<b>防衛施設の詳しい画面に、夜の実際の動き</b>：施設が、地図の上と同じ絵の弾（バリスタは重い矢、投石機は石、物見櫓は矢など）で、歩いてくる魔物を撃つ小さな場面','<b>弾がまったくなくて撃てない防衛施設</b>には、地図の上で施設の上に赤い「!!」を出すように（昼でも分かる）','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる','<b>木の柵は置いたらすぐ完成</b>（罠と同じ）','不具合の修正：建て終わった施設の耐久が少し減って見えることがあった']],
