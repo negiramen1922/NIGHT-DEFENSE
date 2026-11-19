@@ -1776,7 +1776,7 @@ function happyTarget(){return Math.max(0,Math.min(100,happyParts().reduce((a,p)=
 function happyMul(){const h=S.happy;return (h>=75?1.15:h>=55?1:h>=35?0.85:0.7)*(S.starBoost===1?1.1:1);}
 function happyIc(sz){const h=S.happy;const [k,c]=h>=75?['h_joy','green']:h>=55?['h_ok','light']:h>=35?['h_bad','amber']:['h_riot','red'];return ui(k,c,sz||14);}
 function happyName(){const h=S.happy;return h>=75?'上機嫌':h>=55?'ふつう':h>=35?'不満':'暴動寸前';}   // 住民1人あたりの食料消費（毎秒）
-const HQ_GOLD=12;   // 城館の収入（毎ターン）
+const HQ_GOLD=/\/proto\//.test(location.pathname)?18:12;   /* 試作（2026-11-19）：生産の%の研究がなくなって施設が増えた分、金貨が足りなかったので 12→18。道具を替える費用の金貨もなくした */   // 城館の収入（毎ターン）
 const WAVE_LEAD=3;   // 敵を全滅させてから次の波が来るまでの秒数
 const FINAL_WAVE_BASE=10, FIRST_PREP=10, NEXT_PREP=4, BIG_PREP=6, TURN_SEC=10;
 // 山場（ブラッドムーン・ボスの夜）の前は準備の日を長く（2026-11-16 ユーザーの指定：山場の前に6日）
@@ -1916,6 +1916,7 @@ B.dbreath={name:'ドラゴンブレス',glyph:'竜',hp:600,heat:2,cost:{steel:12
 B.mabou={name:'魔弾砲',glyph:'魔',hp:340,heat:2,cost:{steel:100,iron:60,mat:30,gold:60},pop:4,power:0,spec:'守備',grp:'def',req:'mabou',desc:'エーテル結晶を撃ち出す直射砲。射程内でいちばん硬い敵（トロール・シーカー・キングなど）を狙って大ダメージ。エーテル結晶を1発1つ使う',range:6,dmg:200,rate:2.9,pierce:true,direct:true,ammoKey:'elec',ammoUse:1};
 B.powder={name:'火薬工房',glyph:'薬',hp:220,heat:3,cost:{steel:80,stone:40,gold:30},pop:3,power:0,spec:'内政',grp:'prod',req:'gunpowder',desc:'木材を焼いた木炭と魔物の脂（魔核）から火薬を作る（木材 −6・魔核 −1 → 火薬 +6／T）。大砲・迫撃砲・砲兵隊が使う'};
 B.mortar={name:'迫撃砲',glyph:'迫',hp:280,heat:2,cost:{steel:100,iron:80,stone:40,gold:80},pop:4,power:0,spec:'守備',grp:'def',req:'mortar',desc:'投石機の上位。火薬で石の砲弾を高く打ち上げる曲射砲。射程がとても長く、着弾点を大きく吹き飛ばす。壁や味方の建物越しに撃てる（山は越えられない）。最低射程4マス。1発ごとに石材1・火薬1',range:9.5,minRange:2,dmg:120,rate:3.4,splash:1.9,ammoKey:'stone',ammoUse:1,ammo2:{powder:1}};
+if(/\/proto\//.test(location.pathname))B.how.dmg=40;   /* 試作（2026-11-19）：最初の投石機で範囲の中のゴブリン（体力30）がすべて一撃だったので 70→40。真ん中の近くだけ一撃 */
 B.cannon.req='cannontech';B.cannon.ammoUse=1;B.cannon.ammo2={powder:1};B.cannon.desc='火薬で鉄の砲弾を撃ち出す直射砲。射線上の敵を最大4体まで貫く。撃つと轟音とともに閃光が走る。1発ごとに鉄1・火薬1。城壁の上にも置ける';
 B.apart={name:'集合住宅',glyph:'集',hp:320,heat:1,cost:{steel:110,stone:50,gold:30},pop:0,power:0,spec:'内政',grp:'prod',req:'apart',desc:'何世帯も住める大きな家。1棟に36名まで住める（アップグレードでランク2:54名・ランク3:72名）。毎ターン5名ずつ住民が増える'};
 B.hq.hp=3000;B.hq.cap=3;B.hq.name='城';B.hq.desc='街の中心の城（4×4マス）。失うと敗北。周囲を明るく照らす。農兵をここで集める';
@@ -2268,7 +2269,7 @@ function techMul(type){if(IS_PROTO)return 1+(type==='farm'&&S.seedT>0?0.2:0);   
  set('swordplay',{name:'剣術',eff:'農兵・剣士・重装歩兵・騎兵の火力 +20%'});
  set('archery',{name:'弓術',eff:'弓兵隊と物見櫓の火力 +20%'});
  set('doctrine',{name:'英雄教練',cost:{gold:40,fuel:30},eff:'英雄の獲得経験 +50%'});
- set('nighthunt',{cat:'部隊',tier:1,name:'夜狩り術',cost:{fuel:40,ammo:20},t:2,pre:[],icon:'archer',eff:'夜狩りで持ち帰る魔核 +50%、負傷・戦死の危険 −40%'});
+ set('nighthunt',{cat:'部隊',tier:1,name:'夜狩り術',cost:{fuel:40,ammo:20},t:2,pre:[],icon:'archer',eff:(IS_PROTO?'夜狩りで持ち帰る小さな魔核・魔核 +50%':'夜狩りで持ち帰る魔核 +50%')+'、負傷・戦死の危険 −40%'});
  set('formation',{name:'隊列'});set('elite',{name:'精鋭'});set('magic',{name:'魔術'});
  // 魔核
  set('analysis',{name:'魔核解剖',eff:'全ての攻撃の魔物へのダメージ +10%'});
@@ -2868,7 +2869,7 @@ function initCommon(){
   {const sp=[];for(let r=1;r<10*MAP_SCALE;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++)if(Math.max(Math.abs(dx),Math.abs(dy))===r)sp.push([hqTX(dx),hqTY(dy)]);
    const put=k=>{for(const [x,y] of sp)if(x>=0&&y>=0&&x<COLS&&y<ROWS&&!S.grid[y][x]&&placeOKraw(k,x,y)){placeB(k,x,y,true);return;}};
    put('farm');put('miner');put('barracks');}
-  S.cmds.push(makeCmd('内政',1), makeCmd('守備',1));
+  if(!IS_PROTO)S.cmds.push(makeCmd('内政',1), makeCmd('守備',1));   /* 試作：英雄は英雄の家を建ててから（始めは0人・2026-11-19） */
   S.next=genWave(1);
   genCands();
   log(S.mode==='campaign'?`${mapName()}、城館稼働開始。${S.island?'沖の島にアビス（甲21号目標）を確認。魔物は海底を渡り浜から上陸する。':'敵の巣（アビス）3か所を確認。'}第1襲撃まで ${FIRST_PREP}ターン`:`基地城館、稼働開始。第1襲撃の襲撃まで ${FIRST_PREP}ターン`,'good');
@@ -3556,7 +3557,8 @@ function drawNightRest(an){
   // 闇の中の敵は赤い目だけ見える
   ctx.fillStyle='rgba(255,60,40,.85)';
   for(const e of S.enemies){if(seenE(e))continue;const x=(e.x-cam.x)*cam.z,y=(e.y-cam.y)*cam.z;if(x<0||y<0||x>VW||y>VH)continue;if(Math.sin(an*2+e.x)>0.85)continue;
-    const w=Math.max(1.2,1.6*cam.z);ctx.fillRect(x-3*cam.z,y-1*cam.z,w,w);ctx.fillRect(x+2*cam.z,y-1*cam.z,w,w);}
+    const sz=e._sz||(E[e.type].r||6)*3,hy=y-sz*0.28*cam.z,gp=Math.max(2.5,sz*0.09)*cam.z;   /* 目は頭の高さに（大きい魔物はお腹が光って見えていた・2026-11-19） */
+    const w=Math.max(1.2,1.6*cam.z*Math.max(1,sz/30));ctx.fillRect(x-gp-w/2,hy,w,w);ctx.fillRect(x+gp-w/2,hy,w,w);}
 }
 // 撃ってきた敵は一瞬光って見える（闇から撃ち続けて夜が終わらないのを防ぐ）
 function seenE(e){if(S.eyes)for(const [x,y,r] of S.eyes)if(Math.hypot(e.x-x,e.y-y)<=r)return true;return litAt(e.x,e.y)||(e.flashT||0)>(S.waveT||0);}
@@ -3636,7 +3638,7 @@ function stageName(b){const k=KC[b.type];return k&&k.st[(b.lv||1)-1]?k.st[(b.lv|
 const UPG_MAT={2:{iron:15,coal:10},3:{alloy:12,coal:6},4:{elec:15,coal:6},5:{mmetal:10,coal:6},6:{mithril:8,coal:6},7:{mithril:12,mat:10}};   /* その素材の段に改築するとき（2026-11-13 増やした） */
 function upgPop(b){if(!IS_PROTO||!B[b.type].pop)return 0;const nb=Object.assign({},b,{lv:(b.lv||1)+1,upg:false,bt:0});return Math.max(0,crewNeed(nb)-(b.crew||0));}   /* 試作：アップグレードで増える働き手（足りない分も）は、待機中の住民から入れる（2026-11-19） */
 function upgCost(b){
-  if(isTool(b)){const c={},M=TOOL_COST[b.lv]||{};for(const x in M)c[x]=M[x];c.gold=10*b.lv;const pp=upgPop(b);if(pp)c.pop=pp;return c;}   /* 試作：道具を替える費用 */
+  if(isTool(b)){const c={},M=TOOL_COST[b.lv]||{};for(const x in M)c[x]=M[x];const pp=upgPop(b);if(pp)c.pop=pp;return c;}   /* 試作：道具を替える費用 */
   const base=B[b.type].cost,m=[0,1,1.5,2,2.5,3,3.5][b.lv]||3;const c={};
   for(const k in base){if(k==='gold')continue;c[k]=Math.max(5,Math.round(base[k]*m/5)*5);}
   if(base.gold)c.gold=Math.max(5,Math.round(base.gold*m*0.5/5)*5);
@@ -4426,7 +4428,7 @@ const VISIT={
 function useText(c){return Object.keys(c).filter(k=>c[k]).map(k=>{const have=Math.floor(S[k]||0),lack=have<c[k];return `<span class="use${lack?' lack':''}" title="${RES_NAME[k]||k} ${c[k]}を使う（いま ${have}）${lack?'・足りない':''}">${ic(k,12)}−${c[k]}<small class="hv">（いま${have}）</small></span>`;}).join('');}
 // 使う前と後：「金貨 347 → 317」（夜の出来事のポップアップ。2026-11-16 ユーザーの希望：消費するとき今どれくらいあるか見えるように）
 function afterText(c){const ks=Object.keys(c).filter(k=>c[k]);if(!ks.length)return '<span class="muted">使う物はありません</span>';
-  return ks.map(k=>{const have=Math.floor(S[k]||0),lack=have<c[k];return lack?`<span class="aft lack" title="足りない">${ic(k,14)}${RES_NAME[k]||k} <b style="color:#f0e4c8">${have}</b> / <b>${c[k]}</b></span>`:`<span class="aft">${ic(k,14)}${RES_NAME[k]||k} <b>${have}</b> → <b>${have-c[k]}</b></span>`;   /* 足りないときは「今 / 要る量」（要る量を赤で） */}).join('');}
+  return ks.map(k=>{const have=Math.floor(S[k]||0),lack=have<c[k];return lack?`<span class="aft lack" title="足りない">${ic(k,14)}${RES_NAME[k]||k} <b style="color:#f0e4c8">${have}</b> / <b>${c[k]}</b></span>`:`<span class="aft">${ic(k,14)}${RES_NAME[k]||k} <b style="color:#f2b33d">${c[k]}</b> 使う <span class="muted">（${have} → ${have-c[k]}）</span></span>`;   /* 足りないときは「今 / 要る量」（要る量を赤で） */}).join('');}
 function visitCost(o){return typeof o.cost==='function'?o.cost():(o.cost||{});}
 // 夜の出来事で、リリアが言うこと [表情, せりふ]
 const VISIT_LIL={trav:['normal','寒そうな一家です……。食料を少し分ければ、この街に残ってくれるかもしれません。'],fest:['smile','お祭りの相談です！ 開けば、街のみんなが元気になりますよ。'],shop:['smile','行商人さんです。珍しい品があるかもしれません。金貨の残りに気をつけてくださいね。'],
@@ -4514,7 +4516,7 @@ function showNight(){phaseReset();
   // 夜狩り
   h+=`<h3 style="margin:12px 0 4px">夜狩り</h3><div class="help">参加する部隊は<b>1つの一団</b>で森へ出ます（まとめるほど安全）。残った部隊は街の<b>夜警</b>になり、夜中の事件の被害を小さくします。</div>`;
   {const pv=huntPreview(huntParty());const pct=Math.min(100,pv.r/2*100),g=nightGuards();
-   h+=`<div class="hparty"><div class="row" style="align-items:center"><span><b>今夜の狩り</b> <span class="muted" style="font-size:12px">${pv.n?`${pv.n}部隊・${pv.men}人`:'参加する部隊を選んでください'}</span></span>${pv.n?`<span>危険 <b style="color:${pv.rc}">${pv.risk}</b>　${ic('mat',12)}魔核 約${pv.mat}　経験 +${huntXp(huntParty())}/部隊</span>`:''}</div>
+   h+=`<div class="hparty"><div class="row" style="align-items:center"><span><b>今夜の狩り</b> <span class="muted" style="font-size:12px">${pv.n?`${pv.n}部隊・${pv.men}人`:'参加する部隊を選んでください'}</span></span>${pv.n?`<span>危険 <b style="color:${pv.rc}">${pv.risk}</b>　${IS_PROTO?`${ic('smat',12)}小さな魔核 約${pv.mat}${Math.floor(pv.mat/5)?`・${ic('mat',12)}魔核 約${Math.floor(pv.mat/5)}`:''}`:`${ic('mat',12)}魔核 約${pv.mat}`}　経験 +${huntXp(huntParty())}/部隊</span>`:''}</div>
      <div class="hmeter" title="一団の戦力（右ほど安全）"><i style="width:${pct}%;background:${pv.n?pv.rc:'transparent'}"></i><u style="left:45%"></u><u style="left:80%"></u></div>
      <div class="muted" style="font-size:10.5px;display:flex;justify-content:space-between"><span>危険</span><span>ふつう</span><span>安全</span></div>
      <div class="row" style="margin-top:4px"><span class="muted">街の夜警</span><span>${ui('eye',g?'green':'red',12)} ${g}部隊${g?'':'（だれも残っていない）'}</span></div></div>`;}
@@ -4565,7 +4567,7 @@ function morning(){
   if(S.starBoost>0)S.starBoost--;
   const D=huntDanger();let tot=0;const res=[];let ot=null;const pl=[];
   const party=huntParty(),P=party.reduce((a,q)=>a+huntPower(q),0),ye=party.some(q=>heroSk(q,'yome'));
-  if(party.length){tot=Math.max(0,Math.round((3+S.wave*1.5)*Math.max(0.3,Math.min(huntMatCap(party.length),P/D))*(0.6+Math.random()*0.8)*(has('nighthunt')?1.5:1)*(ye?2:1)));S.mat+=tot;}
+  if(party.length){tot=Math.max(0,Math.round((3+S.wave*1.5)*Math.max(0.3,Math.min(huntMatCap(party.length),P/D))*(0.6+Math.random()*0.8)*(has('nighthunt')?1.5:1)*(ye?2:1)));if(IS_PROTO){S.smat=(S.smat||0)+tot;S.mat+=Math.floor(tot/5);}else S.mat+=tot;}   /* 試作（2026-11-19）：夜狩りは小さな魔核が主。魔核は5つに1つ */
   const hxp=huntXp(party);
   for(const q of party){
     const mat=0;
@@ -4576,7 +4578,7 @@ function morning(){
     if(dead||loss>0.25)log(`夜狩り：${unitLabel(q)}${dead?` 戦死${dead}人`:' 負傷'}`,dead?'kia':'warn');
     res.push({q:unitLabel(q),m:MT(q).key,mat,dead,hp:Math.round(q.hp/q.maxhp*100),loss,xp:hxp,up:q._hl,vi:vetIc(q,12)});delete q._hl;
   }
-  if(party.length)log(`夜狩りの一団（${party.length}部隊）が戻った：魔核+${tot}`,'good');
+  if(party.length)log(IS_PROTO?`夜狩りの一団（${party.length}部隊）が戻った：小さな魔核+${tot}${Math.floor(tot/5)?`・魔核+${Math.floor(tot/5)}`:''}`:`夜狩りの一団（${party.length}部隊）が戻った：魔核+${tot}`,'good');
   // 事件は、狩りの部隊が戻る前（夜警の数で決まる）
   const b4={fuel:Math.floor(S.fuel),pop:S.pop,mat:Math.floor(S.mat),happy:Math.round(S.happy)};
   const inc=nightIncident(N);
@@ -7480,7 +7482,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     for(const mk of modelsAt(o.type,o)){const m=MTC[mk];
       h+=`<button data-model="${mk}" style="margin-top:3px;width:100%;text-align:left" title="${m.desc}" ${canAfford(m.cost,m.popEach*m.members)&&!(o.bt>0)&&!full?'':'disabled'}><span style="display:flex;gap:6px;align-items:center">${icSvg(mk,26)}<span><b style="color:${m.color}">${m.name}</b> <span class="muted" style="font-size:10px">${m.role}</span><br><span style="font-size:11px">${costText(m.cost,m.popEach*m.members)}・${Math.ceil(unitTime(mk,o)/TURN_SEC)}T</span></span></span></button>`;}
     if(ut==='mech'&&!modelsFor('mech').length)h+=`<div class="muted" style="font-size:11px">研究「戦術機開発」で撃震を国内生産できます</div>`;
-    for(const mk of buyModels(ut)){const m=MTC[mk];
+    if(!IS_PROTO)for(const mk of buyModels(ut)){const m=MTC[mk];   /* 試作：買う部隊（海外調達）はなし（2026-11-19） */
       h+=`<button data-model="${mk}" style="margin-top:3px;width:100%;text-align:left" title="${m.desc}" ${canAfford(m.cost,m.popEach*m.members)&&!(o.bt>0)&&!full?'':'disabled'}><span style="display:flex;gap:6px;align-items:center">${icSvg(mk,26)}<span><b style="color:${m.color}">${m.name}</b> <span class="muted" style="font-size:10px">${m.role}</span><br><span style="font-size:11px">${costText(m.cost,m.popEach*m.members)}・${Math.ceil(unitTime(mk,o)/TURN_SEC)}T</span></span></span></button>`;}
     h+=`<div id="iQ" class="muted">${o.queue?`訓練中 ${o.queue}`:''}</div>`;
     if(o.qm&&o.qm.length)h+=o.qm.map((mk,i)=>`<div class="row" style="font-size:11px"><span>${i===0?'▶':'・'} ${MTC[mk].name}</span><button data-qcancel="${i}" style="padding:1px 6px;font-size:11px">取り消す</button></div>`).join('');
@@ -8180,7 +8182,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.19（試作版だけ）','2026-11-18',['柵などをまとめて建てたあと、セーブして読み込み直すと見えなくなることがあったのを直した','下の一括のところに「廃墟を建て直す」ボタンを追加','英雄の号令などのスキルの途中で襲撃が終わると、光や文字が残ったままになるのを直した','土地を選んだときの建設リストをなくした（建設は下の建設タブから）','前哨砦の絵の上が切れていたのを直した（切れていた旗を消して、かがり火の炎の先と旗竿の先を描き足した）','訓練所などに出ていた「海外調達」の表示をなくした（英雄は英雄の家から）','<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：画面の上の街の名前・戦いの結果・つづきから・前哨砦にも出る。地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','英雄の家・港・空港・グリフォンの厩舎・兵器工房の建設のアイコン、土地を選んだときの建設の一覧にもアイコン','アップグレードで増える働き手は、費用の「住民」として待機中の住民からすぐに入る（アップグレード直後に人手不足にならない）','倒れた魔物と兵は、その場で横に倒れて少しつぶれてから消える','武器工房の道具の段の絵（地図の絵と立ち絵）を入れた','道具の段の立ち絵を入れた（施設を選んだときの絵が、道具の段ごとに変わる）','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
+ ['1.19（試作版だけ）','2026-11-18',['柵などをまとめて建てたあと、セーブして読み込み直すと見えなくなることがあったのを直した','下の一括のところに「廃墟を建て直す」ボタンを追加','英雄の号令などのスキルの途中で襲撃が終わると、光や文字が残ったままになるのを直した','土地を選んだときの建設リストをなくした（建設は下の建設タブから）','一括修理・一括補給などの確認で、使う量をはっきり出すようにした（「矢 76 使う（671 → 595）」）','闇の中の大きい魔物（トロールなど）の赤い目が、お腹の位置に出ていたのを頭の高さに直した','夜狩りで持ち帰るのは、主に小さな魔核に（魔核は5つに1つ）','「海外調達」（買う部隊）をなくした','英雄は英雄の家を建ててから（始めの2人をなくした。チュートリアルも合わせた）','投石機の威力 70→40（範囲の中のゴブリンがすべて一撃だったので）','金貨：城の毎ターンの金貨 12→18、道具を替える費用から金貨をなくした','前哨砦の絵の上が切れていたのを直した（切れていた旗を消して、かがり火の炎の先と旗竿の先を描き足した）','訓練所などに出ていた「海外調達」の表示をなくした（英雄は英雄の家から）','<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：画面の上の街の名前・戦いの結果・つづきから・前哨砦にも出る。地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','英雄の家・港・空港・グリフォンの厩舎・兵器工房の建設のアイコン、土地を選んだときの建設の一覧にもアイコン','アップグレードで増える働き手は、費用の「住民」として待機中の住民からすぐに入る（アップグレード直後に人手不足にならない）','倒れた魔物と兵は、その場で横に倒れて少しつぶれてから消える','武器工房の道具の段の絵（地図の絵と立ち絵）を入れた','道具の段の立ち絵を入れた（施設を選んだときの絵が、道具の段ごとに変わる）','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
  ['1.18（試作版だけ）','2026-11-18',['<b>大きな生産施設</b>（研究で建てる・4×4）：大農場・大伐採所・養殖場（ランクⅢ）、大採掘場（ランクⅣ・鉄3・石炭2・金1も取れる）。小さい施設4つ分より多く作る（4.5倍）。建てる資材は5倍、働き手は3倍。土地は4分の3が合っていれば建てられる。道具の段も使える。絵はまだないので小さい施設の絵を大きくして借りている','研究「魔核加工」をなくした','兵舎・馬小屋・竜舎・魔導院は、アップグレード1段ごとに入れられる部隊が1つ増える']],
  ['1.17（試作版だけ）','2026-11-18',['<b>道具の段は研究で開く</b>：はじめは木の道具。「石の道具」（Ⅰ）「鉄の道具」（Ⅱ）…「聖銀の道具」（Ⅵ）の研究で、全部の生産施設のその段が使えるようになる（鍛冶の心得はまとめた）','あとから建てる施設は、建てられるランクの道具を持って建つ（炭鉱なら鉄のつるはし）','<b>生産の技術</b>（%ではなく施設ごとの便利な効果）：石運びの道・輪作・網の繕い（Ⅰ）、植林・炭焼き・坑木の補強・夜釣り・魔矢づくり（Ⅱ）、発破・選鉱（Ⅲ）、換気坑（Ⅳ）','<b>魔矢</b>：武器工房で、矢と小さな魔核から作る。あるあいだは物見櫓とバリスタが先に使い、威力 +30%','<b>今夜のエンチャント</b>（研究「一夜の付与」）：小さな魔核で、防衛施設と部隊をその夜だけ強くする（火力 +30%・受ける被害 −15%）。朝にはがれる。まとめてかけるボタンもある','蒼い炎の篝火は、夜ごとに小さな魔核を燃やす','研究の費用に小さな魔核（ランクⅡから）と魔核（ランクⅣから）を使う','小さな魔核を魔核にまとめる仕組みは外した','道具の研究は、研究画面の各ランクのいちばん上に（黄色の枠）','研究「呪骸の柱」「夜狩り術」をなくした']],
  ['1.16（試作版だけ）','2026-11-18',['<b>魔物の種類で取れる素材が違う</b>：小型＝小さな魔核・大型＝魔核・竜型＝龍鱗・空を飛ぶ魔物＝飛膜・ボス＝巨大魔核','<b>巨大魔核の使い道を3つから1つ選ぶ</b>（城の画面）：竜哮砲（城に据える巨大な大砲。夜、20秒ごとに空へ撃ち上げて、いちばん魔物の多いところに落とす。龍鱗5も使う）・知恵の結晶（使うと5ターン研究が2倍の速さ）・英雄の目覚め（英雄1人が大きく強くなる）','<b>竜晶</b>：精錬所をランクⅦにすると、エーテル2・聖銀1・龍鱗1から竜晶を作れる。竜晶の武器と防具（ランクⅦ）に使う','龍鱗の壁は龍鱗を、風船爆弾とグリフォン騎兵は飛膜を、ランクⅦのアップグレードは龍鱗を使う','<b>占い師</b>：ブラッドムーンの3日前の夜に来て、不吉な予言を残す（幸福度 −10・3日間）','<b>まとめて建てる・替えるときは端から順番に</b>：柵や罠をドラッグで並べたとき、施設をまとめて替えたとき（施設の画面の「同じ施設をまとめて替える」）、パパパッと順番に出る。音の高さも少しずつ違う','英雄を付けられる生産施設は、資源を作る施設だけ（住居・研究室・酒場などはなし）']],
@@ -8441,8 +8443,9 @@ const MISSIONS=[
   {t:'兵舎を建てる',b:'train',n:1,d:'剣士や弓兵など、農兵のほかの部隊を招集できる施設です。'}],
   done:'頼もしい兵たちです！'},
  {id:'hero',name:IS_PROTO?'英雄':'英雄と熟練度',
-  say:['街には<b>英雄</b>がいます。いま街にいる英雄は、右の「<b>軍事</b>」のタブの「<b>英雄</b>」で見られます。{IMG:hero}',IS_PROTO?'英雄を<b>生産施設</b>や<b>防衛施設</b>に<b>配属</b>すると、その施設を強くしてくれます。配属のしかたは、施設をクリックして、選択中パネルの「<b>配属英雄</b>」から英雄を選ぶだけ。戦いの英雄は、自分ひとりで部隊として戦います。{ART:h_guard,h_admin}':'英雄を部隊や施設に<b>配属</b>すると、その部隊や施設を強くしてくれます。配属のしかたは、施設か部隊をクリックして、選択中パネルの「<b>配属英雄</b>」から英雄を選ぶだけ。英雄の一覧からも配属できますよ。{ART:h_guard,h_admin}','英雄には、それぞれ<b>スキル</b>があります。防衛施設の連射を上げる「速射」、生産を上げる「指導」など、英雄ごとに違います。英雄を選んで確かめてみてください。向いている配属先に置くと、もっと力を発揮しますよ。',...(IS_PROTO?['兵士の強さは、部隊ごとの<b>武器と防具</b>で決まります。城のランクが上がると、よい装備に替えられるようになりますよ。']:['それから、部隊には<b>熟練度</b>があります。戦いを経験するほど熟練度が上がって、強くなっていきます。熟練の部隊は大事にしてくださいね！'])],
+  say:[IS_PROTO?'<b>英雄の家</b>を建てると、<b>英雄</b>をやとえるようになります。やとった英雄は、右の「<b>軍事</b>」のタブの「<b>英雄</b>」で見られます。{IMG:hero}':'街には<b>英雄</b>がいます。いま街にいる英雄は、右の「<b>軍事</b>」のタブの「<b>英雄</b>」で見られます。{IMG:hero}',IS_PROTO?'英雄を<b>生産施設</b>や<b>防衛施設</b>に<b>配属</b>すると、その施設を強くしてくれます。配属のしかたは、施設をクリックして、選択中パネルの「<b>配属英雄</b>」から英雄を選ぶだけ。戦いの英雄は、自分ひとりで部隊として戦います。{ART:h_guard,h_admin}':'英雄を部隊や施設に<b>配属</b>すると、その部隊や施設を強くしてくれます。配属のしかたは、施設か部隊をクリックして、選択中パネルの「<b>配属英雄</b>」から英雄を選ぶだけ。英雄の一覧からも配属できますよ。{ART:h_guard,h_admin}','英雄には、それぞれ<b>スキル</b>があります。防衛施設の連射を上げる「速射」、生産を上げる「指導」など、英雄ごとに違います。英雄を選んで確かめてみてください。向いている配属先に置くと、もっと力を発揮しますよ。',...(IS_PROTO?['兵士の強さは、部隊ごとの<b>武器と防具</b>で決まります。城のランクが上がると、よい装備に替えられるようになりますよ。']:['それから、部隊には<b>熟練度</b>があります。戦いを経験するほど熟練度が上がって、強くなっていきます。熟練の部隊は大事にしてくださいね！'])],
   steps:[
+  ...(IS_PROTO?[{t:'英雄の家を建てる',b:'herohouse',n:1,d:'英雄が住む家です。建てると英雄をやとえるようになります。'},{t:'英雄を1人やとう',c:()=>S.cmds.length,n:1,ping:'herohouse',d:'英雄の家をクリックして、候補の英雄をやといます。'}]:[]),
   {t:'「軍事」→「英雄」で、街にいる英雄を見る',c:()=>S.heroSeen||0,n:1,rt:'army',hi:'#armySubs [data-asub="hero"]',d:'右の「軍事」のタブを開いて、上の「英雄」を押します。英雄ごとの得意な配属先とスキルが見られます。'},
   {t:IS_PROTO?'英雄を施設に配属する':'英雄を部隊か施設に配属する',c:()=>S.assignN||0,n:1,hi:'#bArmy',d:'施設か部隊をクリックして、選択中パネルの「配属英雄」から英雄を選びます。下の「軍事」→「英雄」からも配属できます。英雄を選ぶと、スキルと向いている配属先が見られます。'}],
   done:'これで、英雄の力も借りられます！ 次は、戦うための武器です。'},
