@@ -985,7 +985,7 @@ body.land #saveMark{right:calc(var(--rail) + 8px);bottom:auto;top:44px}   /* ス
   body:not(.land) #controls>.sep,body:not(.land) #controls>.speed{display:none!important}
   body:not(.land) #controls>#bSpd{display:inline-flex!important;flex-direction:row}
   body:not(.land) #controls>#bPause{display:inline-flex!important;flex-direction:row;align-items:center;height:34px!important;font-size:inherit}   /* ほかのボタンと同じ高さに */
-  body:not(.land) #controls>#bNext{order:1}body:not(.land) #controls>#bRepAll,body:not(.land) #controls>#bRuinAll,body:not(.land) #controls>#bGear{order:2}body:not(.land) #controls>#bSupAll{order:3}body:not(.land) #controls>#bNaval{order:4}
+  body:not(.land) #controls>#bNext{order:1}body:not(.land) #controls>#bRepAll,body:not(.land) #controls>#bRuinAll,body:not(.land) #controls>#bGear,body:not(.land) #controls>#bEnchN{order:2}body:not(.land) #controls>#bSupAll{order:3}body:not(.land) #controls>#bNaval{order:4}
   body:not(.land) #controls>.grow{order:5}body:not(.land) #controls>#bDex{order:6}body:not(.land) #controls>#bHist{order:7}body:not(.land) #controls>#bSpd{order:8}body:not(.land) #controls>#bPause{order:9}body:not(.land) #controls>#more{order:10}
   body:not(.land) #controls>#bSpd .mic,body:not(.land) #controls>#bSpd .pi{display:none}
   body:not(.land) #controls>#bPause .pi{width:12px!important;height:12px!important}
@@ -1522,7 +1522,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .hcd{margin-left:8px;font-family:var(--px-font);font-size:11px;color:var(--dim)}
 .hcd.ready{color:var(--green)}
 .hcd.fire{color:#fff;background:var(--mat);padding:0 5px}
-#bRepAll,#bSupAll,#bRuinAll,#bGear{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
+#bEnchN:not([disabled]){color:#e0c8ff;border-color:#9a6aff;background:#1e1430}#bRepAll,#bSupAll,#bRuinAll,#bGear,#bEnchN{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
 
 /* 立ち絵 v2 */
 .artpx{position:relative;width:100%;aspect-ratio:300/120;background-repeat:no-repeat;background-size:100% 100%;image-rendering:pixelated;background-color:#060a07}
@@ -1538,7 +1538,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .dxi.big .dxcv{width:300px;height:120px;image-rendering:pixelated;display:block}
 @media (max-width:900px){.dxi.big{width:100%;max-width:300px;height:auto}}
 .kcnext{display:flex;gap:8px;align-items:center;margin:4px 0}.kcnext img{width:32px;height:32px;image-rendering:pixelated;background:#0003;border-radius:4px}
-#depChip{position:absolute;bottom:calc(100% + 4px);right:0;z-index:30;font-size:12px;padding:3px 10px;border-radius:3px;white-space:nowrap;cursor:pointer}#depChip.dep{background:#2a2420;border:1px solid #b8b0a0;color:#e8e0d0}#depChip.soon{background:#2a2004;border:1px solid #f2b33d;color:#f2d080}#nShort{position:absolute;bottom:calc(100% + 4px);left:0;z-index:30;background:#3a0d0a;border:1px solid #ff6a5a;color:#ffd0c8;font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none}#controls{position:relative}
+#depChip{position:absolute;bottom:calc(100% + 4px);right:0;z-index:30;font-size:12px;padding:3px 10px;border-radius:3px;white-space:nowrap;cursor:pointer}#depChip.dep{background:#2a2420;border:1px solid #b8b0a0;color:#e8e0d0}#depChip.soon{background:#2a2004;border:1px solid #f2b33d;color:#f2d080}#nShort.ok{background:#0e2a14!important;border-color:#6fe08a!important;color:#c8f0d0!important}#nShort{position:absolute;bottom:calc(100% + 4px);left:0;z-index:30;background:#3a0d0a;border:1px solid #ff6a5a;color:#ffd0c8;font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none}#controls{position:relative}
 .dhints{font-size:13px;line-height:1.8;margin:2px 0 8px}.dhints b{color:var(--amber,#f2b33d)}
 /* 施設の中身の小さなムービー（2026-11-15） */
 .fbox{margin:6px 0 8px;border:1px solid var(--line,#33402f);background:rgba(0,0,0,.25);border-radius:3px}
@@ -1644,6 +1644,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <button id="bRepAll">一括修理</button>
       <button id="bRuinAll">廃墟を建て直す</button>
       <button id="bGear" hidden>装備・道具を替える</button>
+      <button id="bEnchN" hidden>エンチャント付与</button>
       <button id="bSupAll">一括補給</button>
       <button id="bNaval" style="display:none">艦砲射撃 [V]</button>
       <span class="sep"></span>
@@ -4101,7 +4102,7 @@ function useRes(src,k,v,b){S[k]-=v;if(!S.waveActive||!(v>0))return;const L=S.wle
 function supCosts(sp){return sp.costs||{[sp.key]:sp.per};}
 function supAvail(sp){let m=1e9;const c=supCosts(sp);for(const k in c)m=Math.min(m,(S[k]||0)/c[k]);return m;}
 function supPay(sp,n,src){const c=supCosts(sp);if(IS_PROTO){const C=S._sc=S._sc||{};for(const k in c){const t=(C[k]||0)+n*c[k],w=Math.floor(t+1e-9);if(w>0)useRes(src,k,w);C[k]=t-w;}return;}for(const k in c)useRes(src,k,n*c[k]);}   /* 試作：補給は端数をためて、1つ分になったら1ずつ使う（資材が整数で減る） */
-function wledHTML(){const L=S.wled||{};const rows=Object.entries(L).map(([src,o])=>[src,o,Object.values(o).reduce((a,v)=>a+v,0)]).sort((a,b)=>b[2]-a[2]);if(!rows.length)return '';
+function wledHTML(){const L0=S.wled||{};const L=IS_PROTO?Object.fromEntries(Object.entries(L0).map(([k,o])=>[k,Object.fromEntries(Object.entries(normC(o)).map(([x,v])=>[x,Math.round(v)]).filter(x=>x[1]>0))])):L0;const rows=Object.entries(L).map(([src,o])=>[src,o,Object.values(o).reduce((a,v)=>a+v,0)]).sort((a,b)=>b[2]-a[2]);if(!rows.length)return '';
   const tot={};for(const [,o] of rows)for(const k in o)tot[k]=(tot[k]||0)+o[k];
   return `<div style="margin-top:8px"><b>消費</b> <span style="margin-left:6px">${resTxt(Object.fromEntries(Object.entries(tot).map(([k,v])=>[k,-v])))}</span></div><div style="font-size:11.5px;margin-top:2px">`+rows.map(([src,o])=>`<div class="row" style="padding:1px 0"><span class="muted">${src}</span><span>${resTxt(Object.fromEntries(Object.entries(o).map(([k,v])=>[k,-v])))}</span></div>`).join('')+`</div>`;}
 function toast(msg,kind,ms){const box=document.getElementById('toasts');if(!box)return;const cv=document.getElementById('cv').getBoundingClientRect();box.style.left=(cv.left+cv.width/2)+'px';box.style.top=(cv.top+14)+'px';
@@ -5897,8 +5898,9 @@ function drawDepMarks(an){const z=cam.z||1;for(const b of S.blds){if(!YIELD[b.ty
   else{const lab='残り'+t+'T',fs=Math.max(8,10/z);ctx.font=`bold ${fs}px sans-serif`;const tw=ctx.measureText(lab).width+6;ctx.fillStyle='rgba(40,30,4,.9)';ctx.fillRect(x-tw/2,y-fs-4,tw,fs+4);ctx.strokeStyle='#f2b33d';ctx.lineWidth=1;ctx.strokeRect(x-tw/2+.5,y-fs-3.5,tw-1,fs+3);ctx.fillStyle='#f2b33d';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lab,x,y-fs/2-2);}
   ctx.restore();}}
 function nightShortChip(){if(IS_PROTO)depChip();const bn=document.getElementById('bNext');if(!bn)return;let c=document.getElementById('nShort');if(!c){c=document.createElement('div');c.id='nShort';bn.parentElement.insertBefore(c,bn);}
-  let L=[];try{if(S&&S.mode==='campaign'&&!S.waveActive&&!S.over&&S.turnsLeft<=2)L=nightNeeds().filter(r=>r.have<r.need);}catch(e){}
-  const h=L.length?`⚠ 次の襲撃で足りない：${L.map(r=>`${RES_NAME[r.k]||r.k} −${r.need-r.have}`).join('・')}`:'';if(c.textContent!==h)c.textContent=h;c.hidden=!L.length;}
+  let L=[],A=[];try{if(S&&S.mode==='campaign'&&!S.waveActive&&!S.over&&S.turnsLeft<=2){A=nightNeeds();L=A.filter(r=>r.have<r.need);}}catch(e){}
+  if(IS_PROTO&&S&&S.turnsLeft===1&&A.length&&!L.length){const h=`今夜の見込み：${A.map(r=>`${RES_NAME[r.k]||r.k} ${r.need}`).join('・')}（足りています）`;if(c.textContent!==h)c.textContent=h;c.hidden=false;c.className='ok';return;}   /* 試作：襲撃の日は、足りていても使う見込みを出す */
+  c.className='';const h=L.length?`⚠ 次の襲撃で足りない：${L.map(r=>`${RES_NAME[r.k]||r.k} −${r.need-r.have}`).join('・')}`:'';if(c.textContent!==h)c.textContent=h;c.hidden=!L.length;}
 function nightNeeds(){const w=S.waveActive?S.cur:S.next;if(!w)return [];
   const list=S.waveActive?S.enemies.map(e=>({type:e.type,hp:e.hp})).concat(S.cur.q.slice(S.qi).map(q=>({type:q.type}))):w.q;
   let hp=0;for(const e of list){const d=E[e.type];if(!d)continue;hp+=(e.hp!=null?e.hp:d.hp)/(has('incend')?1:1-(d.armor||0));}if(has('analysis'))hp/=1.1;if(has('incend'))hp/=1.15;
@@ -5909,6 +5911,7 @@ function nightNeeds(){const w=S.waveActive?S.cur:S.next;if(!w)return [];
   if(dps<=0)return [];const T=hp*1.25/dps;const need={};for(const k in use)need[k]=use[k]*T;
   // 篝火の燃料（襲撃の夜に1回）
   for(const b of S.blds)if(b.type==='brazier'&&!(b.bt>0)){const [k,n]=BRAZ_FUEL[(b.lv||1)-1]||BRAZ_FUEL[0];need[k]=(need[k]||0)+n;}
+  if(IS_PROTO){const nn=normC(need);for(const k in need)delete need[k];Object.assign(need,nn);}   /* 試作：矢・剣は木材と鉄で見込む */
   const e=econ(),TL=S.waveActive?0:S.turnsLeft,out=[];
   for(const k in need){const n=Math.ceil(need[k]);if(n<1)continue;const have=Math.floor((S[k]||0)+Math.max(0,TL-1)*((e.net||{})[k]||0));out.push({k,need:n,have});}
   return out.sort((a,b)=>(a.have-a.need)-(b.have-b.need));}
@@ -5917,7 +5920,7 @@ function runOut(k,e){const d=e.net[k];return d<0?S[k]/-d:Infinity;}
 function econWarnings(e,f){
   const w=[],c=e.cnt,TL=S.waveActive?0:S.turnsLeft;
   const need=(k,turns,msg)=>{const t=runOut(k,e);if(t<=turns+0.01)w.push([t<=TL?'bd':'wn',msg.replace('N',Math.max(0,Math.floor(t)))]);};
-  if(!c.ammo)w.push(['bd','武器工房がありません（矢を作れません）']);
+  if(!c.ammo&&!IS_PROTO)w.push(['bd','武器工房がありません（矢を作れません）']);
   if(c.ammo&&!c.ironmine&&e.net.iron<0)w.push(['bd','鉱山がありません（鉄が減り続けます）']);
   for(const r of nightNeeds()){if(r.have<r.need)w.push(['bd',`次の襲撃で${RES_NAME[r.k]||r.k}が約${r.need-r.have}足りなくなる見込み（必要 約${r.need}・夜までに ${Math.max(0,r.have)}）`]);else if(r.have<r.need*1.3)w.push(['wn',`次の襲撃で${RES_NAME[r.k]||r.k}がぎりぎり（必要 約${r.need}・夜までに ${r.have}）`]);}
   if(f&&!f.guns)w.push(['bd','稼働中の防衛施設がありません']);
@@ -7238,7 +7241,7 @@ document.getElementById('bArmy').onclick=()=>openArmyTab('list',true);
 function setRT(t){if(t==='info'&&!isNarrow())t='build';if(S&&t==='econ')S.econSeen=(S.econSeen||0)+1;if(S&&t==='army'&&S.armySub==='hero')S.heroSeen=(S.heroSeen||0)+1;document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
-document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bRuinAll').onclick=()=>askRuinAll();document.getElementById('bGear').onclick=()=>showGear();document.getElementById('bSupAll').onclick=()=>askSupplyAll();
+document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bRuinAll').onclick=()=>askRuinAll();document.getElementById('bGear').onclick=()=>showGear();document.getElementById('bEnchN').onclick=()=>{S._nek=null;askNEnchAll();};document.getElementById('bSupAll').onclick=()=>askSupplyAll();
 document.getElementById('bHelp').onclick=()=>{if(!S.overlay)showHelp(false);};
 document.getElementById('bNaval').onclick=toggleNaval;
 document.getElementById('bMute').onclick=auToggle;
@@ -7846,6 +7849,7 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,`一括補給${sq.length?`<span class="bkn">${sq.length}</span>`:''}<kbd>N</kbd>`);
   {const ms=document.getElementById('mSup');if(ms)setHTML(ms,sq.length?`一括補給（${sq.length}部隊）`:'一括補給（必要なし）');}const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
   const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中）':`一括修理${ra2.n?`<span class="bkn">${ra2.n}</span>`:''}<kbd>X</kbd>`);const dA=!ra2.n||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
+  {const be=document.getElementById('bEnchN');if(be){const ok=IS_PROTO&&!S.waveActive&&S.turnsLeft===1&&S.phase!=='night'&&Object.values(NENCH_REQ).some(r=>has(r));const n=ok?nEnchList(null).length:0;setHTML(be,`エンチャント付与${n?`<span class="bkn">${n}</span>`:''}`);be.hidden=!n;}}   /* 試作：襲撃の日だけ出す */
   {const bg=document.getElementById('bGear');if(bg){const gn=IS_PROTO&&!S.waveActive?gearCount():0;setHTML(bg,`装備・道具を替える${gn?`<span class="bkn">${gn}</span>`:''}`);bg.hidden=!gn;}}
   {const rn=ruinsFree().length,bR=document.getElementById('bRuinAll');setHTML(bR,`廃墟を建て直す${rn?`<span class="bkn">${rn}</span>`:''}`);const dR=!rn||S.waveActive;if(bR.disabled!==dR)bR.disabled=dR;}
   {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中）':ra2.n?`一括修理（${repWhat(ra2)}）`:'一括修理');mr.classList.toggle('dim',dA);}}
