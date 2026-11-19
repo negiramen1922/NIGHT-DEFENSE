@@ -4775,6 +4775,7 @@ function doEndTurn(){
   S.shortCrew=short;
   if(!S.tl)tlSnap('開始');S.turnsLeft--;S.turn++;clearUndo();tlSnap('朝');
   const ev=S.rep;S.rep=null;
+  if(IS_PROTO&&S._doneB&&S._doneB.length){const g={};for(const b of S._doneB)(g[b.type]=g[b.type]||[]).push(b);S._doneB=[];for(const [t,L] of Object.entries(g)){const im=kcImg(t)?`<img src="${kcImg(t)}" width="36" height="36" style="image-rendering:pixelated">`:icSvg(t,36);newsTop(`${B[t].name}${L.length>1?' ×'+L.length:''}が完成しました`,'押すとその場所へ移動します',im,()=>camFocus(L[0]));}}   /* 試作（2026-11-19）：建て終わった施設をお知らせ */
   const dn=Object.entries(S.doneCnt);if(dn.length){const m='完成：'+dn.map(([k,v])=>k+(v>1?'×'+v:'')).join('、');ev.unshift({msg:m,cls:'good'});log(m,'good');}
   if(S.turnsLeft<=0)startWave();
   else{log(`ターン${S.turn}　第${S.wave+1}襲撃まで残り${S.turnsLeft}ターン`);bigAhead();}
@@ -5035,7 +5036,7 @@ function update(dt,sim){
         if(b.upg==='ench'){b.upg=false;b.ench=Math.min(3,(b.ench||0)+1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${d.name} の魔核強化が完了（★${b.ench}）`,'good');if(!S.rep)se('upgrade');}
         else if(b.upg==='mat'){b.upg=false;b.mat=Math.min(2,(b.mat||0)+1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${MAT_NAME[b.type][b.mat]}への造り替えが完了`,'good');if(!S.rep)se('upgrade');}
         else if(b.upg){b.upg=false;b.lv++;if(MAT_HP[b.type])b.mat=Math.min(2,b.lv-1);const n=hpB(b);b.hp+=n-b.maxhp;b.maxhp=n;log(`${stageName(b)} へのアップグレードが完了`,'good');if(!S.rep)se('upgrade');}
-        else if(S.rep){S.doneCnt[d.name]=(S.doneCnt[d.name]||0)+1;}
+        else if(S.rep){S.doneCnt[d.name]=(S.doneCnt[d.name]||0)+1;(S._doneB=S._doneB||[]).push(b);}
         else log(`${d.name} 完成`,'good');
       }
       continue;
@@ -8143,7 +8144,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
 const SAVE_KEY='abyss_save_v3_proto',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.19 試作版',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
-const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
+const SAVE_SKIP=new Set(['_doneB','vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
 function saveMark(ok){let el=document.getElementById('saveMark');if(!el){el=document.createElement('div');el.id='saveMark';document.body.appendChild(el);}
