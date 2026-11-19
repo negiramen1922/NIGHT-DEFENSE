@@ -5121,7 +5121,7 @@ function update(dt,sim){
   S.shots=S.shots.filter(s=>s.t<s.dur);
   for(const f of S.fx)f.t+=dt;S.fx=S.fx.filter(f=>f.t<f.dur);
   const dead=S.enemies.filter(e=>e.hp<=0);
-  for(const e of dead){if(e.camp&&!e.extra)campLoss(e);if(e.fled)continue;se(E[e.type].r>=10?'bigkill':'kill');S.kills++;S.waveKills++;S.fx.push({x:e.x,y:e.y,r:E[e.type].r*1.6,t:0,dur:0.25,c:'#ff5a4e'});
+  for(const e of dead){if(e.camp&&!e.extra)campLoss(e);if(e.fled)continue;addCorpse(e._im,e.x,e.y+(e._bob||0),e._sz,e._sz,(e.face||1)<0);se(E[e.type].r>=10?'bigkill':'kill');S.kills++;S.waveKills++;S.fx.push({x:e.x,y:e.y,r:E[e.type].r*1.6,t:0,dur:0.25,c:'#ff5a4e'});
     const sp=E[e.type].spill;if(sp&&!e.sub)spawnAt(sp.type,e.x,e.y,sp.n,E[e.type].r);if(E[e.type].boss)log(`${E[e.type].name}を討ち取った！`,'good');}
   if(dead.length)S.enemies=S.enemies.filter(e=>e.hp>0||(e.hp<=0&&false));
 }
@@ -5426,6 +5426,7 @@ function damageSquad(s,dmg){if(s.invT>0)return;
   s.hp-=dmg;
   // 1機ぶんの耐久を割り込むごとに兵（と衛士）を失う
   const m=Math.max(0,Math.ceil(s.hp/(memberHp(s)*bonus(s).hp)-1e-6));
+  if(s._im&&(m<s.members||s.hp<=0))addCorpse(s._im,s.x+(Math.random()*10-5),s.y+(Math.random()*6-3),s._im.width*s._z,s._im.height*s._z,s._fl);   /* 兵が倒れる */
   if(m<s.members&&s.hp>0){const lost=s.members-m;s.members=m;S.kia+=lost*(t.popEach||(s.ut==='adv'?1:0));log(`${unitLabel(s)} ${lost}${t.unit}撃破される（残り${m}${t.unit}）`,'kia');}
   if(s.hp<=0){
     S.squads=S.squads.filter(x=>x!==s);S.kia+=s.members*(t.popEach||(s.ut==='adv'?1:0));
@@ -5710,7 +5711,7 @@ function draw(){
         const atk=nowS()-(s.atkT||-9)<0.8,fl=(s.face||1)<0;
         for(const i of ord){const [px,py]=n===1?[0,-1]:P[i];const sp=(hs&&i===0&&!one)?hs:base;
           if(sp){const L=atk&&sp.img.attack?sp.img.attack:sp.img.walk,im=L[(atk||moving)?(Math.floor(an/(atk?0.2:0.15))+i)%L.length:0],z=one?2:1;
-            ctx.save();ctx.translate(px,py-2);if(fl)ctx.scale(-1,1);ctx.drawImage(im,-im.width*z/2,-im.height*z/2,im.width*z,im.height*z);ctx.restore();}
+            if(i===0){s._im=im;s._z=z;s._fl=fl;}ctx.save();ctx.translate(px,py-2);if(fl)ctx.scale(-1,1);ctx.drawImage(im,-im.width*z/2,-im.height*z/2,im.width*z,im.height*z);ctx.restore();}
           else{const im=sqSprite(s);ctx.drawImage(im,px-sz/2,py-sz/2-2,sz,sz);}}
         if(c){const tw=Math.sin(an*4+s.no)>0;ctx.fillStyle=SPECS[c.spec].color;const sy=one?-17:-15;ctx.fillRect(-1,sy-2,2,6);ctx.fillRect(-3,sy,6,2);if(tw){ctx.fillStyle='#fff8d0';ctx.fillRect(-1,sy,2,2);}}
         ctx.imageSmoothingEnabled=true;const M=MT(s).members;for(let i=0;i<M;i++){ctx.fillStyle=i<s.members?mt.color:'#2a3a3a';ctx.fillRect(-M*2+i*4,11,3,2);}}
@@ -5749,6 +5750,7 @@ function draw(){
     ctx.fillStyle=m.armed?'#3a3020':'#222';ctx.beginPath();ctx.arc(mx,my,5,0,7);ctx.fill();ctx.strokeStyle=m.armed?'#8a7040':'#444';ctx.stroke();
     if(m.armed&&Math.sin(an*3+m.x)>0.6){ctx.fillStyle='#ff5a4e';ctx.beginPath();ctx.arc(mx,my,1.6,0,7);ctx.fill();}}}
   for(const rt of (S.roots||[])){if(rt.done)continue;const k=1-rt.t/2;ctx.fillStyle=`rgba(30,18,8,${0.25+0.4*k})`;ctx.beginPath();ctx.arc(rt.x,rt.y,rt.r*(0.5+0.5*k),0,7);ctx.fill();ctx.strokeStyle='rgba(200,120,60,.6)';ctx.beginPath();ctx.arc(rt.x,rt.y,rt.r,0,7);ctx.stroke();}   /* 森の抱擁の前ぶれ */
+  drawCorpses();
   for(const e of S.enemies){if(e.sub){ctx.globalAlpha=0.35;drawEnemy(e);ctx.globalAlpha=1;}else drawEnemy(e);}
   for(const n of S.navShells){if(n.t<n.delay){const k=n.t/n.delay;ctx.strokeStyle=`rgba(255,227,138,${0.3+0.5*k})`;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(n.x-30*(1-k),n.y-160*(1-k));ctx.lineTo(n.x-30*(1-k)+4,n.y-160*(1-k)+20);ctx.stroke();ctx.lineWidth=1;
     ctx.strokeStyle='rgba(255,90,78,.35)';ctx.beginPath();ctx.arc(n.x,n.y,6,0,7);ctx.stroke();}}
@@ -6205,6 +6207,10 @@ function enemyPath(e,d){
     default:ctx.rect(x-r,y-r*0.8,r*2,r*1.6);
   }
 }
+/* 倒れた魔物と兵は、その場で横に倒れて少しつぶれてから消える（2026-11-19） */
+const CORPSES=[];function addCorpse(im,x,y,w,h,fl){if(!im||!w)return;if(CORPSES.length>80)CORPSES.shift();CORPSES.push({im,x,y,w,h,fl:!!fl,t0:nowS()});}
+function drawCorpses(){if(!CORPSES.length)return;const now=nowS();ctx.imageSmoothingEnabled=false;for(let i=CORPSES.length-1;i>=0;i--){const c=CORPSES[i],a=now-c.t0;if(a>1.7||a<0){CORPSES.splice(i,1);continue;}
+  const k=Math.min(1,a/0.3),e=k*k,ang=(c.fl?1:-1)*Math.PI/2*e,b=a>0.3?Math.max(0,Math.sin(Math.min(1,(a-0.3)/0.22)*Math.PI))*0.3:0,sq=a>0.3?0.12+b:0;ctx.save();ctx.globalAlpha=a>1.2?Math.max(0,1-(a-1.2)/0.5):1;ctx.translate(c.x,c.y+c.h*0.3*e+c.h*sq*0.25);ctx.scale(1+sq*0.7,1-sq);ctx.rotate(ang);if(c.fl)ctx.scale(-1,1);ctx.drawImage(c.im,-c.w/2,-c.h/2,c.w,c.h);ctx.restore();}ctx.globalAlpha=1;ctx.imageSmoothingEnabled=true;}
 function drawEnemy(e){
   const d=E[e.type],r=d.r;const ratio=Math.max(0,e.hp/e.maxhp);
   if(d.shade){const R0=d.shade*TU,g=ctx.createRadialGradient(e.x,e.y,r,e.x,e.y,R0);g.addColorStop(0,'rgba(6,10,4,.55)');g.addColorStop(1,'rgba(6,10,4,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(e.x,e.y,R0,0,7);ctx.fill();
@@ -6224,7 +6230,7 @@ function drawEnemy(e){
     const sz=SP?16*Math.max(1,Math.round(r*2.7*(d.drawMul||1)/16)):Math.round(Math.max(14,r*2.7)),bob=d.fly?Math.sin(nowS()*6+e.x*0.1)*2-4:0;
     if(d.fly){ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(e.x+4,e.y+sz*0.45,sz*0.35,sz*0.12,0,0,7);ctx.fill();}
     if(e.buff){ctx.strokeStyle='rgba(255,200,60,.7)';ctx.beginPath();ctx.ellipse(e.x,e.y+sz*0.4,sz*0.45,sz*0.16,0,0,7);ctx.stroke();}
-    ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(e.x,e.y+bob);if((e.face||1)<0)ctx.scale(-1,1);ctx.drawImage(im,-sz/2,-sz/2,sz,sz);ctx.restore();
+    e._im=im;e._sz=sz;e._bob=bob;ctx.save();ctx.imageSmoothingEnabled=false;ctx.translate(e.x,e.y+bob);if((e.face||1)<0)ctx.scale(-1,1);ctx.drawImage(im,-sz/2,-sz/2,sz,sz);ctx.restore();
     if(ratio<0.999&&e.type!=='swarm'&&e.type!=='king'){const w=Math.max(10,sz*0.7);ctx.fillStyle='rgba(30,0,0,.8)';ctx.fillRect(e.x-w/2,e.y-sz/2-3+bob,w,2);ctx.fillStyle=ratio>0.5?'#e0c040':'#e04030';ctx.fillRect(e.x-w/2,e.y-sz/2-3+bob,w*ratio,2);}
     return;}}
   if(e.type==='heavy'){ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(e.x+3,e.y+5,r*1.5,r*0.8,0,0,7);ctx.fill();for(let i=-1;i<=1;i++){ctx.fillStyle='#8ac060';ctx.beginPath();ctx.arc(e.x+i*r*0.5,e.y-r*0.7,2.6,0,7);ctx.fill();}}
@@ -7714,7 +7720,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const en=document.getElementById('ovEndless');if(en)en.onclick=()=>{S.endless=true;S.over=false;S.won=false;S.turnsLeft=prepDays(S.wave+1);S.prepTotal=S.turnsLeft;S.next=genWave(S.wave+1);genCands();closeOverlay();auMusicFor();log('防衛続行。敵の増援は止まらない','warn');};
 }
 // ===== セーブ・ロード（ブラウザに自動保存） =====
-const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.12.1',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
+const SAVE_KEY='abyss_save_v3',GAME_TITLE='ナイトディフェンス',GAME_SUB='シミュレーション型ディフェンスゲーム',GAME_VER='1.12.2',GAME_DESC='木材や石材で防壁を築き、食料と住居で人々を養い、兵士と防衛施設で守りを固める。<br>昼に街を育て、夜ごとアビスから湧き出す魔物の大群を撃退せよ。';
 const SAVE_SKIP=new Set(['vfx','dust','flares','skfx','ftx','heroPick','wline','flow','grid','deep','elev','flv','mlv','richLv','seen','_econ','shots','eshots','beams','fx','navShells','porters','sel','selCmd','overlay','multi','buildMode','buildPick','enemies','_totems','_braz','_torch','lights','selTile','review','rep','doneCnt']);
 function canSave(){return S&&S.mode==='campaign'&&!S.waveActive&&!S.skirm&&!S.over&&!TLP;}   /* タイムラプス中は保存しない（作り直した仮の街を保存しないように） */
 // セーブの表示：右下にディスクのマークと「セーブしています…」→「セーブしました」
@@ -7826,6 +7832,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
+ ['1.12.2','2026-11-19',['倒れた魔物と兵が、その場で横に倒れて少しつぶれてから消えるように','閉じるボタンをどの画面でも右下にそろえた','研究の中止ボタンを、研究中のカードの上の赤い枠のボタンに移した（まちがえて押さないように）']],
  ['1.12.1（試作版だけ）','',['<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
  ['1.12.1','2026-11-17',['不具合の修正：建て終わった施設の耐久が減ったままになっていた（前の版で建てた施設も、読み込んだときに満タンに戻す）','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）']],
  ['1.12','2026-11-17',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>時間のバー</b>を地図の中から出して、敵情予測と地図のあいだの細い帯に（残りの時間も出る）','<b>ミニマップに小さな見出し</b>をつけた：「大・小」で大きさを切り替え、「－」でたたむ（たたむと見出しだけになり、「＋」で戻す）','<b>防衛施設の詳しい画面に、夜の実際の動き</b>：施設が、地図の上と同じ絵の弾（バリスタは重い矢、投石機は石、物見櫓は矢など）で、歩いてくる魔物を撃つ小さな場面','<b>弾がまったくなくて撃てない防衛施設</b>には、地図の上で施設の上に赤い「!!」を出すように（昼でも分かる）','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる','<b>木の柵は置いたらすぐ完成</b>（罠と同じ）','不具合の修正：建て終わった施設の耐久が少し減って見えることがあった']],
