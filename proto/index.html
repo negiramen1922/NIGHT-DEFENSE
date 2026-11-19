@@ -1522,7 +1522,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .hcd{margin-left:8px;font-family:var(--px-font);font-size:11px;color:var(--dim)}
 .hcd.ready{color:var(--green)}
 .hcd.fire{color:#fff;background:var(--mat);padding:0 5px}
-#bGear[hidden],#bEnchN[hidden]{display:none!important}#bEnchN:not([disabled]){color:#e0c8ff;border-color:#9a6aff;background:#1e1430}#bRepAll,#bSupAll,#bRuinAll,#bGear,#bEnchN{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
+#bGear[hidden],#bEnchN[hidden],#bBulk[hidden]{display:none!important}body.ndBulk #controls>#bRepAll,body.ndBulk #controls>#bSupAll,body.ndBulk #controls>#bRuinAll,body.ndBulk #controls>#bGear,body.ndBulk #controls>#bEnchN{display:none!important}body:not(.land) #controls>#bBulk{order:2}#bBulk{min-width:110px}#bulkMenu{position:fixed;z-index:400;display:none;background:#121a14;border:1px solid #f2b33d;padding:4px;min-width:250px;box-shadow:0 6px 18px rgba(0,0,0,.6)}#bulkMenu button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;margin:2px 0;padding:6px 8px}#bulkMenu .bki2{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center}#bulkMenu .bki2 svg,#bulkMenu .bki2 img{width:18px;height:18px}#bulkMenu .bkn2{flex:1}#bulkMenu .bkn2 small{display:block;font-size:10.5px;color:#8a9a8a}#bulkMenu b{background:#f2b33d;color:#1a1206;padding:0 6px;border-radius:2px}#bulkMenu button.bkench:not([disabled]){border-color:#9a6aff;color:#e0c8ff;background:#1e1430}#bulkMenu button[disabled]{opacity:.55}#bEnchN:not([disabled]){color:#e0c8ff;border-color:#9a6aff;background:#1e1430}#bRepAll,#bSupAll,#bRuinAll,#bGear,#bEnchN{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
 
 /* 立ち絵 v2 */
 .artpx{position:relative;width:100%;aspect-ratio:300/120;background-repeat:no-repeat;background-size:100% 100%;image-rendering:pixelated;background-color:#060a07}
@@ -1641,6 +1641,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <button id="bHero" class="sp-main lOnly" data-rtb="hero"><span class="mic"></span><span>英雄</span></button>
       <button id="bTown" class="sp-main lOnly" data-rtb="econ"><span class="mic"></span><span>街</span></button>
       <span class="sep"></span>
+      <button id="bBulk" hidden>一括 ▴</button>
       <button id="bRepAll">一括修理</button>
       <button id="bRuinAll">廃墟を建て直す</button>
       <button id="bGear" hidden>装備・道具を替える</button>
@@ -3717,8 +3718,8 @@ function nEnchOK(o){const k=IS_PROTO&&nEnchKind(o);return !!k&&has(NENCH_REQ[k])
 function nEnchCost(o){return {smat:o.kind==='s'?Math.max(1,o.members||1):5*bsz(o)};}   /* 施設は部隊より高い（2026-11-18） */
 function nEnchHp(o){if(o.kind==='s'){const n=unitMaxHp(o);o.hp=Math.max(1,Math.min(n,o.hp+(n-o.maxhp)));o.maxhp=n;}else{const n=hpB(o);o.hp=Math.max(1,Math.min(n,o.hp+(n-o.maxhp)));o.maxhp=n;}}
 function nEnch(o){if(!nEnchOK(o)||o.nEnch||S.waveActive)return false;const c=nEnchCost(o);if(!canAfford(c)){se('error');return false;}for(const k in c)S[k]-=c[k];o.nEnch=true;if(nEnchKind(o)!=='p')nEnchHp(o);S.fx.push({x:o.kind==='s'?o.x:bcx(o),y:o.kind==='s'?o.y:bcy(o),r:TU*1.2,t:0,dur:0.5,c:'#b070ff'});se('upgrade');return true;}
-function nEnchBlock(o){if(!nEnchOK(o))return '';const c=nEnchCost(o);const kd=nEnchKind(o),L=nEnchList(kd);S._nek=kd;
-  return `<div class="upg"><div class="row"><b>エンチャント付与</b>${o.nEnch?'<span style="color:#c79bff">かかっている</span>':''}</div>${o.nEnch?`<div class="muted" style="font-size:11px">${kd==='p'?'今日だけ 産出 +30%（朝にはがれる）':'今夜だけ 火力 +30%・体力 +30%（朝にはがれる）'}</div>`:`<button id="iNE" class="wide" ${canAfford(c)&&!S.waveActive?'':'disabled'}>エンチャントする<span class="cost">${costText(c)}</span></button>`}${L.length>=2&&!S.waveActive?`<button id="iNEAll" class="wide" style="margin-top:4px">${{d:'防衛施設',u:'部隊',p:'生産施設'}[kd]}にまとめてかける（${L.length}）</button>`:''}</div>`;}
+function nEnchBlock(o){if(!nEnchOK(o)){const kd=IS_PROTO&&nEnchKind(o);if(!kd)return '';const t=TECH.find(x=>x.id===NENCH_REQ[kd]);return `<div class="upg"><b style="opacity:.55">${IC_ENC} エンチャント付与</b><div class="muted" style="font-size:11px">研究「${t?t.name:''}」で、小さな魔核を使って${kd==='p'?'その日だけ産出を上げ':'その夜だけ強くし'}られます</div></div>`;}   /* 試作：研究前もグレーで見せて、あることを知らせる */const c=nEnchCost(o);const kd=nEnchKind(o),L=nEnchList(kd);S._nek=kd;
+  return `<div class="upg"><div class="row"><b>${IC_ENC} エンチャント付与</b>${o.nEnch?'<span style="color:#c79bff">かかっている</span>':''}</div>${o.nEnch?`<div class="muted" style="font-size:11px">${kd==='p'?'今日だけ 産出 +30%（朝にはがれる）':'今夜だけ 火力 +30%・体力 +30%（朝にはがれる）'}</div>`:`<button id="iNE" class="wide" ${canAfford(c)&&!S.waveActive?'':'disabled'}>エンチャントする<span class="cost">${costText(c)}</span></button>`}${L.length>=2&&!S.waveActive?`<button id="iNEAll" class="wide" style="margin-top:4px">${{d:'防衛施設',u:'部隊',p:'生産施設'}[kd]}にまとめてかける（${L.length}）</button>`:''}</div>`;}
 function nEnchList(k){return [...S.blds.filter(b=>nEnchOK(b)&&!b.nEnch),...S.squads.filter(q=>nEnchOK(q)&&!q.nEnch)].filter(o=>!k||nEnchKind(o)===k);}
 function askNEnchAll(){const L=nEnchList(S._nek);if(!L.length){se('error');toast('かけられるものがありません','warn');return;}
   /* 試作（2026-11-19）：種類ごとにチェックを外せる（前哨砦だけ外す、など） */
@@ -3734,9 +3735,14 @@ function askNEnchAll(){const L=nEnchList(S._nek);if(!L.length){se('error');toast
     document.getElementById('neNo').onclick=()=>{closeOverlay();renderInfo(true);};
     document.getElementById('neYes').onclick=()=>{const {pick}=calc();if(!pick.length)return;closeOverlay();S._mute=true;for(const o of pick)nEnch(o);S._mute=false;popStage(pick,(o)=>{S.fx.push({x:o.kind==='s'?o.x:bcx(o),y:o.kind==='s'?o.y:bcy(o),r:TU*1.2,t:0,dur:0.5,c:'#b070ff'});},true);log(`${pick.length}つにエンチャント付与をかけた`,'good');renderInfo(true);};};
   draw();}
+/* 試作（2026-11-19）：エンチャントの演出。絵の上を紫の波が斜めにゆらゆら流れる（絵の形だけに塗る） */
+const _gl={};function glint(im,dx,dy,w,h,seed){w=Math.max(1,Math.round(w));h=Math.max(1,Math.round(h));const key=w+'x'+h;let c=_gl[key];if(!c){c=document.createElement('canvas');c.width=w;c.height=h;_gl[key]=c;}const g=c.getContext('2d');g.globalCompositeOperation='source-over';g.clearRect(0,0,w,h);g.imageSmoothingEnabled=false;g.drawImage(im,0,0,w,h);
+  g.globalCompositeOperation='source-atop';const t=performance.now()/1000+(seed||0),L=w+h,o=((t*0.45)%1)*L*2-L;const gr=g.createLinearGradient(o,0,o+L,L*0.6);
+  gr.addColorStop(0,'rgba(150,70,255,0)');gr.addColorStop(0.25+0.05*Math.sin(t*2),'rgba(190,110,255,.85)');gr.addColorStop(0.42,'rgba(120,50,230,.15)');gr.addColorStop(0.6+0.05*Math.sin(t*1.6+1),'rgba(220,150,255,.75)');gr.addColorStop(0.8,'rgba(140,60,255,.1)');gr.addColorStop(1,'rgba(150,70,255,0)');
+  g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle=`rgba(140,70,255,${0.1+0.06*Math.sin(t*3)})`;g.fillRect(0,0,w,h);g.globalCompositeOperation='source-over';
+  const a=ctx.globalAlpha;ctx.globalAlpha=a*0.8;ctx.drawImage(c,dx,dy,w,h);ctx.globalAlpha=a;}
 function drawNEnch(){if(!IS_PROTO)return;const pu=0.5+0.4*Math.sin(performance.now()/260);ctx.save();ctx.strokeStyle=`rgba(190,120,255,${pu})`;ctx.lineWidth=1.5;
-  for(const b of S.blds)if(b.nEnch){const n=bsz(b);ctx.strokeRect(b.x*T+1,b.y*T+1,n*T-2,n*T-2);}
-  for(const q of S.squads)if(q.nEnch&&!q.gar){ctx.beginPath();ctx.arc(q.x,q.y,13,0,7);ctx.stroke();}ctx.restore();}
+  ctx.restore();}
 function placeWallLine(a,b){const t=S.buildMode;if(!t)return;let n=0,miss=0,cap=0;beginUndo();
   const made=[];if(IS_PROTO)S._mute=true;
   for(const [x,y] of lineCells(t,a,b)){if(!placeOK(t,x,y)){continue;}if(capBlock(t)){cap++;continue;}if(!canPlace(t,x,y)){miss++;continue;}const r=placeB(t,x,y);made.push(r||S.mines[S.mines.length-1]);n++;}
@@ -4089,13 +4095,15 @@ const MOD_DEF={mg:{req:'heavymg',o:[['pierce','鋭い矢','貫く数が2体増�
  magetower:{req:'m_mage',o:[['fire','火炎','着弾した所が3秒燃える',{elec:1}],['frost','凍結','当たった魔物が3秒遅くなる',{elec:1}]]},
  mortar:{req:'incend',o:[['cluster','クラスター','着弾した所に細かい破片が飛び散る',{iron:1}],['incend','焼夷','着弾した所が5秒燃える',{powder:1}]]}};
 const MOD_T=2;
+const IC_MOD='<svg width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges" style="vertical-align:-3px"><path d="M10 1L15 6L13 8L12 7L7 12L8 13L6 15L1 10L3 8L4 9L9 4L8 3Z" fill="#f2b33d" stroke="#1c1824"/><rect x="6" y="7" width="3" height="2" fill="#7a5a2a"/></svg>';
+const IC_ENC='<svg width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges" style="vertical-align:-3px"><path d="M8 0L10 6L16 8L10 10L8 16L6 10L0 8L6 6Z" fill="#c79bff" stroke="#3a1a6a"/><rect x="7" y="7" width="2" height="2" fill="#fff"/><rect x="13" y="1" width="2" height="2" fill="#e0c8ff"/><rect x="1" y="13" width="2" height="2" fill="#e0c8ff"/></svg>';
 function modOf(type){if(!IS_PROTO||!S||!S.mods)return null;const m=S.mods[type];return m&&!(m.t>0)?m.id:null;}
 function modOpt(type,id){const d=MOD_DEF[type];return d&&d.o.find(x=>x[0]===id);}
 function modFire(b){const id=modOf(b.type);if(!id)return null;const o=modOpt(b.type,id);if(!o)return null;for(const k in o[3])if((S[k]||0)<o[3][k])return null;for(const k in o[3])useRes(B[b.type].name,k,o[3][k],b);return id;}
 function modBlock(o){const d=MOD_DEF[o.type];if(!IS_PROTO||!d||o.kind==='s')return '';const nm=B[o.type].name;
-  if(!has(d.req)){const t=TECH.find(x=>x.id===d.req);return `<div class="upg"><b>改造</b><div class="muted" style="font-size:11px">研究「${t?t.name:d.req}」で、街の${nm}すべてに改造を1つ選べます</div></div>`;}
+  if(!has(d.req)){const t=TECH.find(x=>x.id===d.req);return `<div class="upg"><b style="opacity:.55">${IC_MOD} 改造</b><div class="muted" style="font-size:11px">研究「${t?t.name:d.req}」で、街の${nm}すべてに改造を1つ選べます</div></div>`;}
   const m=S.mods&&S.mods[o.type];
-  return `<div class="upg"><div class="row"><b>改造（街の${nm}すべて）</b>${m&&m.t>0?`<span style="color:var(--amber)">付け替え中 あと${m.t}T</span>`:''}</div>`+d.o.map(([id,n,ds,use])=>{const on=m&&m.id===id;const u=Object.keys(use).length?`撃つたびに ${Object.entries(use).map(([k,v])=>RES_NAME[k]+' +'+(v<1?'少し':v)).join('・')}`:'撃つ数が増えるぶん、矢や砲弾も多く使う';
+  return `<div class="upg"><div class="row"><b>${IC_MOD} 改造（街の${nm}すべて）</b>${m&&m.t>0?`<span style="color:var(--amber)">付け替え中 あと${m.t}T</span>`:''}</div>`+d.o.map(([id,n,ds,use])=>{const on=m&&m.id===id;const u=Object.keys(use).length?`撃つたびに ${Object.entries(use).map(([k,v])=>RES_NAME[k]+' +'+(v<1?'少し':v)).join('・')}`:'撃つ数が増えるぶん、矢や砲弾も多く使う';
     return `<button data-mod="${id}" class="wide${on?' on':''}" style="text-align:left;display:block;margin-top:4px"><b>${n}</b>${on?(m.t>0?'（付け替え中）':'（いま）'):''}<br><span style="font-size:11px">${ds}</span><br><span class="muted" style="font-size:10.5px">${u}</span></button>`;}).join('')+`<div class="muted" style="font-size:10.5px;margin-top:3px">付け替えには${MOD_T}ターンかかり、その間は改造なしになります</div></div>`;}
 function setMod(type,id){if(!IS_PROTO)return;S.mods=S.mods||{};const m=S.mods[type];if(m&&m.id===id)return;S.mods[type]={id,t:(m||S.blds.some(b=>b.type===type))?MOD_T:0};se('upgrade');const o=modOpt(type,id);log(`街の${B[type].name}の改造を「${o[1]}」に${S.mods[type].t?`（${MOD_T}ターンで付け替え）`:''}`,'good');}
 function useRes(src,k,v,b){S[k]-=v;if(!S.waveActive||!(v>0))return;const L=S.wled||(S.wled={});const o=L[src]||(L[src]={});o[k]=(o[k]||0)+v;if(b){const u=b.wuse||(b.wuse={});u[k]=(u[k]||0)+v;}}
@@ -6140,7 +6148,7 @@ function draw(){
         const atk=nowS()-(s.atkT||-9)<0.8,fl=(s.face||1)<0;
         for(const i of ord){const [px,py]=n===1?[0,-1]:P[i];const sp=(hs&&i===0&&!one)?hs:base;
           if(sp){const L=atk&&sp.img.attack?sp.img.attack:sp.img.walk,im=L[(atk||moving)?(Math.floor(an/(atk?0.2:0.15))+i)%L.length:0],z=one?2:s.hero?1.5:1;   /* 試作：英雄の部隊は少し大きく */
-            if(i===0){s._im=im;s._z=z;s._fl=fl;}ctx.save();ctx.translate(px,py-2);if(fl)ctx.scale(-1,1);ctx.drawImage(im,-im.width*z/2,-im.height*z/2,im.width*z,im.height*z);ctx.restore();}
+            if(i===0){s._im=im;s._z=z;s._fl=fl;}ctx.save();ctx.translate(px,py-2);if(fl)ctx.scale(-1,1);ctx.drawImage(im,-im.width*z/2,-im.height*z/2,im.width*z,im.height*z);if(IS_PROTO&&s.nEnch)glint(im,-im.width*z/2,-im.height*z/2,im.width*z,im.height*z,s.id+i*0.3);ctx.restore();}
           else{const im=sqSprite(s);ctx.drawImage(im,px-sz/2,py-sz/2-2,sz,sz);}}
         if(c){const tw=Math.sin(an*4+s.no)>0;ctx.fillStyle=SPECS[c.spec].color;const sy=one?-17:-15;ctx.fillRect(-1,sy-2,2,6);ctx.fillRect(-3,sy,6,2);if(tw){ctx.fillStyle='#fff8d0';ctx.fillRect(-1,sy,2,2);}}
         ctx.imageSmoothingEnabled=true;const M=MT(s).members;for(let i=0;i<M;i++){ctx.fillStyle=i<s.members?mt.color:'#2a3a3a';ctx.fillRect(-M*2+i*4,11,3,2);}}
@@ -6481,8 +6489,8 @@ function drawBldV2(b,an){if(b.popAt&&performance.now()<b.popAt)return true;const
   else{const L=sp.img.idle;const work=!(building||b.off||b.starved||b.dep);im=L[work?(Math.floor(an/0.2)+b.id)%L.length:0];}
   const sc=(b.onB?Math.min(1,(S2-4)/sp.size):S2/sp.size),w=im.width*sc,h=im.height*sc;
   if(building)ctx.globalAlpha=0.4;
-  if(anim==='dirs'){ctx.save();ctx.translate(Math.round(cx),Math.round(cy));ctx.rotate(b.ang||0);ctx.drawImage(im,-w/2,-h/2,w,h);ctx.restore();}
-  else ctx.drawImage(im,Math.round(cx-w/2),Math.round(cy-h/2),w,h);ctx.globalAlpha=1;
+  if(anim==='dirs'){ctx.save();ctx.translate(Math.round(cx),Math.round(cy));ctx.rotate(b.ang||0);ctx.drawImage(im,-w/2,-h/2,w,h);if(IS_PROTO&&b.nEnch)glint(im,-w/2,-h/2,w,h,b.id);ctx.restore();}
+  else{ctx.drawImage(im,Math.round(cx-w/2),Math.round(cy-h/2),w,h);if(IS_PROTO&&b.nEnch)glint(im,Math.round(cx-w/2),Math.round(cy-h/2),w,h,b.id);}ctx.globalAlpha=1;
   // 発射炎（右向き以外は muzzle を重ねる）
   if(false&&anim==='dirs'&&ft>=0&&ft<0.24&&sprDir(b.ang||0)!==0&&SPR.effects.muzzle){const M=SPR.effects.muzzle.img.play,mi=M[Math.min(M.length-1,Math.floor(ft/0.08))],L2=S2*0.42;ctx.drawImage(mi,Math.round(cx+Math.cos(b.ang)*L2-8),Math.round(cy+Math.sin(b.ang)*L2-8));}
   ctx.imageSmoothingEnabled=true;
@@ -7283,7 +7291,19 @@ document.getElementById('bArmy').onclick=()=>openArmyTab('list',true);
 function setRT(t){if(t==='info'&&!isNarrow())t='build';if(S&&t==='econ')S.econSeen=(S.econSeen||0)+1;if(S&&t==='army'&&S.armySub==='hero')S.heroSeen=(S.heroSeen||0)+1;document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
-document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bRuinAll').onclick=()=>askRuinAll();document.getElementById('bGear').onclick=()=>showGear();document.getElementById('bEnchN').onclick=()=>{S._nek=null;askNEnchAll();};document.getElementById('bSupAll').onclick=()=>askSupplyAll();
+document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bRuinAll').onclick=()=>askRuinAll();document.getElementById('bGear').onclick=()=>showGear();
+/* 試作（2026-11-19）：一括の操作を1つのメニューに（使えないものはグレーで、何ができるかを見せる） */
+function bulkItems(){const any=Object.values(NENCH_REQ).some(r=>has(r)),raid=S.turnsLeft===1&&S.phase!=='night';const en=any&&raid?nEnchList(null).length:0;const fw=S.waveActive;
+  return [['rep','一括修理','<svg width="18" height="18" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="2" width="8" height="5" fill="#9aa2b0" stroke="#1c1824"/><rect x="6" y="7" width="3" height="8" fill="#a0703a" stroke="#1c1824"/></svg>',fw?0:repairAllCost().n,fw?'戦闘中は修理できません':'',()=>askRepairAll()],
+   ['sup','一括補給',ic('sword',18),fw?0:S.squads.filter(needsSupply).length,fw?'戦闘中は補給できません':'',()=>askSupplyAll()],
+   ['ruin','廃墟を建て直す',sic('blost',18),fw?0:ruinsFree().length,fw?'戦闘中は建て直せません':'',()=>askRuinAll()],
+   ['gear','装備・道具を替える',IC_MOD,fw?0:gearCount(),'',()=>showGear()],
+   ['ench','エンチャント付与',IC_ENC,fw?0:en,!any?'研究「防衛のエンチャント付与」などで使えます':!raid?'襲撃の日に使えます（朝にはがれるため）':'',()=>{S._nek=null;askNEnchAll();}]];}
+function bulkMenu(){let m=document.getElementById('bulkMenu');if(m&&m.style.display==='block'){m.style.display='none';return;}if(!m){m=document.createElement('div');m.id='bulkMenu';document.body.appendChild(m);document.addEventListener('mousedown',e=>{const mm=document.getElementById('bulkMenu');if(mm&&mm.style.display==='block'&&!mm.contains(e.target)&&e.target.id!=='bBulk')mm.style.display='none';});}
+  const L=bulkItems();m.innerHTML=L.map(([k,n,icn,c,why],i)=>`<button data-bk="${i}" ${c?'':'disabled'} class="${k==='ench'?'bkench':''}"><span class="bki2">${icn}</span><span class="bkn2">${n}${why&&!c?`<small>${why}</small>`:''}</span>${c?`<b>${c}</b>`:''}</button>`).join('');
+  const r=document.getElementById('bBulk').getBoundingClientRect();m.style.display='block';m.style.left=Math.max(4,r.left)+'px';m.style.top=(r.top-m.offsetHeight-6)+'px';
+  m.querySelectorAll('[data-bk]').forEach(x=>x.onclick=()=>{m.style.display='none';L[+x.dataset.bk][5]();});}
+document.getElementById('bBulk').onclick=()=>bulkMenu();document.getElementById('bEnchN').onclick=()=>{S._nek=null;askNEnchAll();};document.getElementById('bSupAll').onclick=()=>askSupplyAll();
 document.getElementById('bHelp').onclick=()=>{if(!S.overlay)showHelp(false);};
 document.getElementById('bNaval').onclick=toggleNaval;
 document.getElementById('bMute').onclick=auToggle;
@@ -7891,6 +7911,7 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,`一括補給${sq.length?`<span class="bkn">${sq.length}</span>`:''}<kbd>N</kbd>`);
   {const ms=document.getElementById('mSup');if(ms)setHTML(ms,sq.length?`一括補給（${sq.length}部隊）`:'一括補給（必要なし）');}const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
   const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中）':`一括修理${ra2.n?`<span class="bkn">${ra2.n}</span>`:''}<kbd>X</kbd>`);const dA=!ra2.n||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
+  {const bb=document.getElementById('bBulk');if(bb&&IS_PROTO){bb.hidden=false;document.body.classList.add('ndBulk');const n=bulkItems().reduce((a,x)=>a+(x[3]?1:0),0);setHTML(bb,`一括 ▴${n?`<span class="bkn">${n}</span>`:''}`);}}
   {const be=document.getElementById('bEnchN');if(be){const ok=IS_PROTO&&!S.waveActive&&S.turnsLeft===1&&S.phase!=='night'&&Object.values(NENCH_REQ).some(r=>has(r));const n=ok?nEnchList(null).length:0;setHTML(be,`エンチャント付与${n?`<span class="bkn">${n}</span>`:''}`);be.hidden=!n;}}   /* 試作：襲撃の日だけ出す */
   {const bg=document.getElementById('bGear');if(bg){const gn=IS_PROTO&&!S.waveActive?gearCount():0;setHTML(bg,`装備・道具を替える${gn?`<span class="bkn">${gn}</span>`:''}`);bg.hidden=!gn;}}
   {const rn=ruinsFree().length,bR=document.getElementById('bRuinAll');setHTML(bR,`廃墟を建て直す${rn?`<span class="bkn">${rn}</span>`:''}`);const dR=!rn||S.waveActive;if(bR.disabled!==dR)bR.disabled=dR;}
@@ -8625,7 +8646,7 @@ const MISSIONS=[
   say:['この街の毎日は、<b>昼</b>と<b>夜</b>のくり返しです。昼に建てて、研究して、兵をそろえたら「夜へ」。静かな夜は過ごし方を選んで「朝へ」。そして<b>襲撃の日の夜</b>には、魔物が押し寄せてきます。','夜へ進む前に、「夜へ」の横に足りない資源の札が出ていないか見てください。矢が足りないと、バリスタが止まってしまいます！','朝になったら、壊れた施設は「一括修理」、部隊の矢や武具は「一括補給」で整えましょう。','最初の襲撃のあとは、4日ごとに襲撃が来ます。ブラッドムーンなど大きな夜の前は6日あります。昼のうちに「資材を増やす → 守りを足す」をくり返すのが、この街の暮らしです。'],
   steps:[
   {t:'最初の襲撃をしのぐ',c:()=>S.wave,n:1,hi:'#bNext',d:'「夜へ」で日を進め、襲撃の夜を守りきります。襲撃のあいだは、部隊を選んで敵の来る所へ動かしましょう。'},
-  {t:'朝に一括修理か一括補給をする',c:()=>S.careN||0,n:1,hi:'#bRepAll,#bSupAll',d:'下の「一括修理」「一括補給」です。足りない資材は赤で出ます。'}],
+  {t:'朝に一括修理か一括補給をする',c:()=>S.careN||0,n:1,hi:IS_PROTO?'#bBulk':'#bRepAll,#bSupAll',d:IS_PROTO?'下の「一括」のメニューにある「一括修理」「一括補給」です。足りない資材は赤で出ます。':'下の「一括修理」「一括補給」です。足りない資材は赤で出ます。'}],
   done:'しのぎました、領主様！ この調子です。'},
  {id:'castle',name:'城のランク上げ',
   say:['ここからが大事です、領主様！ 城のランクを上げると、<b>新しいランク</b>の研究と施設が開きます。{ART:castle1,castle2}','城をクリックして「強化」を押しましょう。何日かかかりますが、そのあいだも城はふつうに働きます。','城が上がったら、まず新しいランクの研究を見てください。強い施設や新しい素材は、そこにあります。後回しにすると、魔物に追いつかれてしまいます！'],
@@ -8700,10 +8721,10 @@ function applyFlag(){if(!IS_PROTO||!S||typeof NDSPR_TIER==='undefined')return;co
 function townName(){return (S&&S.townName)||(MAPS[S&&S.mapId]?MAPS[S.mapId].name:'この街');}
 function lilTxt(t){if(typeof t==='function')t=t();return String(t||'').replace(/\$\{TOWN\}/g,townName()).replace(/\{ART:([a-z0-9_,]+)\}/g,(m,ks)=>lilArt(ks.split(','))).replace(/\{MOV:([a-z0-9_]+)\}/g,(m,k)=>lilMov(k)).replace(/\{IMG:([a-z0-9_]+)\}/g,(m,k)=>`<div class="limg"><img src="tut/${k}.png" alt=""></div>`);}
 // 操作の短い動画（ゲームを録ったもの。くり返し再生。proto/tut/・本番は tut/）。2026-11-16
-const LIL_MOV={fence:'柵をドラッグして一列に置く',move:'部隊を選んで、行き先を押す',ench:'襲撃の日に「エンチャント付与」を押して、かけるものを選ぶ',camp:'駐屯地を押して、連れて行く部隊を選んで夜襲をかける'};
+const LIL_MOV={fence:'柵をドラッグして一列に置く',move:'部隊を選んで、行き先を押す',ench:'襲撃の日に「一括」→「エンチャント付与」で、かけるものを選ぶ',camp:'駐屯地を押して、連れて行く部隊を選んで夜襲をかける'};
 /* 試作（2026-11-19）：研究が終わったとき、リリアが使い方を教える（1回だけ・動画つき） */
 const LIL_TIPS={
- ench:{ids:['p_ench','p_ench_u','p_ench_p'],t:'エンチャント付与',face:'smile',mov:'ench',say:['エンチャント付与の研究が終わりました！ 小さな魔核で、施設や部隊を<b>その夜だけ</b>強くできます。','<b>襲撃の日</b>になると、下に紫の「<b>エンチャント付与</b>」のボタンが出ます。押すと、かけるものを種類ごとに選べますよ（前哨砦だけ外す、なども）。','かけたものは紫に光ります。朝になるとはがれるので、襲撃のたびにかけ直してくださいね。']},
+ ench:{ids:['p_ench','p_ench_u','p_ench_p'],t:'エンチャント付与',face:'smile',mov:'ench',say:['エンチャント付与の研究が終わりました！ 小さな魔核で、施設や部隊を<b>その夜だけ</b>強くできます。','<b>襲撃の日</b>になると、下の「<b>一括</b>」のメニューの「<b>エンチャント付与</b>」が押せるようになります。押すと、かけるものを種類ごとに選べますよ（前哨砦だけ外す、なども）。','かけたものは紫に光ります。朝になるとはがれるので、襲撃のたびにかけ直してくださいね。']},
  camp:{ids:['scout3'],t:'駐屯地への夜襲',face:'smile',mov:'camp',say:['斥候Ⅲの研究が終わりました！ 地図の上で<b>駐屯地</b>の場所が分かるようになりました。','駐屯地を押すと、<b>夜襲</b>をかけられます。連れて行く部隊を選んで、陣のまわりに置いて戦います。','倒した魔物の分だけ、<b>次の襲撃が減り</b>ます。ただし部隊が受けた被害は残るので、無理はしないでくださいね。夜襲は1日1回です。']},
  mod:{ids:['heavymg','bighow','bigbore','incend','m_tower','m_mage'],t:'改造',face:'normal',say:['改造の研究が終わりました！ その施設を選ぶと「<b>改造</b>」の欄が出て、2つのうち1つを選べます。','選んだ改造は、<b>街のその施設すべて</b>に効きます。たとえばバリスタを「連弩」にして、物見櫓と合わせて手数で攻める、なんて方針もいいですね。','付け替えには2ターンかかります。それから、改造ごとに撃つたびに使う物が増えるので、在庫にも気をつけてください。']}};
 function tipFor(id){for(const k in LIL_TIPS){if(!LIL_TIPS[k].ids.includes(id))continue;S.tipsSeen=S.tipsSeen||{};if(S.tipsSeen[k])return;S.tipsSeen[k]=1;(S.tipQ=S.tipQ||[]).push(k);}}
