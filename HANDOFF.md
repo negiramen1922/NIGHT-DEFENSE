@@ -601,3 +601,4 @@
 - 壁の耐久は 2026-11-12（柵300・石の壁600・城壁900）から変えていない。
 - 両方：街の記録の書き出しの在庫の列を TL_RES（銀貨・魔矢・エーテル火薬・金・魔金属・聖銀・小さな魔核・龍鱗・飛膜・巨大魔核・竜晶も）に。もとの12列はいつも、ほかは一度でも出てきたら（`tlResKeys`）。試作では鎧は出さない。
 - 試作：`heroIc` は名簿の地図の絵（SPR.units[heroArtKey]）の1コマ目。英雄の一覧・候補・詳細で使う。武器工房の STAGE_ART は ['ammo'] だけ（tr_weapon_shop_* は石の兵舎に似すぎ・描き直し待ち）。
+- 試作（届いた絵 5回目）：英雄5人（hero_bram・hero_serena・hero_dolf・hero_emma・hero_otto）を NDSPR_AB.units と NDART_AB に。セレナのキーは hero_serena（名簿も合わせた）。武器工房の段は NDSPR_WS／NDART_WS の tr_weapon_shop_* を置きかえ、STAGE_ART ammo を tl('ammo','weapon_shop',2) に戻した。届いた json の武器工房のドットは前の白い家のままだったので、地図の絵は png（docs/art/weapon_shop2/map）から作り直した。施設に付いた英雄の旗の横の小さな絵も名簿の絵（walk）に。
