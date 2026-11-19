@@ -4795,7 +4795,7 @@ function doEndTurn(){
   const dn=Object.entries(S.doneCnt);if(dn.length){const m='完成：'+dn.map(([k,v])=>k+(v>1?'×'+v:'')).join('、');ev.unshift({msg:m,cls:'good'});log(m,'good');}
   if(S.turnsLeft<=0)startWave();
   else{log(`ターン${S.turn}　第${S.wave+1}襲撃まで残り${S.turnsLeft}ターン`);bigAhead();}
-  turnReport(t0,ev);rtWindow();
+  try{turnReport(t0,ev);}catch(e){console.error(e);try{log('報告の作成でエラーが出ました（夜へは進みます）：'+e.message,'warn');}catch(e2){}}rtWindow();   /* 報告でエラーが出ても、夜へ進めなくならないように（2026-11-19） */
   if(S.overlay==='res')showResearch();
   renderAll();
 }
@@ -9860,7 +9860,8 @@ function loop(now){
   try{rtTick(dt);}catch(e){if(!drawErr++)console.error(e);}
   try{draw();}catch(e){if(!drawErr++)console.error(e);}
   S.fogT=(S.fogT||0)+dt;if(S.fogT>0.5){S.fogT=0;revealAll();}
-  uiT+=dt;if(uiT>0.2){uiT=0;try{storyTick();}catch(e){}try{tipTick();}catch(e){}stripKeyHints();renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
+  uiT+=dt;if(uiT>0.2){uiT=0;try{storyTick();}catch(e){}try{tipTick();}catch(e){}
+    if(IS_PROTO&&S.phase==='night'&&!S.waveActive&&!S.overlay&&!S.over&&!S.night&&!S.nightPending&&!TLP&&!RPV){try{showNight();}catch(e){console.error(e);}}   /* 夜に入ったのに夜の画面が出ていなければ出す（保険） */stripKeyHints();renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
 }
 auUi();newState();S.backdrop=true;renderAll();resizeView();setTimeout(resizeView,300);showTitle();requestAnimationFrame(loop);
 </script>
