@@ -2071,7 +2071,7 @@ const TOOL_COST=[null,{stone:10},{iron:10},{alloy:12},{mmetal:10},{mithril:8}]; 
 const TOOL_START={};   /* あとから建てる施設は、建てられるランクの道具を持って建つ（段の番号） */
 if(IS_PROTO){if(B.hisou&&B.hisou.cost)B.hisou.cost.wing=2;if(MODEL.griffon&&MODEL.griffon.cost)MODEL.griffon.cost.wing=2;}   /* 試作：風船爆弾とグリフォン騎兵は飛膜を使う */
 if(IS_PROTO&&KC.smelter&&KC.smelter.st.length<3)KC.smelter.st.push([7,'竜晶を作れる精錬所']);   /* 試作：竜晶はエーテル・聖銀・龍鱗から作る（2026-11-18） */
-if(IS_PROTO&&KC.barracks)KC.barracks.st=KC.barracks.st.filter(x=>x[1]!=='集合住宅');   /* 試作：集合住宅は研究で建てる新しい建物（住居の段にはしない） */
+if(IS_PROTO&&KC.barracks){KC.barracks.st=KC.barracks.st.filter(x=>x[1]!=='集合住宅').map(x=>x[1]==='石の家'?[x[0],'二階建ての家']:x);B.barracks.desc=B.barracks.desc.replace('石の家','二階建ての家');}   /* 試作：集合住宅は研究で建てる新しい建物（住居の段にはしない） */
 if(IS_PROTO)for(const k in TOOL){if(!KC[k]||!B[k])continue;const bn=B[k].name;KC[k].st=TOOL_T.map(([r,m],i)=>[r,`${bn}（${m}の${TOOL[k]}）`]);}
 const FLOW_T=new Set(['tport','tair','bigfarm','bigminer','bigquarry','bigfish','miner','quarry','ironmine','farm','fishery','well','market','ammo','coalmine','goldmine','mithmine','smelter','powder','tavern']);   /* 試作：1ターンの出入りを prodOf でまとめて扱う施設 */
 function nightWork(b){if(!IS_PROTO)return false;const t=b.type;return (t==='ironmine'&&has('p_prop'))||(t==='fishery'&&has('p_nightfish'))||((t==='coalmine'||t==='goldmine'||t==='mithmine')&&has('p_vent'));}   /* 試作：夜も働く技術 */
@@ -3440,13 +3440,14 @@ const STAGE_ART={mg:['mg','mg_iron','mg_alloy','mg_magic','mg_holy'],how:['how',
 if(IS_PROTO){
  /* 道具の段：段の番号（1木・2石・3鉄・4合金・5魔金属・6聖銀）ごとの絵。建てた段より下は元の絵 */
  const TT=['stone','iron','alloy','magic','holy'],tl=(base,key,from)=>{const L=[base];for(let i=0;i<5;i++)L.push(i+2>=from&&NDSPR.buildings['tr_'+key+'_'+TT[i]]?'tr_'+key+'_'+TT[i]:L[L.length-1]);return L;};
- Object.assign(STAGE_ART,{miner:tl('miner','lumber',2),quarry:tl('quarry','quarry',2),ironmine:tl('ironmine','mine',2),farm:tl('farm','farm',2),fishery:tl('fishery','fishery',2),ammo:tl('ammo','weapon_shop',2),
+ Object.assign(STAGE_ART,{miner:tl('miner','lumber',2),quarry:tl('quarry','quarry',2),ironmine:tl('ironmine','mine',2),farm:tl('farm','farm',2),fishery:tl('fishery','fishery',2),
   well:tl('well','aether_mine',4),coalmine:tl('coalmine','coalmine',4),goldmine:tl('goldmine','goldmine',4),mithmine:tl('holymine','holymine',6),
   bigfarm:tl('farm','big_farm',5),bigfish:tl('fishery','fish_farm',5),bigminer:tl('miner','big_lumber',5),bigquarry:tl('quarry','big_quarry',5)});
  /* 建物の段 */
  Object.assign(STAGE_ART,{barracks:['barracks','tr_two_story_house'],train:['train','tr_stone_barracks','tr_big_barracks'],lab:['tr_lab_base','tr_archive','tr_research','tr_magic_research'],
   market:['market','tr_trading_post'],tavern:['tavern','tr_inn'],powder:['powder','tr_aether_powder'],herohouse:['tr_hero_house','tr_hero_house2','tr_hero_manor','tr_hero_hall'],
-  stable:['stable','tr_chariot_stable'],magic:['magic','tr_grand_magic'],aerie:['aerie','tr_dragon_aerie'],outpost:['outpost','tr_iron_outpost','tr_magic_outpost']});}
+  stable:['stable','tr_chariot_stable'],magic:['magic','tr_grand_magic'],aerie:['aerie','tr_dragon_aerie'],outpost:['outpost','tr_iron_outpost','tr_magic_outpost'],
+  siegew:['arsenal'],bomb:['trap_bigbomb']});}   /* 武器工房の道具の段の絵は描き直しを待つ（元の絵と形が違う） */
 function stageArt(b){const L=STAGE_ART[b.type];if(!L)return null;return L[Math.min(L.length,(b.lv||1))-1];}
 const SPR={};
 // 試作（2026-11-12）：兵士たちの見た目を装備の段で変える。絵の中の「武器の色」と「鎧（ローブ）の色」だけを、段の色に塗り替える（明るさの差は残す）。描き直しまでの仮
@@ -5892,6 +5893,7 @@ const dotE=k=>`<i class="dot" style="background:${E[k].color}"></i>`;
 // ===== 描画 =====
 function nowS(){return performance.now()/1000;}
 function draw(){
+  if(IS_PROTO)applyFlag();
   const an=nowS();if(viewKey!==curView())syncView();
   ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#050706';ctx.fillRect(0,0,VW,VH);
   ctx.setTransform(cam.z,0,0,cam.z,-cam.x*cam.z,-cam.y*cam.z);
@@ -6004,7 +6006,7 @@ function draw(){
     if((m.kind==='spike'||m.kind==='pit')&&SPR.buildings[m.kind]){const L=SPR.buildings[m.kind].img.idle,im=L[(Math.floor(an/0.2)+m.x)%L.length],S2=U*T;ctx.imageSmoothingEnabled=false;ctx.globalAlpha=m.kind==='pit'&&!m.armed?0.45:1;ctx.drawImage(im,m.x*T,m.y*T,S2,S2);ctx.globalAlpha=1;ctx.imageSmoothingEnabled=true;return;}
     if(m.kind==='spike'){ctx.fillStyle='#3a3228';ctx.fillRect(m.x*T+3,m.y*T+3,TU-6,TU-6);ctx.fillStyle='#c8c8c0';for(let i=0;i<3;i++)for(let j=0;j<3;j++){const px=m.x*T+7+i*7,py=m.y*T+8+j*7;ctx.beginPath();ctx.moveTo(px-2,py+2);ctx.lineTo(px,py-3);ctx.lineTo(px+2,py+2);ctx.fill();}return;}
     if(m.kind==='bomb'){if(!m.armed)return;ctx.fillStyle='rgba(60,40,20,.6)';ctx.beginPath();ctx.ellipse(mx,my+5,9,3.5,0,0,7);ctx.fill();ctx.fillStyle='#1c1c24';ctx.beginPath();ctx.arc(mx-1,my,6.5,0,7);ctx.fill();ctx.fillStyle='#4a4a5a';ctx.fillRect(mx-4,my-4,3,3);ctx.strokeStyle='#c8a070';ctx.beginPath();ctx.moveTo(mx+3,my-5);ctx.quadraticCurveTo(mx+5,my-9,mx+7,my-8);ctx.stroke();if(Math.sin(an*8+m.x)>0)  {ctx.fillStyle='#ffd060';ctx.fillRect(mx+6,my-10,3,3);}return;}
-    if(m.kind==='aebomb'||m.kind==='gravity'||m.kind==='stake'||m.kind==='meteor'){const ak=STAGE_ART[m.kind][0],sp=SPR.buildings[ak];if(sp){const L=sp.img.idle,im2=L[(Math.floor(an/0.2)+m.x)%L.length],S2=U*T;ctx.imageSmoothingEnabled=false;ctx.globalAlpha=m.armed?(m.kind==='gravity'&&(m.cd>0||m.uses===0)?0.4:1):0.35;ctx.drawImage(im2,m.x*T,m.y*T,S2,S2);ctx.globalAlpha=1;ctx.imageSmoothingEnabled=true;return;}const im=ICIMG[m.kind];ctx.globalAlpha=m.armed?(m.kind==='gravity'&&(m.cd>0||m.uses===0)?0.4:1):0.35;if(im&&(im.complete||im.getContext))ctx.drawImage(im,mx-TU/2,my-TU/2,TU,TU);ctx.globalAlpha=1;return;}
+    if(m.kind==='aebomb'||m.kind==='gravity'||m.kind==='stake'||m.kind==='meteor'||(IS_PROTO&&m.kind==='bomb')){const ak=STAGE_ART[m.kind][0],sp=SPR.buildings[ak];if(sp){const L=sp.img.idle,im2=L[(Math.floor(an/0.2)+m.x)%L.length],S2=U*T;ctx.imageSmoothingEnabled=false;ctx.globalAlpha=m.armed?(m.kind==='gravity'&&(m.cd>0||m.uses===0)?0.4:1):0.35;ctx.drawImage(im2,m.x*T,m.y*T,S2,S2);ctx.globalAlpha=1;ctx.imageSmoothingEnabled=true;return;}const im=ICIMG[m.kind];ctx.globalAlpha=m.armed?(m.kind==='gravity'&&(m.cd>0||m.uses===0)?0.4:1):0.35;if(im&&(im.complete||im.getContext))ctx.drawImage(im,mx-TU/2,my-TU/2,TU,TU);ctx.globalAlpha=1;return;}
     if(m.kind==='pit'){ctx.fillStyle=m.armed?'rgba(110,80,40,.75)':'#120c06';ctx.beginPath();ctx.ellipse(mx,my,TU*0.4,TU*0.32,0,0,7);ctx.fill();if(m.armed){ctx.strokeStyle='rgba(160,120,60,.8)';for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(mx-9,my+i*3);ctx.lineTo(mx+9,my+i*3+1);ctx.stroke();}}return;}
     ctx.fillStyle=m.armed?'#3a3020':'#222';ctx.beginPath();ctx.arc(mx,my,5,0,7);ctx.fill();ctx.strokeStyle=m.armed?'#8a7040':'#444';ctx.stroke();
     if(m.armed&&Math.sin(an*3+m.x)>0.6){ctx.fillStyle='#ff5a4e';ctx.beginPath();ctx.arc(mx,my,1.6,0,7);ctx.fill();}}}
@@ -6330,7 +6332,7 @@ function drawBldV2(b,an){if(b.popAt&&performance.now()<b.popAt)return true;const
   if(S.sel===b){ctx.strokeStyle='#f2b33d';ctx.lineWidth=2;ctx.strokeRect(x+.5,y+.5,S2-1,S2-1);ctx.lineWidth=1;
     if(gunOf(b)){ctx.strokeStyle='rgba(242,179,61,.35)';ctx.beginPath();ctx.arc(cx,cy,rangeOf(b)*TU,0,7);ctx.stroke();}}
   return true;}
-function drawBuilding(b,an){if(!b._bst&&!b._big&&drawBldV2(b,an))return;
+function drawBuilding(b,an){if(!b._bst&&!b._big&&drawBldV2(b,an)){if(IS_PROTO&&b.type==='hq')drawFlag(b);return;}
   if(b.type==='bastion'){const x0=b.x*T,y0=b.y*T,S2=T*bsz(b);ctx.imageSmoothingEnabled=false;if(ICIMG.bastion)ctx.drawImage(ICIMG.bastion,x0,y0,S2,S2);ctx.imageSmoothingEnabled=true;
     if(b.bt>0&&!b.upg){ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(x0,y0,S2,S2);ctx.fillStyle='#f2b33d';ctx.font='bold 11px sans-serif';ctx.fillText(Math.ceil(b.bt/TURN_SEC-0.01)+'T',x0+S2-16,y0+S2-6);}
     if(b.hp<b.maxhp-0.5){ctx.fillStyle='#222';ctx.fillRect(x0+3,y0+S2-4,S2-6,3);ctx.fillStyle='#b8c8b8';ctx.fillRect(x0+3,y0+S2-4,(S2-6)*b.hp/b.maxhp,3);}
@@ -8148,7 +8150,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.19（試作版だけ）','2026-11-18',['<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
+ ['1.19（試作版だけ）','2026-11-18',['<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','<b>領地の旗</b>：街の名前を決めるときに、地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
  ['1.18（試作版だけ）','2026-11-18',['<b>大きな生産施設</b>（研究で建てる・4×4）：大農場・大伐採所・養殖場（ランクⅢ）、大採掘場（ランクⅣ・鉄3・石炭2・金1も取れる）。小さい施設4つ分より多く作る（4.5倍）。建てる資材は5倍、働き手は3倍。土地は4分の3が合っていれば建てられる。道具の段も使える。絵はまだないので小さい施設の絵を大きくして借りている','研究「魔核加工」をなくした','兵舎・馬小屋・竜舎・魔導院は、アップグレード1段ごとに入れられる部隊が1つ増える']],
  ['1.17（試作版だけ）','2026-11-18',['<b>道具の段は研究で開く</b>：はじめは木の道具。「石の道具」（Ⅰ）「鉄の道具」（Ⅱ）…「聖銀の道具」（Ⅵ）の研究で、全部の生産施設のその段が使えるようになる（鍛冶の心得はまとめた）','あとから建てる施設は、建てられるランクの道具を持って建つ（炭鉱なら鉄のつるはし）','<b>生産の技術</b>（%ではなく施設ごとの便利な効果）：石運びの道・輪作・網の繕い（Ⅰ）、植林・炭焼き・坑木の補強・夜釣り・魔矢づくり（Ⅱ）、発破・選鉱（Ⅲ）、換気坑（Ⅳ）','<b>魔矢</b>：武器工房で、矢と小さな魔核から作る。あるあいだは物見櫓とバリスタが先に使い、威力 +30%','<b>今夜のエンチャント</b>（研究「一夜の付与」）：小さな魔核で、防衛施設と部隊をその夜だけ強くする（火力 +30%・受ける被害 −15%）。朝にはがれる。まとめてかけるボタンもある','蒼い炎の篝火は、夜ごとに小さな魔核を燃やす','研究の費用に小さな魔核（ランクⅡから）と魔核（ランクⅣから）を使う','小さな魔核を魔核にまとめる仕組みは外した','道具の研究は、研究画面の各ランクのいちばん上に（黄色の枠）','研究「呪骸の柱」「夜狩り術」をなくした']],
  ['1.16（試作版だけ）','2026-11-18',['<b>魔物の種類で取れる素材が違う</b>：小型＝小さな魔核・大型＝魔核・竜型＝龍鱗・空を飛ぶ魔物＝飛膜・ボス＝巨大魔核','<b>巨大魔核の使い道を3つから1つ選ぶ</b>（城の画面）：竜哮砲（城に据える巨大な大砲。夜、20秒ごとに空へ撃ち上げて、いちばん魔物の多いところに落とす。龍鱗5も使う）・知恵の結晶（使うと5ターン研究が2倍の速さ）・英雄の目覚め（英雄1人が大きく強くなる）','<b>竜晶</b>：精錬所をランクⅦにすると、エーテル2・聖銀1・龍鱗1から竜晶を作れる。竜晶の武器と防具（ランクⅦ）に使う','龍鱗の壁は龍鱗を、風船爆弾とグリフォン騎兵は飛膜を、ランクⅦのアップグレードは龍鱗を使う','<b>占い師</b>：ブラッドムーンの3日前の夜に来て、不吉な予言を残す（幸福度 −10・3日間）','<b>まとめて建てる・替えるときは端から順番に</b>：柵や罠をドラッグで並べたとき、施設をまとめて替えたとき（施設の画面の「同じ施設をまとめて替える」）、パパパッと順番に出る。音の高さも少しずつ違う','英雄を付けられる生産施設は、資源を作る施設だけ（住居・研究室・酒場などはなし）']],
@@ -8255,11 +8257,13 @@ const TOWN_IDEAS=['グレイヴェル','エルムウッド','アッシュフォ�
 function askTown(mid,cb,inGame){const def=mid==='t'?'エルム':mid==='f'?'グレイヴェル':TOWN_IDEAS[0];
   openOverlay('town',`<h2>街の名前を決める</h2><div class="lslow" style="max-width:300px;margin:0 auto 8px">${artPx('lilia_art',LIL_NAME,'')}</div><div class="help" style="line-height:1.8;display:flex;gap:10px;align-items:center">${lilFace(64,'smile')}<span><b style="color:#e8c070">${LIL_NAME}</b>「${inGame?'では、領主様。まずは、この街の名前を決めてください。街の記録や、最後の歴史に残ります':'はじめまして、領主様！ 王都から参りました、領主様付きの書記官のリリアです。今日からお手伝いをします！ まずは、この街の名前を決めてください。街の記録や、最後の歴史に残ります'}」</span></div>
     <div style="display:flex;gap:6px;margin:10px 0;flex-wrap:wrap"><input id="twName" maxlength="12" value="${def}" style="flex:1;min-width:160px;font-size:16px;padding:6px 8px;background:#0e1510;color:var(--text);border:1px solid var(--line)"><button id="twRand">おまかせ</button></div>
+    ${IS_PROTO?`<div style="margin-top:6px"><b>領地の旗</b><div id="twFlag"></div></div>`:''}
     <div style="display:flex;gap:8px;justify-content:flex-end">${inGame?'':'<button id="twBack">戻る</button>'}<button id="twGo" class="primary">${inGame?'この名前にする':'この名前で始める'}</button></div>`,true);
   const inp=document.getElementById('twName');try{inp.focus();inp.select();}catch(e){}
   document.getElementById('twRand').onclick=()=>{inp.value=TOWN_IDEAS[Math.floor(Math.random()*TOWN_IDEAS.length)];se('click');};
   {const bk=document.getElementById('twBack');if(bk)bk.onclick=showIntro;}
-  const ok=()=>{const v=(inp.value||'').replace(/[<>&"']/g,'').trim().slice(0,12)||def;cb(v);};
+  const fl={bg:0,em:0,ec:0};if(IS_PROTO){const box=document.getElementById('twFlag');const rd=()=>{box.innerHTML=flagPickHTML(fl);bindFlagPick(box,fl,rd);};rd();}
+  const ok=()=>{const v=(inp.value||'').replace(/[<>&"']/g,'').trim().slice(0,12)||def;PEND_FLAG=Object.assign({},fl);cb(v);if(IS_PROTO&&inGame&&S)S.flag=Object.assign({},fl);};
   document.getElementById('twGo').onclick=ok;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ok();}e.stopPropagation();};}
 function showIntro(){
   /* ステージ（2026-11-13）：いま遊べるのはチュートリアルと草原だけ。ほかは Coming Soon で入れない */
@@ -8280,7 +8284,7 @@ function showIntro(){
     <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">Coming Soon</small><br><small style="color:var(--dim)">準備中です${id==='swamp'?`<br>解放の条件：ステージ1で第10襲撃をしのぐ（いま ${stageBest('f')}／10）`:''}</small></span></button>`:`<button data-map="${id}" style="display:flex;justify-content:flex-start;width:100%;gap:12px;align-items:center;text-align:left;padding:8px 10px">
     <img src="${mapIcon(id==='tx'?'t':id)}" width="144" height="84" style="image-rendering:pixelated;border:1px solid var(--line);flex-shrink:0" alt="">
     <span><b style="font-size:14px">${nm}</b> <span class="muted">— ${sub}</span><br><small style="color:${col}">${diff}</small><br><small style="color:var(--dim);line-height:1.6">${desc}</small></span></button>`).join('')+`</div>`,true);
-  const start=(mid,nm)=>{closeOverlay();withLoading('マップを作っています…',()=>{CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');if(nm){S.townName=nm;S.townNamed=true;log(`領主として「${nm}」に着任した。`,'good');}storyQueue(0);renderAll();resizeView();});};
+  const start=(mid,nm)=>{closeOverlay();withLoading('マップを作っています…',()=>{CUR_MAP=mid;BLOOD_MODE=false;document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState('campaign');if(nm){if(IS_PROTO&&PEND_FLAG)S.flag=Object.assign({},PEND_FLAG);S.townName=nm;S.townNamed=true;log(`領主として「${nm}」に着任した。`,'good');}storyQueue(0);renderAll();resizeView();});};
   /* チュートリアル（ステージ0）は、リリアのあいさつのあとで街の名前を決める（2026-11-16）。ほかは始める前に */
   const go=(mid)=>mid==='tx'?startScoutEx():(mid==='t'&&tasksOn())?start(mid,null):askTown(mid,nm=>start(mid,nm));
   document.querySelectorAll('[data-map]').forEach(b=>b.onclick=()=>go(b.dataset.map));
@@ -8457,6 +8461,35 @@ function tutDone(){try{return (+localStorage.getItem('nd_best_t')||0)>=FINAL_BY_
 function misList(){const mid=S&&(S.ex||S.mapId);return STAGE_MIS[mid]||[];}
 const GUIDE={};for(const m of MISSIONS)GUIDE[m.id]=m;   /* 「場所を示す」（guideWhere）がミッションの id で手順を引く */
 function misSay(m){return m.say.filter(x=>typeof x!=='function'||x());}
+/* 試作（2026-11-19）：領地の旗。地の色・紋章・紋章の色を選ぶ。城の上と英雄の家の垂れ幕に出る */
+const FLAG_BG=[['青','#2a5aaa'],['赤','#a83232'],['緑','#2e7a3a'],['紫','#6a3a9a'],['黒','#2a2830'],['白','#d8d8e0'],['橙','#c8702a'],['水色','#2a8aa8']];
+const FLAG_EC=[['金','#e2b830'],['銀','#c8ccd6'],['白','#f4f4f4'],['黒','#1c1824'],['赤','#d03838']];
+const FLAG_EM=[['剣',['...#...','...#...','...#...','...#...','.#####.','...#...','...#...']],['盾',['.#####.','#######','#######','#######','.#####.','..###..','...#...']],
+ ['星',['...#...','...#...','#######','.#####.','..###..','.##.##.','#.....#']],['月',['..###..','.##....','##.....','##.....','##.....','.##....','..###..']],
+ ['王冠',['.......','#..#..#','##.#.##','#######','#######','.......','.......']],['塔',['#.#.#.#','#######','.#####.','.##.##.','.#####.','.##.##.','#######']],['十字',['...#...','...#...','#######','...#...','...#...','...#...','...#...']]];
+let PEND_FLAG=null,FLAG_DONE='';
+function flagOf(){const f=(S&&S.flag)||{};return {bg:f.bg||0,em:f.em||0,ec:f.ec||0};}
+const FLAG_CV={};function flagCanvas(f){const k=f.bg+'|'+f.em+'|'+f.ec;if(FLAG_CV[k])return FLAG_CV[k];const c=document.createElement('canvas');c.width=11;c.height=9;const g=c.getContext('2d');
+  g.fillStyle=FLAG_BG[f.bg][1];g.fillRect(0,0,11,9);g.fillStyle=FLAG_EC[f.ec][1];FLAG_EM[f.em][1].forEach((r,y)=>{for(let x=0;x<r.length;x++)if(r[x]==='#')g.fillRect(2+x,1+y,1,1);});return FLAG_CV[k]=c;}
+function flagImg(f,w){return `<img src="${flagCanvas(f).toDataURL()}" width="${w}" height="${Math.round(w*9/11)}" style="image-rendering:pixelated;box-shadow:0 0 0 1px #000a;vertical-align:middle" alt="">`;}
+function drawFlag(b){const f=flagOf(),x=b.x*T+6,y=b.y*T-4;ctx.fillStyle='#3a2e2a';ctx.fillRect(x,y-22,2,26);ctx.imageSmoothingEnabled=false;ctx.drawImage(flagCanvas(f),x+2,y-22,22,18);ctx.imageSmoothingEnabled=true;}
+function flagPickHTML(f){const sw=(k,i,col,lab,on)=>`<button data-fl="${k}:${i}" title="${lab}" style="width:30px;height:30px;padding:0;${on?'outline:2px solid var(--amber);outline-offset:2px;':''}background:${col||'#0e1510'}">${col?'':lab}</button>`;
+  return `<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:8px 0"><div>${flagImg(f,88)}</div><div style="display:flex;flex-direction:column;gap:6px">
+    <div><b style="font-size:12px">地の色</b><div style="display:flex;gap:4px;flex-wrap:wrap">${FLAG_BG.map(([n,c],i)=>sw('bg',i,c,n,f.bg===i)).join('')}</div></div>
+    <div><b style="font-size:12px">紋章</b><div style="display:flex;gap:4px;flex-wrap:wrap">${FLAG_EM.map(([n],i)=>`<button data-fl="em:${i}" title="${n}" style="padding:2px;${f.em===i?'outline:2px solid var(--amber);outline-offset:2px;':''}">${flagImg({bg:f.bg,em:i,ec:f.ec},26)}</button>`).join('')}</div></div>
+    <div><b style="font-size:12px">紋章の色</b><div style="display:flex;gap:4px;flex-wrap:wrap">${FLAG_EC.map(([n,c],i)=>sw('ec',i,c,n,f.ec===i)).join('')}</div></div></div></div>`;}
+function bindFlagPick(root,f,redraw){root.querySelectorAll('[data-fl]').forEach(b=>b.onclick=()=>{const [k,i]=b.dataset.fl.split(':');f[k]=+i;se('click');redraw();});}
+function showFlagEdit(){const f=flagOf();const draw0=()=>{openOverlay('flag',`<h2 style="margin:0 0 4px">${townName()}の旗</h2><div class="help">城の上と、英雄の家の垂れ幕に出ます。</div><div id="flPick">${flagPickHTML(f)}</div><div style="display:flex;justify-content:flex-end;margin-top:8px"><button id="ovClose" class="primary">決める</button></div>`,false);
+  const c=document.getElementById('ovCard');bindFlagPick(c,f,draw0);document.getElementById('ovClose').onclick=()=>{S.flag=f;closeOverlay();};};draw0();}
+/* 英雄の家の垂れ幕を旗の色に（絵は地 #2a5aaa・影 #1a3a7a・明るい所 #4a7aca・紋章 #e2b830 で描いてある） */
+function flagShade(hex,m){return '#'+[1,3,5].map(i=>Math.max(0,Math.min(255,Math.round(parseInt(hex.slice(i,i+2),16)*m)))).map(v=>v.toString(16).padStart(2,'0')).join('');}
+function applyFlag(){if(!IS_PROTO||!S||typeof NDSPR_TIER==='undefined')return;const f=flagOf(),k=f.bg+'|'+f.ec;if(FLAG_DONE===k)return;FLAG_DONE=k;
+  const bg=FLAG_BG[f.bg][1],M={'#2a5aaa':bg,'#1a3a7a':flagShade(bg,0.62),'#4a7aca':flagShade(bg,1.35),'#e2b830':FLAG_EC[f.ec][1]};
+  for(const key of ['tr_hero_house','tr_hero_house2','tr_hero_manor','tr_hero_hall']){const sp=NDSPR_TIER[key];if(!sp||!SPR.buildings)continue;const pal={};for(const c in sp.pal){const v=(sp.pal[c]||'').toLowerCase();pal[c]=M[v.slice(0,7)]?M[v.slice(0,7)]+v.slice(7):sp.pal[c];}
+    const o={size:sp.size,pal,img:{}};for(const a in sp.anims)o.img[a]=sp.anims[a].map(rows=>{const cv=document.createElement('canvas');cv.width=rows[0].length;cv.height=rows.length;const g=cv.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=pal[r[x]];if(!col)continue;g.fillStyle=col;g.fillRect(x,y,1,1);}});return cv;});SPR.buildings[key]=o;
+    const src=(NDART_TIER[key]||NDART_TIER.tr_hero_house2);if(!src)continue;const im=new Image();im.onload=()=>{if(FLAG_DONE!==k)return;const cv=document.createElement('canvas');cv.width=im.width;cv.height=im.height;const g=cv.getContext('2d');g.drawImage(im,0,0);const d=g.getImageData(0,0,cv.width,cv.height),p=d.data;
+      const RM={};for(const h in M)RM[[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)).join(',')]=[1,3,5].map(i=>parseInt(M[h].slice(i,i+2),16));
+      for(let i=0;i<p.length;i+=4){const t=RM[p[i]+','+p[i+1]+','+p[i+2]];if(t){p[i]=t[0];p[i+1]=t[1];p[i+2]=t[2];}}g.putImageData(d,0,0);NDART[key]=[cv.toDataURL(),src[1]];};im.src=src[0];}}
 function townName(){return (S&&S.townName)||(MAPS[S&&S.mapId]?MAPS[S.mapId].name:'この街');}
 function lilTxt(t){if(typeof t==='function')t=t();return String(t||'').replace(/\$\{TOWN\}/g,townName()).replace(/\{ART:([a-z0-9_,]+)\}/g,(m,ks)=>lilArt(ks.split(','))).replace(/\{MOV:([a-z0-9_]+)\}/g,(m,k)=>lilMov(k)).replace(/\{IMG:([a-z0-9_]+)\}/g,(m,k)=>`<div class="limg"><img src="tut/${k}.png" alt=""></div>`);}
 // 操作の短い動画（ゲームを録ったもの。くり返し再生。proto/tut/・本番は tut/）。2026-11-16
@@ -8703,7 +8736,7 @@ function histData(){const H=S.hist||[],TL=tlRows();const L=[];
   return L.join('\n');}
 function showHist(){const TL=tlRows(),xs=TL.map(r=>r.d+'日');
   const tabs=[['wave','襲撃'],['bld','施設'],['prod','生産'],['res','資源']];
-  let h=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">${townName()}の記録</h2><div style="display:flex;gap:6px;flex-wrap:wrap">${tabs.map(([k,n])=>`<button data-ht="${k}" class="${HIST_TAB===k?'on':''}">${n}</button>`).join('')}<button id="hsTl">▶ 街の成長（タイムラプス）</button><button id="hsCopy">数字をコピー</button><button id="ovClose">閉じる</button></div></div>`;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">${IS_PROTO?flagImg(flagOf(),30)+' ':''}${townName()}の記録</h2>${IS_PROTO?'<button id="hFlag">旗を変える</button>':''}<div style="display:flex;gap:6px;flex-wrap:wrap">${tabs.map(([k,n])=>`<button data-ht="${k}" class="${HIST_TAB===k?'on':''}">${n}</button>`).join('')}<button id="hsTl">▶ 街の成長（タイムラプス）</button><button id="hsCopy">数字をコピー</button><button id="ovClose">閉じる</button></div></div>`;
   if(!TL.length&&HIST_TAB!=='wave')h+=`<div class="muted" style="margin:10px 0">記録はこの版から始まりました。次のターンから記録されます（前のセーブの続きでは、途中からの記録になります）。</div>`;
   if(HIST_TAB==='wave'){h+=`<div class="muted" style="margin:6px 0">襲撃ごとの結果です。</div>${histTable()}`;
     const H=S.hist||[];if(H.length>=2)h+=`<div class="ehist" style="margin-top:10px"><span>撃破と損失の推移</span></div>`+lineChart([{n:'撃破',c:'#6fe08a',v:H.map(r=>r.kills)},{n:'戦死',c:'#e8735c',v:H.map(r=>r.kia)},{n:'施設損失',c:'#f2b33d',v:H.map(r=>r.bld)}],H.map(r=>'第'+r.n));}
@@ -8719,6 +8752,7 @@ function showHist(){const TL=tlRows(),xs=TL.map(r=>r.d+'日');
   if(S.over)h+=`<div style="margin-top:12px;display:flex;gap:8px"><button id="hsRestart" class="on">最初から</button></div>`;
   openOverlay('hist',h,true);document.getElementById('ovClose').onclick=closeOverlay;
   document.querySelectorAll('[data-ht]').forEach(b=>b.onclick=()=>{HIST_TAB=b.dataset.ht;showHist();});
+  {const hf=document.getElementById('hFlag');if(hf)hf.onclick=showFlagEdit;}
   document.getElementById('hsTl').onclick=()=>{closeOverlay();playTimelapse(()=>showHist());};
   document.getElementById('hsCopy').onclick=()=>{const a=document.getElementById('hsData'),done=()=>toast('記録の数字をコピーしました（表計算ソフトに貼り付けられます）','good');try{navigator.clipboard.writeText(a.value).then(done,()=>{a.select();document.execCommand('copy');done();});}catch(e){a.select();try{document.execCommand('copy');}catch(x){}done();}};
   const r=document.getElementById('hsRestart');if(r)r.onclick=()=>{closeOverlay();document.getElementById('log').innerHTML='';squadNo=1;buildSig='';newState(S.mode);renderAll();auMusicFor();};}
