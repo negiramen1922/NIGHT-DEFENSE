@@ -985,7 +985,7 @@ body.land #saveMark{right:calc(var(--rail) + 8px);bottom:auto;top:44px}   /* ス
   body:not(.land) #controls>.sep,body:not(.land) #controls>.speed{display:none!important}
   body:not(.land) #controls>#bSpd{display:inline-flex!important;flex-direction:row}
   body:not(.land) #controls>#bPause{display:inline-flex!important;flex-direction:row;align-items:center;height:34px!important;font-size:inherit}   /* ほかのボタンと同じ高さに */
-  body:not(.land) #controls>#bNext{order:1}body:not(.land) #controls>#bRepAll{order:2}body:not(.land) #controls>#bSupAll{order:3}body:not(.land) #controls>#bNaval{order:4}
+  body:not(.land) #controls>#bNext{order:1}body:not(.land) #controls>#bRepAll,body:not(.land) #controls>#bRuinAll{order:2}body:not(.land) #controls>#bSupAll{order:3}body:not(.land) #controls>#bNaval{order:4}
   body:not(.land) #controls>.grow{order:5}body:not(.land) #controls>#bDex{order:6}body:not(.land) #controls>#bHist{order:7}body:not(.land) #controls>#bSpd{order:8}body:not(.land) #controls>#bPause{order:9}body:not(.land) #controls>#more{order:10}
   body:not(.land) #controls>#bSpd .mic,body:not(.land) #controls>#bSpd .pi{display:none}
   body:not(.land) #controls>#bPause .pi{width:12px!important;height:12px!important}
@@ -1522,7 +1522,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .hcd{margin-left:8px;font-family:var(--px-font);font-size:11px;color:var(--dim)}
 .hcd.ready{color:var(--green)}
 .hcd.fire{color:#fff;background:var(--mat);padding:0 5px}
-#bRepAll,#bSupAll{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
+#bRepAll,#bSupAll,#bRuinAll{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
 
 /* 立ち絵 v2 */
 .artpx{position:relative;width:100%;aspect-ratio:300/120;background-repeat:no-repeat;background-size:100% 100%;image-rendering:pixelated;background-color:#060a07}
@@ -1642,6 +1642,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <button id="bTown" class="sp-main lOnly" data-rtb="econ"><span class="mic"></span><span>街</span></button>
       <span class="sep"></span>
       <button id="bRepAll">一括修理</button>
+      <button id="bRuinAll">廃墟を建て直す</button>
       <button id="bSupAll">一括補給</button>
       <button id="bNaval" style="display:none">艦砲射撃 [V]</button>
       <span class="sep"></span>
@@ -1649,7 +1650,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <span class="grow"></span>
       <button id="bHist" class="dOnly">記録</button>
       <details id="more" class="more"><summary title="表示・設定"><span class="mic"></span><span class="mtx">表示・設定</span></summary><div class="moreBody">
-      <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mSup">一括補給</button><button id="mHist">街の記録</button><button id="mLog">通信ログ</button></div>
+      <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mRuin">廃墟を建て直す</button><button id="mSup">一括補給</button><button id="mHist">街の記録</button><button id="mLog">通信ログ</button></div>
       <div class="mOnly mspeed"><span class="help">速度</span><div class="speed"><button data-spd="1">×1</button><button data-spd="2">×2</button><button data-spd="3">×3</button></div></div>
       <button id="bOrient" style="display:none">画面の向き：横で固定</button>
       <button id="bInstall2" style="display:none">ホーム画面に追加（アプリにする）</button>
@@ -3678,7 +3679,7 @@ function lineCells(t,a,b){const L=wallLineCells(a,b),n=Math.max(1,newSz(t));if(n
 /* 試作（2026-11-18）：まとめて建てる・替えるときは、端から順番にパパパッと出す。音は高さを少し上下にばらす（最後だけ少し高く） */
 function popSE(i,last){if(!AU.ctx||!AU.on)return;const t=AU.ctx.currentTime;const f=(last?1250:900)*(1+(Math.random()*0.24-0.12));tone(f,t,0.06,{type:'square',vol:0.035,to:f*1.4,lp:3200,a:0.002});}
 function popStage(list,fx,keep){const n=list.length;if(!n)return;const gap=Math.min(55,Math.max(12,1000/n));const t0=performance.now();
-  list.forEach((o,i)=>{if(!keep)o.popAt=t0+i*gap;setTimeout(()=>{if(fx)fx(o,i);popSE(i,i===n-1);},i*gap);});}
+  list.forEach((o,i)=>{if(!keep)o.popAt=t0+i*gap;setTimeout(()=>{delete o.popAt;if(fx)fx(o,i);popSE(i,i===n-1);},i*gap);});}
 /* 同じ種類の施設をまとめてアップグレード（道具を替える）。払える数だけ、端から順番に */
 function upAllList(o){return S.blds.filter(b=>b.type===o.type&&!(b.bt>0)&&!b.off&&b.lv<maxLvOf(b.type)&&b.lv<kcMax(b.type)).sort((a,b)=>(a.x-b.x)||(a.y-b.y));}
 function askUpAll(o){const L=upAllList(o);if(!L.length)return;const pick=[],tot={};const left=Object.assign({},S);
@@ -5521,6 +5522,12 @@ function bulkAsk(title,items,cost,doIt,back){
 function bulkYes(){const b=BULK;BULK=null;closeOverlay();if(b){b.doIt();if(b.back)b.back();}}
 function bulkNo(){const b=BULK;BULK=null;closeOverlay();if(b&&b.back)b.back();}
 function cntBy(list,f){const m=new Map();for(const x of list){const k=f(x);m.set(k,(m.get(k)||0)+1);}return [...m.entries()];}
+/* 壊された施設の廃墟をまとめて建て直す（下の一括のところから・2026-11-19） */
+function ruinsFree(){return (S.ruins||[]).filter(r=>bCells(r.x,r.y,r.sz||newSz(r.type)).every(([cx,cy])=>S.grid[cy]&&S.grid[cy][cx]===null));}
+function askRuinAll(back){if(S.waveActive){se('error');toast('戦闘中は建て直せない（昼に建て直そう）','warn');return;}
+  const L=ruinsFree();if(!L.length){se('error');toast('建て直せる廃墟はありません','warn');return;}
+  const cost={};for(const r of L){const c=ruinCost(r);for(const k in c)cost[k]=(cost[k]||0)+c[k];}
+  bulkAsk('一括建て直し',cntBy(L,r=>r.type).map(([t,k])=>[icSvg(t,28),B[t].name,k]),cost,()=>{let n=0;for(const r of [...L].sort((p,q)=>(WALL_TYPES.includes(p.type)?1:0)-(WALL_TYPES.includes(q.type)?1:0)))if(rebuildRuin(r,true))n++;if(n){se('upgrade');log(`廃墟 ${n}件を建て直した`,'good');}else{se('error');toast('資材が足りません','warn');}renderInfo(true);},back);}
 function askRepairAll(back){if(S.waveActive){se('error');toast('戦闘中は修理できない（昼に修理しよう）','warn');return;}
   const ra=repairAllCost(),bl=S.blds.filter(damaged);let miss=0;for(const b of S.blds)if(b.shMax>0)miss+=Math.max(0,b.shMax-(b.shield||0));
   const items=cntBy(bl,b=>b.type).map(([t,k])=>[icSvg(t,28),B[t].name,k]);const pd=pitsToDig().length,sb=spikesBroken().length;
@@ -7086,7 +7093,7 @@ function showLegend(){
   openOverlay('legend',h,true);document.getElementById('lgClose').onclick=closeOverlay;
 }
 document.querySelectorAll('.speed [data-spd]').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.spd;se('click');renderPauseUI();});
-{const px=(id,t)=>{const e=document.getElementById(id);if(e)e.onclick=()=>{document.getElementById('more').open=false;const b=document.getElementById(t);if(b.onclick)b.onclick();else b.click();};};px('mRep','bRepAll');px('mSup','bSupAll');px('mHist','bHist');px('mDex','bDex');
+{const px=(id,t)=>{const e=document.getElementById(id);if(e)e.onclick=()=>{document.getElementById('more').open=false;const b=document.getElementById(t);if(b.onclick)b.onclick();else b.click();};};px('mRep','bRepAll');px('mRuin','bRuinAll');px('mSup','bSupAll');px('mHist','bHist');px('mDex','bDex');
  document.getElementById('mLog').onclick=()=>{document.getElementById('more').open=false;openOverlay('log',`<h2>通信ログ<button id="ovClose" style="float:right">閉じる</button></h2><div class="logfull">${document.getElementById('log').innerHTML}</div>`,false);document.getElementById('ovClose').onclick=closeOverlay;};
  const mic=(id,n)=>{const e=document.querySelector('#'+id+' .mic');if(e)e.innerHTML=ui(n,'light',24);};PXICON.ui.icons.build=PXICON.ui.icons.build||["............","...xxxxx....","..xxxxxxxx..","..xxxxxxxx..","...xxxxx....","......xx....",".....xx.....","....xx......","...xx.......","..xx........",".xx.........","............"];PXICON.ui.icons.town=PXICON.ui.icons.town||["............",".....xx.....","....xxxx....","...xxxxxx...","..xxxxxxxx..",".xxxxxxxxxx.","..xxxxxxxx..","..xx.xx.xx..","..xx.xx.xx..","..xxxxxxxx..","..xxxxxxxx..","............"];
 // 幸福度の顔（h_*）と夜の出来事（ev_*）のアイコン
@@ -7121,7 +7128,7 @@ document.getElementById('bArmy').onclick=()=>openArmyTab('list',true);
 function setRT(t){if(t==='info'&&!isNarrow())t='build';if(S&&t==='econ')S.econSeen=(S.econSeen||0)+1;if(S&&t==='army'&&S.armySub==='hero')S.heroSeen=(S.heroSeen||0)+1;document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
-document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bSupAll').onclick=()=>askSupplyAll();
+document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bRuinAll').onclick=()=>askRuinAll();document.getElementById('bSupAll').onclick=()=>askSupplyAll();
 document.getElementById('bHelp').onclick=()=>{if(!S.overlay)showHelp(false);};
 document.getElementById('bNaval').onclick=toggleNaval;
 document.getElementById('bMute').onclick=auToggle;
@@ -7728,6 +7735,7 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,`一括補給${sq.length?`<span class="bkn">${sq.length}</span>`:''}<kbd>N</kbd>`);
   {const ms=document.getElementById('mSup');if(ms)setHTML(ms,sq.length?`一括補給（${sq.length}部隊）`:'一括補給（必要なし）');}const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
   const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中）':`一括修理${ra2.n?`<span class="bkn">${ra2.n}</span>`:''}<kbd>X</kbd>`);const dA=!ra2.n||S.steel<1||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
+  {const rn=ruinsFree().length,bR=document.getElementById('bRuinAll');setHTML(bR,`廃墟を建て直す${rn?`<span class="bkn">${rn}</span>`:''}`);const dR=!rn||S.waveActive;if(bR.disabled!==dR)bR.disabled=dR;}
   {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中）':ra2.n?`一括修理（${repWhat(ra2)}）`:'一括修理');mr.classList.toggle('dim',dA);}}
   const bnv=document.getElementById('bNaval');bnv.style.display=has('naval')?'':'none';setText(bnv,S.aimNaval?'目標を指定…（Escで取消）':`艦砲射撃 残り${S.waveActive?S.navalLeft:(has('navalre')?2:1)} [V]`);
   {const dn=!S.waveActive||S.navalLeft<=0;if(bnv.disabled!==dn)bnv.disabled=dn;bnv.classList.toggle('on',!!S.aimNaval);}
@@ -8074,7 +8082,7 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   const m=d.meta;CUR_MAP=m.map;BLOOD_MODE=!!m.blood;setDims('campaign');upDims();squadNo=m.squadNo||1;tankNo=m.tankNo||1;
   S=d.S;S.flow=new Map();for(const k of ['ore','oil'])if(S[k]&&S[k].pk)S[k]=unpackG(S[k]);
   // 前のセッションの時刻（performance.now 基準）は持ち越さない：発射アニメなどのコマ番号が狂って描画が止まるため
-  for(const b of S.blds){delete b.fireT;}for(const q of S.squads||[]){delete q.atkT;}S.vfx=[];
+  for(const b of S.blds){delete b.fireT;delete b.popAt;}for(const m of S.mines||[])delete m.popAt;for(const q of S.squads||[]){delete q.atkT;}S.vfx=[];
   if(S.skirm||!S.waveActive){S.skirm=null;if(!S.waveActive)S.enemies=[];if(S.camps)for(const c of S.camps)if(c.state==='fight')c.state='idle';}for(const k in AF)delete AF[k];S.grid=Array.from({length:ROWS},()=>new Array(COLS).fill(null));
   for(const b of S.blds)gridSet(b,true);
   if(IS_PROTO&&!S.eq3){S.eq3=1;for(const q of S.squads){for(const k of ['wHave','wT'])if(q[k]>=2)q[k]--;for(const k of ['aHave','aT'])if(q[k]>=3)q[k]--;}}   /* 試作：装備の鋼をなくした前のセーブ（鋼は合金に） */
@@ -8172,7 +8180,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.19（試作版だけ）','2026-11-18',['<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：画面の上の街の名前・戦いの結果・つづきから・前哨砦にも出る。地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','英雄の家・港・空港・グリフォンの厩舎・兵器工房の建設のアイコン、土地を選んだときの建設の一覧にもアイコン','アップグレードで増える働き手は、費用の「住民」として待機中の住民からすぐに入る（アップグレード直後に人手不足にならない）','倒れた魔物と兵は、その場で横に倒れて少しつぶれてから消える','武器工房の道具の段の絵（地図の絵と立ち絵）を入れた','道具の段の立ち絵を入れた（施設を選んだときの絵が、道具の段ごとに変わる）','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
+ ['1.19（試作版だけ）','2026-11-18',['柵などをまとめて建てたあと、セーブして読み込み直すと見えなくなることがあったのを直した','下の一括のところに「廃墟を建て直す」ボタンを追加','<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：画面の上の街の名前・戦いの結果・つづきから・前哨砦にも出る。地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','英雄の家・港・空港・グリフォンの厩舎・兵器工房の建設のアイコン、土地を選んだときの建設の一覧にもアイコン','アップグレードで増える働き手は、費用の「住民」として待機中の住民からすぐに入る（アップグレード直後に人手不足にならない）','倒れた魔物と兵は、その場で横に倒れて少しつぶれてから消える','武器工房の道具の段の絵（地図の絵と立ち絵）を入れた','道具の段の立ち絵を入れた（施設を選んだときの絵が、道具の段ごとに変わる）','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
  ['1.18（試作版だけ）','2026-11-18',['<b>大きな生産施設</b>（研究で建てる・4×4）：大農場・大伐採所・養殖場（ランクⅢ）、大採掘場（ランクⅣ・鉄3・石炭2・金1も取れる）。小さい施設4つ分より多く作る（4.5倍）。建てる資材は5倍、働き手は3倍。土地は4分の3が合っていれば建てられる。道具の段も使える。絵はまだないので小さい施設の絵を大きくして借りている','研究「魔核加工」をなくした','兵舎・馬小屋・竜舎・魔導院は、アップグレード1段ごとに入れられる部隊が1つ増える']],
  ['1.17（試作版だけ）','2026-11-18',['<b>道具の段は研究で開く</b>：はじめは木の道具。「石の道具」（Ⅰ）「鉄の道具」（Ⅱ）…「聖銀の道具」（Ⅵ）の研究で、全部の生産施設のその段が使えるようになる（鍛冶の心得はまとめた）','あとから建てる施設は、建てられるランクの道具を持って建つ（炭鉱なら鉄のつるはし）','<b>生産の技術</b>（%ではなく施設ごとの便利な効果）：石運びの道・輪作・網の繕い（Ⅰ）、植林・炭焼き・坑木の補強・夜釣り・魔矢づくり（Ⅱ）、発破・選鉱（Ⅲ）、換気坑（Ⅳ）','<b>魔矢</b>：武器工房で、矢と小さな魔核から作る。あるあいだは物見櫓とバリスタが先に使い、威力 +30%','<b>今夜のエンチャント</b>（研究「一夜の付与」）：小さな魔核で、防衛施設と部隊をその夜だけ強くする（火力 +30%・受ける被害 −15%）。朝にはがれる。まとめてかけるボタンもある','蒼い炎の篝火は、夜ごとに小さな魔核を燃やす','研究の費用に小さな魔核（ランクⅡから）と魔核（ランクⅣから）を使う','小さな魔核を魔核にまとめる仕組みは外した','道具の研究は、研究画面の各ランクのいちばん上に（黄色の枠）','研究「呪骸の柱」「夜狩り術」をなくした']],
  ['1.16（試作版だけ）','2026-11-18',['<b>魔物の種類で取れる素材が違う</b>：小型＝小さな魔核・大型＝魔核・竜型＝龍鱗・空を飛ぶ魔物＝飛膜・ボス＝巨大魔核','<b>巨大魔核の使い道を3つから1つ選ぶ</b>（城の画面）：竜哮砲（城に据える巨大な大砲。夜、20秒ごとに空へ撃ち上げて、いちばん魔物の多いところに落とす。龍鱗5も使う）・知恵の結晶（使うと5ターン研究が2倍の速さ）・英雄の目覚め（英雄1人が大きく強くなる）','<b>竜晶</b>：精錬所をランクⅦにすると、エーテル2・聖銀1・龍鱗1から竜晶を作れる。竜晶の武器と防具（ランクⅦ）に使う','龍鱗の壁は龍鱗を、風船爆弾とグリフォン騎兵は飛膜を、ランクⅦのアップグレードは龍鱗を使う','<b>占い師</b>：ブラッドムーンの3日前の夜に来て、不吉な予言を残す（幸福度 −10・3日間）','<b>まとめて建てる・替えるときは端から順番に</b>：柵や罠をドラッグで並べたとき、施設をまとめて替えたとき（施設の画面の「同じ施設をまとめて替える」）、パパパッと順番に出る。音の高さも少しずつ違う','英雄を付けられる生産施設は、資源を作る施設だけ（住居・研究室・酒場などはなし）']],

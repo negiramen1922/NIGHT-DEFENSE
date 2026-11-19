@@ -984,7 +984,7 @@ body.land #saveMark{right:calc(var(--rail) + 8px);bottom:auto;top:44px}   /* ス
   body:not(.land) #controls>.sep,body:not(.land) #controls>.speed{display:none!important}
   body:not(.land) #controls>#bSpd{display:inline-flex!important;flex-direction:row}
   body:not(.land) #controls>#bPause{display:inline-flex!important;flex-direction:row;align-items:center;height:34px!important;font-size:inherit}   /* ほかのボタンと同じ高さに */
-  body:not(.land) #controls>#bNext{order:1}body:not(.land) #controls>#bRepAll{order:2}body:not(.land) #controls>#bSupAll{order:3}body:not(.land) #controls>#bNaval{order:4}
+  body:not(.land) #controls>#bNext{order:1}body:not(.land) #controls>#bRepAll,body:not(.land) #controls>#bRuinAll{order:2}body:not(.land) #controls>#bSupAll{order:3}body:not(.land) #controls>#bNaval{order:4}
   body:not(.land) #controls>.grow{order:5}body:not(.land) #controls>#bDex{order:6}body:not(.land) #controls>#bHist{order:7}body:not(.land) #controls>#bSpd{order:8}body:not(.land) #controls>#bPause{order:9}body:not(.land) #controls>#more{order:10}
   body:not(.land) #controls>#bSpd .mic,body:not(.land) #controls>#bSpd .pi{display:none}
   body:not(.land) #controls>#bPause .pi{width:12px!important;height:12px!important}
@@ -1521,7 +1521,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .hcd{margin-left:8px;font-family:var(--px-font);font-size:11px;color:var(--dim)}
 .hcd.ready{color:var(--green)}
 .hcd.fire{color:#fff;background:var(--mat);padding:0 5px}
-#bRepAll,#bSupAll{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
+#bRepAll,#bSupAll,#bRuinAll{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
 
 /* 立ち絵 v2 */
 .artpx{position:relative;width:100%;aspect-ratio:300/120;background-repeat:no-repeat;background-size:100% 100%;image-rendering:pixelated;background-color:#060a07}
@@ -1640,6 +1640,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <button id="bTown" class="sp-main lOnly" data-rtb="econ"><span class="mic"></span><span>街</span></button>
       <span class="sep"></span>
       <button id="bRepAll">一括修理</button>
+      <button id="bRuinAll">廃墟を建て直す</button>
       <button id="bSupAll">一括補給</button>
       <button id="bNaval" style="display:none">艦砲射撃 [V]</button>
       <span class="sep"></span>
@@ -1647,7 +1648,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <span class="grow"></span>
       <button id="bHist" class="dOnly">記録</button>
       <details id="more" class="more"><summary title="表示・設定"><span class="mic"></span><span class="mtx">表示・設定</span></summary><div class="moreBody">
-      <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mSup">一括補給</button><button id="mHist">街の記録</button><button id="mLog">通信ログ</button></div>
+      <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mRuin">廃墟を建て直す</button><button id="mSup">一括補給</button><button id="mHist">街の記録</button><button id="mLog">通信ログ</button></div>
       <div class="mOnly mspeed"><span class="help">速度</span><div class="speed"><button data-spd="1">×1</button><button data-spd="2">×2</button><button data-spd="3">×3</button></div></div>
       <button id="bOrient" style="display:none">画面の向き：横で固定</button>
       <button id="bInstall2" style="display:none">ホーム画面に追加（アプリにする）</button>
@@ -5267,6 +5268,12 @@ function bulkAsk(title,items,cost,doIt,back){
 function bulkYes(){const b=BULK;BULK=null;closeOverlay();if(b){b.doIt();if(b.back)b.back();}}
 function bulkNo(){const b=BULK;BULK=null;closeOverlay();if(b&&b.back)b.back();}
 function cntBy(list,f){const m=new Map();for(const x of list){const k=f(x);m.set(k,(m.get(k)||0)+1);}return [...m.entries()];}
+/* 壊された施設の廃墟をまとめて建て直す（下の一括のところから・2026-11-19） */
+function ruinsFree(){return (S.ruins||[]).filter(r=>bCells(r.x,r.y,r.sz||newSz(r.type)).every(([cx,cy])=>S.grid[cy]&&S.grid[cy][cx]===null));}
+function askRuinAll(back){if(S.waveActive){se('error');toast('戦闘中は建て直せない（昼に建て直そう）','warn');return;}
+  const L=ruinsFree();if(!L.length){se('error');toast('建て直せる廃墟はありません','warn');return;}
+  const cost={};for(const r of L){const c=ruinCost(r);for(const k in c)cost[k]=(cost[k]||0)+c[k];}
+  bulkAsk('一括建て直し',cntBy(L,r=>r.type).map(([t,k])=>[icSvg(t,28),B[t].name,k]),cost,()=>{let n=0;for(const r of [...L].sort((p,q)=>(WALL_TYPES.includes(p.type)?1:0)-(WALL_TYPES.includes(q.type)?1:0)))if(rebuildRuin(r,true))n++;if(n){se('upgrade');log(`廃墟 ${n}件を建て直した`,'good');}else{se('error');toast('資材が足りません','warn');}renderInfo(true);},back);}
 function askRepairAll(back){if(S.waveActive){se('error');toast('戦闘中は修理できない（昼に修理しよう）','warn');return;}
   const ra=repairAllCost(),bl=S.blds.filter(damaged);let miss=0;for(const b of S.blds)if(b.shMax>0)miss+=Math.max(0,b.shMax-(b.shield||0));
   const items=cntBy(bl,b=>b.type).map(([t,k])=>[icSvg(t,28),B[t].name,k]);const pd=pitsToDig().length,sb=spikesBroken().length;
@@ -6802,7 +6809,7 @@ function showLegend(){
   openOverlay('legend',h,true);document.getElementById('lgClose').onclick=closeOverlay;
 }
 document.querySelectorAll('.speed [data-spd]').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.spd;se('click');renderPauseUI();});
-{const px=(id,t)=>{const e=document.getElementById(id);if(e)e.onclick=()=>{document.getElementById('more').open=false;const b=document.getElementById(t);if(b.onclick)b.onclick();else b.click();};};px('mRep','bRepAll');px('mSup','bSupAll');px('mHist','bHist');px('mDex','bDex');
+{const px=(id,t)=>{const e=document.getElementById(id);if(e)e.onclick=()=>{document.getElementById('more').open=false;const b=document.getElementById(t);if(b.onclick)b.onclick();else b.click();};};px('mRep','bRepAll');px('mRuin','bRuinAll');px('mSup','bSupAll');px('mHist','bHist');px('mDex','bDex');
  document.getElementById('mLog').onclick=()=>{document.getElementById('more').open=false;openOverlay('log',`<h2>通信ログ<button id="ovClose" style="float:right">閉じる</button></h2><div class="logfull">${document.getElementById('log').innerHTML}</div>`,false);document.getElementById('ovClose').onclick=closeOverlay;};
  const mic=(id,n)=>{const e=document.querySelector('#'+id+' .mic');if(e)e.innerHTML=ui(n,'light',24);};PXICON.ui.icons.build=PXICON.ui.icons.build||["............","...xxxxx....","..xxxxxxxx..","..xxxxxxxx..","...xxxxx....","......xx....",".....xx.....","....xx......","...xx.......","..xx........",".xx.........","............"];PXICON.ui.icons.town=PXICON.ui.icons.town||["............",".....xx.....","....xxxx....","...xxxxxx...","..xxxxxxxx..",".xxxxxxxxxx.","..xxxxxxxx..","..xx.xx.xx..","..xx.xx.xx..","..xxxxxxxx..","..xxxxxxxx..","............"];
 // 幸福度の顔（h_*）と夜の出来事（ev_*）のアイコン
@@ -6837,7 +6844,7 @@ document.getElementById('bArmy').onclick=()=>openArmyTab('list',true);
 function setRT(t){if(t==='info'&&!isNarrow())t='build';if(S&&t==='econ')S.econSeen=(S.econSeen||0)+1;if(S&&t==='army'&&S.armySub==='hero')S.heroSeen=(S.heroSeen||0)+1;document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
-document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bSupAll').onclick=()=>askSupplyAll();
+document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bRuinAll').onclick=()=>askRuinAll();document.getElementById('bSupAll').onclick=()=>askSupplyAll();
 document.getElementById('bHelp').onclick=()=>{if(!S.overlay)showHelp(false);};
 document.getElementById('bNaval').onclick=toggleNaval;
 document.getElementById('bMute').onclick=auToggle;
@@ -7418,6 +7425,7 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,`一括補給${sq.length?`<span class="bkn">${sq.length}</span>`:''}<kbd>N</kbd>`);
   {const ms=document.getElementById('mSup');if(ms)setHTML(ms,sq.length?`一括補給（${sq.length}部隊）`:'一括補給（必要なし）');}const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
   const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中）':`一括修理${ra2.n?`<span class="bkn">${ra2.n}</span>`:''}<kbd>X</kbd>`);const dA=!ra2.n||S.steel<1||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
+  {const rn=ruinsFree().length,bR=document.getElementById('bRuinAll');setHTML(bR,`廃墟を建て直す${rn?`<span class="bkn">${rn}</span>`:''}`);const dR=!rn||S.waveActive;if(bR.disabled!==dR)bR.disabled=dR;}
   {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中）':ra2.n?`一括修理（${repWhat(ra2)}）`:'一括修理');mr.classList.toggle('dim',dA);}}
   const bnv=document.getElementById('bNaval');bnv.style.display=has('naval')?'':'none';setText(bnv,S.aimNaval?'目標を指定…（Escで取消）':`艦砲射撃 残り${S.waveActive?S.navalLeft:(has('navalre')?2:1)} [V]`);
   {const dn=!S.waveActive||S.navalLeft<=0;if(bnv.disabled!==dn)bnv.disabled=dn;bnv.classList.toggle('on',!!S.aimNaval);}
@@ -7832,7 +7840,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.12.2','2026-11-19',['倒れた魔物と兵が、その場で横に倒れて少しつぶれてから消えるように','閉じるボタンをどの画面でも右下にそろえた','研究の中止ボタンを、研究中のカードの上の赤い枠のボタンに移した（まちがえて押さないように）']],
+ ['1.12.2','2026-11-19',['倒れた魔物と兵が、その場で横に倒れて少しつぶれてから消えるように','閉じるボタンをどの画面でも右下にそろえた','研究の中止ボタンを、研究中のカードの上の赤い枠のボタンに移した（まちがえて押さないように）','下の一括のところに「廃墟を建て直す」ボタンを追加（壊された施設をまとめて建て直す）']],
  ['1.12.1（試作版だけ）','',['<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
  ['1.12.1','2026-11-17',['不具合の修正：建て終わった施設の耐久が減ったままになっていた（前の版で建てた施設も、読み込んだときに満タンに戻す）','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）']],
  ['1.12','2026-11-17',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>時間のバー</b>を地図の中から出して、敵情予測と地図のあいだの細い帯に（残りの時間も出る）','<b>ミニマップに小さな見出し</b>をつけた：「大・小」で大きさを切り替え、「－」でたたむ（たたむと見出しだけになり、「＋」で戻す）','<b>防衛施設の詳しい画面に、夜の実際の動き</b>：施設が、地図の上と同じ絵の弾（バリスタは重い矢、投石機は石、物見櫓は矢など）で、歩いてくる魔物を撃つ小さな場面','<b>弾がまったくなくて撃てない防衛施設</b>には、地図の上で施設の上に赤い「!!」を出すように（昼でも分かる）','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる','<b>木の柵は置いたらすぐ完成</b>（罠と同じ）','不具合の修正：建て終わった施設の耐久が少し減って見えることがあった']],
