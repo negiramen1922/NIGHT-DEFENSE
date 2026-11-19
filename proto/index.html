@@ -985,7 +985,7 @@ body.land #saveMark{right:calc(var(--rail) + 8px);bottom:auto;top:44px}   /* ス
   body:not(.land) #controls>.sep,body:not(.land) #controls>.speed{display:none!important}
   body:not(.land) #controls>#bSpd{display:inline-flex!important;flex-direction:row}
   body:not(.land) #controls>#bPause{display:inline-flex!important;flex-direction:row;align-items:center;height:34px!important;font-size:inherit}   /* ほかのボタンと同じ高さに */
-  body:not(.land) #controls>#bNext{order:1}body:not(.land) #controls>#bRepAll,body:not(.land) #controls>#bRuinAll{order:2}body:not(.land) #controls>#bSupAll{order:3}body:not(.land) #controls>#bNaval{order:4}
+  body:not(.land) #controls>#bNext{order:1}body:not(.land) #controls>#bRepAll,body:not(.land) #controls>#bRuinAll,body:not(.land) #controls>#bGear{order:2}body:not(.land) #controls>#bSupAll{order:3}body:not(.land) #controls>#bNaval{order:4}
   body:not(.land) #controls>.grow{order:5}body:not(.land) #controls>#bDex{order:6}body:not(.land) #controls>#bHist{order:7}body:not(.land) #controls>#bSpd{order:8}body:not(.land) #controls>#bPause{order:9}body:not(.land) #controls>#more{order:10}
   body:not(.land) #controls>#bSpd .mic,body:not(.land) #controls>#bSpd .pi{display:none}
   body:not(.land) #controls>#bPause .pi{width:12px!important;height:12px!important}
@@ -1522,7 +1522,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .hcd{margin-left:8px;font-family:var(--px-font);font-size:11px;color:var(--dim)}
 .hcd.ready{color:var(--green)}
 .hcd.fire{color:#fff;background:var(--mat);padding:0 5px}
-#bRepAll,#bSupAll,#bRuinAll{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
+#bRepAll,#bSupAll,#bRuinAll,#bGear{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
 
 /* 立ち絵 v2 */
 .artpx{position:relative;width:100%;aspect-ratio:300/120;background-repeat:no-repeat;background-size:100% 100%;image-rendering:pixelated;background-color:#060a07}
@@ -1643,6 +1643,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <span class="sep"></span>
       <button id="bRepAll">一括修理</button>
       <button id="bRuinAll">廃墟を建て直す</button>
+      <button id="bGear" hidden>装備・道具を替える</button>
       <button id="bSupAll">一括補給</button>
       <button id="bNaval" style="display:none">艦砲射撃 [V]</button>
       <span class="sep"></span>
@@ -1650,7 +1651,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <span class="grow"></span>
       <button id="bHist" class="dOnly">記録</button>
       <details id="more" class="more"><summary title="表示・設定"><span class="mic"></span><span class="mtx">表示・設定</span></summary><div class="moreBody">
-      <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mRuin">廃墟を建て直す</button><button id="mSup">一括補給</button><button id="mHist">街の記録</button><button id="mLog">通信ログ</button></div>
+      <div class="mOnly mgrid"><button id="mRep">一括修理</button><button id="mRuin">廃墟を建て直す</button><button id="mGear">装備・道具</button><button id="mSup">一括補給</button><button id="mHist">街の記録</button><button id="mLog">通信ログ</button></div>
       <div class="mOnly mspeed"><span class="help">速度</span><div class="speed"><button data-spd="1">×1</button><button data-spd="2">×2</button><button data-spd="3">×3</button></div></div>
       <button id="bOrient" style="display:none">画面の向き：横で固定</button>
       <button id="bInstall2" style="display:none">ホーム画面に追加（アプリにする）</button>
@@ -4789,7 +4790,7 @@ function unlockNews(t){if(!S||S.backdrop||lvl(t.id)>1)return;const L=BUILD_GROUP
 function tickBaseUp(){if(!S.baseUp)return;S.baseUp.left--;if(S.baseUp.left>0)return;
   S.baseLv=Math.min(BASE_MAX,S.baseUp.to);S.baseUp=null;se('upgrade');storyQueue('r'+S.baseLv);
   const m=`城のランクが${S.baseLv}になった（英雄の上限${maxCmd()}名・領地拡大・施設の上限${facCap()}）`;log(m,'good');
-  {const nR=TECH.filter(t=>techRank(t)===S.baseLv).length;const ck='castle'+Math.max(1,Math.min(7,S.baseLv));newsTop(`城のランクが${S.baseLv}に上がりました`,nR?`新しい研究内容（ランク${['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'][S.baseLv]}）を確認してみましょう`:'新しい研究内容を確認してみましょう',ICIMG[ck]?sprImg(ck,36):icSvg('hq',36),()=>{const b=document.getElementById('bRes');if(b)b.click();});}if(S.rep)S.rep.push({msg:m,cls:'good'});revealAll();}
+  {const nR=TECH.filter(t=>techRank(t)===S.baseLv).length;const ck='castle'+Math.max(1,Math.min(7,S.baseLv));newsTop(`城のランクが${S.baseLv}に上がりました`,nR?`新しい研究内容（ランク${['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'][S.baseLv]}）を確認してみましょう`:'新しい研究内容を確認してみましょう',ICIMG[ck]?sprImg(ck,36):icSvg('hq',36),()=>{const b=document.getElementById('bRes');if(b)b.click();});if(IS_PROTO)setTimeout(()=>{const n=gearCount();if(n)newsTop('新しい装備と道具が使えます',`替えられるものが ${n}つあります（押すとまとめて替える画面）`,icSvg('ammo',36),()=>showGear());},50);}if(S.rep)S.rep.push({msg:m,cls:'good'});revealAll();}
 function turnReport(t0,ev){
   const L=[];
   L.push(`<div class="grid">${['steel','fuel','ammo','elec','pop'].map(k=>{const d=Math.round(S[k]-S.before[k]);return `<span title="${RES_NAME[k]}">${ic(k)}${Math.floor(S[k])} <b class="${d<0?'bd':d>0?'gd':''}" style="font-size:11px">${d>=0?'+':''}${d}</b></span>`;}).join('')}</div>`);
@@ -5580,6 +5581,19 @@ function bulkNo(){const b=BULK;BULK=null;closeOverlay();if(b&&b.back)b.back();}
 function cntBy(list,f){const m=new Map();for(const x of list){const k=f(x);m.set(k,(m.get(k)||0)+1);}return [...m.entries()];}
 /* 壊された施設の廃墟をまとめて建て直す（下の一括のところから・2026-11-19） */
 function ruinsFree(){return (S.ruins||[]).filter(r=>bCells(r.x,r.y,r.sz||newSz(r.type)).every(([cx,cy])=>S.grid[cy]&&S.grid[cy][cx]===null));}
+/* 試作（2026-11-19）：装備・道具の付け替え忘れ対策。替えられるものをまとめて見せる */
+function gearTools(){const g={};for(const b of S.blds){if(!isTool(b)||g[b.type])continue;const L=upAllList(b);if(L.length)g[b.type]=L;}return g;}
+function gearSquads(){return S.squads.filter(q=>!q.hero&&eqBetter(q));}
+function gearCount(){if(!IS_PROTO||!S||!S.blds)return 0;let n=0;for(const L of Object.values(gearTools()))n+=L.length;return n+gearSquads().length;}
+function showGear(){const T=gearTools(),Q=gearSquads();if(!Object.keys(T).length&&!Q.length){se('error');toast('替えられる装備・道具はありません','warn');return;}
+  const tRows=Object.entries(T).map(([t,L])=>{const b=L[0],nx=TOOL_T[b.lv][1]+'の'+TOOL[t];const c={};for(const x of L){const ci=upgCost(x);for(const k in ci)c[k]=(c[k]||0)+ci[k];}const pop=c.pop||0;delete c.pop;
+    return `<div class="row" style="align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #2a3a2e">${icSvg(t,28)}<span style="flex:1"><b>${B[t].name}</b> ×${L.length}<br><span style="font-size:11px">${TOOL_T[b.lv-1]?TOOL_T[b.lv-1][1]+'の'+TOOL[t]:''} → <b style="color:var(--amber)">${nx}</b></span></span><span style="font-size:11px">${costText(c,pop)}</span><button data-gt="${t}">替える</button></div>`;}).join('');
+  const byUt={};for(const q of Q)(byUt[q.ut]=byUt[q.ut]||[]).push(q);
+  const qRows=Object.entries(byUt).map(([ut,L])=>{const w=wMat(L[0]),a=armK(ut)?aMat(armK(ut)):0;return `<div class="row" style="align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #2a3a2e">${icSvg(L[0].model||defModel(ut),28)}<span style="flex:1"><b>${UT[ut].name}</b> ×${L.length}部隊<br><span style="font-size:11px">もっとよい${armK(ut)&&L.some(q=>a>aTier(q))?'鎧':''}${armK(ut)&&L.some(q=>a>aTier(q))&&L.some(q=>w>wTier(q))?'と':''}${L.some(q=>w>wTier(q))?'武器':''}に替えられます</span></span><button data-gq="${ut}">替える</button></div>`;}).join('');
+  openOverlay('gear',`<h2 style="margin:0 0 8px">装備・道具を替える</h2>${tRows?`<h3 style="margin:6px 0 2px">施設の道具</h3>${tRows}`:''}${qRows?`<h3 style="margin:10px 0 2px">兵士の装備</h3>${qRows}`:''}<div class="nfoot" style="margin-top:10px"><button id="gClose">閉じる</button></div>`,true);
+  document.getElementById('gClose').onclick=()=>closeOverlay();
+  document.querySelectorAll('[data-gt]').forEach(x=>x.onclick=()=>{const L=T[x.dataset.gt];closeOverlay();askUpAll(L[0]);});
+  document.querySelectorAll('[data-gq]').forEach(x=>x.onclick=()=>{const L=byUt[x.dataset.gq];const w=wMat(L[0]);eqSet(L.filter(q=>w>wTier(q)),'w',w);const k=armK(x.dataset.gq);if(k){const a=aMat(k);eqSet(L.filter(q=>a>aTier(q)),'a',a);}log(`${UT[x.dataset.gq].name}の装備を替えた`,'good');closeOverlay();showGear();});}
 function askRuinAll(back){if(S.waveActive){se('error');toast('戦闘中は建て直せない（昼に建て直そう）','warn');return;}
   const L=ruinsFree();if(!L.length){se('error');toast('建て直せる廃墟はありません','warn');return;}
   const cost={};for(const r of L){const c=ruinCost(r);for(const k in c)cost[k]=(cost[k]||0)+c[k];}
@@ -5875,6 +5889,9 @@ function camFocus(b){cam.z=Math.max(cam.z||1,1.4);cam.x=bcx(b)-VW/cam.z/2;cam.y=
 function depChip(){const bn=document.getElementById('bNext');if(!bn||!IS_PROTO)return;let c=document.getElementById('depChip');if(!c){c=document.createElement('button');c.id='depChip';bn.parentElement.insertBefore(c,bn);c.onclick=()=>{const D=depList(),L=[...D.dep,...D.soon];if(!L.length)return;S._depI=((S._depI||0)+1)%L.length;camFocus(L[S._depI]);se('click');};}
   let D={dep:[],soon:[]};try{if(S&&S.mode==='campaign'&&!S.over)D=depList();}catch(e){}
   const h=D.dep.length||D.soon.length?`${D.dep.length?`枯渇 ${D.dep.length}軒`:''}${D.dep.length&&D.soon.length?'・':''}${D.soon.length?`もうすぐ枯渇 ${D.soon.length}軒`:''}`:'';if(c.textContent!==h)c.textContent=h;c.hidden=!h;c.className=D.dep.length?'dep':'soon';c.title='押すと、その施設へ移動します（押すたびに次へ）';}
+let _gearC=null,_gearT=0;function drawGearMarks(an){if(S.waveActive)return;const now=performance.now();if(!_gearC||now-_gearT>1000){_gearT=now;const T=gearTools();_gearC={b:new Set(Object.values(T).flat()),q:new Set(gearSquads())};}
+  const up=(x,y)=>{const k=Math.sin(an*4)*1.5;ctx.fillStyle='rgba(10,30,14,.85)';ctx.fillRect(x-5,y-6+k,10,9);ctx.fillStyle='#6fe08a';ctx.beginPath();ctx.moveTo(x,y-5+k);ctx.lineTo(x+4,y+k);ctx.lineTo(x+1.5,y+k);ctx.lineTo(x+1.5,y+2+k);ctx.lineTo(x-1.5,y+2+k);ctx.lineTo(x-1.5,y+k);ctx.lineTo(x-4,y+k);ctx.closePath();ctx.fill();};
+  for(const b of _gearC.b)if(S.blds.includes(b))up(b.x*T+6,b.y*T+6);for(const q of _gearC.q)if(S.squads.includes(q)&&!q.gar)up(q.x+10,q.y-14);}   /* 試作：装備・道具を替えられる印 */
 function drawDepMarks(an){const z=cam.z||1;for(const b of S.blds){if(!YIELD[b.type])continue;const t=b.dep?0:depLeft(b);if(t==null||t>3)continue;const n=bsz(b),x=b.x*T+n*T/2,y=b.y*T-4;
   ctx.save();if(b.dep){ctx.globalAlpha=0.55+0.45*Math.abs(Math.sin(an*2.5+b.id));const w=14,h=9;ctx.fillStyle='rgba(20,18,24,.85)';ctx.fillRect(x-w/2-2,y-h-4,w+4,h+4);ctx.strokeStyle='#b8b0a0';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x-w/2,y-h);ctx.lineTo(x-w/2+2,y-2);ctx.lineTo(x+w/2-2,y-2);ctx.lineTo(x+w/2,y-h);ctx.stroke();ctx.beginPath();ctx.moveTo(x-w/2+2,y-h+3);ctx.lineTo(x+w/2-2,y-h+3);ctx.stroke();ctx.beginPath();ctx.arc(x,y-h,w/2-1,Math.PI,0);ctx.stroke();}   /* 空のかご（点滅） */
   else{const lab='残り'+t+'T',fs=Math.max(8,10/z);ctx.font=`bold ${fs}px sans-serif`;const tw=ctx.measureText(lab).width+6;ctx.fillStyle='rgba(40,30,4,.9)';ctx.fillRect(x-tw/2,y-fs-4,tw,fs+4);ctx.strokeStyle='#f2b33d';ctx.lineWidth=1;ctx.strokeRect(x-tw/2+.5,y-fs-3.5,tw-1,fs+3);ctx.fillStyle='#f2b33d';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lab,x,y-fs/2-2);}
@@ -6046,7 +6063,7 @@ function draw(){
   drawRuins();
   for(const b of S.blds){{const m=3*TU,bx=b.x*T,by=b.y*T,bs=bsz(b)*T;if(bx+bs<VR[0]-m||by+bs<VR[1]-m||bx>VR[0]+VR[2]+m||by>VR[1]+VR[3]+m)continue;}drawBuilding(b,an);if(b.ench){const n=bsz(b);for(let i=0;i<b.ench;i++){const sx=b.x*T+3+i*5,sy=b.y*T+3;ctx.fillStyle='#1a0e2a';ctx.fillRect(sx-1,sy-1,5,5);ctx.fillStyle='#c48aff';ctx.fillRect(sx,sy,3,3);}}}
   drawUpgBadges(an);
-  if(IS_PROTO){drawWanderHeroes(an);drawDepMarks(an);}
+  if(IS_PROTO){drawWanderHeroes(an);drawDepMarks(an);drawGearMarks(an);}
   if(!S.backdrop)for(const b of S.blds)if(outOfAmmo(b))drawNoAmmo(b);
   if(!S.backdrop)drawNEnch();
   if(S.viewProd&&!S.waveActive)drawProdView();
@@ -7186,7 +7203,7 @@ function showLegend(){
   openOverlay('legend',h,true);document.getElementById('lgClose').onclick=closeOverlay;
 }
 document.querySelectorAll('.speed [data-spd]').forEach(b=>b.onclick=()=>{S.speed=+b.dataset.spd;se('click');renderPauseUI();});
-{const px=(id,t)=>{const e=document.getElementById(id);if(e)e.onclick=()=>{document.getElementById('more').open=false;const b=document.getElementById(t);if(b.onclick)b.onclick();else b.click();};};px('mRep','bRepAll');px('mRuin','bRuinAll');px('mSup','bSupAll');px('mHist','bHist');px('mDex','bDex');
+{const px=(id,t)=>{const e=document.getElementById(id);if(e)e.onclick=()=>{document.getElementById('more').open=false;const b=document.getElementById(t);if(b.onclick)b.onclick();else b.click();};};px('mRep','bRepAll');px('mRuin','bRuinAll');px('mGear','bGear');px('mSup','bSupAll');px('mHist','bHist');px('mDex','bDex');
  document.getElementById('mLog').onclick=()=>{document.getElementById('more').open=false;openOverlay('log',`<h2>通信ログ<button id="ovClose" style="float:right">閉じる</button></h2><div class="logfull">${document.getElementById('log').innerHTML}</div>`,false);document.getElementById('ovClose').onclick=closeOverlay;};
  const mic=(id,n)=>{const e=document.querySelector('#'+id+' .mic');if(e)e.innerHTML=ui(n,'light',24);};PXICON.ui.icons.build=PXICON.ui.icons.build||["............","...xxxxx....","..xxxxxxxx..","..xxxxxxxx..","...xxxxx....","......xx....",".....xx.....","....xx......","...xx.......","..xx........",".xx.........","............"];PXICON.ui.icons.town=PXICON.ui.icons.town||["............",".....xx.....","....xxxx....","...xxxxxx...","..xxxxxxxx..",".xxxxxxxxxx.","..xxxxxxxx..","..xx.xx.xx..","..xx.xx.xx..","..xxxxxxxx..","..xxxxxxxx..","............"];
 // 幸福度の顔（h_*）と夜の出来事（ev_*）のアイコン
@@ -7221,7 +7238,7 @@ document.getElementById('bArmy').onclick=()=>openArmyTab('list',true);
 function setRT(t){if(t==='info'&&!isNarrow())t='build';if(S&&t==='econ')S.econSeen=(S.econSeen||0)+1;if(S&&t==='army'&&S.armySub==='hero')S.heroSeen=(S.heroSeen||0)+1;document.body.classList.toggle('rt-info',t==='info');for(const b of document.querySelectorAll('#rtabs button'))b.classList.toggle('on',b.dataset.rt===t);for(const x of document.querySelectorAll('#right .box[data-rt]'))x.style.display=x.dataset.rt===t?'':'none';if(t==='army')renderArmyPanel(true);for(const b of document.querySelectorAll('#controls [data-rtb]'))b.classList.toggle('tabOn',b.dataset.rtb===t);}
 document.querySelectorAll('#rtabs button').forEach(b=>b.onclick=()=>setRT(b.dataset.rt));
 document.addEventListener('click',ev=>{const m=document.getElementById('more');if(m&&m.open&&!m.contains(ev.target))m.open=false;});
-document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bRuinAll').onclick=()=>askRuinAll();document.getElementById('bSupAll').onclick=()=>askSupplyAll();
+document.getElementById('bRepAll').onclick=()=>askRepairAll();document.getElementById('bRuinAll').onclick=()=>askRuinAll();document.getElementById('bGear').onclick=()=>showGear();document.getElementById('bSupAll').onclick=()=>askSupplyAll();
 document.getElementById('bHelp').onclick=()=>{if(!S.overlay)showHelp(false);};
 document.getElementById('bNaval').onclick=toggleNaval;
 document.getElementById('bMute').onclick=auToggle;
@@ -7829,6 +7846,7 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   {const sq=S.squads.filter(needsSupply),bs=document.getElementById('bSupAll');setHTML(bs,`一括補給${sq.length?`<span class="bkn">${sq.length}</span>`:''}<kbd>N</kbd>`);
   {const ms=document.getElementById('mSup');if(ms)setHTML(ms,sq.length?`一括補給（${sq.length}部隊）`:'一括補給（必要なし）');}const dis=!sq.length;if(bs.disabled!==dis)bs.disabled=dis;}
   const ra2=repairAllCost();const brA=document.getElementById('bRepAll');setHTML(brA,S.waveActive?'一括修理（戦闘中）':`一括修理${ra2.n?`<span class="bkn">${ra2.n}</span>`:''}<kbd>X</kbd>`);const dA=!ra2.n||S.waveActive;if(brA.disabled!==dA)brA.disabled=dA;
+  {const bg=document.getElementById('bGear');if(bg){const gn=IS_PROTO&&!S.waveActive?gearCount():0;setHTML(bg,`装備・道具を替える${gn?`<span class="bkn">${gn}</span>`:''}`);bg.hidden=!gn;}}
   {const rn=ruinsFree().length,bR=document.getElementById('bRuinAll');setHTML(bR,`廃墟を建て直す${rn?`<span class="bkn">${rn}</span>`:''}`);const dR=!rn||S.waveActive;if(bR.disabled!==dR)bR.disabled=dR;}
   {const mr=document.getElementById('mRep');if(mr){setText(mr,S.waveActive?'一括修理（戦闘中）':ra2.n?`一括修理（${repWhat(ra2)}）`:'一括修理');mr.classList.toggle('dim',dA);}}
   const bnv=document.getElementById('bNaval');bnv.style.display=has('naval')?'':'none';setText(bnv,S.aimNaval?'目標を指定…（Escで取消）':`艦砲射撃 残り${S.waveActive?S.navalLeft:(has('navalre')?2:1)} [V]`);
