@@ -602,3 +602,5 @@
 - 両方：街の記録の書き出しの在庫の列を TL_RES（銀貨・魔矢・エーテル火薬・金・魔金属・聖銀・小さな魔核・龍鱗・飛膜・巨大魔核・竜晶も）に。もとの12列はいつも、ほかは一度でも出てきたら（`tlResKeys`）。試作では鎧は出さない。
 - 試作：`heroIc` は名簿の地図の絵（SPR.units[heroArtKey]）の1コマ目。英雄の一覧・候補・詳細で使う。武器工房の STAGE_ART は ['ammo'] だけ（tr_weapon_shop_* は石の兵舎に似すぎ・描き直し待ち）。
 - 試作（届いた絵 5回目）：英雄5人（hero_bram・hero_serena・hero_dolf・hero_emma・hero_otto）を NDSPR_AB.units と NDART_AB に。セレナのキーは hero_serena（名簿も合わせた）。武器工房の段は NDSPR_WS／NDART_WS の tr_weapon_shop_* を置きかえ、STAGE_ART ammo を tl('ammo','weapon_shop',2) に戻した。届いた json の武器工房のドットは前の白い家のままだったので、地図の絵は png（docs/art/weapon_shop2/map）から作り直した。施設に付いた英雄の旗の横の小さな絵も名簿の絵（walk）に。
+- 試作：武器工房をなくした。`protoRes(S)` で S.ammo／S.sword を木材・鉄から計算する getter/setter に（ARROW_C＝木材0.5・鉄0.1、SWORD_C＝鉄1）。今までの `S.ammo-=n` はそのまま資材を減らす。`normC` で費用の表示・canAfford・afterText を木材と鉄に。読み込みで武器工房を消して建設費を戻す（noWS フラグで前の矢と剣を1回だけ資材に）。行商人の矢・剣、魔矢の研究、上の軍需の矢・剣、軍事タブの武器工房の欄は試作で出さない。チュートリアル「軍需」は鉱山と鉄50。武器工房の絵は docs/art/weapon_shop2 に保存。
+- 試作：`drawWanderHeroes`（生産施設の英雄がまわりを歩く）。一括エンチャントは種類ごとのチェックリスト（overlay 'nench'）。costText に smat。
