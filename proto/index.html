@@ -1522,7 +1522,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .hcd{margin-left:8px;font-family:var(--px-font);font-size:11px;color:var(--dim)}
 .hcd.ready{color:var(--green)}
 .hcd.fire{color:#fff;background:var(--mat);padding:0 5px}
-#bEnchN:not([disabled]){color:#e0c8ff;border-color:#9a6aff;background:#1e1430}#bRepAll,#bSupAll,#bRuinAll,#bGear,#bEnchN{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
+#bGear[hidden],#bEnchN[hidden]{display:none!important}#bEnchN:not([disabled]){color:#e0c8ff;border-color:#9a6aff;background:#1e1430}#bRepAll,#bSupAll,#bRuinAll,#bGear,#bEnchN{max-width:190px;overflow:hidden;text-overflow:ellipsis;display:inline-block!important;white-space:nowrap}
 
 /* 立ち絵 v2 */
 .artpx{position:relative;width:100%;aspect-ratio:300/120;background-repeat:no-repeat;background-size:100% 100%;image-rendering:pixelated;background-color:#060a07}
@@ -1538,7 +1538,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .dxi.big .dxcv{width:300px;height:120px;image-rendering:pixelated;display:block}
 @media (max-width:900px){.dxi.big{width:100%;max-width:300px;height:auto}}
 .kcnext{display:flex;gap:8px;align-items:center;margin:4px 0}.kcnext img{width:32px;height:32px;image-rendering:pixelated;background:#0003;border-radius:4px}
-#depChip{position:absolute;bottom:calc(100% + 4px);right:0;z-index:30;font-size:12px;padding:3px 10px;border-radius:3px;white-space:nowrap;cursor:pointer}#depChip.dep{background:#2a2420;border:1px solid #b8b0a0;color:#e8e0d0}#depChip.soon{background:#2a2004;border:1px solid #f2b33d;color:#f2d080}#nShort.ok{background:#0e2a14!important;border-color:#6fe08a!important;color:#c8f0d0!important}#nShort{position:absolute;bottom:calc(100% + 4px);left:0;z-index:30;background:#3a0d0a;border:1px solid #ff6a5a;color:#ffd0c8;font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none}#controls{position:relative}
+#depChip{position:absolute;bottom:calc(100% + 4px);right:0;z-index:30;font-size:12px;padding:3px 10px;border-radius:3px;white-space:nowrap;cursor:pointer}#depChip.dep{background:#2a2420;border:1px solid #b8b0a0;color:#e8e0d0}#depChip.soon{background:#2a2004;border:1px solid #f2b33d;color:#f2d080}#ovCard .lrep{display:flex;gap:12px;align-items:flex-end;margin:0 0 12px}.lrep .lpic{flex-shrink:0;text-align:center;background:#2a3a5a;border:2px solid #f2b33d;border-radius:6px;padding:2px}.lrep .lpic small{display:block;font-size:10px;color:#f2d070}.lrep .lbub{position:relative;flex:1;background:#f4ecd8;color:#2a2010;border-radius:8px;padding:9px 13px;font-size:14px;line-height:1.7}.lrep .lbub b{color:#a0400a}.lrep .lbub:before{content:'';position:absolute;left:-9px;bottom:16px;border:9px solid transparent;border-right-color:#f4ecd8;border-left:0}#report>div:not(.lrep):not(.grid){padding:2px 4px}#nShort.ok{background:#0e2a14!important;border-color:#6fe08a!important;color:#c8f0d0!important}#nShort{position:absolute;bottom:calc(100% + 4px);left:0;z-index:30;background:#3a0d0a;border:1px solid #ff6a5a;color:#ffd0c8;font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none}#controls{position:relative}
 .dhints{font-size:13px;line-height:1.8;margin:2px 0 8px}.dhints b{color:var(--amber,#f2b33d)}
 /* 施設の中身の小さなムービー（2026-11-15） */
 .fbox{margin:6px 0 8px;border:1px solid var(--line,#33402f);background:rgba(0,0,0,.25);border-radius:3px}
@@ -4651,6 +4651,7 @@ function morning(){
   S.phase='day';setTimeout(()=>saveGame(true),0);log(`朝になった。ターン${S.turn}　第${S.wave+1}襲撃まで残り${S.turnsLeft}ターン`);
   renderAll();
   let h=`<h2 style="margin:0 0 8px">${ui('sun','amber',24)} 夜明け — 夜の結果</h2>`;
+  if(IS_PROTO){const pts=['おはようございます！ 夜の結果を報告しますね。'];if(inc)pts.push(inc.bad?`夜中に<b>${inc.n}</b>がありました……。`:`夜中に<b>${inc.n}</b>がありました。`);if(res.length)pts.push(`夜狩りの一団が戻りました（小さな魔核 +${tot}）。`);const D=depList();if(D.soon.length)pts.push(`もうすぐ枯渇しそうな施設が${D.soon.length}軒あります。`);h+=lilRep(pts.join('<br>'),inc&&inc.bad?'panic':'smile');}
   if(inc)h+=`<div class="nvisit" style="--vc:${inc.col}"><div class="nvh">${ui(inc.ic,inc.col,24)}<b>${inc.n}</b></div><div class="nvt">${inc.t}</div></div>`;
   if(pl.length)h+=`<h3 style="margin:6px 0 4px">今夜の過ごし方</h3>`+pl.map(t=>`<div>${t}</div>`).join('');
   if(ot)h+=`<h3 style="margin:10px 0 4px">夜なべ</h3><div>${resTxt({steel:ot.wood,fuel:ot.food},true)}<span style="color:var(--amber)">幸福度 −${has('allnight')?15:8}</span></div>`;
@@ -4723,7 +4724,7 @@ const RT_PHASE=360,RT_TICK=10;
 function rtStep(n){for(let i=0;i<n;i++)update(0.1,true);}
 function rtRest(ph){const r=S.rt;if(ph==='day'){const g=r&&r.ph==='day'?r.g:0;rtStep(Math.max(0,Math.round((TURN_SEC-g)*10)));}S.rt=null;}
 // 朝の報告の「増えた・減った」は、前の「夜へ」からの分（夜＋昼）で数える
-function rtWindow(){S.before={};for(const k of ['steel','fuel','ammo','elec','pop'])S.before[k]=S[k];S.gross={steel:0,ammo:0,pop:0,used:0};}
+function rtWindow(){S.before={};for(const k of ['steel','stone','iron','fuel','ammo','elec','pop'])S.before[k]=S[k];S.gross={steel:0,ammo:0,pop:0,used:0};}
 function rtTick(dt){
   if(!S||S.backdrop||S.over||S.waveActive||S.skirm||S.paused||S.tlOn||!S.turnsLeft)return;
   const ph=S.phase==='night'?'night':'day';if(S.overlay&&!(ph==='night'&&S.overlay==='night'))return;
@@ -4792,9 +4793,16 @@ function tickBaseUp(){if(!S.baseUp)return;S.baseUp.left--;if(S.baseUp.left>0)ret
   S.baseLv=Math.min(BASE_MAX,S.baseUp.to);S.baseUp=null;se('upgrade');storyQueue('r'+S.baseLv);
   const m=`城のランクが${S.baseLv}になった（英雄の上限${maxCmd()}名・領地拡大・施設の上限${facCap()}）`;log(m,'good');
   {const nR=TECH.filter(t=>techRank(t)===S.baseLv).length;const ck='castle'+Math.max(1,Math.min(7,S.baseLv));newsTop(`城のランクが${S.baseLv}に上がりました`,nR?`新しい研究内容（ランク${['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'][S.baseLv]}）を確認してみましょう`:'新しい研究内容を確認してみましょう',ICIMG[ck]?sprImg(ck,36):icSvg('hq',36),()=>{const b=document.getElementById('bRes');if(b)b.click();});if(IS_PROTO)setTimeout(()=>{const n=gearCount();if(n)newsTop('新しい装備と道具が使えます',`替えられるものが ${n}つあります（押すとまとめて替える画面）`,icSvg('ammo',36),()=>showGear());},50);}if(S.rep)S.rep.push({msg:m,cls:'good'});revealAll();}
+/* 試作（2026-11-19）：報告はリリアが話す形に。顔と吹き出し＋中身はカードで */
+function lilRep(msg,face){return `<div class="lrep"><div class="lpic">${lilFace(72,face||'smile')}<small>リリア</small></div><div class="lbub">${msg}</div></div>`;}
 function turnReport(t0,ev){
   const L=[];
-  L.push(`<div class="grid">${['steel','fuel','ammo','elec','pop'].map(k=>{const d=Math.round(S[k]-S.before[k]);return `<span title="${RES_NAME[k]}">${ic(k)}${Math.floor(S[k])} <b class="${d<0?'bd':d>0?'gd':''}" style="font-size:11px">${d>=0?'+':''}${d}</b></span>`;}).join('')}</div>`);
+  if(IS_PROTO){const dn=Object.entries(S.doneCnt||{}),rd=ev.filter(e=>e.msg.startsWith('研究完了'));const rc=repairAllCost(),D=depList();const pts=[];
+    if(S.waveActive)pts.push(`<b>魔物が来ます！</b> 第${S.wave}襲撃です。守りを固めましょう！`);else pts.push(`今日もおつかれさまでした。第${S.wave+1}襲撃まで、あと<b>${S.turnsLeft}日</b>です。`);
+    if(dn.length)pts.push(`${dn.map(([k,v])=>k+(v>1?'×'+v:'')).join('・')}が完成しました！`);if(rd.length)pts.push(`研究が${rd.length}つ終わりました。`);
+    if(rc.n)pts.push(`傷んだ施設が${rc.n}つあります。`);if(D.dep.length)pts.push(`枯渇した施設が${D.dep.length}軒あります。`);
+    L.push(lilRep(pts.join('<br>'),S.waveActive?'panic':(rc.n||D.dep.length)?'normal':'smile'));}
+  L.push(`<div class="grid">${(IS_PROTO?['steel','stone','iron','fuel','pop']:['steel','fuel','ammo','elec','pop']).map(k=>{const d=Math.round(S[k]-(S.before[k]!=null?S.before[k]:S[k]));return `<span title="${RES_NAME[k]}">${ic(k)}${Math.floor(S[k])} <b class="${d<0?'bd':d>0?'gd':''}" style="font-size:11px">${d>=0?'+':''}${d}</b></span>`;}).join('')}</div>`);
   const done=ev.filter(e=>e.msg.startsWith('研究完了'));
   const other=ev.filter(e=>!e.msg.startsWith('研究完了'));
   for(const e of done)L.push(`<div class="gd">◆ ${e.msg}</div>`);
@@ -4806,7 +4814,7 @@ function turnReport(t0,ev){
   if(S.research.length)L.push(`<div class="muted">研究中：${S.research.map(r=>`${techOf(r.id).name} 残り${r.left}T`).join('　')}</div>`);
   const warn=[];
   {const e=econ(),f=ammoForecast();for(const [c,t] of econWarnings(e,f))if(c==='bd')L.push(`<div class="bd">${ui('close','red',12)} ${t}</div>`);
-   if(f&&f.need!=null&&!S.waveActive)L.push(`<div class="muted">次の夜の矢：必要 約${f.need} ／ 開戦時の見込み 約${f.have}</div>`);}
+   if(f&&f.need!=null&&!S.waveActive&&!IS_PROTO)L.push(`<div class="muted">次の夜の矢：必要 約${f.need} ／ 開戦時の見込み 約${f.have}</div>`);}
   if(!S.research.length)warn.push(`研究員が${resCap()}人空いています`);
   if(S.powerRatio<1)warn.push('電力不足で生産が落ちています');
   if(popTotal()>=S.popCap)warn.push('住居が満員です。住居を増やすかアップグレードしてください');
@@ -5257,7 +5265,7 @@ function update(dt,sim){
       recordWave(ws,true);try{saveCkpt();}catch(e){}
       const relief=reliefAfter(ws);
       if(S.mapId==='s'&&S.wave+1===8&&!S.frozen){log('❄ 冷え込みが厳しい。次の襲撃までに川が凍りつきそうだ（川を渡ってくる）','warn');}
-      showReport(`第${S.wave}襲撃（${S.turn}日目） 戦闘報告`,statGrid([['撃破',S.waveKills,'var(--green)'],['戦死',S.kia-(ws.kia||0),S.kia-(ws.kia||0)?'var(--red)':''],['施設損失',S.bldLost-(ws.bld||0),S.bldLost-(ws.bld||0)?'var(--amber)':''],['魔核','+'+(S.mat-(ws.mat||0)),'var(--mat)']])+`<div class="rsup">補給 ${resTxt({steel:rew})}</div>`
+      showReport(`第${S.wave}襲撃（${S.turn}日目） 戦闘報告`,(IS_PROTO?lilRep(`第${S.wave}襲撃、守りきりました！ ${S.waveKills}体を倒しました。${S.kia-(ws.kia||0)?`<br>でも、${S.kia-(ws.kia||0)}人の兵士が倒れました……。`:''}${S.bldLost-(ws.bld||0)?`<br>施設が${S.bldLost-(ws.bld||0)}つ壊されました。朝のうちに建て直しましょう。`:''}`,S.kia-(ws.kia||0)||S.bldLost-(ws.bld||0)?'relief':'smile'):'')+statGrid([['撃破',S.waveKills,'var(--green)'],['戦死',S.kia-(ws.kia||0),S.kia-(ws.kia||0)?'var(--red)':''],['施設損失',S.bldLost-(ws.bld||0),S.bldLost-(ws.bld||0)?'var(--amber)':''],['魔核','+'+(S.mat-(ws.mat||0)),'var(--mat)']])+`<div class="rsup">補給 ${resTxt({steel:rew})}</div>`
         +lostC.map(c=>`<div class="bd">✝ ${cmdName(c)}（${c.spec}）${c.cause}</div>`).join('')
         +(newSide&&scoutL()>=1?`<div class="wn">⚠ 偵察より：次の夜から新たに${sideName(newSide)}からの襲撃が予測されます</div>`:newSide?`<div class="wn">⚠ 敵の動きに変化あり。襲撃方面が増える可能性があります</div>`:'')
         +wledHTML()+relief+(pitN?`<div>落とし穴 ${pitN}個を掘り直した（木材−${pitN*PIT_DIG}）</div>`:pitsToDig().length?`<div class="wn">落とし穴 ${pitsToDig().length}個が埋まったまま（木材が足りない）</div>`:'')+`<div>昼・準備に移行。第${S.wave+1}襲撃まで <b>${NEXT_PREP}</b> ターン。雇用候補が更新されました</div>`);
