@@ -3499,6 +3499,8 @@ for(const k in PXS)ICIMG[k]=pxCanvas(k);
 if(IS_PROTO&&ICIMG.apart&&!ICIMG.herohouse)ICIMG.herohouse=ICIMG.apart;
 if(IS_PROTO)for(const k in BIG)if(ICIMG[BIG[k]]&&!ICIMG[k])ICIMG[k]=ICIMG[BIG[k]];   /* 英雄の家の絵はまだない（集合住宅の絵を借りる） */
 const PXI={};for(const k in PXS)PXI[k]=ICIMG[k];
+if(IS_PROTO)for(const k of [...new Set(BUILD_ORDER)]){if(WICON[k]||!B[k])continue;const ak=(STAGE_ART[k]||[])[0]||k,sp=SPR.buildings[ak];if(!sp||!sp.img.idle)continue;const cv=sp.img.idle[0];   /* 試作：アイコンのない建物（英雄の家・港・空港など）は地図の絵から作る（2026-11-19） */
+  try{const u=cv.toDataURL();WICON[k]=`<image href="${u}" x="0" y="0" width="24" height="24" style="image-rendering:pixelated" preserveAspectRatio="xMidYMid meet"/>`;if(!ICIMG[k]||k==='herohouse')ICIMG[k]=cv;}catch(e){}}
 for(const [a,b] of [['e_shogre','ogre_shield'],['e_golem','e_golem'],['e_mole','mole'],['e_bat','bat'],['e_treant','e_troll'],['e_maneater','e_spitter'],['e_werewolf','e_wolf'],['e_eltreant','e_elder_treant'],['e_eltreant_burn','e_elder_treant_burn'],['e_grove','boss_shade'],['e_grove_rage','boss_shade2'],['e_grove_burn','boss_shade_burn'],['e_grove_rage_burn','boss_shade2_burn'],['e_grove','e_troll'],['e_grove_rage','e_grove']]){if(SPR.enemies&&!SPR.enemies[a]&&SPR.enemies[b])SPR.enemies[a]=SPR.enemies[b];if(!ICIMG[a]&&ICIMG[b])ICIMG[a]=ICIMG[b];}   /* トレント・マンイーター・ワーウルフは絵ができるまで代わり */
 for(const [k,,,,col] of WALL_UP){const src=ICIMG.wall;const c=document.createElement('canvas');c.width=src.width||48;c.height=src.height||48;const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(src,0,0,c.width,c.height);g.globalCompositeOperation='source-atop';g.globalAlpha=0.5;g.fillStyle=col;g.fillRect(0,0,c.width,c.height);ICIMG[k]=c;PXI[k]=c;
   if(WICON.wall)WICON[k]=WICON.wall.split('#a09a90').join(col);}   /* 壁の上位：城壁の絵に材料の色を重ねた仮の絵 */
@@ -6345,7 +6347,7 @@ function drawBldV2(b,an){if(b.popAt&&performance.now()<b.popAt)return true;const
   if(S.sel===b){ctx.strokeStyle='#f2b33d';ctx.lineWidth=2;ctx.strokeRect(x+.5,y+.5,S2-1,S2-1);ctx.lineWidth=1;
     if(gunOf(b)){ctx.strokeStyle='rgba(242,179,61,.35)';ctx.beginPath();ctx.arc(cx,cy,rangeOf(b)*TU,0,7);ctx.stroke();}}
   return true;}
-function drawBuilding(b,an){if(!b._bst&&!b._big&&drawBldV2(b,an)){if(IS_PROTO&&b.type==='hq')drawFlag(b);return;}
+function drawBuilding(b,an){if(!b._bst&&!b._big&&drawBldV2(b,an)){if(IS_PROTO&&(b.type==='hq'||b.type==='outpost'))drawFlag(b);return;}
   if(b.type==='bastion'){const x0=b.x*T,y0=b.y*T,S2=T*bsz(b);ctx.imageSmoothingEnabled=false;if(ICIMG.bastion)ctx.drawImage(ICIMG.bastion,x0,y0,S2,S2);ctx.imageSmoothingEnabled=true;
     if(b.bt>0&&!b.upg){ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(x0,y0,S2,S2);ctx.fillStyle='#f2b33d';ctx.font='bold 11px sans-serif';ctx.fillText(Math.ceil(b.bt/TURN_SEC-0.01)+'T',x0+S2-16,y0+S2-6);}
     if(b.hp<b.maxhp-0.5){ctx.fillStyle='#222';ctx.fillRect(x0+3,y0+S2-4,S2-6,3);ctx.fillStyle='#b8c8b8';ctx.fillRect(x0+3,y0+S2-4,(S2-6)*b.hp/b.maxhp,3);}
@@ -7195,7 +7197,7 @@ function tileBuildHTML(x,y,title){
   let h=`<div style="margin-top:8px" class="muted">${title}</div>`;
   for(const {g,list} of gs){
     h+=`<div style="font-size:10px;color:var(--cyan);margin:4px 0 2px">${g.name}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">`;
-    for(const k of list){const d=B[k],c=costOf(k);h+=`<button data-tb="${k}" style="text-align:left;padding:3px 5px;line-height:1.25" ${canAfford(c,d.pop)?'':'disabled'} title="${d.desc}">${d.name}<br><small style="color:var(--dim);font-size:10px">${costText(c,d.pop)} ／ ${turnsTxt(buildTurns(k))}</small></button>`;}
+    for(const k of list){const d=B[k],c=costOf(k);h+=`<button data-tb="${k}" style="display:block;text-align:left;padding:3px 5px;line-height:1.25;min-width:0" ${canAfford(c,d.pop)?'':'disabled'} title="${d.desc}"><span style="display:flex;align-items:center;gap:4px;white-space:nowrap">${icSvg(k,20)}${d.name}</span><small style="display:block;color:var(--dim);font-size:10px">${costText(c,d.pop)} ／ ${turnsTxt(buildTurns(k))}</small></button>`;}
     h+=`</div>`;
   }
   return h;
@@ -7711,9 +7713,9 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   let wv='';
   document.body.classList.toggle('night',!!S.waveActive);
   document.body.classList.toggle('qnight',!S.waveActive&&S.phase==='night');
-  if(S.waveActive)wv=`${ui('moon','red',24)}<div class="wvm"><b>${S.turn}日目・夜</b><small>第${S.wave}襲撃 交戦中${S.cur&&S.cur.blood?'・ブラッドムーン':''}</small></div><i class="rmoon"></i>`;
+  if(S.waveActive)wv=`${ui('moon','red',24)}<div class="wvm"><b>${IS_PROTO?flagImg(flagOf(),11)+' '+townName()+'　':''}${S.turn}日目・夜</b><small>第${S.wave}襲撃 交戦中${S.cur&&S.cur.blood?'・ブラッドムーン':''}</small></div><i class="rmoon"></i>`;
   else if(!S.over){const tot=Math.max(S.prepTotal||S.turnsLeft,S.turnsLeft),past=tot-S.turnsLeft+1;let pips='';for(let i=0;i<tot;i++)pips+=`<i class="${i<past?'on':''}"></i>`;
-    wv=`${S.phase==='night'?ui('moon','amber',24):ui('sun','amber',24)}<div class="wvm"><b>${S.turn}日目・${S.phase==='night'?'夜':'昼'}${S.paused?' <span class="rtc">停止中</span>':''}</b><div class="daypips">${pips}</div></div><div class="wvc"><small>第${S.wave+1}襲撃まで${S.wave+1===finalWave()?'（最後の夜）':''}</small><b>${S.turnsLeft}日</b></div>`;}
+    wv=`${S.phase==='night'?ui('moon','amber',24):ui('sun','amber',24)}<div class="wvm"><b>${IS_PROTO?flagImg(flagOf(),11)+' '+townName()+'　':''}${S.turn}日目・${S.phase==='night'?'夜':'昼'}${S.paused?' <span class="rtc">停止中</span>':''}</b><div class="daypips">${pips}</div></div><div class="wvc"><small>第${S.wave+1}襲撃まで${S.wave+1===finalWave()?'（最後の夜）':''}</small><b>${S.turnsLeft}日</b></div>`;}
   setHTML(document.getElementById('wave'),wv);
   nightShortChip();
   renderSheetHandle();
@@ -8036,7 +8038,7 @@ function showEnd(win){if(!S.endShown){S.endShown=true;S.endWin=win;se(win?'win':
   const fallen=S.fallen.map(c=>`${cmdName(c)}（${c.spec} Lv${c.lv}・撃破${c.kills}・第${c.diedWave}襲撃 ${c.cause}）`).join('、')||'なし';
   const matSum=(S.hist||[]).reduce((a,r)=>a+Math.max(0,r.mat||0),0);
   const ck=(S.baseLv||1)===2?'castle':'castle'+Math.max(1,Math.min(5,S.baseLv||1));
-  openOverlay('end',`<div class="endhead ${win?'win':'lose'}"><div class="ecs">${sprImg(ICIMG[ck]?ck:'castle',76)}</div><div><div class="ekick">${win?'VICTORY':'DEFEAT'}</div><div class="etitle">${win?'防衛成功':'陥落'}</div><div class="esub">${win?`${townName()}は、第${finalWave()}襲撃までの襲撃を退けました。`:`第${S.wave}襲撃にて、${townName()}の城は陥落しました。`}</div></div></div>
+  openOverlay('end',`<div class="endhead ${win?'win':'lose'}"><div class="ecs">${sprImg(ICIMG[ck]?ck:'castle',76)}</div><div><div class="ekick">${win?'VICTORY':'DEFEAT'}</div><div class="etitle">${win?'防衛成功':'陥落'}</div>${IS_PROTO?`<div style="margin:2px 0">${flagImg(flagOf(),22)} <b>${townName()}</b></div>`:''}<div class="esub">${win?`${townName()}は、第${finalWave()}襲撃までの襲撃を退けました。`:`第${S.wave}襲撃にて、${townName()}の城は陥落しました。`}</div></div></div>
   ${storyOn()?lilSay(win?'smile':'normal',storyEnd(win,townName())):''}
   ${statGrid([['撃破数',S.kills],['戦死者（人員）',S.kia,'var(--red)'],['生存英雄',S.cmds.length,'var(--green)'],['獲得した魔核','+'+matSum,'var(--mat)']])}
   <div class="efallen"><span>戦没英雄</span>${fallen}</div>
@@ -8063,7 +8065,7 @@ function packG(g){if(!Array.isArray(g)||!Array.isArray(g[0]))return g;const w=g[
 function unpackG(o){if(!o||!o.pk)return o;const R=o.r.split(',').map(Number),out=[];let cur=!!o.f,row=[];for(const n of R){for(let i=0;i<n;i++){row.push(cur);if(row.length===o.w){out.push(row);row=[];}}cur=!cur;}return out;}
 function packSave(o){for(const k of ['ore','oil'])if(o[k])o[k]=packG(o[k]);return o;}
 function saveGame(quiet){if(!canSave())return false;try{const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}packSave(o);
-  o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:(S.townName?S.townName+'（'+(MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'')+'）':MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'')};
+  o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),flag:IS_PROTO&&S.flag?S.flag:undefined,name:(S.townName?S.townName+'（'+(MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'')+'）':MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'')};
   localStorage.setItem(SAVE_KEY,JSON.stringify({meta,S:o}));saveMark(true);return true;}catch(e){saveMark(false);if(!quiet)toast('セーブできませんでした（ブラウザの保存領域）','bad');return false;}}
 function saveInfo(){try{const r=localStorage.getItem(SAVE_KEY);if(!r)return null;return JSON.parse(r).meta;}catch(e){return null;}}
 function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catch(e){return false;}if(!d||!d.S)return false;
@@ -8094,7 +8096,7 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   return true;}
 // ===== 襲撃のあとの区切り（2026-11-15）：負けたら「第N襲撃のあと」からやり直せる。ゲームごとの番号 gid で、別のゲームの区切りは使わない =====
 function saveCkpt(){if(!S||S.mode!=='campaign')return;S.gid=S.gid||Date.now();const o={};for(const k in S){if(SAVE_SKIP.has(k)||typeof S[k]==='function')continue;o[k]=S[k];}packSave(o);
-  o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),name:(S.townName?S.townName+'（'+(MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'')+'）':MAPS[CUR_MAP]?MAPS[CUR_MAP].name:''),gid:S.gid,ck:true};
+  o.seenArr=S.seen?Array.from(S.seen):null;const meta={v:1,map:CUR_MAP,squadNo,tankNo,blood:BLOOD_MODE,date:Date.now(),wave:S.wave,turn:S.turn,final:finalWave(),flag:IS_PROTO&&S.flag?S.flag:undefined,name:(S.townName?S.townName+'（'+(MAPS[CUR_MAP]?MAPS[CUR_MAP].name:'')+'）':MAPS[CUR_MAP]?MAPS[CUR_MAP].name:''),gid:S.gid,ck:true};
   try{localStorage.setItem(SAVE_KEY+'_ck',JSON.stringify({meta,S:o}));}catch(e){}}
 function ckptInfo(){try{const d=JSON.parse(localStorage.getItem(SAVE_KEY+'_ck'));if(!d||!d.meta)return null;if(S&&S.gid&&d.meta.gid!==S.gid)return null;return d.meta;}catch(e){return null;}}
 function loadCkpt(){const r=localStorage.getItem(SAVE_KEY+'_ck');if(!r)return false;try{localStorage.setItem(SAVE_KEY,r);}catch(e){return false;}closeOverlay();const ok=loadGame();if(ok&&S.wave>=1)S.campHint=true;   /* やり直しで駐屯地の案内をもう一度出さない */
@@ -8168,7 +8170,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.19（試作版だけ）','2026-11-18',['<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','倒れた魔物と兵は、その場で横に倒れて少しつぶれてから消える','武器工房の道具の段の絵（地図の絵と立ち絵）を入れた','道具の段の立ち絵を入れた（施設を選んだときの絵が、道具の段ごとに変わる）','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
+ ['1.19（試作版だけ）','2026-11-18',['<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：画面の上の街の名前・戦いの結果・つづきから・前哨砦にも出る。地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','英雄の家・港・空港・グリフォンの厩舎・兵器工房の建設のアイコン、土地を選んだときの建設の一覧にもアイコン','倒れた魔物と兵は、その場で横に倒れて少しつぶれてから消える','武器工房の道具の段の絵（地図の絵と立ち絵）を入れた','道具の段の立ち絵を入れた（施設を選んだときの絵が、道具の段ごとに変わる）','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける']],
  ['1.18（試作版だけ）','2026-11-18',['<b>大きな生産施設</b>（研究で建てる・4×4）：大農場・大伐採所・養殖場（ランクⅢ）、大採掘場（ランクⅣ・鉄3・石炭2・金1も取れる）。小さい施設4つ分より多く作る（4.5倍）。建てる資材は5倍、働き手は3倍。土地は4分の3が合っていれば建てられる。道具の段も使える。絵はまだないので小さい施設の絵を大きくして借りている','研究「魔核加工」をなくした','兵舎・馬小屋・竜舎・魔導院は、アップグレード1段ごとに入れられる部隊が1つ増える']],
  ['1.17（試作版だけ）','2026-11-18',['<b>道具の段は研究で開く</b>：はじめは木の道具。「石の道具」（Ⅰ）「鉄の道具」（Ⅱ）…「聖銀の道具」（Ⅵ）の研究で、全部の生産施設のその段が使えるようになる（鍛冶の心得はまとめた）','あとから建てる施設は、建てられるランクの道具を持って建つ（炭鉱なら鉄のつるはし）','<b>生産の技術</b>（%ではなく施設ごとの便利な効果）：石運びの道・輪作・網の繕い（Ⅰ）、植林・炭焼き・坑木の補強・夜釣り・魔矢づくり（Ⅱ）、発破・選鉱（Ⅲ）、換気坑（Ⅳ）','<b>魔矢</b>：武器工房で、矢と小さな魔核から作る。あるあいだは物見櫓とバリスタが先に使い、威力 +30%','<b>今夜のエンチャント</b>（研究「一夜の付与」）：小さな魔核で、防衛施設と部隊をその夜だけ強くする（火力 +30%・受ける被害 −15%）。朝にはがれる。まとめてかけるボタンもある','蒼い炎の篝火は、夜ごとに小さな魔核を燃やす','研究の費用に小さな魔核（ランクⅡから）と魔核（ランクⅣから）を使う','小さな魔核を魔核にまとめる仕組みは外した','道具の研究は、研究画面の各ランクのいちばん上に（黄色の枠）','研究「呪骸の柱」「夜狩り術」をなくした']],
  ['1.16（試作版だけ）','2026-11-18',['<b>魔物の種類で取れる素材が違う</b>：小型＝小さな魔核・大型＝魔核・竜型＝龍鱗・空を飛ぶ魔物＝飛膜・ボス＝巨大魔核','<b>巨大魔核の使い道を3つから1つ選ぶ</b>（城の画面）：竜哮砲（城に据える巨大な大砲。夜、20秒ごとに空へ撃ち上げて、いちばん魔物の多いところに落とす。龍鱗5も使う）・知恵の結晶（使うと5ターン研究が2倍の速さ）・英雄の目覚め（英雄1人が大きく強くなる）','<b>竜晶</b>：精錬所をランクⅦにすると、エーテル2・聖銀1・龍鱗1から竜晶を作れる。竜晶の武器と防具（ランクⅦ）に使う','龍鱗の壁は龍鱗を、風船爆弾とグリフォン騎兵は飛膜を、ランクⅦのアップグレードは龍鱗を使う','<b>占い師</b>：ブラッドムーンの3日前の夜に来て、不吉な予言を残す（幸福度 −10・3日間）','<b>まとめて建てる・替えるときは端から順番に</b>：柵や罠をドラッグで並べたとき、施設をまとめて替えたとき（施設の画面の「同じ施設をまとめて替える」）、パパパッと順番に出る。音の高さも少しずつ違う','英雄を付けられる生産施設は、資源を作る施設だけ（住居・研究室・酒場などはなし）']],
@@ -8213,7 +8215,7 @@ function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.a
     <div class="tlogo">${pixelLogo()}</div>
     <div class="tsub">〜 ${GAME_SUB} 〜</div>
     <div class="tmain">
-      ${sv?`<button id="tContinue" class="on"><b>つづきから</b>${sv.name?`<small>${sv.name}　第${(sv.wave||0)+1}襲撃の前</small>`:''}</button>`:''}
+      ${sv?`<button id="tContinue" class="on"><b>つづきから</b>${sv.name?`<small>${sv.flag&&typeof flagImg==='function'?flagImg(sv.flag,12)+' ':''}${sv.name}　第${(sv.wave||0)+1}襲撃の前</small>`:''}</button>`:''}
       <button id="tNew" ${sv?'':'class="on"'}><b>はじめから</b></button>
     </div>
     <div class="tgrid">
