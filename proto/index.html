@@ -1538,7 +1538,7 @@ button.primary:disabled,.tdet button.primary:disabled{background:var(--panel)!im
 .dxi.big .dxcv{width:300px;height:120px;image-rendering:pixelated;display:block}
 @media (max-width:900px){.dxi.big{width:100%;max-width:300px;height:auto}}
 .kcnext{display:flex;gap:8px;align-items:center;margin:4px 0}.kcnext img{width:32px;height:32px;image-rendering:pixelated;background:#0003;border-radius:4px}
-#depChip{position:absolute;bottom:calc(100% + 4px);right:0;z-index:30;font-size:12px;padding:3px 10px;border-radius:3px;white-space:nowrap;cursor:pointer}#depChip.dep{background:#2a2420;border:1px solid #b8b0a0;color:#e8e0d0}#depChip.soon{background:#2a2004;border:1px solid #f2b33d;color:#f2d080}#ovCard .lrep{display:flex;gap:12px;align-items:flex-end;margin:0 0 12px}.lrep .lpic{flex-shrink:0;text-align:center;background:#2a3a5a;border:2px solid #f2b33d;border-radius:6px;padding:2px}.lrep .lpic small{display:block;font-size:10px;color:#f2d070}.lrep .lbub{position:relative;flex:1;background:#f4ecd8;color:#2a2010;border-radius:8px;padding:9px 13px;font-size:14px;line-height:1.7}.lrep .lbub b{color:#a0400a}.lrep .lbub:before{content:'';position:absolute;left:-9px;bottom:16px;border:9px solid transparent;border-right-color:#f4ecd8;border-left:0}#report>div:not(.lrep):not(.grid){padding:2px 4px}#nShort.ok{background:#0e2a14!important;border-color:#6fe08a!important;color:#c8f0d0!important}#nShort{position:absolute;bottom:calc(100% + 4px);left:0;z-index:30;background:#3a0d0a;border:1px solid #ff6a5a;color:#ffd0c8;font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none}#controls{position:relative}
+#depChip{position:absolute;bottom:calc(100% + 4px);right:0;z-index:30;font-size:12px;padding:3px 10px;border-radius:3px;white-space:nowrap;cursor:pointer}#depChip.dep{background:#2a2420;border:1px solid #b8b0a0;color:#e8e0d0}#depChip.soon{background:#2a2004;border:1px solid #f2b33d;color:#f2d080}#ovCard .lrep{display:flex;gap:12px;align-items:flex-end;margin:0 0 12px}.lrep .lpic{flex-shrink:0;text-align:center;background:#2a3a5a;border:2px solid #f2b33d;border-radius:6px;padding:2px}.lrep .lpic small{display:block;font-size:10px;color:#f2d070}.lrep .lbub{position:relative;flex:1;background:#f4ecd8;color:#2a2010;border-radius:8px;padding:9px 13px;font-size:14px;line-height:1.7}.lrep .lbub b{color:#a0400a}.lrep .lbub:before{content:'';position:absolute;left:-9px;bottom:16px;border:9px solid transparent;border-right-color:#f4ecd8;border-left:0}#report>div:not(.lrep):not(.grid){padding:2px 4px}#ovCard .lmov{margin:8px 0}#ovCard .lmov video{display:block;width:100%;max-width:560px;margin:0 auto;border:1px solid #5a4a2a}#ovCard .lmov small{display:block;text-align:center;color:#c8b890;font-size:12px;margin-top:3px}#nShort.ok{background:#0e2a14!important;border-color:#6fe08a!important;color:#c8f0d0!important}#nShort{position:absolute;bottom:calc(100% + 4px);left:0;z-index:30;background:#3a0d0a;border:1px solid #ff6a5a;color:#ffd0c8;font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap;pointer-events:none}#controls{position:relative}
 .dhints{font-size:13px;line-height:1.8;margin:2px 0 8px}.dhints b{color:var(--amber,#f2b33d)}
 /* 施設の中身の小さなムービー（2026-11-15） */
 .fbox{margin:6px 0 8px;border:1px solid var(--line,#33402f);background:rgba(0,0,0,.25);border-radius:3px}
@@ -4414,7 +4414,7 @@ function advanceResearch(){
   for(const r of S.research){r.left--;if(IS_PROTO&&S.wisT>0&&r.left>0)r.left--;   /* 知恵の結晶：研究が2倍の速さ */
 if(r.left>0&&Math.random()<chance){r.left--;log(`研究所より報告：${techOf(r.id).name} の進捗が前倒し`,'good');}}
   const done=S.research.filter(r=>r.left<=0);
-  if(done.length)se('research');for(const r of done){if(r.paid.pop){S.pop+=r.paid.pop;}S.pop+=r.res||0;S.tech[r.id]=lvl(r.id)+1;const t=techOf(r.id);log(`研究完了：${t.name}${tMax(t)>1||t.lvRank?' Lv'+lvl(r.id):''}`,'good');unlockNews(t);if(r.id==='chariott'&&!IS_PROTO)chariotUp();}
+  if(done.length)se('research');for(const r of done){if(r.paid.pop){S.pop+=r.paid.pop;}S.pop+=r.res||0;S.tech[r.id]=lvl(r.id)+1;const t=techOf(r.id);log(`研究完了：${t.name}${tMax(t)>1||t.lvRank?' Lv'+lvl(r.id):''}`,'good');unlockNews(t);if(r.id==='chariott'&&!IS_PROTO)chariotUp();if(IS_PROTO)tipFor(r.id);}
   S.research=S.research.filter(r=>r.left>0);
   if(done.length)rescaleHp();
 }
@@ -7126,6 +7126,7 @@ document.addEventListener('keydown',ev=>{
   if(S.overlay==='report'&&(ev.key==='Enter'||ev.key==='Escape'||ev.code==='Space')){ev.preventDefault();closeOverlay();return;}
   if(S.overlay==='confirm'&&ev.key==='Escape'){closeOverlay();return;}
   if(S.overlay==='bulk'&&(ev.key==='Enter'||ev.key==='Escape')){ev.preventDefault();if(ev.key==='Enter')bulkYes();else bulkNo();return;}
+  if(S.overlay==='tip'&&(ev.key==='Enter'||ev.key==='Escape')){ev.preventDefault();closeOverlay();return;}
   if(S.overlay==='nench'&&(ev.key==='Enter'||ev.key==='Escape')){ev.preventDefault();const b=document.getElementById(ev.key==='Enter'?'neYes':'neNo');if(b&&!b.disabled)b.click();return;}
   if(S.overlay==='night'&&ev.key==='Enter'){ev.preventDefault();closeOverlay();morning();return;}
   if(S.overlay==='visit'&&(ev.key==='Enter'||ev.key==='Escape')){ev.preventDefault();closeOverlay();return;}
@@ -8662,7 +8663,17 @@ function applyFlag(){if(!IS_PROTO||!S||typeof NDSPR_TIER==='undefined')return;co
 function townName(){return (S&&S.townName)||(MAPS[S&&S.mapId]?MAPS[S.mapId].name:'この街');}
 function lilTxt(t){if(typeof t==='function')t=t();return String(t||'').replace(/\$\{TOWN\}/g,townName()).replace(/\{ART:([a-z0-9_,]+)\}/g,(m,ks)=>lilArt(ks.split(','))).replace(/\{MOV:([a-z0-9_]+)\}/g,(m,k)=>lilMov(k)).replace(/\{IMG:([a-z0-9_]+)\}/g,(m,k)=>`<div class="limg"><img src="tut/${k}.png" alt=""></div>`);}
 // 操作の短い動画（ゲームを録ったもの。くり返し再生。proto/tut/・本番は tut/）。2026-11-16
-const LIL_MOV={fence:'柵をドラッグして一列に置く',move:'部隊を選んで、行き先を押す'};
+const LIL_MOV={fence:'柵をドラッグして一列に置く',move:'部隊を選んで、行き先を押す',ench:'襲撃の日に「エンチャント付与」を押して、かけるものを選ぶ',camp:'駐屯地を押して、連れて行く部隊を選んで夜襲をかける'};
+/* 試作（2026-11-19）：研究が終わったとき、リリアが使い方を教える（1回だけ・動画つき） */
+const LIL_TIPS={
+ ench:{ids:['p_ench','p_ench_u','p_ench_p'],t:'エンチャント付与',face:'smile',mov:'ench',say:['エンチャント付与の研究が終わりました！ 小さな魔核で、施設や部隊を<b>その夜だけ</b>強くできます。','<b>襲撃の日</b>になると、下に紫の「<b>エンチャント付与</b>」のボタンが出ます。押すと、かけるものを種類ごとに選べますよ（前哨砦だけ外す、なども）。','かけたものは紫に光ります。朝になるとはがれるので、襲撃のたびにかけ直してくださいね。']},
+ camp:{ids:['scout3'],t:'駐屯地への夜襲',face:'smile',mov:'camp',say:['斥候Ⅲの研究が終わりました！ 地図の上で<b>駐屯地</b>の場所が分かるようになりました。','駐屯地を押すと、<b>夜襲</b>をかけられます。連れて行く部隊を選んで、陣のまわりに置いて戦います。','倒した魔物の分だけ、<b>次の襲撃が減り</b>ます。ただし部隊が受けた被害は残るので、無理はしないでくださいね。夜襲は1日1回です。']},
+ mod:{ids:['heavymg','bighow','bigbore','incend','m_tower','m_mage'],t:'改造',face:'normal',say:['改造の研究が終わりました！ その施設を選ぶと「<b>改造</b>」の欄が出て、2つのうち1つを選べます。','選んだ改造は、<b>街のその施設すべて</b>に効きます。たとえばバリスタを「連弩」にして、物見櫓と合わせて手数で攻める、なんて方針もいいですね。','付け替えには2ターンかかります。それから、改造ごとに撃つたびに使う物が増えるので、在庫にも気をつけてください。']}};
+function tipFor(id){for(const k in LIL_TIPS){if(!LIL_TIPS[k].ids.includes(id))continue;S.tipsSeen=S.tipsSeen||{};if(S.tipsSeen[k])return;S.tipsSeen[k]=1;(S.tipQ=S.tipQ||[]).push(k);}}
+function tipTick(){if(!IS_PROTO||!S||S.overlay||S.waveActive||!S.tipQ||!S.tipQ.length)return;const k=S.tipQ.shift();showTip(k);}
+function showTip(k){const T=LIL_TIPS[k];if(!T)return;
+  openOverlay('tip',`<h2 style="margin:0 0 8px">リリアの説明：${T.t}</h2>${lilRep(T.say.join('<br><br>'),T.face)}${T.mov?lilMov(T.mov):''}<div class="nfoot" style="margin-top:10px"><button id="tipOk" class="on">わかりました [Enter]</button></div>`,true);
+  document.getElementById('tipOk').onclick=()=>closeOverlay();}
 function lilMov(k){return LIL_MOV[k]?`<div class="lmov"><video src="tut/${k}.mp4" autoplay muted loop playsinline preload="auto"></video><small>${LIL_MOV[k]}</small></div>`:'';}
 // 説明の絵：ゲームの立ち絵（4コマで動く）を並べる。2026-11-16 ユーザーの希望「説明には画像を・動いているとなおよい」
 const ART_NAME={camp_tent:'テント',camp_boss:'大将のテント',castle1:'城 Lv1',castle2:'城 Lv2',h_inf:'英雄（歩兵）',h_admin:'英雄（内政）',h_guard:'英雄（守備）',tower1:'物見櫓',pawn:'剣士',farmer:'農兵',archer:'弓兵'};
@@ -9734,7 +9745,7 @@ function loop(now){
   try{rtTick(dt);}catch(e){if(!drawErr++)console.error(e);}
   try{draw();}catch(e){if(!drawErr++)console.error(e);}
   S.fogT=(S.fogT||0)+dt;if(S.fogT>0.5){S.fogT=0;revealAll();}
-  uiT+=dt;if(uiT>0.2){uiT=0;try{storyTick();}catch(e){}stripKeyHints();renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
+  uiT+=dt;if(uiT>0.2){uiT=0;try{storyTick();}catch(e){}try{tipTick();}catch(e){}stripKeyHints();renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
 }
 auUi();newState();S.backdrop=true;renderAll();resizeView();setTimeout(resizeView,300);showTitle();requestAnimationFrame(loop);
 </script>
