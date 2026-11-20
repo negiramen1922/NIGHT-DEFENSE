@@ -144,7 +144,7 @@ select{background:#0e1510;color:var(--text);border:1px solid var(--line);font:in
 .tvol{display:flex;flex-direction:column;gap:6px;padding-bottom:8px;margin-bottom:8px;border-bottom:1px dashed #5a4a2a;font-size:13px}.tvol label{display:flex;align-items:center;gap:8px}.tvol input{accent-color:#f2b33d}.tvol input{flex:1}.tvol b{width:28px;text-align:right}.tvol button{align-self:flex-start;padding:3px 10px}
 .tsetL{display:flex;flex-wrap:wrap;gap:6px}.tsetL button{flex:1 1 40%;padding:6px;font-size:13px}
 @media (max-height:520px){.ttl{padding:2px}.ttl .tlogo svg,.ttl .tlogo img,.ttl .tlogo canvas{max-height:58px}.ttl .tsub{margin:0 0 6px;font-size:11px}.ttl .tmain{margin-bottom:6px}.ttl .tmain button{padding:6px;font-size:14px}.ttl .tgrid{gap:4px;max-width:520px}.ttl .tgrid button,.ttl .tmoreL button{padding:4px;font-size:12px}.ttl .tmoreL{gap:4px;max-width:520px}.ttl .tmoreL button{flex:1 1 30%}.ttl .tfoot{margin-top:6px;font-size:10px}#overlay.home .card{max-height:96vh;max-height:96dvh}}
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:20;touch-action:pan-y}
+body.ovOn #depChip,body.ovOn #nShort{visibility:hidden}#overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:20;touch-action:pan-y}
 #overlay .card{background:var(--panel);border:1px solid var(--amber);padding:20px 24px;max-width:540px;width:92%;max-height:88vh;max-height:88dvh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 body.ov #left,body.ov #right{overflow:hidden!important}
 .howto summary{cursor:pointer;color:var(--amber);font-weight:bold;padding:6px 0;user-select:none}
@@ -6870,7 +6870,8 @@ function buildSpy(){const el=document.getElementById('build');if(!el)return;cons
   ch.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.g===cur));
   if(ch.scrollWidth>ch.clientWidth+1&&ch._cur!==cur){ch._cur=cur;const b=ch.querySelector('button.on');if(b)ch.scrollLeft=b.offsetLeft-ch.offsetLeft-(ch.clientWidth-b.offsetWidth)/2;}}
 function visibleBuilds(){return BUILD_ORDER.filter(k=>!B[k].req||has(B[k].req));}
-function groupList(g){return g.list.filter(k=>!B[k].req||has(B[k].req));}
+function bOpenRank(k){const r=B[k]&&B[k].req;if(!r)return 0;const R=(typeof RANK_OPEN!=='undefined'&&RANK_OPEN[r])||(techOf(r)&&techRank(techOf(r)));return R||1;}
+function groupList(g){const L=g.list.filter(k=>!B[k].req||has(B[k].req));if(g.id!=='prod')return L;return L.map((k,i)=>[k,i,bOpenRank(k)]).sort((a,b)=>a[2]-b[2]||a[1]-b[1]).map(x=>x[0]);}   /* 領地：はじめからある施設を上に、あとから開く施設は開くランクの順に下へ足す（2026-11-20） */
 let buildSig='',bgClosed={};try{bgClosed=JSON.parse(localStorage.getItem('bd_bgrp')||'{}');}catch(e){}
 function renderBuild(){
   const el=document.getElementById('build');
@@ -7413,6 +7414,7 @@ function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==n
   // 右端：日付と襲撃までの日数
   let wv='';
   document.body.classList.toggle('night',!!S.waveActive);
+  document.body.classList.toggle('ovOn',!!S.overlay);   /* 説明などの画面を開いている間は、下の「枯渇」「足りない」の札を隠す（2026-11-20） */
   document.body.classList.toggle('qnight',!S.waveActive&&S.phase==='night');
   if(S.waveActive)wv=`${ui('moon','red',24)}<div class="wvm"><b>${S.turn}日目・夜</b><small>第${S.wave}襲撃 交戦中${S.cur&&S.cur.blood?'・ブラッドムーン':''}</small></div><i class="rmoon"></i>`;
   else if(!S.over){const tot=Math.max(S.prepTotal||S.turnsLeft,S.turnsLeft),past=tot-S.turnsLeft+1;let pips='';for(let i=0;i<tot;i++)pips+=`<i class="${i<past?'on':''}"></i>`;
@@ -7844,7 +7846,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.12.2','2026-11-19',['倒れた魔物と兵が、その場で横に倒れて少しつぶれてから消えるように','閉じるボタンをどの画面でも右下にそろえた','研究の中止ボタンを、研究中のカードの上の赤い枠のボタンに移した（まちがえて押さないように）','下の一括のところに「廃墟を建て直す」ボタンを追加（壊された施設をまとめて建て直す）','英雄の号令などのスキルの途中で襲撃が終わると、光や文字が残ったままになるのを直した','土地を選んだときの建設リストをなくした（建設は下の建設タブから）','一括修理・一括補給などの確認で、使う量をはっきり出すようにした（「矢 76 使う（671 → 595）」）','闇の中の大きい魔物（トロールなど）の赤い目が、お腹の位置に出ていたのを頭の高さに直した','置いたらすぐ完成する木の柵も、その日のうちなら取り消せるように（取り消しボタン・Ctrl+Z）','スマホ：詳細を開いたとき、右上に「×」を出して閉じられるように（下の「マップに戻る」が画面の外に出ていた）','街の記録の書き出しに、上の資源欄に出ている資源（銀貨・小さな魔核・龍鱗・魔金属・聖銀など）も出てきたら入るように','前哨砦の絵の上が切れていたのを直した','訓練所などの冒険者の雇い入れの表示から「海外調達」の言葉をなくした','壁が2列並んでいるところの門が、横向き・縦向きを間違えて描かれていたのを直した']],
+ ['1.12.2','2026-11-19',['倒れた魔物と兵が、その場で横に倒れて少しつぶれてから消えるように','閉じるボタンをどの画面でも右下にそろえた','研究の中止ボタンを、研究中のカードの上の赤い枠のボタンに移した（まちがえて押さないように）','下の一括のところに「廃墟を建て直す」ボタンを追加（壊された施設をまとめて建て直す）','英雄の号令などのスキルの途中で襲撃が終わると、光や文字が残ったままになるのを直した','土地を選んだときの建設リストをなくした（建設は下の建設タブから）','一括修理・一括補給などの確認で、使う量をはっきり出すようにした（「矢 76 使う（671 → 595）」）','闇の中の大きい魔物（トロールなど）の赤い目が、お腹の位置に出ていたのを頭の高さに直した','置いたらすぐ完成する木の柵も、その日のうちなら取り消せるように（取り消しボタン・Ctrl+Z）','スマホ：詳細を開いたとき、右上に「×」を出して閉じられるように（下の「マップに戻る」が画面の外に出ていた）','街の記録の書き出しに、上の資源欄に出ている資源（銀貨・小さな魔核・龍鱗・魔金属・聖銀など）も出てきたら入るように','前哨砦の絵の上が切れていたのを直した','訓練所などの冒険者の雇い入れの表示から「海外調達」の言葉をなくした','壁が2列並んでいるところの門が、横向き・縦向きを間違えて描かれていたのを直した','建設の「生産・街」は、はじめからある施設を上に、あとから開く施設を下に足す並びに','説明などを開いている間は、下の「足りない」の札を隠す']],
  ['1.12.1（試作版だけ）','',['<b>砲兵をランクⅣへ</b>（砲術・特殊砲弾も）。かわりにランクⅢに<b>銃兵</b>（研究「火薬」のあと）：足が遅く撃つのも遅いが、1発が重く射程が長い','<b>チャリオット</b>（ランクⅢ・騎馬突撃のあと）：騎兵が強化され、突撃で群れの中を突っ切って、通った魔物すべてに当たる。大きな魔物でも止まらない','<b>狙撃兵</b>：射程をもっと長く（24マス）。3発続けて撃ってから長い装填。大きな魔物には1.6倍']],
  ['1.12.1','2026-11-17',['不具合の修正：建て終わった施設の耐久が減ったままになっていた（前の版で建てた施設も、読み込んだときに満タンに戻す）','<b>襲撃が進んでも魔物の体力が上がらないように</b>：かわりに、第10襲撃より後は魔物の数が1回ごとに増える（第20で1.3倍・第30で1.6倍・第40で1.9倍）。ブラッドムーンの夜は今までどおり少し強い','夜の過ごし方の<b>「祈り」は教会がないとできない</b>ように。幸福度 +5（休むは +2）']],
  ['1.12','2026-11-17',['<b>画面の整理</b>：地図の上は、昼夜のバーと表示の切り替えだけに。「○○を選択中」「建設」の帯は地図の左下へ。「Shift＋ドラッグで範囲選択」の案内は、地図の左下の小さな説明の中へ','<b>施設の詳しい画面</b>：絵は名前の横の小さな絵に。耐久のすぐ下に「操作」の箱をつくり、改築・城の強化・作るもの・生産・砲弾・部隊の編成・配置・つながった壁をまとめた（傷んでいるときは修理も）。説明・数字・英雄はその下','城の強化のボタンを「城をLv○に強化（費用・ターン）」の見やすい形に','<b>地図の表示の切り替えをボタン1つに</b>：「表示」を押すたびに 通常 → 土地Lv → 狙われやすさ → 生産 と切り替わる（T・H のキーも今までどおり）','建設のタブの中にあった「一括修理」をなくした（下のバーと同じものだったので）','<b>一括修理・一括補給は、押すと確認</b>：ボタンには費用を書かず（件数だけ）、押すと直すもの・補給する部隊を「アイコン（下に名前）×数」で、使う物を「木材 250 → 202」（足りないときは「今 / 要る量」）で並べて、はい／いいえ','<b>時間のバー</b>を地図の中から出して、敵情予測と地図のあいだの細い帯に（残りの時間も出る）','<b>ミニマップに小さな見出し</b>をつけた：「大・小」で大きさを切り替え、「－」でたたむ（たたむと見出しだけになり、「＋」で戻す）','<b>防衛施設の詳しい画面に、夜の実際の動き</b>：施設が、地図の上と同じ絵の弾（バリスタは重い矢、投石機は石、物見櫓は矢など）で、歩いてくる魔物を撃つ小さな場面','<b>弾がまったくなくて撃てない防衛施設</b>には、地図の上で施設の上に赤い「!!」を出すように（昼でも分かる）','<b>敵情予測</b>は、はじめからたたんだ1行に（規模・襲撃元・魔物のアイコンと数・危険度）。右の ▾ で開く','<b>通信ログをたためる</b>ように（「通信ログ」を押す）。たたむと、いちばん新しい1行だけになり、そのぶん地図が広くなる','<b>木の柵は置いたらすぐ完成</b>（罠と同じ）','不具合の修正：建て終わった施設の耐久が少し減って見えることがあった']],
