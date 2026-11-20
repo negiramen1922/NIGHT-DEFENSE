@@ -18,6 +18,8 @@
     <button data-f="note">書き込みあり</button>
     <button id="kcTg">改築の研究（まとめ）を出す</button>
     <span class="sep"></span>
+    <span class="lnf" id="lnf"></span>
+    <span class="sep"></span>
     <button id="addBtn">＋ 研究を足す</button>
     <button id="linkBtn">線をつなぐ</button>
     <span class="msg" id="msg">カードはドラッグで動かせます（列を動かすと、取れるランクが変わる）</span>
@@ -30,7 +32,7 @@
 (function(){
 const D=JSON.parse(document.getElementById('data').textContent);
 const RN=['0','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ','Ⅸ'];
-const TC={'N領地':'var(--c-prod)','N防衛':'var(--c-def)','N部隊':'var(--c-army)','生産':'var(--c-prod)','内政':'var(--c-gov)','防衛':'var(--c-def)','部隊':'var(--c-army)','魔核':'var(--c-mat)'};
+const TC={'N素材':'var(--c-mat)','N領地':'var(--c-prod)','N防衛':'var(--c-def)','N部隊':'var(--c-army)','生産':'var(--c-prod)','内政':'var(--c-gov)','防衛':'var(--c-def)','部隊':'var(--c-army)','魔核':'var(--c-mat)'};
 const STX={keep:['残す','var(--green)'],change:['変える','var(--amber)'],drop:['消す','var(--red)'],adopt:['入れる','var(--green)'],reject:['やめる','var(--red)']};
 const W=212,G=46,CH=70,VG=10;
 const $=id=>document.getElementById(id);
@@ -41,7 +43,9 @@ for(const t of D.T){if(t.lv){for(let k=1;k<=3;k++){const id=t.id+'_'+k;const n=O
   else{const n=Object.assign({},t);BASE.push(n);nodeById[t.id]=n;}}
 for(const n of BASE)n.pre=(n.pre||[]).map(p=>nodeById[p]?nodeById[p].id:p);
 // 保存しているもの
-const notes={},posO={},links={},custom={};let db=null,canWrite=true;
+const notes={},posO={},links={},custom={},lines={};let lnF='all';
+/* 方針（2026-11-20）：カードごとに 共通・工業・魔法 を決める（db の line）。決めていないカードは、ゲームの今の振り分け */
+const LNN={'共':'共通','工':'工業','魔':'魔法'};function lnOf(t){const v=lines[t.id];return v&&v.ln?v.ln:(t.ln||'共');}let db=null,canWrite=true;
 let tab=D.tabs[0],sel=null,filt='all',showKc=false,linkMode=false,linkSrc=null;
 function allNodes(){const C=Object.entries(custom).map(([id,c])=>({id,cat:c.cat,r:c.r||1,n:c.n||'（名前なし）',e:c.e||'',pre:[],mx:1,custom:true,un:[],c:'',tt:0}));for(const c of C)nodeById[c.id]=c;return BASE.concat(C);}
 function stOf(id){const n=notes[id];return n&&n.st&&STX[n.st]?n.st:'';}
@@ -78,11 +82,11 @@ function cardHTML(t,p){const st=stOf(t.id),n=notes[t.id];const memo=n&&(n.note||
   const tags=[];if(t.custom)tags.push('<span class="tag new">足したカード</span>');if(t.prop==='新'){tags.push(`<span class="tag tg-${({'ランクで開く':'rank','はじめから':'rank','研究':'res','そのほか':'res','改造':'mod','案':'idea','なくす':'gone'})[t.tg]||'res'}">${esc(t.tg)}</span>`);}
   else if(t.prop)tags.push(`<span class="tag ${t.prop==='案3'?'p3':'p4'}">${t.prop==='見本'?esc(t.tg):t.prop}</span>`);if(t.art)tags.push('<span class="tag art">新しい絵</span>');
   if(t.stage)tags.push(`<span class="tag stg">改築${t.by?'・'+esc(t.by):''}</span>`);else if(t.kc)tags.push('<span class="tag kc">改築</span>');
-  if(t.ln==='工'&&(!t.prop||t.prop==='新'))tags.push('<span class="tag ind">工業</span>');if(t.ln==='魔')tags.push('<span class="tag mag">魔法</span>');
+  {const l=lnOf(t);if(l==='工')tags.push('<span class="tag ind">工業</span>');else if(l==='魔')tags.push('<span class="tag mag">魔法</span>');}
   if(t.mv&&!(t.lvk>1))tags.push(`<span class="tag mv">→ ${esc(t.mv)}</span>`);if(st)tags.push(`<span class="tag st" style="--stc:${STX[st][1]}">${STX[st][0]}</span>`);
   const xp=(t.pre||[]).filter(q=>nodeById[q]&&nodeById[q].cat!==t.cat).map(q=>nodeById[q].n+'（'+nodeById[q].cat+'）');
   const x=12+(p.col-C0())*(W+G),y=12+p.row*(CH+VG);
-  return `<button class="card${t.kc?' kc':''}${t.stage?' stage':''}${t.prop&&t.prop!=='新'?' prop':''}${t.prop==='新'&&(t.tg==='ランクで開く'||t.tg==='はじめから')?' auto':''}${t.prop==='新'&&t.tg==='なくす'?' gone':''}${t.custom?' custom':''}${sel===t.id?' sel':''}${linkSrc===t.id?' src':''}" data-id="${t.id}" style="--stc:${st?STX[st][1]:'transparent'};left:${x}px;top:${y}px;width:${W}px;--ch:${CH}px">
+  const LC=lnOf(t);return `<button class="card ln-${({'工':'ind','魔':'mag','共':'com'})[LC]}${lnF!=='all'&&LC!==lnF?' lndim':''}${t.kc?' kc':''}${t.stage?' stage':''}${t.prop&&t.prop!=='新'?' prop':''}${t.prop==='新'&&(t.tg==='ランクで開く'||t.tg==='はじめから')?' auto':''}${t.prop==='新'&&t.tg==='なくす'?' gone':''}${t.custom?' custom':''}${sel===t.id?' sel':''}${linkSrc===t.id?' src':''}" data-id="${t.id}" style="--stc:${st?STX[st][1]:'transparent'};left:${x}px;top:${y}px;width:${W}px;--ch:${CH}px">
     <div class="tt">${t.ic&&D.IC[t.ic]?`<img class="ic" src="${D.IC[t.ic]}" alt="">`:''}<b>${esc(t.n)}</b><span class="lv"${off?' style="color:var(--amber)"':''}>${off?`ランク${RN[t.r]}→${RN[p.col]||p.col}`:'ランク'+RN[t.r]}</span></div>
     <div class="e">${t.prop&&t.prop!=='見本'&&t.prop!=='新'?`${esc(t.tg)}：`:''}${esc(t.e)||'（効果を書いてください）'}</div>
     ${xp.length?`<div class="xp">← ${esc(xp.join('・'))}</div>`:''}${memo?`<div class="memo">✎ ${esc(memo)}</div>`:tags.length?`<div class="tags">${tags.join('')}</div>`:''}</button>`;}
@@ -104,6 +108,7 @@ function render(){renderTabs();const AN=allNodes();
   $('tree').querySelectorAll('[data-id]').forEach(bindCard);
   $('tree').querySelectorAll('path.hit').forEach(p=>p.onclick=e=>{e.stopPropagation();if(!canWrite)return;const a=p.dataset.a,bb=p.dataset.b,na=(nodeById[a]||{}).n||a,nb=(nodeById[bb]||{}).n||bb;
     if(confirm(`「${na}」→「${nb}」の線を切りますか？（あとで「線をつなぐ」でもどせます）`)){toggleLink(a,bb);$('msg').textContent=`線を切った：${na} → ${nb}`;}});
+  {const R4=AN.filter(t=>!(t.kc&&!t.stage)&&t.r>=4&&['N領地','N防衛','N部隊'].includes(t.cat));const cnt=k=>R4.filter(t=>lnOf(t)===k).length;$('lnf').innerHTML=`<span class="hint">方針で見る：</span>`+[['all','すべて'],['共','共通'],['工','工業'],['魔','魔法']].map(([k,n])=>`<button data-lnf="${k}" class="${lnF===k?'on':''}${k!=='all'?' ln-'+({'工':'ind','魔':'mag','共':'com'})[k]:''}">${n}</button>`).join('')+`<span class="hint" title="ランクⅣ以上のカードの数（全部のタブ）">Ⅳ以上：工業 <b>${cnt('工')}</b>・魔法 <b>${cnt('魔')}</b></span>`;$('lnf').querySelectorAll('[data-lnf]').forEach(b=>b.onclick=()=>{lnF=b.dataset.lnf;render();});}
   const wn=AN.filter(t=>hasNote(t.id)).length;$('sum').innerHTML=`カード <b>${AN.filter(t=>!(t.kc&&!t.stage)).length}</b>・書き込み <b>${wn}</b>・動かした <b>${Object.keys(posO).length}</b>・足した <b>${Object.keys(custom).length}</b>`;}
 // ドラッグで動かす・押して選ぶ・線をつなぐ
 function bindCard(el){el.onpointerdown=ev=>{if(ev.button!==0||addMode)return;const id=el.dataset.id;const sx=ev.clientX,sy=ev.clientY,x0=parseFloat(el.style.left),y0=parseFloat(el.style.top);let drag=false;
@@ -141,9 +146,11 @@ function renderDet(){const t=nodeById[sel];if(!t)return;const n=notes[t.id]||{};
   const inc=incoming(t.id);const preHTML=`<div class="row">前提：${inc.length?inc.map(q=>`<span class="pre1"><b>${esc(nodeById[q]?nodeById[q].n:q)}</b><button data-unpre="${q}" title="この前提を外す">×</button></span>`).join(''):'<span style="color:var(--dim)">なし</span>'}
     <button class="addpre" id="addpre">＋ 前提を足す</button></div>`;
   $('det').innerHTML=left.replace('__PRE__',preHTML)+`<div><div class="st">${opts.map(k=>`<button data-st="${k}" class="${st===k?'on':''}" style="--stc:${STX[k][1]}">${STX[k][0]}</button>`).join('')}</div>
+    <div class="lnsel"><span class="hint">方針：</span>${['共','工','魔'].map(k=>`<button data-ln="${k}" class="ln-${({'工':'ind','魔':'mag','共':'com'})[k]}${lnOf(t)===k?' on':''}">${LNN[k]}</button>`).join('')}</div>
     <label for="memo" class="hint" style="display:block;margin-top:8px">メモ（変え方・気になること）</label>
     <textarea id="memo" placeholder="例：射程も伸ばしたい／ランクⅣに移したい">${esc(n.note||'')}</textarea>
     ${canWrite?'':'<div class="ro">この画面からは書き込めません（閲覧のみ）</div>'}</div>`;
+  $('det').querySelectorAll('[data-ln]').forEach(b=>b.onclick=()=>{const k=b.dataset.ln;lines[t.id]={ln:k,name:t.n,cat:t.cat};put('line',t.id,lines[t.id]);render();renderDet();});
   $('det').querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{const k=b.dataset.st;notes[t.id]=Object.assign({},notes[t.id],{st:st===k?'':k});putNote(t.id);render();renderDet();});
   deb($('memo'),v=>{notes[t.id]=Object.assign({},notes[t.id],{note:v});putNote(t.id);render();});
   if(t.custom){deb($('cn'),v=>{custom[t.id]=Object.assign({},custom[t.id],{n:v});put('custom',t.id,custom[t.id]);render();});
@@ -192,6 +199,7 @@ render();
   sub('notes',s=>{for(const d of s.docs){const v=d.data();if(!v||busy['notes/'+d.id])continue;if(sel===d.id&&typing())continue;notes[d.id]=v;}});
   sub('pos',s=>{const seen=new Set();for(const d of s.docs){const v=d.data();if(!v)continue;seen.add(d.id);if(!busy['pos/'+d.id])posO[d.id]=v;}for(const k of Object.keys(posO))if(!seen.has(k)&&!busy['pos/'+k])delete posO[k];});
   sub('links',s=>{const nl={};for(const d of s.docs){const v=d.data();if(v)nl[v.from+'>'+v.to]=v;}for(const k of Object.keys(links))delete links[k];Object.assign(links,nl);});
+  sub('line',s=>{for(const d of s.docs){const v=d.data();if(v&&!busy['line/'+d.id])lines[d.id]=v;}});
   sub('custom',s=>{const seen=new Set();for(const d of s.docs){const v=d.data();if(!v)continue;seen.add(d.id);if(sel===d.id&&typing())continue;custom[d.id]=v;}for(const k of Object.keys(custom))if(!seen.has(k)&&!busy['custom/'+k])delete custom[k];});
 })();
 })();

@@ -9,3 +9,5 @@ claude.ai の Artifact https://claude.ai/artifact/K4cx9jLcpKJ7hrQAf1HawE （オ�
 3. `head.html` ＋ `body.html`（`__DATA__` に data.json）で `research_board.html` を作り、同じ Artifact に publish
 
 **並びを保つ**：`fix.json`（カードid → タブ・列・行）に前の並びを入れておくと、作り直してもそのカードは同じ場所に出る（新しいカードは空いているところへ）。カードを足したり消したりして並びが変わると、ユーザーがボードで動かしたカードとずれるので、必ず `fix.json` を残したまま作り直す。新しいカードの場所も残したいときは、作ったボードの位置を読み直して `fix.json` に足す
+
+**方針（2026-11-20）**：カードごとに 共通・工業・魔法 を選べる（db の `line` コレクション、doc id はカードid、`{ln:'共'|'工'|'魔'}`）。選んでいないカードはゲームの今の振り分け（`TECH_LINE`）。「素材」タブ（`N素材`）は mk_actual.py で作る。素材のカードの並びは fix.json の `res_*`

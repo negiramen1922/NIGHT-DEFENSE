@@ -89,9 +89,17 @@ for k,src in [('t_bigfarm','b_farm'),('t_bigminer','b_miner'),('t_bigquarry','b_
   c=byid.get('g_'+k)
   if c and src in byid and src not in c['pre']:c['pre']=[src]+c['pre']
 
+# 素材のタブ（2026-11-20）：どの方針の素材にするかを決める
+RRANK={'steel':0,'stone':0,'fuel':0,'iron':0,'coal':2,'goldore':3,'alloy':3,'elec':2,'powder':3,'apowder':4,'mmetal':5,'mithril':6,'dcrys':7,'smat':1,'mat':1,'bigmat':3,'scale':4,'wing':3}
+RLN={'elec':'魔','apowder':'魔','mmetal':'魔'}
+RDESC={'steel':'伐採所','stone':'石切り場','fuel':'農場・漁場（食料）','iron':'鉱山','coal':'炭鉱','goldore':'金鉱','alloy':'精錬所（鉄＋金）','elec':'エーテル採掘所','powder':'火薬工房','apowder':'火薬工房Ⅱ（エーテル火薬）','mmetal':'魔金属','mithril':'聖銀鉱','dcrys':'竜晶精錬所','smat':'小型の魔物','mat':'大型の魔物','bigmat':'ボス','scale':'竜型の魔物','wing':'飛ぶ魔物'}
+for k,r in RRANK.items():
+  icn='r.'+k if 'r.'+k in IC else None
+  if not icn and k in D.get('ricons',{}):IC['r.'+k]=D['ricons'][k];icn='r.'+k
+  N('res_'+k,'N素材',r,D.get('rnames',{}).get(k,k),'はじめから' if r==0 else 'ランクで開く','取れるところ：'+RDESC.get(k,''),[],icn,RLN.get(k,''))
 d['T']+=cards
-d['tabs']=['N領地','N防衛','N部隊','生産','内政','防衛','部隊','魔核']
-d['TABL']={'N領地':'領地','N防衛':'防衛','N部隊':'部隊','生産':'前：生産','内政':'前：内政','防衛':'前：防衛','部隊':'前：部隊','魔核':'前：魔核'}
+d['tabs']=['N領地','N防衛','N部隊','N素材','生産','内政','防衛','部隊','魔核']
+d['TABL']={'N領地':'領地','N防衛':'防衛','N部隊':'部隊','N素材':'素材','生産':'前：生産','内政':'前：内政','防衛':'前：防衛','部隊':'前：部隊','魔核':'前：魔核'}
 used={t['ic'] for t in d['T'] if t.get('ic')}|{k for k in IC if k.startswith('r.')}
 d['IC']={k:IC[k] for k in used if k in IC}
 import os
