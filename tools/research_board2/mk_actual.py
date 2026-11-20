@@ -35,7 +35,7 @@ for k,v in D['kc'].items():
     t=techOfB.get(k)
     if t:base='g_'+t['id']
     else:
-      N(base,btab(k,v.get('grp')),0,k,'はじめから','',[],k+'.1')
+      continue   # 試作でなくなった施設（武器工房など）は出さない
   cat=next(c['cat'] for c in cards if c['id']==base)
   prev=base
   s0=0   # あとから建てる施設は、建てられるランクの道具を持って建つ（その段より下のカードは出さない・2026-11-18）
