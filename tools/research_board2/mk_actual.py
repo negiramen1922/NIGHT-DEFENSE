@@ -35,7 +35,7 @@ for k,v in D['kc'].items():
     t=techOfB.get(k)
     if t:base='g_'+t['id']
     else:
-      N(base,btab(k,v.get('grp')),0,k,'はじめから','',[],k+'.1')
+      continue   # 試作でなくなった施設（武器工房など）は出さない
   cat=next(c['cat'] for c in cards if c['id']==base)
   prev=base
   s0=0   # あとから建てる施設は、建てられるランクの道具を持って建つ（その段より下のカードは出さない・2026-11-18）
@@ -89,9 +89,195 @@ for k,src in [('t_bigfarm','b_farm'),('t_bigminer','b_miner'),('t_bigquarry','b_
   c=byid.get('g_'+k)
   if c and src in byid and src not in c['pre']:c['pre']=[src]+c['pre']
 
+# 素材のタブ（2026-11-20）：どの方針の素材にするかを決める
+RRANK={'steel':0,'stone':0,'fuel':0,'iron':0,'coal':2,'goldore':3,'alloy':3,'elec':4,'powder':3,'apowder':4,'mmetal':5,'mithril':6,'dcrys':7,'smat':1,'mat':1,'bigmat':3,'scale':4,'wing':3}
+RLN={'elec':'魔','apowder':'魔','mmetal':'魔'}
+RDESC={'steel':'伐採所','stone':'石切り場','fuel':'農場・漁場（食料）','iron':'鉱山','coal':'炭鉱','goldore':'金鉱','alloy':'精錬所（鉄＋金）','elec':'エーテル採掘所','powder':'火薬工房','apowder':'火薬工房Ⅱ（エーテル火薬）','mmetal':'魔金属','mithril':'聖銀鉱','dcrys':'竜晶精錬所','smat':'小型の魔物','mat':'大型の魔物','bigmat':'ボス','scale':'竜型の魔物','wing':'飛ぶ魔物'}
+for k,r in RRANK.items():
+  icn='r.'+k if 'r.'+k in IC else None
+  if not icn and k in D.get('ricons',{}):IC['r.'+k]=D['ricons'][k];icn='r.'+k
+  N('res_'+k,'N素材',r,D.get('rnames',{}).get(k,k),'はじめから' if r==0 else 'ランクで開く','取れるところ：'+RDESC.get(k,''),[],icn,RLN.get(k,''))
+# 方針の案（2026-11-20）：工業と魔法で分かれる生産の改良・改造・新しい施設。カードは「案」
+QA=[
+ ('q_i_miner','N領地',4,'製材機','伐採所','蒸気で動くのこぎり。木材 +30%。毎日 石炭を少し使う','工',['q_i_steam','b_miner']),
+ ('q_i_quarry','N領地',4,'蒸気のドリル','石切り場','石材 +30%。毎日 石炭を少し使う','工',['q_i_steam','b_quarry']),
+ ('q_i_iron','N領地',4,'蒸気ポンプ','鉱山','坑道の水をくみ出して深く掘る。鉄 +30%。毎日 石炭を少し使う','工',['q_i_steam','b_ironmine']),
+ ('q_i_farm','N領地',4,'蒸気の鋤','農場','食料 +30%。毎日 石炭を少し使う','工',['q_i_steam','b_farm']),
+ ('q_i_fish','N領地',4,'蒸気船','漁場','食料 +30%。毎日 石炭を少し使う','工',['q_i_steam','b_fishery']),
+ ('q_i_smelt','N領地',5,'高炉','新しい施設（ランクで開く）','新しい施設。高い精錬の塔で、煙をもくもく上げて合金・石炭・鉄から黒鉄を作る（工業の金属。新しい絵）','工',['q_i_steam','b_smelter']),
+ ('q_m_alch','N領地',5,'錬金工房','新しい施設（ランクで開く）','新しい施設。錬金術師が魔法も使って、夜のあいだに石材とエーテルから月光石を作る（昼は作らない。新しい絵）','魔',['b_well','b_smelter']),
+ ('q_i_house','N領地',5,'高層住宅','住居','重金属の骨組みで高く建てる。住める人数 +50%','工',['q_i_smelt','b_barracks']),
+ ('q_m_miner','N領地',4,'精霊の森','伐採所','木材 +20%。埋蔵の減り −30%','魔','b_miner'),
+ ('q_m_quarry','N領地',4,'ノームの導き','石切り場','石材 +20%。ときどき魔金属が少し出る','魔','b_quarry'),
+ ('q_m_iron','N領地',4,'鉱脈探知','鉱山','埋蔵 +50%','魔','b_ironmine'),
+ ('q_m_farm','N領地',4,'実りの魔法陣','農場','食料 +20%。幸福度 +3','魔','b_farm'),
+ ('q_m_fish','N領地',4,'水妖の網','漁場','食料 +20%。漁場1軒につき毎日 4分の1の見込みで小さな魔核 +1','魔','b_fishery'),
+ ('q_m_smelt','N領地',5,'錬金炉','精錬所','合金の一部が魔金属になる','魔','b_smelter'),
+ ('q_m_well','N領地',5,'魔力の泉','エーテル採掘所','エーテル +50%。小さな魔核も少し取れる','魔','b_well'),
+ ('q_m_house','N領地',5,'浮遊の館','住居','住める人数 +20%。幸福度 +5','魔','b_barracks'),
+ ('q_i_mg','N防衛',4,'連弩','バリスタの改造','矢をとても速く撃つ。10発ごとに装填（今の改造を工業へ）','工','g_heavymg'),
+ ('q_m_mg','N防衛',4,'光の矢','バリスタの改造','3本を同時に撃ち、魔物を追いかける','魔','g_heavymg'),
+ ('q_i_tw','N防衛',4,'2連物見櫓','物見櫓の改造','一度に2本撃つ（今の改造を工業へ）','工','g_m_tower'),
+ ('q_m_tw','N防衛',4,'魔眼','物見櫓の改造','暗闇の魔物も見えて撃てる','魔','g_m_tower'),
+ ('q_i_how','N防衛',4,'大岩','投石機の改造','爆発の範囲 140%・小型を吹き飛ばす（今の改造を工業へ）','工','g_bighow'),
+ ('q_m_how','N防衛',4,'重力の岩','投石機の改造','着弾した所に魔物を引き寄せる','魔','g_bighow'),
+ ('q_i_can','N防衛',5,'連射砲','大砲の改造','2発続けて撃つ（今の改造を工業へ）','工','g_bigbore'),
+ ('q_m_can','N防衛',5,'エーテル弾','大砲の改造','着弾した所でエーテルが弾けて、魔物の硬さを無視して傷を与える','魔','g_bigbore'),
+ ('q_i_mor','N防衛',4,'クラスター','迫撃砲の改造','着弾した所に破片が飛び散る（今の改造を工業へ）','工','g_incend'),
+ ('q_m_mor','N防衛',4,'凍結弾','迫撃砲の改造','着弾した所の魔物が遅くなる','魔','g_incend'),
+ ('q_i_wire','N防衛',4,'鉄条網','柵・石の壁','触れた魔物が傷を受け続け、足が遅くなる','工',['q_i_steam','b_fence']),
+ ('q_i_fort','N防衛',5,'重金属の壁','新しい壁（ランクで開く）','耐久1500（城壁より硬い。月光石の壁と同じ）','工',['q_i_smelt','b_wall']),
+ ('q_i_hgun','N防衛',5,'重砲','大砲のアップグレード','重金属の砲身。射程・火力が大きい（魔導砲の工業版。新しい絵）','工',['q_i_smelt','g_cannontech']),
+ ('q_i_flare','N防衛',6,'照明弾の発射台','新しい施設','夜の広い範囲を照らす（新しい絵）','工',['q_i_gas','b_brazier']),
+ ('q_i_bigc','N防衛',7,'大要塞砲','新しい施設','城に据える切り札の大砲。一晩に数回、遠くの群れを吹き飛ばす（新しい絵）','工','q_i_hgun'),
+ ('q_i_spg','N部隊',6,'蒸気戦車','新しい兵','蒸気で動く装甲の大砲車。砲兵より硬く、動きながら撃てる（新しい絵）','工',['q_i_steam','g_artillery']),
+ ('q_r_heavy','N素材',5,'黒鉄','素材','工業の金属。高炉で、合金・石炭・鉄から作る。工業の壁・門・武器・鎧・道具の上の段に使う','工',None),
+]
+QT=[
+ ('q_policy','N領地',4,'方針を決める（工業か魔法）','ランクⅣ','城がランクⅣになると選ぶ。選ばなかった方針のランクⅣ以上の研究は費用2倍（前の研究も要る）。あとから変えられない','',None),
+ ('q_i_steam','N領地',4,'蒸気機関','研究','石炭で動く機械を作れるようになる。工業の入口（製材機・蒸気ポンプ・蒸気船・蒸気砲などが開く）','工',['q_policy','b_coalmine']),
+ ('q_i_powder','N防衛',4,'火薬の工場','火薬工房のアップグレード','蒸気で火薬をたくさん作る。火薬を2倍作る（エーテル火薬工房の工業版）','工',['q_i_steam','g_gunpowder']),
+ ('q_i_tool4','N領地',5,'重金属の道具','そのほか','生産施設の道具を「重金属」に替えられる（つるはし・斧・農具・銛。魔金属の道具と同じ強さ）','工',['q_i_smelt','g_tool_3']),
+ ('q_i_lab','N領地',6,'技術研究所','研究所のアップグレード','魔導研究所の工業版','工',['q_i_smelt','k_lab_2']),
+ ('q_i_steamgun','N防衛',4,'銃士の塔','新しい施設','銃兵隊を配置する石の塔。高いところから長い射程で撃ち、空の魔物も撃てる。火薬を使う（新しい絵）','工',['q_policy','g_musket']),
+ ('q_i_mine','N防衛',4,'地雷','新しい罠','爆弾罠の上位。埋めるので魔物に見えない。踏んだ魔物の周り5マスを吹き飛ばし、一晩に2回まで爆発する（エーテル爆弾の工業版）','工',['g_bombtrap']),
+ ('q_i_gas','N防衛',4,'ガス灯','篝火のアップグレード','石炭を蒸し焼きにして出るガスで灯す。照らす範囲 +8マス。石炭を少し使う（蒼い炎の工業版）','工',['q_i_steam','b_brazier']),
+ ('q_i_trap','N防衛',5,'トラバサミ','新しい罠','踏んだ魔物を5秒つかんで動けなくする。大きな魔物にも効く（重金属。重力の罠の工業版）','工',['q_i_mine','q_i_smelt']),
+ ('q_i_gate','N防衛',5,'重金属の門','門のアップグレード','魔金属の門の工業版','工',['q_i_smelt','k_gate_2']),
+ ('q_i_mg3','N防衛',5,'重金属の大弩','バリスタのアップグレード','魔金属の大弩の工業版','工',['q_i_smelt','k_mg_2']),
+ ('q_i_bas','N防衛',5,'重金属の櫓台','櫓台のアップグレード','魔金属の櫓台の工業版','工',['q_i_smelt','b_bastion']),
+ ('q_i_out','N防衛',5,'重金属の前哨砦','前哨砦のアップグレード','魔金属の前哨砦の工業版','工',['q_i_smelt','k_outpost_1']),
+ ('q_i_mor3','N防衛',5,'重金属の迫撃砲','迫撃砲のアップグレード','魔金属の迫撃砲の工業版','工',['q_i_smelt','g_mortar']),
+ ('q_i_hisou','N防衛',5,'重金属の風船爆弾','風船爆弾のアップグレード','爆発の範囲 +50%（エーテル風船の工業版）','工',['q_i_smelt','g_hisousha']),
+ ('q_i_coat','N部隊',4,'鉄板入りの外套','ローブを替える','弓兵・砲兵・魔術師の守りを上げる（エーテルローブの工業版）','工',['q_i_steam','e_r_1']),
+ ('q_i_arm','N部隊',5,'重金属の鎧','鎧を替える','魔金属の鎧の工業版','工',['q_i_smelt','e_a_2']),
+ ('q_i_wpn','N部隊',5,'重金属の武器','武器を替える','魔金属の武器の工業版','工',['q_i_smelt','e_w_1']),
+]
+QT+=[
+ ('q_i_mech','N部隊',5,'蒸気機兵','新しい兵','人が乗って動かす蒸気の鎧。とても硬く力が強い壁役。石炭を使う（新しい絵）','工',['q_i_steam','g_heavyinf']),
+ ('q_i_balloon','N部隊',5,'銃士の気球','新しい兵','銃士の乗った気球。ゆっくり動き、空を飛ぶ魔物を撃ち落とし、地上にも撃てる。火薬を使う（新しい絵）','工',['q_i_steam','g_musket']),
+ ('q_i_airship','N部隊',7,'爆撃飛行船','新しい兵','気球に蒸気の機関を付けた船。空を飛んで、群れの上から爆弾を落とす。火薬を使う（新しい絵）','工',['q_i_balloon']),
+ ('q_m_owl','N部隊',5,'空の魔術師','新しい兵','飛ぶ魔法で空を飛ぶ魔術師。空を飛ぶ魔物を撃ち落とし、地上にも魔法を撃てる。エーテルを使う（銃士の気球の魔法版。新しい絵）','魔',['g_magic']),
+ ('q_m_biggolem','N部隊',6,'巨大ゴーレム','新しい兵','巨大な手で、まわりの魔物をまとめて薙ぎ払う。魔術師に近づく魔物を払いのける壁役（蒸気戦車の魔法版。新しい絵）','魔',['g_golemt']),
+ ('q_i_core1','N領地',4,'魔核のボイラー','研究','蒸気の機械の燃料に魔核も使える。魔核1で石炭5の代わり（石炭が足りないとき）','工',['q_i_steam','b_hq']),
+ ('q_i_core2','N防衛',5,'魔核の砲弾','研究','大砲・迫撃砲・砲台の弾に小さな魔核を込める。火力 +30%。1発ごとに小さな魔核を少し使う','工',['g_cannontech']),
+ ('q_i_core3','N領地',6,'魔核の動力炉','新しい施設','魔核を燃やして、周りの機械を動かす。まわり6マスの施設は石炭を使わない。毎日 魔核2を使う（新しい絵）','工',['q_i_core1']),
+ ('q_m_core1','N部隊',4,'魔核の宝珠','研究','魔術師の杖に小さな魔核をはめる。エーテルが足りないとき、小さな魔核でも魔法を撃てる','魔',['g_magic']),
+ ('q_m_core2','N防衛',5,'魔核の守り石','研究','防衛施設に小さな魔核をはめる（昼に1軒ずつ。一括でも）。耐久が3割以下になったとき5秒間 傷を受けない。効いたら割れる','魔',['b_well']),
+ ('q_m_core3','N部隊',7,'空飛ぶクジラ','新しい兵','エーテルで空に浮かぶ大きなクジラの船。群れの上をゆっくり飛び、背中の魔術師が範囲魔法を撃つ（爆撃飛行船の魔法版。新しい絵）','魔',['q_m_owl']),
+]
+QT+=[
+ ('q_i_gearfac','N領地',4,'機械工房','新しい施設（ランクで開く）','新しい施設。鉄と合金から歯車を作る。歯車は蒸気の機械（製材機・蒸気ポンプ・蒸気戦車など）に使う（新しい絵）','工',['q_i_steam','b_smelter']),
+ ('q_r_gear','N素材',4,'歯車','素材','工業の素材。機械工房で、鉄と合金から作る。蒸気の機械に使う（魔法のエーテルと対になる）','工',None),
+ ('q_i_carry','N領地',5,'蒸気のトロッコ','研究','生産施設と城を線路でつなぐ。生産施設の働き手が1人少なくてすむ。毎日 石炭を少し使う','工',['q_i_gearfac']),
+ ('q_m_carry','N領地',5,'運搬ゴーレム','研究','小さなゴーレムが荷物を運ぶ。生産施設の働き手が1人少なくてすむ。毎日 エーテルを少し使う','魔',['b_well']),
+]
+QA+=QT
+ids2={c['id'] for c in cards}|{q[0] for q in QA}
+for (id,cat,r,n,tg,e,ln,pre) in QA:
+  P=pre if isinstance(pre,list) else ([pre] if pre else [])
+  cards.append(dict(id=id,cat=cat,r=r,n=n,mx=1,pre=[p for p in P if p in ids2],c='',tt=0,e=e,kc=False,ln=ln,un=[],mv='',lv=False,prop='案',tg=tg,art=1 if '新しい絵' in e else 0))
+# ── 工業と魔法のツリー（2026-11-20）──────────────────────────────
+# 方針はランクⅣで選ぶので、ランクⅠ〜Ⅲは共通。ランクⅣ以上を工業・魔法に分ける。
+# 工業の柱：蒸気機関（Ⅳ）→ 高炉で重金属（Ⅴ）。生産の改良は「石炭で動く機械」で大きく増やす。
+# 魔法の柱：エーテル採掘（Ⅳ。ランクⅡから移す）→ 魔金属を作れる精錬所（Ⅴ）。生産の改良は少し増やして、別のよいことが付く。
+# 聖銀・竜晶は共通の素材。使い方（どの施設の段か）で分ける。
+byid={c['id']:c for c in cards}
+for k in ['q_m_smelt','k_smelter_1','b_bastion','k_bastion_1','q_i_bas']:   # 櫓台はやめる（砲台に）          # 「魔金属も作れる精錬所」と同じなので消す
+  if k in byid:cards.remove(byid.pop(k))
+LN={}
+for k in ['b_well','k_smelter_1','g_tool_4','k_powder_1','k_lab_3','k_brazier_2',
+          'b_wall3','k_gate_3','k_mg_3','k_bastion_1','k_outpost_2','k_mortar_1','k_cannon_1','k_hisou_1',
+          'k_barrier_1','k_magetower_1','k_magetower_2','k_mray_1','k_tesla_1',
+          'e_r_2','e_a_3','e_w_2','k_magic_1']:LN[k]='魔'
+for c in cards:
+  if c['cat']=='N領地' and c['id'].startswith('k_') and c['id'].endswith('_4') and '魔金属' in c['n']:LN[c['id']]='魔'   # 魔金属の道具の段
+  if c['id'].startswith('k_well_'):LN[c['id']]='魔'
+for k in ['k_harpoon_1']:LN[k]='工'
+for k,v in LN.items():
+  if k in byid:byid[k]['ln']=v
+def addpre(k,*P):
+  if k in byid:byid[k]['pre']=byid[k]['pre']+[p for p in P if p in byid and p not in byid[k]['pre']]
+def sete(k,e):
+  if k in byid:byid[k]['e']=e
+# エーテル採掘所：ランクⅡ→Ⅳ（魔法の柱）
+if 'b_well' in byid:
+  w=byid['b_well'];w['r']=4;w['tg']='研究';w['e']='「エーテル採掘所」を建てられる（ランクⅡから移す。魔法を選ぶと開く）。エーテルを使う研究の入口';w['pre']=['q_policy']
+for c in cards:
+  if c['id'].startswith('k_well_') and c['r']<4:c['r']=4
+addpre('g_tool_4','q_m_alch');addpre('k_powder_1','b_well')
+for k in ['q_m_miner','q_m_quarry','q_m_iron','q_m_farm','q_m_fish','q_m_well']:addpre(k,'b_well')
+addpre('q_m_house','q_m_alch')
+# 共通の段（聖銀・竜晶）は、工業・魔法どちらの前の段からでも上がれる
+addpre('g_tool_5','q_i_tool4');sete('g_tool_5',(byid.get('g_tool_5') or {}).get('e','')+'（前の段は魔金属か重金属の道具のどちらか）')
+if 'b_mithmine' in byid:sete('b_mithmine','新しい施設。城のランクが上がるとすぐ建てられる。魔金属か重金属のつるはしで建つ')
+addpre('k_mg_4','q_i_mg3');addpre('k_gate_4','q_i_gate');addpre('b_wall5','q_i_fort');addpre('k_cannon_2','q_i_hgun')
+addpre('e_a_4','q_i_arm');addpre('e_w_3','q_i_wpn');addpre('e_r_3','q_i_coat')
+for k in ['g_barrierst','g_teslat','g_gravityt','g_mrayt','g_dbreatht','g_meteort','g_magic','g_aebombt']:addpre(k,'b_well')   # 魔法の施設・兵はエーテル採掘から
+addpre('g_harpoont','q_i_smelt');addpre('g_artillery','q_i_steam')   # 工業の施設・兵は蒸気機関・高炉から
+# カードの種類（2026-11-20）：研究で取るもの／城のランクで開くもの を見分ける
+def kd(c):
+  tg=c.get('tg') or '';p=c.get('prop')
+  if c['cat']=='N素材' or tg=='素材':return 'mat'
+  if tg=='ランクⅣ':return 'pol'
+  if p=='新':return {'ランクで開く':'rank','はじめから':'start','改造':'mod'}.get(tg,'res')
+  if tg.endswith('改造'):return 'opt'
+  if 'アップグレード' in tg or '替える' in tg or 'ランクで開く' in tg:return 'rank'
+  return 'res'
+for c in cards:c['kd']=kd(c)
+if 'k_smelter_2' in byid:byid['k_smelter_2']['pre']=['b_smelter']
+# ランクⅤの工業の道具の段（魔金属の道具の段の工業版。2026-11-20）
+for c in list(cards):
+  i=c['id']
+  if c['cat']=='N領地' and i.startswith('k_') and i.endswith('_4') and '魔金属' in c['n'] and not i.startswith('k_well'):
+    fac=i[2:-2];nid='q_i_t_'+fac
+    cards.append(dict(c,id=nid,n=c['n'].replace('魔金属','重金属'),pre=[p for p in [c['pre'][0] if c['pre'] else None,'q_i_tool4'] if p],ln='工',prop='案',tg='道具を替える',e=c['e'].replace('魔金属','重金属').split('。',1)[-1]+'（すぐ・資材）'))
+    byid[nid]=cards[-1]
+    addpre('k_'+fac+'_5',nid)
+# 兵の施設の分け方（2026-11-20 試作版と合わせる）：人は兵舎、作るものは錬金工房（魔法）・蒸気の工場（工業）。竜騎兵・グリフォンは大きな厩舎。月光石は月光の祭壇
+def card(id,cat,r,n,tg,e,ln,pre):
+  c=dict(id=id,cat=cat,r=r,n=n,mx=1,pre=[p for p in pre if p in byid],c='',tt=0,e=e,kc=False,ln=ln,un=[],mv='',lv=False,prop='案',tg=tg,art=1 if '新しい絵' in e else 0);cards.append(c);byid[id]=c;return c
+for k in ['k_aerie_1','k_magic_1','k_train_2']:
+  if k in byid:cards.remove(byid.pop(k))
+if 'q_m_alch' in byid:
+  c=byid['q_m_alch'];c['n']='月光の祭壇';c['e']='新しい施設。夜のあいだに月の光を集めて、石材とエーテルから月光石を作る（昼は作らない。新しい絵）'
+sete('g_magic','兵舎で魔術師隊（3人・範囲魔法・エーテルを使う）を育てられる。魔法の街では、兵舎がランクⅣで「魔導院」になる')
+sete('g_dragon','馬小屋を「大きな厩舎」（ランクⅣ）にすると、竜騎兵を育てられる（大きな厩舎1軒につき1部隊）')
+sete('g_golemt','「錬金工房」を建設できる。エーテルゴーレム（とても硬い壁役）を作れる')
+if 'g_griffont' in byid:byid['g_griffont']['n']='グリフォン騎兵';sete('g_griffont','「大きな厩舎」でグリフォン騎兵を育てられる（空を飛んで移動し、降りて戦う）')
+sete('g_siegewt','「兵器工房」を建設できる。攻城兵器（工兵・破城槌・移動式投石機）を作る')
+card('q_stable','N部隊',4,'大きな厩舎','馬小屋のアップグレード','馬小屋の上の段。研究「竜騎兵」「グリフォン騎兵」のあと、ここで育てられる（新しい絵）','',['k_stable_1'])
+addpre('g_dragon','q_stable');addpre('g_griffont','q_stable')
+card('q_m_alchw','N部隊',5,'錬金工房','新しい施設（研究で開く）','ゴーレムや空飛ぶクジラを作る工房（エーテルゴーレム・巨大ゴーレム・空飛ぶクジラ）','魔',['g_golemt'])
+card('q_i_steamf','N部隊',5,'蒸気の工場','新しい施設（ランクで開く）','蒸気機兵・蒸気戦車・銃士の気球・爆撃飛行船を組み立てる工場（新しい絵）','工',['q_i_steam'])
+card('q_i_barr','N領地',4,'蒸気の兵舎','兵舎のアップグレード','兵舎のランクⅣの工業の段。人の兵（銃兵・砲兵・狙撃兵など）を育てる（新しい絵）','工',['k_train_1'])
+card('q_m_barr','N領地',4,'魔導院','兵舎のアップグレード','兵舎のランクⅣの魔法の段。魔術師・空の魔術師も育てる（新しい絵）','魔',['k_train_1'])
+card('q_m_barr2','N領地',6,'大魔導院','兵舎のアップグレード','兵舎のランクⅥの魔法の段（新しい絵）','魔',['q_m_barr'])
+for k in ['q_i_mech','q_i_balloon','q_i_spg','q_i_airship']:
+  if k in byid:byid[k]['e']=byid[k]['e'].replace('（新しい絵）','（蒸気の工場で作る）')
+  addpre(k,'q_i_steamf')
+for k in ['q_m_biggolem','q_m_core3']:
+  if k in byid:byid[k]['e']=byid[k]['e'].replace('（','（錬金工房で作る。',1) if '（' in byid[k]['e'] else byid[k]['e']+'（錬金工房で作る）'
+  addpre(k,'q_m_alchw')
+if 'q_m_owl' in byid:byid['q_m_owl']['e']=byid['q_m_owl']['e'].replace('（','（兵舎で育てる。',1)
+# 魔金属 → 月光石（魔法・夜に作る石）、重金属 → 黒鉄（2026-11-20）
+for c in cards:
+  for k in ('n','e','tg'):
+    if isinstance(c.get(k),str):c[k]=c[k].replace('魔金属','月光石').replace('重金属','黒鉄')
+NI=json.load(open('newicons.json'));IC.update(NI)
+if 'res_mmetal' in byid:byid['res_mmetal']['e']='錬金工房で、夜のあいだに石材とエーテルから作る（魔法の素材。黒鉄と同じランクⅤ）'
+if 'q_r_heavy' in byid:byid['q_r_heavy']['ic']='r.heavy'
+if 'q_r_gear' in byid:byid['q_r_gear']['ic']='r.gear'
+for k in ['q_i_miner','q_i_quarry','q_i_iron','q_i_farm','q_i_fish','q_i_spg','q_i_mech']:addpre(k,'q_i_gearfac')   # 蒸気の機械は歯車を使う
+d.setdefault('RESN',{})['mmetal']='月光石';d['RESN']['heavy']='黒鉄';d['RESN']['gear']='歯車'
+for c in cards:c['kd']=kd(c)
 d['T']+=cards
-d['tabs']=['N領地','N防衛','N部隊','生産','内政','防衛','部隊','魔核']
-d['TABL']={'N領地':'領地','N防衛':'防衛','N部隊':'部隊','生産':'前：生産','内政':'前：内政','防衛':'前：防衛','部隊':'前：部隊','魔核':'前：魔核'}
+RM=d.get('RANKMAT') or {}
+if 'heavy' not in RM.get('5',[]):RM.setdefault('5',[]).append('heavy')
+if 'gear' not in RM.get('4',[]):RM.setdefault('4',[]).append('gear')
+if 'elec' in RM.get('2',[]):RM['2']=[x for x in RM['2'] if x!='elec'];RM.setdefault('4',[]).append('elec')
+d['tabs']=['N領地','N防衛','N部隊','N素材','生産','内政','防衛','部隊','魔核']
+d['TABL']={'N領地':'領地','N防衛':'防衛','N部隊':'部隊','N素材':'素材','生産':'前：生産','内政':'前：内政','防衛':'前：防衛','部隊':'前：部隊','魔核':'前：魔核'}
 used={t['ic'] for t in d['T'] if t.get('ic')}|{k for k in IC if k.startswith('r.')}
 d['IC']={k:IC[k] for k in used if k in IC}
 import os

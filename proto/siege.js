@@ -118,7 +118,7 @@ function renderCampSetup(){const root=$('siege'),c=campById(G.camp);const st=sta
     <div class="sgFoot"><button id="sgBack">やめる（街へ戻る）</button><button id="sgGo" class="primary" ${L.some(q=>G.pick[q.id])?'':'disabled'}>出撃（配置へ）</button></div></div>`;
   root.querySelectorAll('[data-pick]').forEach(el=>el.onchange=()=>{G.pick[el.dataset.pick]=el.checked;if(!el.checked)delete G.pick[el.dataset.pick];sfx('click');renderCampSetup();});
   $('sgBack').onclick=closeSiege;
-  $('sgGo').onclick=()=>{G.pool={};G.queue={};for(const q of L)if(G.pick[q.id]){const k=suOf(q);G.pool[k]=(G.pool[k]||0)+1;(G.queue[k]=G.queue[k]||[]).push(q.id);}c.raidDay=S.turn;startDeploy();};}
+  $('sgGo').onclick=()=>{G.pool={};G.queue={};for(const q of L)if(G.pick[q.id]){const k=suOf(q);G.pool[k]=(G.pool[k]||0)+1;(G.queue[k]=G.queue[k]||[]).push(q.id);}c.raidDay=S.turn;S.raidN=(S.raidN||0)+1;startDeploy();};}
 // 夜襲の結果を本編へ：倒した魔物の分だけ次の襲撃を減らし、部隊の被害を戻す
 function killsByType(){const kd={};for(const f of G.foes)if(!f.def&&!alive(f))kd[f.k]=(kd[f.k]||0)+1;for(const b of G.blds)if(b.burnBy)for(const k in b.burnBy)kd[k]=(kd[k]||0)+b.burnBy[k];return kd;}
 function campApply(why){const c=campById(G.camp);if(!c||G.applied)return null;G.applied=true;S.siegeN=(S.siegeN||0)+1;const kd=killsByType();let n=0;
