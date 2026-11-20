@@ -1773,7 +1773,7 @@ function dayFlow(tot){if(!IS_PROTO)return {food:foodTurn(tot),tax:taxTurn(tot),w
 function foodTurn(tot){return IR(tot*FOOD_PER*foodMul()*TURN_SEC);}
 function taxTurn(tot){return IR(tot*TAX[S.tax].g)+HQ_GOLD;}
 const TRADE=[['steel',1.5],['stone',2],['iron',3],['fuel',1.5]];
-if(/\/proto\//.test(location.pathname))TRADE.push(['coal',3,3],['elec',4,3],['goldore',4,3],['alloy',6,3],['powder',4,3],['mmetal',10,5],['mithril',14,7]);   /* 試作：交易所（Ⅲ）・小さな港（Ⅴ）・小さな空港（Ⅶ）で品が増える */
+if(/\/proto\//.test(location.pathname))TRADE.push(['coal',3,3],['elec',4,3],['goldore',4,3],['alloy',6,3],['powder',4,3],['mmetal',10,5],['heavy',10,5],['mithril',14,7]);   /* 試作：交易所（Ⅲ）・小さな港（Ⅴ）・小さな空港（Ⅶ）で品が増える */
 // 資材の売り買いは銀貨（S.silver）。資材を売ると銀貨が入り、資材は銀貨で買う。1日に買える量にも上限
 function buyLimit(){const n=S.blds.filter(b=>b.type==='market'&&!(b.bt>0)).length;return 100+60*Math.max(0,n-1)+(IS_PROTO&&hasPort()?150:0);}
 function hasPort(){return S.blds.some(b=>b.type==='tport'&&!(b.bt>0));}
@@ -1906,11 +1906,17 @@ B.tower.garUt='arch';B.spike.req='spikes';
 B.furnace={name:'精製炉',glyph:'炉',hp:260,heat:3,cost:{steel:60,stone:40},pop:2,power:0,spec:'内政',grp:'prod',req:'furnace',desc:'魔核のエネルギーを取り出してエーテル結晶を精製する（魔核 −2 → エーテル結晶 +4／T）。魔核が尽きると止まる'};
 B.totem={name:'呪骸の柱',glyph:'呪',hp:420,heat:1,cost:{stone:40,mat:30},pop:0,power:0,spec:'工兵',grp:'def',req:'totem',desc:'魔物の骨で組んだ呪いの柱。周り6マスの魔物の足を30%遅くし、攻撃の間隔を伸ばす（与える被害 −25%）'};
 /* ランクⅣ〜Ⅶの防衛施設（2026-11-13・絵は仮のアイコン。費用・弾は仮） */
-/* 新しい素材の生産施設（2026-11-13）：炭鉱Ⅱ・金鉱Ⅲ・精錬所Ⅲ（Ⅴの改築で魔金属も）・聖銀鉱Ⅵ。鉱山と同じく鉱脈の上に建てる（仮） */
+/* 新しい素材の生産施設（2026-11-13）：炭鉱Ⅱ・金鉱Ⅲ・精錬所Ⅲ（Ⅴの改築でエーテル金属も）・聖銀鉱Ⅵ。鉱山と同じく鉱脈の上に建てる（仮） */
 B.coalmine={name:'炭鉱',glyph:'炭',hp:220,heat:1,cost:{steel:50,stone:20,gold:10},pop:3,power:0,spec:'内政',grp:'prod',req:'coalt',desc:'鉱脈の上に建設。石炭を産出（+6/T）。石炭は篝火・合金に使う'};
 B.goldmine={name:'金鉱',glyph:'金',hp:220,heat:1,cost:{steel:60,stone:30,gold:20},pop:3,power:0,spec:'内政',grp:'prod',req:'goldt',desc:'鉱脈の上に建設。素材の金を産出（+4/T）。金貨ではない。合金の材料'};
 B.mithmine={name:'聖銀鉱',glyph:'銀',hp:260,heat:1,cost:{steel:100,stone:60,alloy:10,gold:40},pop:4,power:0,spec:'内政',grp:'prod',req:'mitht',desc:'鉱脈の上に建設。聖銀（ミスリル）を産出（+2/T）'};
-B.smelter={name:'精錬所',glyph:'錬',hp:300,heat:2,cost:{steel:80,stone:60,iron:20,gold:30},pop:3,power:0,spec:'内政',grp:'prod',req:'smeltt',desc:'鉄4・金3・石炭2から合金5を作る（1ターン）。ランクⅤのアップグレードで魔金属も作れる（合金2・エーテル2・魔核1から魔金属3）'};
+B.smelter={name:'精錬所',glyph:'錬',hp:300,heat:2,cost:{steel:80,stone:60,iron:20,gold:30},pop:3,power:0,spec:'内政',grp:'prod',req:'smeltt',desc:'鉄4・金3・石炭2から合金5を作る（1ターン）。ランクⅤのアップグレードでエーテル金属も作れる（合金2・エーテル2・魔核1からエーテル金属3）'};
+if(/\/proto\//.test(location.pathname)){   /* 試作（2026-11-20）：工業と魔法の素材の施設 */
+  B.gearw={name:'機械工房',glyph:'歯',hp:300,heat:2,cost:{steel:80,stone:60,iron:40,gold:40},pop:3,power:0,spec:'内政',grp:'prod',req:'steam',desc:'鉄2・合金1から歯車3を作る（1ターン）。歯車は蒸気の機械に使う（工業）'};
+  B.blast={name:'高炉',glyph:'炉',hp:360,heat:3,cost:{steel:100,stone:100,iron:60,gold:60},pop:3,power:0,spec:'内政',grp:'prod',req:'blastt',desc:'高い精錬の塔。合金2・石炭2・鉄2から黒鉄3を作る（1ターン）。工業のランクⅤの金属'};
+  B.alchemy={name:'錬金工房',glyph:'錬',hp:300,heat:2,cost:{steel:100,stone:80,elec:40,gold:60},pop:3,power:0,spec:'内政',grp:'prod',req:'alcht',desc:'錬金術師が魔法も使って、合金2・エーテル2からエーテル金属3を作る（1ターン）。魔法のランクⅤの金属'};
+  B.smelter.desc='鉄4・金3・石炭2から合金5を作る（1ターン）。ランクⅦのアップグレードで竜晶も作れる';
+  BSIZE.gearw=BSIZE.blast=BSIZE.alchemy=BIG_SZ;}
 /* ランクⅣ〜Ⅶの罠（2026-11-13・絵と費用は仮） */
 B.aebomb={name:'エーテル爆弾',glyph:'',hp:1,heat:0,cost:{steel:15,elec:12},pop:0,power:0,spec:'工兵',isMine:true,kind:'aebomb',req:'aebombt',desc:'爆弾罠の上位。踏んだ魔物の周り6マスをエーテルの爆発で吹き飛ばす（使い切り・空の敵には効かない）'};
 B.gravity={name:'重力の罠',glyph:'',hp:1,heat:0,cost:{steel:20,elec:20,mat:10},pop:0,power:0,spec:'工兵',isMine:true,kind:'gravity',req:'gravityt',desc:'近づいた魔物（空を飛ぶ魔物も）を、周り5マスまとめて地面に押さえつける（4秒動けない・空の魔物は地面に落ちる）。ボスは遅くなるだけ。一晩に2回、8秒おき'};
@@ -1943,7 +1949,7 @@ const KC={   // 改築の段：[ランク, 名前]。1つ目は建てたとき�
  coalmine:{g:'mine',st:[[2,'炭鉱'],[4,'深い炭鉱']]},
  goldmine:{g:'mine',st:[[3,'金鉱'],[5,'深い金鉱']]},
  mithmine:{g:'mine',st:[[6,'聖銀鉱'],[7,'深い聖銀鉱']]},
- smelter:{g:'work',st:[[3,'合金の精錬所'],[5,'魔金属も作れる精錬所']]},
+ smelter:{g:'work',st:[[3,'合金の精錬所'],[5,'エーテル金属も作れる精錬所']]},
  ammo:{g:'work',st:[[1,'武器工房'],[2,'鋼の武器工房'],[3,'合金の武器工房']]},
  powder:{g:'work',st:[[3,'火薬工房'],[4,'エーテル火薬工房']]},
  barracks:{g:'town',st:[[1,'住居'],[2,'石の家'],[4,'集合住宅']]},
@@ -1955,15 +1961,15 @@ const KC={   // 改築の段：[ランク, 名前]。1つ目は建てたとき�
  stable:{g:'town',st:[[2,'馬小屋'],[6,'グリフォンの厩舎']]},
  aerie:{g:'town',st:[[4,'竜舎'],[7,'竜晶の竜舎']]},
  tower:{g:'def',st:[[1,'木の物見櫓'],[2,'石の物見櫓'],[3,'城塞の物見櫓'],[6,'聖銀の物見櫓']]},
- mg:{g:'def',st:[[1,'木のバリスタ'],[2,'鉄のバリスタ'],[3,'合金のバリスタ'],[5,'魔金属の大弩'],[6,'ミスリルの大弩']]},
+ mg:{g:'def',st:[[1,'木のバリスタ'],[2,'鉄のバリスタ'],[3,'合金のバリスタ'],[5,'エーテル金属の大弩'],[6,'ミスリルの大弩']]},
  how:{g:'def',st:[[1,'投石機'],[2,'鉄の投石機']]},
  cannon:{g:'def',st:[[3,'大砲'],[5,'魔導砲'],[7,'竜晶砲']]},
- mortar:{g:'def',st:[[3,'迫撃砲'],[5,'魔金属の迫撃砲']]},
+ mortar:{g:'def',st:[[3,'迫撃砲'],[5,'エーテル金属の迫撃砲']]},
  hisou:{g:'def',st:[[3,'風船爆弾'],[4,'エーテル風船']]},
- gate:{g:'def',st:[[1,'木の門'],[2,'石の門'],[4,'鉄の門'],[5,'魔金属の門'],[7,'龍鱗の門']]},
- bastion:{g:'def',st:[[3,'櫓台'],[5,'魔金属の櫓台']]},
+ gate:{g:'def',st:[[1,'木の門'],[2,'石の門'],[4,'鉄の門'],[5,'エーテル金属の門'],[7,'龍鱗の門']]},
+ bastion:{g:'def',st:[[3,'櫓台'],[5,'エーテル金属の櫓台']]},
  brazier:{g:'def',st:[[1,'篝火'],[2,'石炭の篝火'],[4,'蒼い炎']]},
- magetower:{g:'magic',st:[[4,'メイジの塔'],[5,'魔金属の塔'],[7,'竜晶の塔']]},
+ magetower:{g:'magic',st:[[4,'メイジの塔'],[5,'エーテル金属の塔'],[7,'竜晶の塔']]},
  barrier:{g:'magic',st:[[4,'バリアストーン'],[6,'聖銀のバリアストーン']]},
  tesla:{g:'magic',st:[[5,'テスラタワー'],[7,'竜晶のテスラタワー']]},
  harpoon:{g:'def',st:[[5,'ハープーンランチャー'],[6,'聖銀の銛のランチャー']]},
@@ -2066,24 +2072,24 @@ MODEL.scout={ut:'arch',wage:2,name:'斥候',role:'斥候（スカウト）',colo
 MODEL.farmer={ut:'mil',name:'農兵',role:'農兵（クワ）',color:'#c8a060',wage:1,desc:'クワや鋤を手にした村人。兵舎がなくても城館で集められる。弱いが安く、食料だけで編成できる'};
 const IS_PROTO=/\/proto\//.test(location.pathname);   /* 試作版だけで試すもの（兵種・強さの見直し）は IS_PROTO で分ける。本番は今までどおり（2026-11-17） */
 /* 研究の作り直し（試作版・2026-11-18 docs/RESEARCH.md 0章）：城のランクで開くもの（has() が城のランクで答える）と、やめた研究 */
-const RANK_OPEN={},DROPPED=new Set();
-/* 生産施設の道具（試作版）：施設のアップグレード＝道具を替える（石→鉄→合金→魔金属→聖銀）。すぐ終わり、資材を払う。道具は毎ターン少しずつ減る */
+const RANK_OPEN={},DROPPED=new Set(),RANK_LINE={aethert:'mag',blastt:'ind',alcht:'mag'};   /* 方針の施設（2026-11-20）：その方針なら城のランクで開く。違う方針なら研究（費用2倍）で開く */
+/* 生産施設の道具（試作版）：施設のアップグレード＝道具を替える（石→鉄→合金→エーテル金属→聖銀）。すぐ終わり、資材を払う。道具は毎ターン少しずつ減る */
 /* 試作（2026-11-18）：大きな生産施設（4×4）。小さい施設4つ分より多く作り、建設の資材も多い。研究で建てる */
 const BIG={bigfarm:'farm',bigminer:'miner',bigquarry:'quarry',bigfish:'fishery'},BIG_MUL=4.5;
 if(/\/proto\//.test(location.pathname))for(const [k,base,name,desc] of [['bigfarm','farm','大農場','農場の大きい版。4×4。農場4つ分より多く食料を作る'],['bigminer','miner','大伐採所','伐採所の大きい版。4×4。伐採所4つ分より多く木材を取る'],['bigquarry','quarry','大採掘場','石切り場の大きい版。4×4。石切り場4つ分より多く石材を取り、鉄・石炭・金も少し取れる'],['bigfish','fishery','養殖場','漁場の大きい版。4×4。漁場4つ分より多く食料を取る']]){
   const d=B[base];const c={};for(const x in d.cost)c[x]=Math.round(d.cost[x]*5/5)*5;
   B[k]=Object.assign({},d,{name,desc,cost:c,pop:(d.pop||1)*3,req:'t_'+k,glyph:d.glyph});BSIZE[k]=4;if(KC[base])KC[k]={g:KC[base].g,st:KC[base].st.slice()};}
 const TOOL={bigfarm:'農具',bigminer:'斧',bigquarry:'つるはし',bigfish:'銛',miner:'斧',quarry:'つるはし',ironmine:'つるはし',coalmine:'つるはし',goldmine:'つるはし',mithmine:'つるはし',well:'つるはし',farm:'農具',fishery:'銛',ammo:'金槌'};
-const TOOL_T=[[1,'木'],[1,'石'],[2,'鉄'],[3,'合金'],[5,'魔金属'],[6,'聖銀']];   /* 2026-11-18：鋼はなくして合金にまとめた（合金＝黒に金色） */   /* 2026-11-18：はじめは木の道具。石から上の段は研究（tool_1〜tool_6）で開く */
+const TOOL_T=[[1,'木'],[1,'石'],[2,'鉄'],[3,'合金'],[5,'エーテル金属'],[6,'聖銀']];   /* 2026-11-18：鋼はなくして合金にまとめた（合金＝黒に金色） */   /* 2026-11-18：はじめは木の道具。石から上の段は研究（tool_1〜tool_6）で開く */
 const TOOL_MUL=[1,1.4,2.0,3.0,4.0,4.6];   /* 道具の段ごとの産出（木を1として） */
 const TOOL_WEAR=[{steel:1},{stone:1},{iron:1},{alloy:1},{mmetal:1},{mithril:1}];   /* 毎ターン1施設あたり使う資材 */
 const TOOL_COST=[null,{stone:10},{iron:10},{alloy:12},{mmetal:10},{mithril:8}];   /* その段の道具に替えるとき */
 const TOOL_START={};   /* あとから建てる施設は、建てられるランクの道具を持って建つ（段の番号） */
 if(IS_PROTO){if(B.hisou&&B.hisou.cost)B.hisou.cost.wing=2;if(MODEL.griffon&&MODEL.griffon.cost)MODEL.griffon.cost.wing=2;}   /* 試作：風船爆弾とグリフォン騎兵は飛膜を使う */
-if(IS_PROTO&&KC.smelter&&KC.smelter.st.length<3)KC.smelter.st.push([7,'竜晶を作れる精錬所']);   /* 試作：竜晶はエーテル・聖銀・龍鱗から作る（2026-11-18） */
+if(IS_PROTO&&KC.smelter)KC.smelter.st=[[3,'精錬所'],[7,'竜晶を作れる精錬所']];   /* 試作：竜晶はエーテル・聖銀・龍鱗から作る（2026-11-18）。エーテル金属は錬金工房へ（2026-11-20） */   /* 試作：竜晶はエーテル・聖銀・龍鱗から作る（2026-11-18） */
 if(IS_PROTO&&KC.barracks){KC.barracks.st=KC.barracks.st.filter(x=>x[1]!=='集合住宅').map(x=>x[1]==='石の家'?[x[0],'二階建ての家']:x);B.barracks.desc=B.barracks.desc.replace('石の家','二階建ての家');}   /* 試作：集合住宅は研究で建てる新しい建物（住居の段にはしない） */
 if(IS_PROTO)for(const k in TOOL){if(!KC[k]||!B[k])continue;const bn=B[k].name;KC[k].st=TOOL_T.map(([r,m],i)=>[r,`${bn}（${m}の${TOOL[k]}）`]);}
-const FLOW_T=new Set(['tport','tair','bigfarm','bigminer','bigquarry','bigfish','miner','quarry','ironmine','farm','fishery','well','market','ammo','coalmine','goldmine','mithmine','smelter','powder','tavern']);   /* 試作：1ターンの出入りを prodOf でまとめて扱う施設 */
+const FLOW_T=new Set(['tport','tair','bigfarm','bigminer','bigquarry','bigfish','miner','quarry','ironmine','farm','fishery','well','market','ammo','coalmine','goldmine','mithmine','smelter','powder','tavern','gearw','blast','alchemy']);   /* 試作：1ターンの出入りを prodOf でまとめて扱う施設 */
 function nightWork(b){if(!IS_PROTO)return false;const t=b.type;return (t==='ironmine'&&has('p_prop'))||(t==='fishery'&&has('p_nightfish'))||((t==='coalmine'||t==='goldmine'||t==='mithmine')&&has('p_vent'));}   /* 試作：夜も働く技術 */
 function isTool(b){return IS_PROTO&&!!TOOL[b.type];}
 function upProd(b){return isTool(b)?TOOL_MUL[Math.min(TOOL_MUL.length,b.lv||1)-1]*(b.worn?0.5:1):UP.prod[(b.lv||1)-1];}
@@ -2130,15 +2136,15 @@ if(IS_PROTO){
  B.gstable=Object.assign({},B.stable,{name:'グリフォンの厩舎',glyph:'鷲',req:'griffont',tier:6,cap:2,cost:{steel:200,stone:120,mithril:10,gold:150},desc:'グリフォン騎兵を育てる厩舎（空を飛んで移動し、降りて戦う）'});
  B.siegew=Object.assign({},B.train,{name:'兵器工房',glyph:'工',req:'siegewt',tier:3,cap:3,cost:{steel:150,stone:80,iron:40,gold:80},desc:'攻城兵器（工兵・破城槌・移動式投石機）を作る作業場。駐屯地の夜襲で力を出す'});UNIT_HOME.siegew='art';BUILD_ORDER.push('siegew');
  B.aerie.cap=1;   /* 竜舎1軒で竜騎兵1部隊。竜晶の竜舎で +1。竜舎の数は全体の建物の上限だけ */
- B.tport=Object.assign({},B.market,{name:'小さな港',glyph:'港',req:'tportt',tier:5,cost:{steel:200,stone:120,iron:60,gold:150},desc:'水に面した所に建てる交易の港（1軒だけ）。金貨を作り、交易で魔金属まで売り買いできる'});
+ B.tport=Object.assign({},B.market,{name:'小さな港',glyph:'港',req:'tportt',tier:5,cost:{steel:200,stone:120,iron:60,gold:150},desc:'水に面した所に建てる交易の港（1軒だけ）。金貨を作り、交易でエーテル金属まで売り買いできる'});
  B.tair=Object.assign({},B.market,{name:'小さな空港',glyph:'空',req:'tairt',tier:7,cost:{steel:300,stone:200,alloy:60,gold:300},desc:'飛行船で交易する空港（1軒だけ）。金貨を作り、交易で聖銀まで売り買いできる（竜晶は売り買いしない）'});
  B.market.desc=B.market.desc+'（1軒だけ）';
  BUILD_ORDER.push('tport','tair','gstable');
  KC.church.st=[[1,'小さな教会'],[3,'教会'],[6,'聖堂']];B.church.name='小さな教会';
- KC.gate.st=[[1,'木の門'],[1,'石の門'],[2,'鉄の門'],[5,'魔金属の門'],[7,'龍鱗の門']];
+ KC.gate.st=[[1,'木の門'],[1,'石の門'],[2,'鉄の門'],[5,'エーテル金属の門'],[7,'龍鱗の門']];
  KC.hisou.st=[[3,'風船爆弾'],[5,'エーテル風船']];
  KC.stable.st=[[2,'馬小屋'],[3,'戦車の馬小屋']];   /* グリフォンの厩舎は別の建物にした。戦車の馬小屋でチャリオットを作る */
- KC.outpost={g:'def',st:[[1,'前哨砦'],[2,'鉄の前哨砦'],[5,'魔金属の前哨砦']]};
+ KC.outpost={g:'def',st:[[1,'前哨砦'],[2,'鉄の前哨砦'],[5,'エーテル金属の前哨砦']]};
  Object.assign(B.outpost,{range:7,dmg:8,rate:0.8,ammoUse:0.25,direct:true,antiAir:true,desc:B.outpost.desc+'。弱い矢を撃って守る（物見櫓より弱い）'});
  KC.herohouse={g:'town',st:[[1,'英雄の家'],[2,'大きな英雄の家'],[4,'英雄の館'],[6,'英雄の殿堂']]};
  B.herohouse.desc='英雄が暮らす家（1軒だけ）。英雄を雇える人数：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人';
@@ -2172,7 +2178,8 @@ function ready(b){return !(b.bt>0);}
 for(const k of ['fence','swall','wall']){const c=B[k].cost;for(const r in c)c[r]=Math.ceil(c[r]/2);}   // 壁は1×1になったので、同じ長さで前と同じ費用になるよう半額
 const GUN_TYPES=['mg','how','cannon','mabou','hisou','tower','magetower','field','mortar','hvy','mlrs','rail'];
 /* 壁の上位（2026-11-12）：城壁の上に重ねて置くと置き換わる。城壁と同じく上に防衛施設を置ける */
-const WALL_UP=[['wall3','魔金属の壁',1500,'mwall','#a774ec',{stone:30,mmetal:3}],['wall5','龍鱗の壁',2100,'dragwall','#5a8a6a',IS_PROTO?{stone:40,scale:1}:{stone:40,mat:10}]];   /* 試作：龍鱗の壁は龍鱗を使う */   /* 壁の段：Ⅰ木の柵・Ⅱ石の壁・Ⅲ城壁・Ⅴ魔金属の壁・Ⅶ龍鱗の壁（2026-11-13） */
+function IS_PROTO_RE(){return /\/proto\//.test(location.pathname);}
+const WALL_UP=[['wall3','エーテル金属の壁',1500,'mwall',IS_PROTO_RE()?'#7fd8f5':'#a774ec',{stone:30,mmetal:3}],['wall5','龍鱗の壁',2100,'dragwall','#5a8a6a',IS_PROTO?{stone:40,scale:1}:{stone:40,mat:10}]];   /* 試作：龍鱗の壁は龍鱗を使う */   /* 壁の段：Ⅰ木の柵・Ⅱ石の壁・Ⅲ城壁・Ⅴエーテル金属の壁・Ⅶ龍鱗の壁（2026-11-13） */
 B.fence.cost={steel:8};B.swall.cost={stone:13};B.wall.cost={stone:30,iron:5};   /* 壁から金貨をなくす（2026-11-13） */
 for(const [k,t] of [['coalmine',2],['goldmine',3],['smelter',3],['mithmine',6],['aebomb',4],['gravity',5],['stake',6],['meteor',7],['barrier',4],['tesla',5],['harpoon',5],['mray',6],['dbreath',7]])if(B[k])B[k].tier=t;
 for(const [k,n,hp,rq,col,cost] of WALL_UP)B[k]=Object.assign({},B.wall,{name:n,hp,req:rq,cost,wcol:col,tier:{wall3:5,wall5:7}[k],desc:n+'。城壁（と下の段の壁）の上に重ねて置くと置き換わる。上に防衛施設を置ける'});
@@ -2361,7 +2368,7 @@ function techMul(type){if(IS_PROTO)return 1+(type==='farm'&&S.seedT>0?0.2:0);   
  set('mrayt',{cat:'防衛',tier:6,name:'ミスリルレイ',cost:{steel:180,alloy:40,elec:80,gold:120},t:5,pre:[],icon:'mray',eff:'「ミスリルレイ」を建設できる（当て続けるほど強くなる光線）'});
  set('dbreatht',{cat:'防衛',tier:7,name:'ドラゴンブレス',cost:{steel:200,alloy:50,mat:60,gold:150},t:6,pre:[],icon:'dbreath',eff:'「ドラゴンブレス」を建設できる（扇形に焼く火炎放射器）'});
  set('masonry',{tier:2});set('castle',{tier:3});   /* 壁の段：石の壁はⅡ、城壁はⅢ（2026-11-13） */
- set('mwall',{cat:'防衛',tier:5,name:'魔金属の壁',cost:{stone:100,alloy:30,mat:20,gold:60},t:4,pre:['castle'],icon:'wall3',eff:'「魔金属の壁」を建設できる（耐久1500。城壁の上に重ねて置くと置き換わる。上に防衛施設を置ける）'});
+ set('mwall',{cat:'防衛',tier:5,name:'エーテル金属の壁',cost:{stone:100,alloy:30,mat:20,gold:60},t:4,pre:['castle'],icon:'wall3',eff:'「エーテル金属の壁」を建設できる（耐久1500。城壁の上に重ねて置くと置き換わる。上に防衛施設を置ける）'});
  set('dragwall',{cat:'防衛',tier:7,name:'龍鱗の壁',cost:{stone:150,alloy:50,mat:40,gold:100},t:6,pre:['mwall'],icon:'wall5',eff:'「龍鱗の壁」を建設できる（耐久2100。いちばん硬い）'});
  set('steelarmor',{cat:'部隊',tier:2,name:'鋼の鎧',cost:{iron:45,steel:30},t:2,pre:['ironarmor'],icon:'heavy',eff:'鎧が「鋼の鎧」になる：体力 +20%（補給で鎧と鉄を使う）'});
  set('alloyarmor',{cat:'部隊',tier:3,name:'合金の鎧',cost:{iron:80,gold:50},t:3,pre:['steelarmor'],icon:'heavy',eff:'鎧が「合金の鎧」になる：体力 +30%。補給で「合金」を使う'});
@@ -2431,7 +2438,7 @@ function techMul(type){if(IS_PROTO)return 1+(type==='farm'&&S.seedT>0?0.2:0);   
 if(IS_PROTO){const T=id=>TECH.find(t=>t.id===id),del=id=>{const i=TECH.findIndex(t=>t.id===id);if(i>=0){DROPPED.add(id);TECH.splice(i,1);}},set=(id,o)=>{const t=T(id);if(t)Object.assign(t,o);};
  /* なくてはならない施設と装備は、城のランクで開く */
  for(const id of ['coalt','aethert','goldt','smeltt','mitht','masonry','castle','mwall','dragwall'])if(T(id))RANK_OPEN[id]=T(id).tier||1;
- Object.assign(RANK_OPEN,{eqw_5:7,eqa_6:7,catapult:1,spikes:1,ironarmor:1,heavyarms:2,steelarmor:2,chainmail:2,alloyarms:3,alloyarmor:3,eqw_3:5,eqw_4:6,eqa_4:5,eqa_5:6,eqr_2:4,eqr_3:6,eqm_1:4,eqm_2:5,eqm_3:6});
+ Object.assign(RANK_OPEN,{aethert:4,blastt:5,alcht:5,eqw_5:7,eqa_6:7,catapult:1,spikes:1,ironarmor:1,heavyarms:2,steelarmor:2,chainmail:2,alloyarms:3,alloyarmor:3,eqw_3:5,eqw_4:6,eqa_4:5,eqa_5:6,eqr_2:4,eqr_3:6,eqm_1:4,eqm_2:5,eqm_3:6});
  /* やめる研究：%の研究・改築の研究（まとめ）・城のランクで開くもの */
  const drop=[...Object.keys(RANK_OPEN),'mine','quarrying','farming','fishing','smelt','autoammo','craft','housing','kougen','goukyu','autoload','wallplus','fcs','tetsudan','pitch','swordplay','archery','elite','trade','scouting','carapace','bonepick','boneaxe','bonehoe','abysslamp','analysis','doctrine','armcare','totem','nighthunt','refine',...TECH.filter(t=>/^kc_/.test(t.id)).map(t=>t.id)];
  for(const id of drop)del(id);for(const k of Object.keys(RANK_OPEN))DROPPED.add(k);
@@ -2444,7 +2451,7 @@ if(IS_PROTO){const T=id=>TECH.find(t=>t.id===id),del=id=>{const i=TECH.findIndex
  set('bighow',{name:'投石機の改造',eff:'改造：街の投石機すべてに「大岩」か「燃える岩」を1つ選べる'});
  set('refine',{max:1,eff:'魔核の回収量 +50%'});
  /* 道具の段の研究（2026-11-18）：1つの研究で、全部の生産施設のその段の道具が使えるようになる */
- const TN=['','石','鉄','合金','魔金属','聖銀'];for(let i=1;i<=5;i++)TECH.push({id:'tool_'+i,cat:'領地',tier:TOOL_T[i][0],name:TN[i]+'の道具',t:Math.min(4,1+i),cost:{steel:40+30*i,stone:20+10*i},pre:i>1?['tool_'+(i-1)]:[],icon:'ammo',eff:`生産施設の道具を「${TN[i]}」に替えられるようになる（施設を選んで替える。すぐ・資材を払う）`});
+ const TN=['','石','鉄','合金','エーテル金属','聖銀'];for(let i=1;i<=5;i++)TECH.push({id:'tool_'+i,cat:'領地',tier:TOOL_T[i][0],name:TN[i]+'の道具',t:Math.min(4,1+i),cost:{steel:40+30*i,stone:20+10*i},pre:i>1?['tool_'+(i-1)]:[],icon:'ammo',eff:`生産施設の道具を「${TN[i]}」に替えられるようになる（施設を選んで替える。すぐ・資材を払う）`});
  /* 生産の技術（%ではなく、その施設だけの便利な効果。2026-11-18） */
  for(const [id,tier,name,icon,eff] of [['p_road',1,'石運びの道','quarry','石切り場の働き手が1人少なくてすむ'],['p_rot',1,'輪作','farm','農場の土がやせにくい（埋蔵の減りが半分）'],['p_net',1,'網の繕い','fishery','漁場の道具の減りが半分'],
    ['p_plant',2,'植林','miner','伐採所の埋蔵の減りが半分'],['p_charcoal',2,'炭焼き','miner','伐採所で、木材と一緒に石炭も少し取れる（1ターン +1）'],['p_prop',2,'坑木の補強','ironmine','鉱山が夜も掘り続ける'],['p_nightfish',2,'夜釣り','fishery','漁場が夜も漁をする'],
@@ -2465,7 +2472,7 @@ if(IS_PROTO){const T=id=>TECH.find(t=>t.id===id),del=id=>{const i=TECH.findIndex
  TECH.push({id:'scout2',cat:'部隊',tier:2,name:'斥候Ⅱ',t:2,cost:{fuel:50,gold:30},pre:['scout'],icon:'archer',eff:'駐屯地のだいたいの場所（地図に赤い点線の円）と、次の襲撃の数のめやすが分かる'});
  TECH.push({id:'scout3',cat:'部隊',tier:3,name:'斥候Ⅲ',t:3,cost:{fuel:70,gold:50},pre:['scout2'],icon:'archer',eff:'魔物の種類ごとの数と、駐屯地の場所が分かる。駐屯地を押すと夜襲をかけられる（斥候の部隊はいらない）'});
  TECH.push({id:'scout4',cat:'部隊',tier:4,name:'斥候Ⅳ',t:3,cost:{fuel:90,gold:70},pre:['scout3'],icon:'archer',eff:'方面ごとの魔物の構成が分かる'});
- TECH.push({id:'incend',cat:'防衛',tier:4,name:'迫撃砲の改造',t:3,cost:{iron:60,powder:30},pre:['mortar'],icon:'mortar',eff:'改造：街の迫撃砲すべてに「クラスター」か「焼夷」を1つ選べる。迫撃砲を「魔金属の迫撃砲」にアップグレードするのに要る'});
+ TECH.push({id:'incend',cat:'防衛',tier:4,name:'迫撃砲の改造',t:3,cost:{iron:60,powder:30},pre:['mortar'],icon:'mortar',eff:'改造：街の迫撃砲すべてに「クラスター」か「焼夷」を1つ選べる。迫撃砲を「エーテル金属の迫撃砲」にアップグレードするのに要る'});
  TECH.push({id:'bigbore',cat:'防衛',tier:4,name:'大砲の改造',t:3,cost:{iron:80,powder:30},pre:['cannontech'],icon:'cannon',eff:'改造：街の大砲すべてに「大口径砲」か「連射砲」を1つ選べる'});
  TECH.push({id:'m_tower',cat:'防衛',tier:3,name:'物見櫓の改造',t:2,cost:{steel:80,stone:30},pre:['tower'],icon:'tower',eff:'改造：街の物見櫓すべてに「照明台」か「2連物見櫓」を1つ選べる'});
  TECH.push({id:'m_mage',cat:'防衛',tier:5,name:'メイジの塔の改造',t:3,cost:{elec:60,stone:40},pre:['magetower'],icon:'magetower',eff:'改造：街のメイジの塔すべてに「火炎」か「凍結」を1つ選べる'});
@@ -2473,8 +2480,11 @@ if(IS_PROTO){const T=id=>TECH.find(t=>t.id===id),del=id=>{const i=TECH.findIndex
  TECH.push({id:'ramt',cat:'部隊',tier:3,name:'破城槌',t:3,cost:{steel:100,iron:30,gold:50},pre:['siegewt'],icon:'heavy',eff:'兵器工房で「破城槌」を作れる（夜襲で大将のテントへまっすぐ進み、柵・門を打ち破る）'});
  TECH.push({id:'mcatt',cat:'部隊',tier:3,name:'移動式投石機',t:3,cost:{steel:100,stone:50,gold:50},pre:['siegewt'],icon:'how',eff:'兵器工房で「移動式投石機」を作れる（とても遅いが、遠くから物見櫓やテントを壊す）'});
  TECH.push({id:'ironram',cat:'部隊',tier:5,name:'鉄張りの破城槌',t:4,cost:{iron:80,mmetal:10,gold:80},pre:['ramt'],icon:'heavy',eff:'破城槌に鉄を張る：夜襲での破城槌の耐久 +50%'});
+ /* 工業と魔法の柱（2026-11-20） */
+ TECH.push({id:'steam',cat:'領地',tier:4,name:'蒸気機関',t:4,cost:{iron:120,coal:60,gold:100},pre:[],icon:'smelter',eff:'石炭で動く機械を作れるようになる（工業の入口）。「機械工房」を建設できる（鉄と合金から歯車を作る）'});
+ for(const [id,name,icon,eff,cost] of [['aethert','エーテル採掘','well','「エーテル採掘所」を建設できる（龍脈の泉からエーテルを採る。魔法の施設）',{steel:120,stone:60,gold:60}],['blastt','高炉','smelter','「高炉」を建設できる（合金・石炭・鉄から黒鉄を作る。工業の施設）',{steel:150,stone:120,iron:60,gold:80}],['alcht','錬金工房','smelter','「錬金工房」を建設できる（合金とエーテルからエーテル金属を作る。魔法の施設）',{steel:150,stone:100,elec:40,gold:80}]]){TECH.push({id,cat:'領地',tier:RANK_OPEN[id],name,t:3,cost,pre:[],icon,eff,rk:true});DROPPED.delete(id);}
  del('furnace');   /* 精製炉はなくした：エーテルは龍脈の泉の採掘所から（泉を増やした・2026-11-18） */
- TECH.push({id:'tportt',cat:'領地',tier:5,name:'小さな港',t:4,cost:{steel:150,stone:100,gold:120},pre:[],icon:'market',eff:'「小さな港」を建設できる（水に面した所だけ・1軒だけ）。金貨を作り、交易で魔金属まで売り買いできる'});
+ TECH.push({id:'tportt',cat:'領地',tier:5,name:'小さな港',t:4,cost:{steel:150,stone:100,gold:120},pre:[],icon:'market',eff:'「小さな港」を建設できる（水に面した所だけ・1軒だけ）。金貨を作り、交易でエーテル金属まで売り買いできる'});
  TECH.push({id:'tairt',cat:'領地',tier:7,name:'小さな空港',t:5,cost:{steel:200,alloy:60,gold:200},pre:['tportt'],icon:'market',eff:'「小さな空港」を建設できる（1軒だけ）。飛行船の交易で、聖銀まで売り買いできる（竜晶は売り買いしない）'});
 }
 (function(){const rnd=v=>Math.max(5,Math.round(v/5)*5);
@@ -2803,7 +2813,7 @@ const MAPS={
 function mapName(){return S&&S.mode==='campaign'?MAPS[S.mapId||'7'].name:'演習';}
 function newCampaign(){
   const G=upGen(addSprings(CUR_MAP==='s'?genSnow():CUR_MAP==='f'||CUR_MAP==='t'?genFantasy():CUR_MAP==='m'?genMountain():CUR_MAP==='c'?genCoast():genCampaign(CUR_MAP)));
-  S=baseState(G.ore,G.t,G.oil);S.mode='campaign';S.mapId=CUR_MAP;S.hives=G.hives;S.siegeMode=siegeModeDefault();
+  S=baseState(G.ore,G.t,G.oil);S.mode='campaign';if(IS_PROTO){S.sm2=1;S.eq3=S.eq3||1;}S.mapId=CUR_MAP;S.hives=G.hives;S.siegeMode=siegeModeDefault();
   if(G.island){S.island=G.island;S.seaWalk=true;}
   // α（最寄り）→β→γ の順に襲撃元が増える
   S.sideOrder=['A','B','C'];S.lanes={A:.5,B:.5,C:.5};
@@ -3148,7 +3158,7 @@ function nearestOre(cx,cy){let best=null,bd=1e9;for(let y=0;y<ROWS;y++)for(let x
 function scoutN(){if(!IS_PROTO)return lvl('scout');return ['scout','scout2','scout3','scout4'].filter(x=>has(x)).length;}   /* 試作：斥候Ⅰ〜Ⅳ（2026-11-18） */
 function scoutL(){return IS_PROTO?Math.max(0,scoutN()-1):lvl('scout');}   /* 前の段階（0〜3）に合わせた値 */
 function lvl(id){if(IS_PROTO&&DROPPED.has(id))return 0;return S.tech[id]||0;}
-function has(id){if(IS_PROTO){const bl=(typeof S!=='undefined'&&S&&S.baseLv)||1;const r=RANK_OPEN[id];if(r!=null)return bl>=r;const m=/^kc_[a-z]+_(\d)$/.exec(id);if(m)return bl>=+m[1];}return lvl(id)>0;}
+function has(id){if(IS_PROTO){const bl=(typeof S!=='undefined'&&S&&S.baseLv)||1;const r=RANK_OPEN[id];if(r!=null){const ln=RANK_LINE[id];if(ln&&POLICY_ON){if(!S||!S.policy)return false;if(S.policy!==ln)return bl>=r&&lvl(id)>0;}return bl>=r;}const m=/^kc_[a-z]+_(\d)$/.exec(id);if(m)return bl>=+m[1];}return lvl(id)>0;}
 const MERGED={mine2:'mine',quarry2:'quarrying',farm2:'farming',fish2:'fishing',autoammo2:'autoammo'};   // 試作：「Ⅱ」の研究は元の研究のⅡ段目にまとめた（効果の計算は元から両方を足しているのでそのまま）
 const HIDDEN_T=new Set(['enchant','bonearmor','polearm','firecraft','horsearch','elemental','shells','dragongear',...Object.keys(MERGED)]);   // 装備の種類の研究は武器の材料の段にまとめた
 for(const t of TECH)if(t&&HIDDEN_T.has(t.id)){t.cat0=t.cat;t.cat='（まとめた）';}
@@ -3167,16 +3177,27 @@ const TECH_NO_COAL=new Set(['masonry','castle','tower','fcs','bighow','wallplus'
   'cavalry','magic','dragon','elite','scouting','shieldwall','charge','highmagic','fieldsup','snipert','golemt','griffont','battalion','division','dragonscale',
   'trade','allnight','apart','carapace','abysslamp','poison','totem','amulet','mine2','quarry2','farm2','fish2','bonearmor','horsearch','elemental']);
 // ===== 街の研究方針（2026-11-16 ユーザーの指定）：城がランクⅣになったら「工業」か「魔法」を選ぶ。方針と違うランクⅣ以上の研究は費用2倍 =====
-const TECH_LINE={artillery:'ind',gunnery:'ind',shells:'ind',harpoont:'ind',snipert:'ind',
-  magic:'mag',highmagic:'mag',magetower:'mag',aebombt:'mag',barrierst:'mag',teslat:'mag',gravityt:'mag',golemt:'mag',mrayt:'mag',meteort:'mag',dbreatht:'mag',mwall:'mag',dragwall:'mag',dragon:'mag',dragonscale:'mag'};
-const POLICY_ON=false;   /* 研究の整理が終わるまで止めておく（2026-11-17 ユーザーの指定：選ぶ場面は研究を整理してから） */
+const TECH_LINE={artillery:'ind',gunnery:'ind',shells:'ind',harpoont:'ind',snipert:'ind',steam:'ind',blastt:'ind',
+  magic:'mag',highmagic:'mag',magetower:'mag',aebombt:'mag',barrierst:'mag',teslat:'mag',gravityt:'mag',golemt:'mag',mrayt:'mag',meteort:'mag',dbreatht:'mag',aethert:'mag',alcht:'mag'};   /* 2026-11-20：竜騎兵・龍鱗の壁は共通に */
+const POLICY_ON=true;   /* 2026-11-20：研究の整理ができたので入れた */ //   /* 研究の整理が終わるまで止めておく（2026-11-17 ユーザーの指定：選ぶ場面は研究を整理してから） */
 const POLICY={ind:{n:'工業',ic:'powder',col:'#e0a050'},mag:{n:'魔法',ic:'elec',col:'#a080ff'}};
 function techLine(t){return POLICY_ON?TECH_LINE[t.id]||null:null;}
 function offPolicy(t){return !!(S&&S.policy&&techLine(t)&&techLine(t)!==S.policy&&techRank(t)>=4);}
+/* 工業と魔法（2026-11-20）：工業の街では、ランクⅤの金属は黒鉄（魔法の施設・杖はエーテル金属のまま） */
+const MAG_B=new Set(['magetower','barrier','tesla','mray','magic','well','wall3']);
+let _polK=null;
+function polText(){const k=isInd()?'ind':'mag';if(_polK===k)return;_polK=k;const ind=k==='ind',sw=v=>ind?v.replace(/エーテル金属/g,'黒鉄'):v;   /* 工業の街では「エーテル金属の〜」を「黒鉄の〜」に（魔法の施設・杖はそのまま） */
+  for(const t of ['mg','mortar','gate','bastion','outpost'])if(KC[t])for(const x of KC[t].st){if(x._o==null)x._o=x[1];x[1]=sw(x._o);}
+  if(TOOL_T[4]){if(TOOL_T[4]._o==null)TOOL_T[4]._o=TOOL_T[4][1];TOOL_T[4][1]=sw(TOOL_T[4]._o);}
+  for(const A of [W_MAT,A_MAT,AR.a.n]){if(!A._o)A._o=A.slice();A._o.forEach((v,i)=>A[i]=sw(v));}
+  {const t=techOf('tool_4');if(t){if(!t._o)t._o={n:t.name,e:t.eff};t.name=sw(t._o.n);t.eff=sw(t._o.e);}}
+  {const wi=W_MAT._o.findIndex(v=>/エーテル金属/.test(v)),ai=A_MAT._o.findIndex(v=>/エーテル金属/.test(v));if(wi>=0){W_TINT[wi]=ind?'#6a6a78':'#7fd8f5';W_COL[wi]=ind?'#4a4a56':'#7fd8f5';}if(ai>=0){A_TINT[ai]=ind?'#5a5a66':'#8fb4c4';A_COL[ai]=ind?'#4a4a56':'#7fd8f5';}}M_TINT[2]='#7fd8f5';for(const x in SPR_T)delete SPR_T[x];}
+function isInd(){return IS_PROTO&&POLICY_ON&&!!S&&S.policy==='ind';}
+function pm(c,keep){if(!c||!c.mmetal||keep||!isInd())return c;const o=Object.assign({},c);o.heavy=(o.heavy||0)+o.mmetal;delete o.mmetal;return o;}
 function techCost(t){const L=lvl(t.id);const c={};const base=Object.assign({},t.cost);if(t.tier>=2)base.gold=(base.gold||0)+20*(t.tier-1);
   {const M=TECH_MAT[t.tier||1];if(M&&!TECH_MAT_FREE.has(t.id))for(const k in M)if(!base[k]&&!(k==='coal'&&TECH_NO_COAL.has(t.id)))base[k]=M[k];}
   if(IS_PROTO){const r=t.tier||1;if(r>=2&&!base.smat)base.smat=5*r;if(r>=4&&!base.mat)base.mat=4*(r-3);}   /* 試作：研究の素材に小さな魔核（Ⅱから）・魔核（Ⅳから） */
-  if((t.tier||1)>=2){if(base.stone)base.stone=Math.max(5,Math.round(base.stone*0.5/5)*5);if(base.iron)base.iron=Math.max(5,Math.round(base.iron*0.6/5)*5);}   /* 研究の石材・鉄を減らす（建設と壁に回す・2026-11-13） */for(const k in base)c[k]=Math.round(base[k]*(1+0.7*L)*(offPolicy(t)?2:1));return c;}
+  if((t.tier||1)>=2){if(base.stone)base.stone=Math.max(5,Math.round(base.stone*0.5/5)*5);if(base.iron)base.iron=Math.max(5,Math.round(base.iron*0.6/5)*5);}   /* 研究の石材・鉄を減らす（建設と壁に回す・2026-11-13） */{const b2=pm(base,techLine(t)==='mag');for(const k in b2)c[k]=Math.round(b2[k]*(1+0.7*L)*(offPolicy(t)?2:1));}return c;}
 function techTurns(t){return t.t+lvl(t.id);}
 const MAP_MAXTIER={m:3,t:2,s:3};   // 草原（f）は城のランクを上げれば研究を最後までできる（2026-11-13）
 function mapMaxTier(){return MAP_MAXTIER[CUR_MAP]||7;}
@@ -3219,7 +3240,7 @@ function hpOf(type,lv,mat){
   if(CWALL.has(type)||type==='bastion')h*=UP.wallhp[lv-1];
   else if(B[type].grp==='def')h*=UP.hp[lv-1];
   else if(B[type].grp==='prod')h*=1+0.25*(lv-1);
-  if(IS_PROTO&&type==='outpost')h*=[1,1.6,2.4][lv-1]||1;   /* 鉄の前哨砦・魔金属の前哨砦 */
+  if(IS_PROTO&&type==='outpost')h*=[1,1.6,2.4][lv-1]||1;   /* 鉄の前哨砦・エーテル金属の前哨砦 */
   if(has('carapace')&&(B[type].grp==='prod'||type==='hq'))h*=1.25;
   if(has('fort')&&(CWALL.has(type)||B[type].range))h*=1.25;
   return Math.round(h);
@@ -3429,7 +3450,7 @@ function pxCanvas(k){const sp=PXS[k],N=sp.rows.length,c=document.createElement('
 function castleImg(lv){return PXI['castle'+(lv===2?'':Math.max(1,Math.min(5,lv||1)))]||PXI.castle;}
 // 斥候：弓兵の絵の外套を灰色に塗り替えて使う（描き直しまでの仮）
 if(NDSPR.units&&NDSPR.units.archer&&!NDSPR.units.scout){const a=NDSPR.units.archer;const pal=Object.assign({},a.pal,{b:'#8a90a0',d:'#646a7a',e:'#3c404c',n:'#4c5060',i:'#5e6272',q:'#6e6656',r:'#807868',s:'#665e50',u:'#4e4838',v:'#5a5446',p:'#2e2a24'});NDSPR.units.scout=Object.assign({},a,{pal});}
-// 試作：砲兵の大砲を武器の段の色に塗り替える（鉄・鋼・合金・魔金属・聖銀・竜晶）。見た目で装備の段が分かる
+// 試作：砲兵の大砲を武器の段の色に塗り替える（鉄・鋼・合金・エーテル金属・聖銀・竜晶）。見た目で装備の段が分かる
 if(NDSPR.units&&NDSPR.units.cannoneer){const a=NDSPR.units.cannoneer;const sh=(hex,f)=>'#'+[1,3,5].map(i=>Math.round(parseInt(hex.slice(i,i+2),16)*f).toString(16).padStart(2,'0')).join('');
   const CC=IS_PROTO?['#676c73','#5a5e70','#9a62e0','#eef4ff','#d0504a']:['#676c73','#a8c4e0','#5a5e70','#9a62e0','#eef4ff','#d0504a'];for(let t=1;t<CC.length;t++){const c=CC[t];NDSPR.units['cannoneer_w'+t]=Object.assign({},a,{pal:Object.assign({},a.pal,{e:c,f:sh(c,0.85),g:sh(c,0.8),k:sh(c,0.65),l:sh(c,0.5),m:sh(c,0.4)},t===(IS_PROTO?1:2)?{g:'#f0c850',m:'#a8862e'}:{})});}}
 /* Claude Design の追加の絵（design_handoff_art_v2・2026-11-13） */
@@ -3463,11 +3484,11 @@ if(/\/proto\//.test(location.pathname)){Object.assign(NDSPR.buildings,NDSPR_TIER
  for(const [t,k] of [['bigfarm','ab_big_farm'],['bigfish','ab_fish_farm'],['bigminer','ab_big_lumber'],['bigquarry','ab_big_quarry'],['tport','ab_small_port'],['tair','ab_small_airport'],['gstable','ab_griffon_roost'],['siegew','ab_weapon_works'],['bomb','ab_trap_bomb'],['herohouse','ab_hero_house']])if(NDART_AB[k])NDART[t]=NDART_AB[k];}
 const STAGE_ART={mg:['mg','mg_iron','mg_alloy','mg_magic','mg_holy'],how:['how','how_iron'],cannon:['cannon','mabou','cannon_dragon'],mortar:['mortar','mortar_magic'],hisou:['balloon','balloon_aether'],
  magetower:['magetower','magetower_magic','magetower_dragon'],barrier:['barrier','barrier_holy'],tesla:['tesla','tesla_dragon'],mray:['ray','ray_dragon'],harpoon:['harpoon','harpoon_holy'],dbreath:['dragonbreath'],
- brazier:['brazier','coalbrazier','brazier_blue'],bastion:['gunbase','gunbase_magic'],coalmine:['coalmine'],goldmine:['goldmine'],mithmine:['holymine'],smelter:['smelter','magicsmelter'],church:['church','chapel'],
+ brazier:['brazier','coalbrazier','brazier_blue'],bastion:['gunbase','gunbase_magic'],coalmine:['coalmine'],goldmine:['goldmine'],mithmine:['holymine'],smelter:['smelter','magicsmelter'],gearw:['ammo'],blast:['smelter'],alchemy:['magicsmelter'],church:['church','chapel'],
  tower:['tower1','tower2','tower3','tower_holy'],gate:['gate1','gate2','gate3','gate_magic','gate_scale'],wall3:['wall_magic'],wall5:['wall_dragon'],
  aebomb:['trap_aether'],gravity:['trap_gravity'],stake:['trap_holystake'],meteor:['trap_meteor']};
 if(IS_PROTO){
- /* 道具の段：段の番号（1木・2石・3鉄・4合金・5魔金属・6聖銀）ごとの絵。建てた段より下は元の絵 */
+ /* 道具の段：段の番号（1木・2石・3鉄・4合金・5エーテル金属・6聖銀）ごとの絵。建てた段より下は元の絵 */
  const TT=['stone','iron','alloy','magic','holy'],tl=(base,key,from)=>{const L=[base];for(let i=0;i<5;i++)L.push(i+2>=from&&NDSPR.buildings['tr_'+key+'_'+TT[i]]?'tr_'+key+'_'+TT[i]:L[L.length-1]);return L;};
  Object.assign(STAGE_ART,{ammo:tl('ammo','weapon_shop',2)/* 描き直した黒い炉の段（2026-11-19） */,miner:tl('miner','lumber',2),quarry:tl('quarry','quarry',2),ironmine:tl('ironmine','mine',2),farm:tl('farm','farm',2),fishery:tl('fishery','fishery',2),
   well:tl('well','aether_mine',4),coalmine:tl('coalmine','coalmine',4),goldmine:tl('goldmine','goldmine',4),mithmine:tl('holymine','holymine',6),
@@ -3502,7 +3523,8 @@ function sprTinted(cat,key,wt,at,ut){const base=SPR[cat]&&SPR[cat][key];const mk
  for(const k in NDSPR.buildings)put(k,fr('buildings',k,NDSPR.buildings[k].anims.idle?'idle':'open',0));
  for(let i=1;i<=5;i++)put('castle'+i,fr('buildings','castle'+i,'idle'));put('castle',fr('buildings','castle2','idle'));put('hq',fr('buildings','castle1','idle'));
  put('tower',fr('buildings','tower1','idle'));put('tower_s',fr('buildings','tower2','idle'));put('tower_c',fr('buildings','tower3','idle'));
- put('gate',fr('buildings','gate1','open'));put('gate_s',fr('buildings','gate2','open'));put('gate_i',fr('buildings','gate3','open'));
+ put('gate',fr('buildings','gate1','open'));
+ if(/\/proto\//.test(location.pathname))for(const [k,src] of [['gearw','ammo'],['blast','smelter'],['alchemy','magicsmelter']])if(NDSPR.buildings[src])put(k,fr('buildings',src,NDSPR.buildings[src].anims.idle?'idle':'open',0));   /* 試作：新しい施設の絵ができるまでの代わり */put('gate_s',fr('buildings','gate2','open'));put('gate_i',fr('buildings','gate3','open'));
  for(const k in NDSPR.walls)put(k,fr('walls',k,'tiles',10));
  for(const k in NDSPR.weapons)put(k,fr('weapons',k,'dirs',1));
  for(const k in NDSPR.units)put(k,fr('units',k,'walk'));for(const k in NDSPR.equipment)put(k,fr('equipment',k,'walk'));for(const k in NDSPR.enemies)put(k,fr('enemies',k,'walk'));
@@ -3639,7 +3661,7 @@ function costOf(type){return B[type].cost;}
 /* 改築（2026-11-13）：施設を一段ずつ上げる（前の段が無いと次へ行けない）。段は施設ごとに違い、ランクごとの「〇〇の改築」の研究で開く */
 function maxLvOf(type){const k=KC[type];if(!k)return 1;if(isTool({type})){let m=1;for(let i=1;i<k.st.length;i++){if(has('tool_'+i))m++;else break;}return m;}   /* 試作：道具の段は研究で開く */
   let m=1;for(let i=1;i<k.st.length;i++){if(has(kcId(k.g,k.st[i][0])))m++;else break;}return m;}
-if(IS_PROTO){const _ml=maxLvOf;maxLvOf=function(type){const m=_ml(type);return type==='mortar'&&!has('incend')?Math.min(m,1):m;};}   /* 焼夷砲弾の研究のあと、魔金属の迫撃砲に上げられる */
+if(IS_PROTO){const _ml=maxLvOf;maxLvOf=function(type){const m=_ml(type);return type==='mortar'&&!has('incend')?Math.min(m,1):m;};}   /* 焼夷砲弾の研究のあと、エーテル金属の迫撃砲に上げられる */
 function kcMax(type){const k=KC[type];return k?k.st.length:1;}
 function upgNeed(type,lv){const k=KC[type];return k&&k.st[lv]?kcId(k.g,k.st[lv][0]):null;}
 function kcImg(type){const im=ICIMG[type]||PXI[type];if(!im)return '';try{return im.toDataURL?im.toDataURL():im.src;}catch(e){return '';}}
@@ -3648,13 +3670,14 @@ function kcStat(b){const L=[],lv=b.lv||1,d=B[b.type],n=lv+1;   // 改築でど�
   if(d.grp==='def'&&d.range){const a=UP.range[lv-1],c=UP.range[n-1];if(c>a)L.push(`射程 +${Math.round((c-a)*U)}マス`);}
   if(d.grp==='def'){const m0=b.mat||0,m1=MAT_HP[b.type]?Math.min(2,n-1):m0;L.push(`耐久 ${Math.round(hpOf(b.type,lv,m0))} → ${Math.round(hpOf(b.type,n,m1))}`);}
   if(IS_PROTO&&UNIT_HOME[b.type])L.push(`部隊の枠 ${capOf(b)} → ${capOf(b)+1}`);
-  if(d.grp==='prod'&&!d.range&&!(IS_PROTO&&UNIT_HOME[b.type])){const P=i=>isTool(b)?TOOL_MUL[i-1]:UP.prod[i-1];L.push(`生産 ${Math.round(P(lv)*100)}% → ${Math.round(P(n)*100)}%`);if(isTool(b)&&TOOL_WEAR[n-1])L.push(`道具の消耗 毎ターン ${Object.entries(TOOL_WEAR[n-1]).map(([k,v])=>RES_NAME[k]+v).join('・')}`);}
+  if(d.grp==='prod'&&!d.range&&!(IS_PROTO&&UNIT_HOME[b.type])){const P=i=>isTool(b)?TOOL_MUL[i-1]:UP.prod[i-1];L.push(`生産 ${Math.round(P(lv)*100)}% → ${Math.round(P(n)*100)}%`);if(isTool(b)&&TOOL_WEAR[n-1])L.push(`道具の消耗 毎ターン ${Object.entries(pm(TOOL_WEAR[n-1],MAG_B.has(b.type))).map(([k,v])=>RES_NAME[k]+v).join('・')}`);}
   return L;}
 function stageName(b){const k=KC[b.type];return k&&k.st[(b.lv||1)-1]?k.st[(b.lv||1)-1][1]:B[b.type].name;}
 /* 改築の費用（2026-11-13）：建設費 × 段（2段目100%・3段目150%・4段目200%…）＋その段のランクの素材。金貨は半分 */
 const UPG_MAT={2:{iron:15,coal:10},3:{alloy:12,coal:6},4:{elec:15,coal:6},5:{mmetal:10,coal:6},6:{mithril:8,coal:6},7:{mithril:12,mat:10}};   /* その素材の段に改築するとき（2026-11-13 増やした） */
 function upgPop(b){if(!IS_PROTO||!B[b.type].pop)return 0;const nb=Object.assign({},b,{lv:(b.lv||1)+1,upg:false,bt:0});return Math.max(0,crewNeed(nb)-(b.crew||0));}   /* 試作：アップグレードで増える働き手（足りない分も）は、待機中の住民から入れる（2026-11-19） */
-function upgCost(b){
+function upgCost(b){const c=upgCost0(b);return pm(c,MAG_B.has(b.type));}
+function upgCost0(b){
   if(isTool(b)){const c={},M=TOOL_COST[b.lv]||{};for(const x in M)c[x]=M[x];const pp=upgPop(b);if(pp)c.pop=pp;return c;}   /* 試作：道具を替える費用 */
   const base=B[b.type].cost,m=[0,1,1.5,2,2.5,3,3.5][b.lv]||3;const c={};
   for(const k in base){if(k==='gold')continue;c[k]=Math.max(5,Math.round(base[k]*m/5)*5);}
@@ -3822,7 +3845,7 @@ function placeB(type,x,y,free,szo){
       if(urec)urec.replaced=occ.slice();
       S.blds=S.blds.filter(o=>!occ.includes(o));}
   }
-  if(IS_PROTO&&isTool(b)){const R0=(d.req&&(RANK_OPEN[d.req]||(techOf(d.req)&&techRank(techOf(d.req)))))||1;if(R0>1){let i=0;TOOL_T.forEach((x,j)=>{if(x[0]<=R0)i=j;});if(b.type==='mithmine')i=Math.min(i,4);if(b.type==='goldmine')i=Math.min(i,2);b.lv=i+1;}}   /* 聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ（その上の段は替えられる。2026-11-18） */   /* 試作：あとから建てる施設は、建てられるランクの道具を持って建つ */
+  if(IS_PROTO&&isTool(b)){const R0=(d.req&&(RANK_OPEN[d.req]||(techOf(d.req)&&techRank(techOf(d.req)))))||1;if(R0>1){let i=0;TOOL_T.forEach((x,j)=>{if(x[0]<=R0)i=j;});if(b.type==='mithmine')i=Math.min(i,4);if(b.type==='goldmine')i=Math.min(i,2);b.lv=i+1;}}   /* 聖銀鉱はエーテル金属の道具・金鉱は鉄の道具で建つ（その上の段は替えられる。2026-11-18） */   /* 試作：あとから建てる施設は、建てられるランクの道具を持って建つ */
   if(!free&&buildTurns(type)>0){b.bt=b.btTotal=buildTurns(type)*TURN_SEC;b.hp=Math.round(hp*0.4);}
   if(urec){urec.b=b;urec.type=type;addUndo(urec);}
   S.blds.push(b);gridSet(b,true);if(S.ruins){const n=b.sz;S.ruins=S.ruins.filter(r=>{const rn=r.sz||newSz(r.type);return r.x+rn<=x||r.x>=x+n||r.y+rn<=y||r.y>=y+n;});}
@@ -3831,7 +3854,7 @@ function placeB(type,x,y,free,szo){
 function normC(c){if(!IS_PROTO||!c||!(c.ammo||c.sword||c.marrow))return c;const o={};for(const k in c){if(k==='ammo'||k==='marrow'){for(const x in ARROW_C)o[x]=(o[x]||0)+c[k]*ARROW_C[x];}else if(k==='sword'){for(const x in SWORD_C)o[x]=(o[x]||0)+c[k]*SWORD_C[x];}else o[k]=(o[k]||0)+c[k];}for(const k in o)o[k]=Math.ceil(o[k]*10)/10;return o;}   /* 試作：矢と剣の費用は木材と鉄で見せる・払う */
 function canAfford(cost,pop){cost=normC(cost);for(const k in cost)if((S[k]||0)<cost[k])return false;return S.pop>=(pop||0);}
 // ===== 資源アイコン =====
-const RES_NAME={apowder:'エーテル火薬',marrow:'魔矢',smat:'小さな魔核',scale:'龍鱗',wing:'飛膜',bigmat:'巨大魔核',dcrys:'竜晶',coal:'石炭',mmetal:'魔金属',mithril:'聖銀',goldore:'金',alloy:'合金',armor:'鎧',powder:'火薬',gold:'金貨',silver:'銀貨',sword:'剣',steel:'木材',stone:'石材',iron:'鉄',ammo:'矢',fuel:'食料',elec:'エーテル',mat:'魔核',pop:'住民',power:'電力',kia:'戦死'};
+const RES_NAME={apowder:'エーテル火薬',marrow:'魔矢',smat:'小さな魔核',scale:'龍鱗',wing:'飛膜',bigmat:'巨大魔核',dcrys:'竜晶',coal:'石炭',mmetal:'エーテル金属',heavy:'黒鉄',gear:'歯車',mithril:'聖銀',goldore:'金',alloy:'合金',armor:'鎧',powder:'火薬',gold:'金貨',silver:'銀貨',sword:'剣',steel:'木材',stone:'石材',iron:'鉄',ammo:'矢',fuel:'食料',elec:'エーテル',mat:'魔核',pop:'住民',power:'電力',kia:'戦死'};
 const ICON={
   gold:'<circle cx="8" cy="8" r="6.2" fill="#d8a830"/><circle cx="8" cy="8" r="4.6" fill="none" stroke="#f8d870" stroke-width="1"/><path d="M8 5 V11 M6.5 6.5 H9.5 M6.5 9.5 H9.5" stroke="#8a6a10" stroke-width="1"/>',
   sword:'<path d="M12.5 1.5 L14.5 3.5 L6 12 L4 10Z" fill="#d8dce4"/><path d="M3 9 L7 13" stroke="#8a6a3a" stroke-width="1.6"/><path d="M2.5 13.5 L4.5 11.5" stroke="#6a4a2a" stroke-width="1.8"/>',
@@ -3863,7 +3886,8 @@ function piSz(sz){return sz<=18?12:sz<=36?24:48;}
 // 操作アイコン（1色）：name=sun/moon/research/army/hire/menu/lock/check/pause/play/gear/close/log
 function ui(name,col,sz){sz=piSz(sz||12);return `<img class="pi" src="${piURL(name,col)}" width="${sz}" height="${sz}" alt="" style="width:${sz}px;height:${sz}px">`;}
 // 試作：新しい資源（鎧・金・合金）のアイコン（仮の絵）
-function icNew(k,sz){{const RK={coal:'res_coal',alloy:'res_alloy',goldore:'res_gold',armor:'res_armor',mmetal:'res_magic',mithril:'res_holy'}[k];const u=RK&&typeof SPR!=='undefined'&&sprIconURL(RK);if(u)return `<img class="ic pi" src="${u}" width="${sz}" height="${sz}" title="${RES_NAME[k]}" style="width:${sz}px;height:${sz}px;image-rendering:pixelated;vertical-align:-3px${k==='coal'||k==='alloy'?';filter:drop-shadow(0 0 1px #c8c0d8) drop-shadow(0 0 1px #c8c0d8)':''}">`;}{const O={smat:['#b98aff',4],bigmat:['#c070ff',7]}[k];if(O){const [c,r]=O;return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" class="ic" style="vertical-align:-3px" shape-rendering="crispEdges"><title>${RES_NAME[k]}</title><circle cx="8" cy="8" r="${r}" fill="${c}" stroke="#1c1824"/><rect x="${8-Math.ceil(r/2)}" y="${8-Math.ceil(r/2)}" width="2" height="2" fill="#f4e8ff"/>${k==='bigmat'?'<circle cx="8" cy="8" r="7.5" fill="none" stroke="#e0b0ff" stroke-opacity=".5"/>':''}</svg>`;}
+const NEWRIC={mmetal:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAt0lEQVR4nGNgGAWjYKQDRkIKBIz8/lNiwYdzm/DawUSJ4dQAOF0H8/mDsxtRxDe8Ic+iAnd/BgYGzBAZ8BBgQReA+XzCTur4nBAYfCGADqjlc52UKgYGBgaGK3MY/jMwINLC4AkB9PwOS7XUArAQQAeDJwRgwH/iIhT+RBt+BgYGBob8Ix8psuju5RtYxQdfCKADSn1OCAx4CIw6ACMN3Dh5jq4OGHwhcHPZBLo6YMBDYBSMglEAAGVGKyt0O4PpAAAAAElFTkSuQmCC',heavy:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAvElEQVR4nGNgGAWjYKQDRkIKuLj4/lNiwbdvn/DawUSJ4dQAOF0H8/m+fSdRxFevXkmWRdOn9zEwMGCGyICHAAu6AMznmZlFKOLk+pwQGHwhgA6o5XNlZU0GBgYGhrt3r/9nYECkhQEPAXiKpDS/EwJIIcDAwDCIQgAjDdjYuKDwm5paGRgYGBjq6qopsuj586dYxQdfCKADSn1OCAx4CIw6ACMNPHr0gK4OGPAQoFtJiA4GTUk4CkbBKAAA77sw+tyQUcAAAAAASUVORK5CYII=',gear:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABAUlEQVR4nO1XuxHCMAwVHJeWSZKGlpqKDZggTAATJBOQCdiAijotDZ6EloZUOvA7Hvb5uLMNeV1k+aP3ZEsR+XdMQieuyvnj9ftsbkFrTUMP8C3QU2uELLL7dWcxUFTtWz/XOtEZmKEBtdVI15vu40I4r6lLERHZd8YaRyaiM0BzADVmMH3vtdFi26eZA85bcDrWlt2VC6q9QnMgn1vAgJFjRMqYRoxMMKTDANMcwbRUO3sPGhGLIfVPhwEG33seinQYUE2KqhWRp5aYzexNR+0Vv/MOsOrG/HwRnQFaCy6HpVc19EU+1dDV2aBdwcbRnk9H5OpmMUeYxsl3xeOf0YgBdU2BeuqZyxIAAAAASUVORK5CYII='};   /* 試作（2026-11-20）：エーテル金属（水色）・黒鉄・歯車の仮のアイコン */
+function icNew(k,sz){if(IS_PROTO&&NEWRIC[k])return `<img class="ic pi" src="${NEWRIC[k]}" width="${sz}" height="${sz}" title="${RES_NAME[k]}" style="width:${sz}px;height:${sz}px;image-rendering:pixelated;vertical-align:-3px">`;{const RK={coal:'res_coal',alloy:'res_alloy',goldore:'res_gold',armor:'res_armor',mmetal:'res_magic',mithril:'res_holy'}[k];const u=RK&&typeof SPR!=='undefined'&&sprIconURL(RK);if(u)return `<img class="ic pi" src="${u}" width="${sz}" height="${sz}" title="${RES_NAME[k]}" style="width:${sz}px;height:${sz}px;image-rendering:pixelated;vertical-align:-3px${k==='coal'||k==='alloy'?';filter:drop-shadow(0 0 1px #c8c0d8) drop-shadow(0 0 1px #c8c0d8)':''}">`;}{const O={smat:['#b98aff',4],bigmat:['#c070ff',7]}[k];if(O){const [c,r]=O;return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" class="ic" style="vertical-align:-3px" shape-rendering="crispEdges"><title>${RES_NAME[k]}</title><circle cx="8" cy="8" r="${r}" fill="${c}" stroke="#1c1824"/><rect x="${8-Math.ceil(r/2)}" y="${8-Math.ceil(r/2)}" width="2" height="2" fill="#f4e8ff"/>${k==='bigmat'?'<circle cx="8" cy="8" r="7.5" fill="none" stroke="#e0b0ff" stroke-opacity=".5"/>':''}</svg>`;}
    const P={apowder:`<circle cx="8" cy="10" r="5" fill="#2a7ab0" stroke="#1c1824"/><circle cx="7" cy="9" r="2" fill="#b8f0ff"/><path d="M10 5l2-3" stroke="#f2b33d"/>`,marrow:`<path d="M2 14L12 4" stroke="#c79bff" stroke-width="2"/><path d="M12 2l2 2-3 1z" fill="#e0c0ff" stroke="#1c1824"/><path d="M2 12l2 2-1 1-2-2z" fill="#8a6ab0"/>`,scale:`<path d="M8 1l6 5-2 8H4L2 6z" fill="#4a9a6a" stroke="#1c1824"/><path d="M5 7h6M6 10h4" stroke="#8ad0a0"/>`,wing:`<path d="M1 4l7 2 7-3-2 9-5-3-5 4z" fill="#9a8a9a" stroke="#1c1824"/><path d="M8 6v6" stroke="#5a4a5a"/>`,dcrys:`<path d="M8 1l4 4-1 9H5L4 5z" fill="#e05a4e" stroke="#1c1824"/><path d="M8 2v11" stroke="#ffb0a0" stroke-opacity=".7"/>`}[k];if(P)return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" class="ic" style="vertical-align:-3px" shape-rendering="crispEdges"><title>${RES_NAME[k]}</title>${P}</svg>`;}   /* 試作：魔物の素材の仮のアイコン */
   const C={armor:['#9aa0a6','a'],goldore:['#f2c84a','n'],alloy:['#3a3d4a','i'],coal:['#2a2a32','n'],mmetal:['#a774ec','i'],mithril:['#f0f6ff','i']}[k];if(!C)return null;const [c,t]=C,d='#1c1824';
   const body=t==='a'?`<path d="M4 2h8l3 3-2 2v7H3V7L1 5z" fill="${c}" stroke="${d}"/>`:t==='n'?`<path d="M3 9l3-5h5l3 4-2 5H5z" fill="${c}" stroke="${d}"/><rect x="6" y="6" width="2" height="2" fill="#fff8c0"/>`:`<path d="M2 11l3-5h9l-3 5z" fill="${c}" stroke="${d}"/><path d="M2 11h9v3H2z" fill="#b89a50" stroke="${d}"/><path d="M11 11l3-5v3l-3 5z" fill="#c9b070" stroke="${d}"/>`;
@@ -3871,7 +3895,7 @@ function icNew(k,sz){{const RK={coal:'res_coal',alloy:'res_alloy',goldore:'res_g
 function ic(k,sz){sz=sz||14;{const n=icNew(k,sz);if(n)return n;}const p=PI_RES[k];if(p&&PXICON.items[p]){const z=piSz(sz);return `<img class="ic pi" src="${piURL(p)}" width="${z}" height="${z}" alt="${RES_NAME[k]||k}" title="${RES_NAME[k]||k}" style="width:${z}px;height:${z}px">`;}
   return `<svg class="ic" width="${sz}" height="${sz}" viewBox="0 0 16 16" aria-label="${RES_NAME[k]||k}">${ICON[k]||''}</svg>`;}
 // 費用の表示。手持ちが足りない資源は赤字にする
-function costText(c,pop){c=normC(c);const p=[];const lack=(k,v)=>S&&(S[k]||0)<v;for(const k of ['gold','steel','stone','iron','coal','goldore','alloy','mmetal','mithril','fuel','ammo','sword','armor','powder','elec','mat','smat'])if(c[k])p.push(`<span class="cst${lack(k,c[k])?' lack':''}" title="${RES_NAME[k]}${lack(k,c[k])?`（足りない：あと${Math.ceil(c[k]-(S[k]||0))}）`:''}">${ic(k,12)}${c[k]}</span>`);if(c.pop)p.push(`<span class="cst${lack('pop',c.pop)?' lack':''}" title="人員（研究中だけ拘束・完了で復帰）">${ic('pop',12)}${c.pop}</span>`);if(pop)p.push(`<span class="cst${lack('pop',pop)?' lack':''}" title="人員">${ic('pop',12)}${pop}</span>`);return p.join(' ');}
+function costText(c,pop){c=normC(c);const p=[];const lack=(k,v)=>S&&(S[k]||0)<v;for(const k of ['gold','steel','stone','iron','coal','goldore','alloy','gear','mmetal','heavy','mithril','fuel','ammo','sword','armor','powder','elec','mat','smat'])if(c[k])p.push(`<span class="cst${lack(k,c[k])?' lack':''}" title="${RES_NAME[k]}${lack(k,c[k])?`（足りない：あと${Math.ceil(c[k]-(S[k]||0))}）`:''}">${ic(k,12)}${c[k]}</span>`);if(c.pop)p.push(`<span class="cst${lack('pop',c.pop)?' lack':''}" title="人員（研究中だけ拘束・完了で復帰）">${ic('pop',12)}${c.pop}</span>`);if(pop)p.push(`<span class="cst${lack('pop',pop)?' lack':''}" title="人員">${ic('pop',12)}${pop}</span>`);return p.join(' ');}
 function setHTML(el,v){if(el&&el.dataset.h!==v){el.dataset.h=v;el.innerHTML=v;}}
 
 // ===== 英雄 =====
@@ -4633,7 +4657,7 @@ function morning(){
   if(IS_PROTO&&S.mods)for(const k in S.mods){const m=S.mods[k];if(m.t>0){m.t--;if(!m.t){const o=modOpt(k,m.id);log(`街の${B[k].name}の改造「${o?o[1]:''}」が付いた`,'good');for(const b of S.blds)if(b.type===k)S.fx.push({x:bcx(b),y:bcy(b),r:T*0.9*bsz(b),t:0,dur:0.7,c:MODC,sh:'dbl'});}}}   /* 改造の付け替え */
   if(IS_PROTO)nEnchClear();   /* 今夜のエンチャントは朝にはがれる */
   if(IS_PROTO){for(const c of S.cmds){c.busy=false;if(unitHero(c)&&!heroSquad(c))spawnHero(c);}}   /* 試作：訓練の休みを終える・部隊を失って生き残った英雄は城から出直す */
-  if(IS_PROTO){const use={};let bad=0;for(const b of S.blds){if(!isTool(b)||(b.bt>0&&!b.upg)||b.off)continue;const w=TOOL_WEAR[Math.min(TOOL_WEAR.length,b.lv||1)-1];if(b.type==='fishery'&&has('p_net')&&S.turn%2){b.worn=false;continue;}if(canAfford(w)){for(const k in w){S[k]-=w[k];use[k]=(use[k]||0)+w[k];}b.worn=false;}else{b.worn=true;bad++;}}   /* 試作：道具は毎ターン少しずつ減る（2026-11-18） */
+  if(IS_PROTO){const use={};let bad=0;for(const b of S.blds){if(!isTool(b)||(b.bt>0&&!b.upg)||b.off)continue;const w=pm(TOOL_WEAR[Math.min(TOOL_WEAR.length,b.lv||1)-1],MAG_B.has(b.type));if(b.type==='fishery'&&has('p_net')&&S.turn%2){b.worn=false;continue;}if(canAfford(w)){for(const k in w){S[k]-=w[k];use[k]=(use[k]||0)+w[k];}b.worn=false;}else{b.worn=true;bad++;}}   /* 試作：道具は毎ターン少しずつ減る（2026-11-18） */
     const u=Object.entries(use);if(u.length)log(`道具の消耗：${u.map(([k,v])=>RES_NAME[k]+' −'+v).join('・')}`);if(bad)log(`道具の資材が足りず、${bad}つの施設の生産が半分になっています`,'bad');}
   if(S.starBoost>0)S.starBoost--;
   const D=huntDanger();let tot=0;const res=[];let ot=null;const pl=[];
@@ -5568,7 +5592,7 @@ const SUP={
 const ADV_SUP={advSword:'inf',advBow:'arch',advMage:'mage'};
 const SUP_M={ram:{key:'steel',costs:{steel:2,iron:1},max:20,per:1,name:'槌と台車',melee:true,desc:'打つたびに丸太と鉄の留め具が傷む（木材2・鉄1で直す）。尽きると火力半減'},mcat:{key:'stone',costs:{stone:2},max:16,per:1,name:'岩',desc:'1発ごとに石材2を使う（投石機と同じ）。尽きると撃てない'}};   /* 試作：破城槌・移動式投石機の補給（2026-11-18） */
 function supT(s){if(IS_PROTO&&s&&SUP_M[s.model])return SUP_M[s.model];const b=s.ut==='adv'?SUP[ADV_SUP[s.model]]:SUP[s.ut];if(!b||s.ut==='adv')return b;const wt=wTier(s),at=aTier(s);if(!wt&&!at)return b;
-  const c=Object.assign({},b.costs||{[b.key]:b.per});for(const x of [W_SUP[wt]||{},(armK(s.ut)&&AR[armK(s.ut)].sup[at])||{}])for(const k in x)c[k]=(c[k]||0)+x[k]*(b.per||1);return Object.create(b,{costs:{value:c}});}   // 武器・鎧の段が上なほど補給で使う資材が増える
+  const c=Object.assign({},b.costs||{[b.key]:b.per});for(const x of [pm(W_SUP[wt]||{},s.ut==='mage'),pm((armK(s.ut)&&AR[armK(s.ut)].sup[at])||{})])for(const k in x)c[k]=(c[k]||0)+x[k]*(b.per||1);return Object.create(b,{costs:{value:c}});}   // 武器・鎧の段が上なほど補給で使う資材が増える
 function supOf(s){const sp=supT(s);if(!sp)return null;if(s.sup==null)s.sup=sp.max;return sp;}
 function supNeed(s){const sp=supOf(s);return sp?Math.max(0,sp.max-s.sup):0;}
 function needsSupply(s){return supNeed(s)>0.01||refillNeed(s)>0||healNeed(s)>=1;}
@@ -5757,25 +5781,25 @@ const BIG_E=new Set(['charger','grappler','troll','heavy','king','wyvern']),SMAL
 // 試作（2026-11-11）：武器と鎧は、種類は変えず材料が一段ずつ良くなる（鉄の剣→鋼の剣→合金の剣…／革の鎧→鉄の鎧→鋼の鎧…）。
 // 部隊ごとに使う段を選べる（s.wT／s.aT。null＝研究した最新を自動で使う）。上の段ほど補給で使う資材が増える＝古い段にして資材を節約できる
 const EQ_UP=null;
-const W_MAT=['鉄','鋼','合金','魔金属','聖銀','竜晶'],W_REQ=[null,'heavyarms','alloyarms'],W_RANK=['Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ','Ⅶ'];
+const W_MAT=['鉄','鋼','合金','エーテル金属','聖銀','竜晶'],W_REQ=[null,'heavyarms','alloyarms'],W_RANK=['Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ','Ⅶ'];
 const W_PCT=[100,140,190,260,350,460];const W_DMG=W_PCT.map(v=>v/100);                       // 武器の段ごとの攻撃（鉄を1として）。部隊の数・防衛施設も増えるので、伸びは控えめ（2026-11-12）
 const W_SUP=[{},{iron:0.3},{alloy:0.4}];   // 鋼の武器は鉄、合金の武器は合金（金＋鉄の素材）で補給            // 武器の段ごとに、補給1あたり余分に使う資材
 const W_NAME={inf:'剣',mil:'剣',guard:'剣',arch:'矢じり',cav:'騎槍',mage:'杖',art:'砲弾',drake:'竜具',adv:'武器'};
-const A_MAT=['革','鉄','鋼','合金','魔金属','聖銀','竜晶'],A_REQ=[null,'ironarmor','steelarmor','alloyarmor'],A_RANK=['Ⅰ','Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ','Ⅶ'];   // 鎧：革→鉄→鋼→合金→魔金属→聖銀→竜晶（2026-11-12）
+const A_MAT=['革','鉄','鋼','合金','エーテル金属','聖銀','竜晶'],A_REQ=[null,'ironarmor','steelarmor','alloyarmor'],A_RANK=['Ⅰ','Ⅰ','Ⅱ','Ⅲ','Ⅴ','Ⅵ','Ⅶ'];   // 鎧：革→鉄→鋼→合金→エーテル金属→聖銀→竜晶（2026-11-12）
 const A_PCT=[0,10,20,30,45,60,80];   // 鎧の段ごとに、1人あたりの体力が元の何%増えるか（決まった数を足すと体力の少ない兵科ほど伸びすぎるので割合に）                            // 鎧の段ごとに、1人あたり増える体力
 const A_SUP=[{},{armor:0.5},{armor:0.7,iron:0.2},{armor:0.9,alloy:0.4}];   // 鎧の段ごとの補給の資材
 const ARMORED=['inf','cav','guard','mil'];
 // 防具は2系統：鎧（剣士・重装歩兵・騎兵・近衛）とローブ（弓兵・砲兵・魔術師）
-const AR={a:{n:['革の鎧','鉄の鎧','鋼の鎧','合金の鎧','魔金属の鎧','聖銀の鎧','竜晶の鎧'],get req(){return A_REQ;},get rank(){return A_RANK;},get pct(){return A_PCT;},get sup(){return A_SUP;},ut:ARMORED},
+const AR={a:{n:['革の鎧','鉄の鎧','鋼の鎧','合金の鎧','エーテル金属の鎧','聖銀の鎧','竜晶の鎧'],get req(){return A_REQ;},get rank(){return A_RANK;},get pct(){return A_PCT;},get sup(){return A_SUP;},ut:ARMORED},
   r:{n:['皮のローブ','鎖帷子','エーテルローブ','銀のローブ','竜のローブ'],req:[null,'chainmail'],rank:['Ⅰ','Ⅱ','Ⅳ','Ⅵ','Ⅶ'],pct:[0,15,30,50,75],sup:[{},{armor:0.4}],ut:['arch','art','mage']}};
 const R_COL=['#9a6a3a','#9aa0a6','#62c6d9','#f6faff','#e05a4e'];
 function armK(ut){return ARMORED.includes(ut)?'a':AR.r.ut.includes(ut)?'r':null;}                   // 鎧を着る兵科：剣士・重装歩兵・騎兵（騎士）・近衛
 const W_NOUN={pawn:'剣',heavy:'戦斧',guard:'剣',militia:'剣',farmer:'鍬',scout:'短剣',archer:'矢',rider:'騎槍',cannoneer:'砲弾',dragon:'竜具'};   // 部隊ごとの武器の呼び名
-const W_MAGE={req:[null,'highmagic'],pct:[100,140,190,260,350],names:['樫の杖','エーテルの杖','魔金属の杖','聖銀の杖','竜晶の杖'],rank:['Ⅰ','Ⅳ','Ⅴ','Ⅵ','Ⅶ']};   // 魔術師だけは材料ではなく魔法の杖の並び
+const W_MAGE={req:[null,'highmagic'],pct:[100,140,190,260,350],names:['樫の杖','エーテルの杖','エーテル金属の杖','聖銀の杖','竜晶の杖'],rank:['Ⅰ','Ⅳ','Ⅴ','Ⅵ','Ⅶ']};   // 魔術師だけは材料ではなく魔法の杖の並び
 /* 試作（2026-11-18）：装備の段は城のランクで開く（研究はなし）。部隊ごとに詳しい画面で替え、上の段に替えるときは資材を払う（一度買った段までは自由に替えられる） */
 if(IS_PROTO){W_REQ.push('eqw_3','eqw_4','eqw_5');W_SUP.push({mmetal:0.3},{mithril:0.3},{dcrys:0.2});A_REQ.push('eqa_4','eqa_5','eqa_6');A_SUP.push({armor:0.9,mmetal:0.3},{armor:0.9,mithril:0.3},{armor:0.9,dcrys:0.2});AR.r.req.push('eqr_2','eqr_3');AR.r.sup.push({armor:0.4,elec:0.2},{armor:0.4,mithril:0.2});W_MAGE.req=[null,'eqm_1','eqm_2','eqm_3'];}
 const EQ_BUY={w:[null,{iron:2},{alloy:2},{mmetal:2},{mithril:2},{dcrys:1}],a:[null,{iron:1},{iron:2},{alloy:2},{mmetal:2},{mithril:2},{dcrys:1}],r:[null,{iron:1},{elec:2},{mithril:2}],m:[null,{elec:3},{mmetal:2},{mithril:2}]};   /* 1人あたり */
-function eqBuyCost(o,kind,i){const k=kind==='w'?(o.ut==='mage'?'m':'w'):armK(o.ut);const L=EQ_BUY[k]||[];const per=L[i];if(!per)return null;const c={};for(const x in per)c[x]=per[x]*(o.members||1);return c;}
+function eqBuyCost(o,kind,i){const k=kind==='w'?(o.ut==='mage'?'m':'w'):armK(o.ut);const L=EQ_BUY[k]||[];const per=L[i];if(!per)return null;const c={};for(const x in per)c[x]=per[x]*(o.members||1);return pm(c,k==='m');}
 function eqBetter(o){if(IS_PROTO&&NOEQ.has(o.model))return false;return wMat(o)>wTier(o)||(!!armK(o.ut)&&aMat(armK(o.ut))>aTier(o));}   /* 試作：もっとよい装備に替えられる */
 function eqHave(o,kind){return kind==='w'?(o.wHave||0):(o.aHave||0);}
 function wTrack(s){return s&&s.ut==='mage'?W_MAGE:{req:W_REQ,pct:W_PCT,rank:W_RANK};}
@@ -7224,7 +7248,8 @@ function prodOf0(b){if(BIG[b.type]){const f=prodOf0(Object.assign({},b,{type:BIG
   case 'fishery':return {fuel:1.0*um*(techMul('fishery')+bn.prod-1)*k};case 'well':return {elec:0.5*um*RICH[richAt(b.x,b.y)]*bn.prod*k};   /* エーテル 3→5/T（2026-11-13・ランクⅣで足りなかった） */case 'market':return {gold:0.6*um*bn.prod*k};case 'tport':return {gold:1.0*um*bn.prod*k};case 'tair':return {gold:1.5*um*bn.prod*k};
   case 'ammo':{const m=um*(techMul('ammo')+bn.prod-1)*k;const kf=heroSk(b,'kenyaku')?0.6:1;if(IS_PROTO&&b.mode==='marrow')return {marrow:1.0*m,ammo:-1.0*m,smat:-0.2*m};return b.mode==='armor'?{armor:0.4*m,steel:-0.2*m*kf,iron:-0.6*m*kf}:b.mode==='sword'?{sword:0.5*m,steel:-0.2*m*kf,iron:-0.4*m*kf}:{ammo:3.0*m,steel:-0.4*m*kf,iron:-0.2*m*kf};}
   case 'coalmine':return {coal:0.6*um*RICH[richAt(b.x,b.y)]*bn.prod*k};case 'goldmine':return {goldore:0.4*um*RICH[richAt(b.x,b.y)]*bn.prod*k};case 'mithmine':return {mithril:0.2*um*RICH[richAt(b.x,b.y)]*bn.prod*k};
-  case 'smelter':{const m=um*bn.prod;if(IS_PROTO&&b.mode==='dcrys'&&b.lv>=3)return {dcrys:m,elec:-2*m,mithril:-m,scale:-m};return b.mode==='mmetal'&&b.lv>=2?{mmetal:3*m,alloy:-2*m,elec:-2*m,mat:-m}:{alloy:5*m,iron:-4*m,goldore:-3*m,coal:-2*m};}
+  case 'smelter':{const m=um*bn.prod;if(IS_PROTO&&b.mode==='dcrys'&&b.lv>=2)return {dcrys:m,elec:-2*m,mithril:-m,scale:-m};return !IS_PROTO&&b.mode==='mmetal'&&b.lv>=2?{mmetal:3*m,alloy:-2*m,elec:-2*m,mat:-m}:{alloy:5*m,iron:-4*m,goldore:-3*m,coal:-2*m};}
+  case 'gearw':{const m=um*bn.prod;return {gear:3*m,iron:-2*m,alloy:-m};}case 'blast':{const m=um*bn.prod;return {heavy:3*m,alloy:-2*m,coal:-2*m,iron:-2*m};}case 'alchemy':{const m=um*bn.prod;return {mmetal:3*m,alloy:-2*m,elec:-2*m};}
   case 'barracks':return {pop:S.happy>=35?bn.prod*3:0};case 'apart':return {pop:S.happy>=35?bn.prod*5:0};case 'tavern':return {fuel:-0.2*k};
   case 'furnace':{const m=0.2*um*bn.prod*k;return {elec:2*m,mat:-m};}case 'powder':{const m=um*bn.prod*k;if(IS_PROTO&&b.mode==='apowder'&&b.lv>=2)return {apowder:0.3*m,powder:-0.3*m,elec:-0.3*m};return {powder:0.6*m,steel:-0.6*m,mat:-0.1*m};}}return null;}
 function depleteTick(b,amt){if(b.res==null||b.res===Infinity)return;if(IS_PROTO&&((b.type==='miner'&&has('p_plant'))||(b.type==='farm'&&has('p_rot'))))amt*=0.5;   /* 植林・輪作：埋蔵の減りが半分 */b.res-=amt;if(b.res<=0){b.res=0;b.dep=true;log(`${B[b.type].name}の資源が尽きた（新しい場所を探そう）`,'warn');
@@ -7441,7 +7466,7 @@ function setText(el,v){if(el&&el.textContent!==v)el.textContent=v;}
 const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','wall3','wall5','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','barrier','tesla','harpoon','mray','dbreath','spike','pit','bomb','aebomb','gravity','stake','meteor','brazier','totem','outpost']},
   {id:'prod',name:IS_PROTO?'領地':'生産・街',keys:'⇧',list:['coalmine','goldmine','mithmine','smelter','miner','quarry','ironmine','farm','fishery','well',...(IS_PROTO?[]:['ammo']),'powder','furnace','barracks','apart','market','tavern','church','lab']},
   {id:'unit',name:'部隊',keys:'-',list:['train','stable','magic','aerie']}];
-if(IS_PROTO){const g=BUILD_GROUPS.find(x=>x.id==='prod');if(g&&!g.list.includes('herohouse'))g.list.push('herohouse');if(g)g.list.push('tport','tair');{const u=BUILD_GROUPS.find(x=>x.id==='unit');if(u){u.list.splice(u.list.indexOf('stable')+1,0,'gstable');u.list.push('siegew');}}if(g)for(const k of ['bigfarm','bigminer','bigquarry','bigfish'])if(!g.list.includes(k)){g.list.push(k);BUILD_ORDER.push(k);B[k].cost.gold=(B[BIG[k]].cost.gold||5)*5;}}
+if(IS_PROTO){{const g=BUILD_GROUPS.find(x=>x.id==='prod');const i=g.list.indexOf('smelter');g.list.splice(i+1,0,'gearw','blast','alchemy');const d=BUILD_GROUPS.find(x=>x.id==='def');d.list=d.list.filter(k=>k!=='bastion');}   /* 2026-11-20：工業と魔法の素材の施設・櫓台はやめた */WICON.gearw=WICON.ammo||WICON.smelter;WICON.blast=WICON.smelter;WICON.alchemy=WICON.smelter;const g=BUILD_GROUPS.find(x=>x.id==='prod');if(g&&!g.list.includes('herohouse'))g.list.push('herohouse');if(g)g.list.push('tport','tair');{const u=BUILD_GROUPS.find(x=>x.id==='unit');if(u){u.list.splice(u.list.indexOf('stable')+1,0,'gstable');u.list.push('siegew');}}if(g)for(const k of ['bigfarm','bigminer','bigquarry','bigfish'])if(!g.list.includes(k)){g.list.push(k);BUILD_ORDER.push(k);B[k].cost.gold=(B[BIG[k]].cost.gold||5)*5;}}
 // 建設の分類タブ（防衛・生産・街・部隊）。押すとその見出しまで一覧をスクロールする
 function buildScroller(el){for(let p=el.parentElement;p;p=p.parentElement){const o=getComputedStyle(p).overflowY;if((o==='auto'||o==='scroll')&&p.scrollHeight>p.clientHeight+1)return p;}return document.scrollingElement;}
 function buildJump(id){const el=document.getElementById('build'),h=el&&el.querySelector(`.bh[data-g="${id}"]`);if(!h)return;
@@ -7755,7 +7780,7 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
     const mx=maxLvOf(o.type),kmx=kcMax(o.type);const pips='◆'.repeat(o.lv)+'◇'.repeat(Math.max(0,kmx-o.lv));
     if(IS_PROTO){const tl=isTool(o),RNx=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'],tn=i=>tl?TOOL_T[i][1]+'の'+TOOL[o.type]:KC[o.type].st[i][1];   /* 試作（2026-11-18）：道具／アップグレード。城のランクで開く */
       h+=`<div class="upg"><div class="row"><b>${tl?'道具':'アップグレード'}</b><span class="pips">${pips}</span></div>`;
-      if(tl){const w=TOOL_WEAR[o.lv-1]||{};h+=`<div style="font-size:11.5px;margin:2px 0">いまの道具：<b>${tn(o.lv-1)}</b>　<span class="muted">毎ターン ${Object.entries(w).map(([k,v])=>RES_NAME[k]+v).join('・')}</span>${o.worn?' <span style="color:var(--red)">資材が足りず生産が半分</span>':''}</div>`;}
+      if(tl){const w=pm(TOOL_WEAR[o.lv-1]||{},MAG_B.has(o.type));h+=`<div style="font-size:11.5px;margin:2px 0">いまの道具：<b>${tn(o.lv-1)}</b>　<span class="muted">毎ターン ${Object.entries(w).map(([k,v])=>RES_NAME[k]+v).join('・')}</span>${o.worn?' <span style="color:var(--red)">資材が足りず生産が半分</span>':''}</div>`;}
       if(o.lv>=kmx)h+=`<div class="muted" style="margin-top:3px">いちばん上の${tl?'道具':'ランク'}です</div>`;
       else{const nx=tn(o.lv);
         h+=`<div class="kcnext"><img src="${kcImg(o.type)}" alt=""><div><b>${nx}</b><div class="muted" style="font-size:11px">${kcStat(o).join('　')}</div></div></div>`;
@@ -7795,7 +7820,8 @@ function renderInfo(force){if(S)document.body.classList.toggle('hasSel',!!(S.sel
       if(o.wuse)h+=`<div class="row"><span class="muted">${S.waveActive?'今夜の消費':'前回の夜の消費'}</span><span class="bd">${Object.entries(o.wuse).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;
       else if(o.wlast)h+=`<div class="row"><span class="muted">前回の夜の消費</span><span class="bd">${Object.entries(o.wlast).map(([k,v])=>`${ic(k,12)}−${Math.round(v)}`).join(' ')}</span></div>`;}}
     if(o.res!=null&&o.res!==Infinity&&o.dep)h+=`<div class="row"><span class="muted">残りの埋蔵量</span><span class="bd">枯渇（もう採れない）</span></div>`;}
-  if(!isS&&o.type==='smelter'&&o.lv>=2){const mm=o.mode==='mmetal'||o.mode==='dcrys'&&false;h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-smode="alloy" class="${mm?'':'on'}">${ic('alloy',14)}合金</button><button data-smode="mmetal" class="${mm?'on':''}">${ic('mmetal',14)}魔金属</button>${IS_PROTO&&o.lv>=3?`<button data-smode="dcrys" class="${o.mode==='dcrys'?'on':''}">${ic('dcrys',14)}竜晶</button>`:''}</div>${IS_PROTO&&o.mode==='dcrys'?'<div class="muted" style="font-size:11px;margin-top:3px">エーテル2・聖銀1・龍鱗1 → 竜晶1</div>':''}</div>`;}
+  if(!isS&&o.type==='smelter'&&o.lv>=2&&IS_PROTO){h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-smode="alloy" class="${o.mode==='dcrys'?'':'on'}">${ic('alloy',14)}合金</button><button data-smode="dcrys" class="${o.mode==='dcrys'?'on':''}">${ic('dcrys',14)}竜晶</button></div>${o.mode==='dcrys'?'<div class="muted" style="font-size:11px;margin-top:3px">エーテル2・聖銀1・龍鱗1 → 竜晶1</div>':''}</div>`;}
+  else if(!isS&&o.type==='smelter'&&o.lv>=2){const mm=o.mode==='mmetal'||o.mode==='dcrys'&&false;h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-smode="alloy" class="${mm?'':'on'}">${ic('alloy',14)}合金</button><button data-smode="mmetal" class="${mm?'on':''}">${ic('mmetal',14)}エーテル金属</button>${IS_PROTO&&o.lv>=3?`<button data-smode="dcrys" class="${o.mode==='dcrys'?'on':''}">${ic('dcrys',14)}竜晶</button>`:''}</div>${IS_PROTO&&o.mode==='dcrys'?'<div class="muted" style="font-size:11px;margin-top:3px">エーテル2・聖銀1・龍鱗1 → 竜晶1</div>':''}</div>`;}
   if(IS_PROTO&&!isS&&o.type==='powder'&&o.lv>=2){const ap=o.mode==='apowder';h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-pmode="powder" class="${ap?'':'on'}">${ic('powder',14)}火薬</button><button data-pmode="apowder" class="${ap?'on':''}">${ic('apowder',14)}エーテル火薬</button></div>${ap?'<div class="muted" style="font-size:11px;margin-top:3px">火薬とエーテルから作る。エーテル爆弾に使う</div>':''}</div>`;}
   if(!isS&&o.type==='ammo'){const sw=o.mode==='sword',ar=o.mode==='armor';h+=`<div class="upg"><b>作るもの</b><div style="display:flex;gap:4px;margin-top:4px"><button data-wmode="arrow" class="${sw||ar?'':'on'}">${ic('ammo',14)} 矢</button><button data-wmode="sword" class="${sw?'on':''}">${ic('sword',14)} 剣</button>${IS_PROTO?'':`<button data-wmode="armor" class="${ar?'on':''}">${ic('armor',14)} 鎧</button>`}${IS_PROTO&&has('p_marrow')?`<button data-wmode="marrow" class="${o.mode==='marrow'?'on':''}">${ic('marrow',14)} 魔矢</button>`:''}</div>${IS_PROTO&&o.mode==='marrow'?'<div class="muted" style="font-size:11px;margin-top:3px">魔矢：矢と小さな魔核から作る。物見櫓とバリスタが先に使い、威力 +30%</div>':''}<div class="muted" style="font-size:11px;margin-top:3px">${ar?'鎧：剣士・重装歩兵・騎兵の鎧の補給に使う（木材 −2・鉄 −6 → 鎧 +4／T 相当）':sw?'剣：剣士・重装歩兵・騎兵の編成と補充に使う':'矢：バリスタ・物見櫓・弓兵が使う'}</div></div>`;}
   if(false&&!isS&&canEnch(o)&&!(o.bt>0&&!o.upg)){   /* 魔核の強化はやめた（2026-11-13） */const e=o.ench||0;const what=B[o.type].range?'火力':PROD_BT.includes(o.type)?'生産量':'';
@@ -8006,12 +8032,12 @@ function renderSheetHandle(){const el=document.getElementById('sheetSel');if(!el
   if(o){const r=Math.max(0,o.hp/o.maxhp);h=`${o.kind==='s'?icSvg(o.model||defModel(o.ut),30):icSvg(o.type,30)}<span class="shm"><span class="shn"><b>${o.kind==='s'?unitLabel(o):B[o.type].name}</b>${o.kind==='b'&&B[o.type].grp?`<span class="ilv">${'◆'.repeat(o.lv||1)}</span>`:''}<span class="shv">${o.kind==='s'?Math.round(r*100)+'%':Math.ceil(o.hp)+'/'+Math.ceil(o.maxhp)}</span></span><span class="hpbar${r<0.3?' low':r<0.6?' mid':''}"><i style="width:${Math.round(r*100)}%"></i></span></span>`;}
   else if(S.buildMode)h=`${icSvg(S.buildMode,30)}<span class="shm"><span class="shn"><b>${B[S.buildMode].name}</b><span class="shv">建設中</span></span></span>`;
   setHTML(el,h);document.getElementById('sheetHandle').classList.toggle('has',!!h);}
-function renderTop(){if(S){for(const k of ['coal','mmetal','mithril'])if(S[k]==null)S[k]=0;}if(S&&S.armor==null)S.armor=20;if(S&&S.alloy==null)S.alloy=0;if(S&&S.goldore==null)S.goldore=0;   // 試作：鎧（新しい軍需）
+function renderTop(){if(IS_PROTO&&S)try{polText();}catch(e){}if(S){for(const k of ['coal','mmetal','mithril','heavy','gear'])if(S[k]==null)S[k]=0;}if(S&&S.armor==null)S.armor=20;if(S&&S.alloy==null)S.alloy=0;if(S&&S.goldore==null)S.goldore=0;   // 試作：鎧（新しい軍需）
 
   const e=econ(),n=e.net;
   if(S.powder==null)S.powder=0;if(S.silver==null){S.silver=Math.floor(S.tcred||0);delete S.tcred;}let h='';
   // 13種を5グループに（UI v2）
-  const GRP=[['通貨',['gold','silver']],['資材',['steel','stone','iron'].concat(S.coal>0||has('coalt')?['coal']:[]).concat((S.goldore>0||has('goldt')||has('alloyarms')||has('alloyarmor'))?['goldore']:[]).concat((S.alloy>0||has('smeltt')||has('alloyarms')||has('alloyarmor'))?['alloy']:[]).concat(S.mmetal>0||has('kc_work_5')?['mmetal']:[]).concat(S.mithril>0||has('mitht')?['mithril']:[]).concat(['fuel','elec','mat']).concat(IS_PROTO?['smat','scale','wing','bigmat','dcrys'].filter(k=>(S[k]||0)>0):[])],['軍需',(IS_PROTO?[]:['ammo','sword','armor']).concat(has('gunpowder')||S.powder>0?['powder']:[]).concat(IS_PROTO&&((S.apowder||0)>0||S.blds.some(b=>b.type==='powder'&&(b.lv||1)>=2))?['apowder']:[])]].filter(g=>g[1].length);
+  const GRP=[['通貨',['gold','silver']],['資材',['steel','stone','iron'].concat(S.coal>0||has('coalt')?['coal']:[]).concat((S.goldore>0||has('goldt')||has('alloyarms')||has('alloyarmor'))?['goldore']:[]).concat((S.alloy>0||has('smeltt')||has('alloyarms')||has('alloyarmor'))?['alloy']:[]).concat(IS_PROTO&&(S.gear>0||has('steam'))?['gear']:[]).concat(S.mmetal>0||(IS_PROTO?has('alcht'):has('kc_work_5'))?['mmetal']:[]).concat(IS_PROTO&&(S.heavy>0||has('blastt'))?['heavy']:[]).concat(S.mithril>0||has('mitht')?['mithril']:[]).concat(['fuel'].concat(!IS_PROTO||S.elec>0||has('aethert')?['elec']:[]),['mat']).concat(IS_PROTO?['smat','scale','wing','bigmat','dcrys'].filter(k=>(S[k]||0)>0):[])],['軍需',(IS_PROTO?[]:['ammo','sword','armor']).concat(has('gunpowder')||S.powder>0?['powder']:[]).concat(IS_PROTO&&((S.apowder||0)>0||S.blds.some(b=>b.type==='powder'&&(b.lv||1)>=2))?['apowder']:[])]].filter(g=>g[1].length);
   const KEY=['gold','steel','stone','iron','fuel'];
   const dl=d=>d==null?'':`<span class="dl ${d>0.5?'up':d<-0.5?'dn':'zero'}">${Math.abs(d)<0.5?'±0':Math.round(Math.abs(d))}</span>`;
   for(const [lb,gp] of GRP){h+=`<div class="rgp" data-label="${lb}"><div class="rgi">`;for(const k of gp){
@@ -8138,7 +8164,7 @@ function dexAnim(box,ak){const [url,n]=NDART[ak];const im=new Image();im.onload=
 // ===== 研究：スキルツリー =====
 const NW=178,NH=72,GX=46,GY=14;
 function treeLayout(cat){
-  const list=TECH.filter(t=>t.cat===cat),inTab=id=>list.some(t=>t.id===id);
+  const list=TECH.filter(t=>t.cat===cat&&!(t.rk&&!offPolicy(t))),inTab=id=>list.some(t=>t.id===id);
   const PRE=t=>(t.pre||[]).filter(inTab).filter(p=>techRank(techOf(p))===techRank(t));
   const dep={};const D=t=>{if(dep[t.id]!=null)return dep[t.id];const ps=PRE(t);dep[t.id]=ps.length?1+Math.max(...ps.map(p=>D(techOf(p)))):0;return dep[t.id];};
   list.forEach(D);
@@ -8210,7 +8236,7 @@ function showResearch(){
     <div class="rres">${['steel','stone','iron','fuel','ammo','elec','gold','mat'].map(k=>`<span>${ic(k,12)}${Math.floor(S[k])}</span>`).join('')}<span>${ic('pop',12)}${S.pop}</span></div><button id="ovClose">閉じる<kbd>R</kbd></button></div>`;
   // 研究中のもの（どのタブにあっても見えるように）。押すとそのタブのその研究へ移動。横持ちはヘッダーの中に入れる
   if(!land)h+=nowH;
-  h+=`<div class="rtabsrow"><div class="ttabs">${RES_TABS.map(c=>{const ts=TECH.filter(t=>t.cat===c);const dn=ts.filter(t=>techState(t)==='done').length;return `<button data-tab="${c}" class="${c===cat?'on':''}" style="--tc:${CAT_COLOR[c]}">${c}<span class="tcnt">${dn}/${ts.length}</span>${S.research.some(r=>techOf(r.id).cat===c)?'<i class="tact" title="研究中あり"></i>':''}</button>`;}).join('')}</div>
+  h+=`<div class="rtabsrow"><div class="ttabs">${RES_TABS.map(c=>{const ts=TECH.filter(t=>t.cat===c&&!(t.rk&&!offPolicy(t)));const dn=ts.filter(t=>techState(t)==='done').length;return `<button data-tab="${c}" class="${c===cat?'on':''}" style="--tc:${CAT_COLOR[c]}">${c}<span class="tcnt">${dn}/${ts.length}</span>${S.research.some(r=>techOf(r.id).cat===c)?'<i class="tact" title="研究中あり"></i>':''}</button>`;}).join('')}</div>
     <div class="rlegend"><span><i class="lg done"></i>完了</span><span><i class="lg active"></i>研究中</span><span><i class="lg ready"></i>研究できる</span><span><i class="lg locked"></i>前提が足りない</span><span>${ui('lock','dim',12)}城のランクで解放</span></div></div>`;
   if(IS_PROTO){const isPr=x=>!!RES_PRIO[x.id]&&techState(x)!=='done';h+=resTreeHTML(cat,L,t=>{const st=techState(t),r=S.research.find(x=>x.id===t.id);const outside=(t.pre||[]).filter(x=>!L.inTab(x));
     const stTxt=st==='done'?'<span class="s done">完了</span>':st==='active'?`<span class="s act">研究中 ${r.total-r.left}/${r.total}T</span>`:st==='locked'?'<span class="s">要 前提</span>':st==='maplock'?'<span class="s">次のマップから</span>':'';
@@ -8332,7 +8358,7 @@ function showHire(target,mode){
 // ===== 街の記録（2026-11-15）：ターンごとの施設の数・人口・資源・生産量と、タイムラプス用の施設の出入り =====
 // S.tl：[{d:日,w:襲撃,tag,n:施設数,g:{種類別の数},pop,res:{在庫},gross:{1ターンの生産},net:{差し引き},bl:城Lv,tech}]
 // S.tlb：{keys:今ある施設の鍵, ev:[[記録の番号, 増えた鍵の一覧, 減った鍵の一覧], ...]}（差分だけ残すのでセーブが大きくならない）
-const TL_RES=['gold','silver','steel','stone','iron','fuel','ammo','marrow','sword','armor','elec','powder','apowder','coal','goldore','alloy','mmetal','mithril','mat','smat','scale','wing','bigmat','dcrys'];   /* 上の資源欄に出るものは記録にも（書き出しは、一度でも出てきたものだけ・2026-11-19） */
+const TL_RES=['gold','silver','steel','stone','iron','fuel','ammo','marrow','sword','armor','elec','powder','apowder','coal','goldore','alloy','gear','mmetal','heavy','mithril','mat','smat','scale','wing','bigmat','dcrys'];   /* 上の資源欄に出るものは記録にも（書き出しは、一度でも出てきたものだけ・2026-11-19） */
 const TL_BASE=new Set(['gold','steel','stone','iron','fuel','ammo','sword','elec','powder','coal','alloy','mat']);
 function tlResKeys(TL){return TL_RES.filter(k=>!(IS_PROTO&&k==='armor')&&(TL_BASE.has(k)||TL.some(r=>r.res&&r.res[k])));}
 const TL_GROUPS=[['防衛','#e8735c'],['壁・門','#9aa5a8'],['生産','#6fe08a'],['住居','#f2b33d'],['軍','#7fb0ff'],['罠','#c48aff'],['その他','#b9a98a']];
@@ -8400,7 +8426,7 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   S=d.S;protoRes(S);S.flow=new Map();
   if(IS_PROTO&&S.research){const bad=S.research.filter(r=>!TECH.some(t=>t.id===r.id));if(bad.length){S.research=S.research.filter(r=>TECH.some(t=>t.id===r.id));for(const r of bad)for(const k in (r.paid||{}))if(k!=='pop')S[k]=(S[k]||0)+r.paid[k];setTimeout(()=>log(`なくなった研究（${bad.length}つ）を研究中から外し、資材を戻しました`,'warn'),600);}}   /* 試作：まとめて消した研究（燃える岩・魔矢など）が研究中だと、研究の画面が開けなかった（2026-11-19） */for(const k of ['ore','oil'])if(S[k]&&S[k].pk)S[k]=unpackG(S[k]);
   // 前のセッションの時刻（performance.now 基準）は持ち越さない：発射アニメなどのコマ番号が狂って描画が止まるため
-  for(const b of S.blds){delete b.fireT;delete b.popAt;if(IS_PROTO&&b.mode==='armor')b.mode=null;}if(IS_PROTO&&S.blds.some(b=>b.type==='ammo')){const n=S.blds.filter(b=>b.type==='ammo').length;S.blds=S.blds.filter(b=>b.type!=='ammo');S.steel+=60*n;S.stone+=20*n;for(const c of S.cmds||[])if(c.assign&&!S.blds.some(b=>b.id===c.assign)&&!S.squads.some(q=>q.id===c.assign))c.assign=null;setTimeout(()=>log(`武器工房はなくなりました。矢と剣は木材と鉄から直接使います（武器工房${n}軒の建設費を戻しました）`,'warn'),500);}   /* 試作（2026-11-19）：武器工房はなくした */for(const m of S.mines||[])delete m.popAt;for(const q of S.squads||[]){delete q.atkT;}S.vfx=[];
+  for(const b of S.blds){delete b.fireT;delete b.popAt;if(IS_PROTO&&b.mode==='armor')b.mode=null;if(IS_PROTO&&b.type==='smelter'&&!S.sm2){if(b.lv===2){b.lv=1;b.mode=null;}else if(b.lv>=3)b.lv=2;if(b.mode==='mmetal')b.mode=null;}}if(IS_PROTO)S.sm2=1;   /* 2026-11-20：精錬所のエーテル金属の段をなくした（錬金工房へ） */if(IS_PROTO&&S.blds.some(b=>b.type==='ammo')){const n=S.blds.filter(b=>b.type==='ammo').length;S.blds=S.blds.filter(b=>b.type!=='ammo');S.steel+=60*n;S.stone+=20*n;for(const c of S.cmds||[])if(c.assign&&!S.blds.some(b=>b.id===c.assign)&&!S.squads.some(q=>q.id===c.assign))c.assign=null;setTimeout(()=>log(`武器工房はなくなりました。矢と剣は木材と鉄から直接使います（武器工房${n}軒の建設費を戻しました）`,'warn'),500);}   /* 試作（2026-11-19）：武器工房はなくした */for(const m of S.mines||[])delete m.popAt;for(const q of S.squads||[]){delete q.atkT;}S.vfx=[];
   if(S.skirm||!S.waveActive){S.skirm=null;if(!S.waveActive)S.enemies=[];if(S.camps)for(const c of S.camps)if(c.state==='fight')c.state='idle';}for(const k in AF)delete AF[k];S.grid=Array.from({length:ROWS},()=>new Array(COLS).fill(null));
   for(const b of S.blds)gridSet(b,true);
   if(IS_PROTO&&!S.eq3){S.eq3=1;for(const q of S.squads){for(const k of ['wHave','wT'])if(q[k]>=2)q[k]--;for(const k of ['aHave','aT'])if(q[k]>=3)q[k]--;}}   /* 試作：装備の鋼をなくした前のセーブ（鋼は合金に） */
@@ -8498,7 +8524,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['1.19（試作版だけ）','2026-11-18',['柵などをまとめて建てたあと、セーブして読み込み直すと見えなくなることがあったのを直した','下の一括のところに「廃墟を建て直す」ボタンを追加','英雄の号令などのスキルの途中で襲撃が終わると、光や文字が残ったままになるのを直した','土地を選んだときの建設リストをなくした（建設は下の建設タブから）','一括修理・一括補給などの確認で、使う量をはっきり出すようにした（「矢 76 使う（671 → 595）」）','闇の中の大きい魔物（トロールなど）の赤い目が、お腹の位置に出ていたのを頭の高さに直した','夜狩りで持ち帰るのは、主に小さな魔核に（魔核は5つに1つ）','「海外調達」（買う部隊）をなくした','英雄は英雄の家を建ててから（始めの2人をなくした。チュートリアルも合わせた）','投石機の威力 70→40（範囲の中のゴブリンがすべて一撃だったので）','金貨：城の毎ターンの金貨 12→18、道具を替える費用から金貨をなくした','修理は建てたときの素材で払うように（石の壁は石材、城壁は石材と鉄など。前はどれも木材だった）','襲撃の方向の増え方をゆっくりに（1方向：第1〜4・2方向：第5〜9・3方向：第10〜15・4方向：第16から）','鎧の補給は、その鎧の素材で（鉄の鎧・鎖帷子なら鉄、合金の鎧なら合金…）。武器工房の「鎧」作りはなくした','守備（ブラム・セレナ・ドルフ）と内政（エマ・オットー）の英雄も名簿に。絵が届くまでは今の見た目','街の記録の書き出しに、上の資源欄に出ている資源（銀貨・小さな魔核・龍鱗・魔金属・聖銀など）も出てきたら入るように','英雄の一覧・候補・詳細の絵を、名簿の英雄の絵に','武器工房の道具の段の絵を、描き直した黒い炉の絵に（石・鉄・合金・魔金属・聖銀の金槌）','守備と内政の英雄5人（ブラム・セレナ・ドルフ・エマ・オットー）の絵を入れた。施設に付いた英雄も、地図の上で名簿の絵で出る','<b>武器工房をなくした</b>：矢と剣は在庫を持たず、使うたびに資材から払う（矢10本＝木材5・鉄1、剣1つ＝鉄1）。費用の表示も木材と鉄で出る。前のセーブの武器工房は消して建設費を戻し、残っていた矢と剣は資材に戻す','魔矢をなくした','チュートリアルの「軍需」を、鉱山を建てて鉄をためる内容に','生産施設に付けた英雄が、施設のまわりをうろうろ歩くように','一括エンチャントで、種類ごとにチェックを外してかけないようにできる（前哨砦だけ外す、など）','<b>改造</b>：施設の種類ごとに1つ選ぶ形に（街のその施設すべてに効く）。バリスタ（鋭い矢・連弩）・物見櫓（照明台・2連物見櫓）・投石機（大岩・燃える岩）・大砲（大口径砲・連射砲）・メイジの塔（火炎・凍結）・迫撃砲（クラスター・焼夷）。付け替えは2ターン。改造ごとに、撃つたびに使う物が増える（足りないときは改造なしで撃つ）','研究は「〇〇の改造」に（物見櫓とメイジの塔の改造を追加・燃える岩の研究は投石機の改造にまとめた）','弾の消費の表示を木材と鉄で','<b>枯渇</b>：枯渇した施設に空のかごの印（点滅）、あと3日で枯渇する施設に「残りNT」の札。下に「枯渇 N軒・もうすぐ枯渇 N軒」のボタン（押すとその施設へ）','建て終わった施設をアイコン付きでお知らせ（押すとその場所へ）','<b>ボスを倒したとき</b>：少し止まって揺れ、白く光り、「撃破！」の大きな文字と魔核がこぼれる','ダメージの数字（まとめて出す・重くならないよう30個まで）','<b>装備・道具を替える</b>：下のボタンから、替えられる道具と装備をまとめて替えられる。地図の上に緑の矢印、城のランクが上がったときにお知らせ','<b>襲撃の日</b>：「今夜の見込み（木材・鉄など）」と紫の「エンチャント付与」ボタンを出す。戦闘報告の消費も木材と鉄で','報告（ターンの報告・夜明け・戦闘報告）をリリアが話す形に','研究が終わったとき、リリアが動画つきで使い方を説明（エンチャント付与・駐屯地への夜襲・改造）','建物の間を歩く運び手をなくして、施設の前で働く人に（木を切る・石を割る・耕す・網を引く・金槌）。建設中は足場と金槌を打つ人','ボスが倒れたら、残りの魔物は街から離れる向きに逃げ、離れると消える（倒した数には入らない）','戦闘報告にアイコン（撃破＝魔物の幽霊・戦死・施設損失）と、手に入れた魔物の素材（魔核・小さな魔核・巨大魔核・龍鱗・飛膜）の内訳','エンチャントがかかった施設と兵士の絵の上に、紫の波がゆらゆら流れる','詳細の「改造」「エンチャント付与」にアイコン。研究前もグレーで出して、何ができるかを知らせる','<b>一括</b>：一括修理・一括補給・廃墟の建て直し・装備と道具・エンチャント付与を、下の「一括」のメニューにまとめた（使えないものはグレーで理由を出す）','演出の形：建った＝緑の輪・強化した＝黄色のひし形・改造が付いた＝水色の二重の輪（タイムラプスも同じ・控えめに）','前のセーブで、なくした研究（燃える岩・魔矢）が研究中だと研究の画面が開けなかったのを直した','襲撃のあと、エンチャントがはがれていなかったのを直した','空の「枯渇」のお知らせが、地図の右下に小さな枠だけ出ていたのを直した','タイムラプスで、人員不足などの印が出ていたのを直した','前のセーブで、研究の画面で最後に選んでいた研究が消した研究だと、研究の画面が開けなかったのを直した','置いたらすぐ完成する柵・壁も、その日のうちなら取り消せるように（取り消しボタン・Ctrl+Z）','「次の襲撃で足りない」「今夜の見込み」を押すと、何に（施設・部隊・篝火）どれだけ使う見込みかが見られる','英雄の部隊が、地図で英雄の共通の絵になっていたのを本人の絵に直した','メイジの塔・テスラタワー・ミスリルレイが、撃つときに撃つ絵になる','前哨砦の攻撃を、線（弾）から矢に','スマホ：詳細を開いたとき、右上に「×」を出して閉じられるように（下の「マップに戻る」が画面の外に出ていた）','<b>王都からの依頼</b>：街と守りの目標2つ（住民100・200・500・1000、研究の数、魔物の討伐数、城のランク、道具、英雄、改造、駐屯地への夜襲・つぶす、ゴブリンキング討伐）と、王都へ救援物資を送る依頼1つ。達成で金貨・銀貨・資材が届く。城か下の「依頼」で見られる。断るは1日1回','城の毎ターンの金貨を 18→12 に戻した（王都からの依頼で補う）','依頼は街と守り3つ＋送る1つに。依頼のアイコンを専用の絵に','【緊急】第19襲撃のあと、ゴブリンキング討伐の依頼（第20襲撃まで）','<b>襲撃のリプレイ</b>：一番新しい襲撃を、戦闘報告か街の記録の「リプレイ」から見られる（再生・一時停止・速さ・好きな位置へ。セーブには入らないので、読み込み直すと消える）','記録のタイムラプスを動画で保存できる（街の名前と日付入り）','前哨砦の絵の上が切れていたのを直した（切れていた旗を消して、かがり火の炎の先と旗竿の先を描き足した）','訓練所などに出ていた「海外調達」の表示をなくした（英雄は英雄の家から）','<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：画面の上の街の名前・戦いの結果・つづきから・前哨砦にも出る。地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','英雄の家・港・空港・グリフォンの厩舎・兵器工房の建設のアイコン、土地を選んだときの建設の一覧にもアイコン','アップグレードで増える働き手は、費用の「住民」として待機中の住民からすぐに入る（アップグレード直後に人手不足にならない）','倒れた魔物と兵は、その場で横に倒れて少しつぶれてから消える','武器工房の道具の段の絵（地図の絵と立ち絵）を入れた','道具の段の立ち絵を入れた（施設を選んだときの絵が、道具の段ごとに変わる）','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける','壁が2列並んでいるところの門が、横向き・縦向きを間違えて描かれていたのを直した','門も置いたらすぐ完成するように','英雄の部隊が3人に見えていたのを、英雄1人の絵にした','掘り尽くした石切り場・鉱山・採掘所は、森と同じように足元の丘・岩場・鉱脈・泉がなくなるように（解体したときも）','一括に「枯渇した施設を解体」：1軒ずつ絵・名前・何が尽きたか・城から見た場所を出し、チェックで選んで解体できる','襲撃の群れを、開いている方角に順番に割り振るように（同じ時間に1方向からだけ来ることがなくなる）','建設の「領地」は、はじめからある施設を上に、あとから開く施設を下に足す並びに','リリアの説明などを開いている間は、下の「枯渇」「足りない」の札を隠す','地図を引いて見るとき、「残り○T」の札が大きくなりすぎていたのを、地図と一緒に小さくなるように（かなり引くと出さない）']],
+ ['1.19（試作版だけ）','2026-11-18',['柵などをまとめて建てたあと、セーブして読み込み直すと見えなくなることがあったのを直した','下の一括のところに「廃墟を建て直す」ボタンを追加','英雄の号令などのスキルの途中で襲撃が終わると、光や文字が残ったままになるのを直した','土地を選んだときの建設リストをなくした（建設は下の建設タブから）','一括修理・一括補給などの確認で、使う量をはっきり出すようにした（「矢 76 使う（671 → 595）」）','闇の中の大きい魔物（トロールなど）の赤い目が、お腹の位置に出ていたのを頭の高さに直した','夜狩りで持ち帰るのは、主に小さな魔核に（魔核は5つに1つ）','「海外調達」（買う部隊）をなくした','英雄は英雄の家を建ててから（始めの2人をなくした。チュートリアルも合わせた）','投石機の威力 70→40（範囲の中のゴブリンがすべて一撃だったので）','金貨：城の毎ターンの金貨 12→18、道具を替える費用から金貨をなくした','修理は建てたときの素材で払うように（石の壁は石材、城壁は石材と鉄など。前はどれも木材だった）','襲撃の方向の増え方をゆっくりに（1方向：第1〜4・2方向：第5〜9・3方向：第10〜15・4方向：第16から）','鎧の補給は、その鎧の素材で（鉄の鎧・鎖帷子なら鉄、合金の鎧なら合金…）。武器工房の「鎧」作りはなくした','守備（ブラム・セレナ・ドルフ）と内政（エマ・オットー）の英雄も名簿に。絵が届くまでは今の見た目','街の記録の書き出しに、上の資源欄に出ている資源（銀貨・小さな魔核・龍鱗・魔金属・聖銀など）も出てきたら入るように','英雄の一覧・候補・詳細の絵を、名簿の英雄の絵に','武器工房の道具の段の絵を、描き直した黒い炉の絵に（石・鉄・合金・魔金属・聖銀の金槌）','守備と内政の英雄5人（ブラム・セレナ・ドルフ・エマ・オットー）の絵を入れた。施設に付いた英雄も、地図の上で名簿の絵で出る','<b>武器工房をなくした</b>：矢と剣は在庫を持たず、使うたびに資材から払う（矢10本＝木材5・鉄1、剣1つ＝鉄1）。費用の表示も木材と鉄で出る。前のセーブの武器工房は消して建設費を戻し、残っていた矢と剣は資材に戻す','魔矢をなくした','チュートリアルの「軍需」を、鉱山を建てて鉄をためる内容に','生産施設に付けた英雄が、施設のまわりをうろうろ歩くように','一括エンチャントで、種類ごとにチェックを外してかけないようにできる（前哨砦だけ外す、など）','<b>改造</b>：施設の種類ごとに1つ選ぶ形に（街のその施設すべてに効く）。バリスタ（鋭い矢・連弩）・物見櫓（照明台・2連物見櫓）・投石機（大岩・燃える岩）・大砲（大口径砲・連射砲）・メイジの塔（火炎・凍結）・迫撃砲（クラスター・焼夷）。付け替えは2ターン。改造ごとに、撃つたびに使う物が増える（足りないときは改造なしで撃つ）','研究は「〇〇の改造」に（物見櫓とメイジの塔の改造を追加・燃える岩の研究は投石機の改造にまとめた）','弾の消費の表示を木材と鉄で','<b>枯渇</b>：枯渇した施設に空のかごの印（点滅）、あと3日で枯渇する施設に「残りNT」の札。下に「枯渇 N軒・もうすぐ枯渇 N軒」のボタン（押すとその施設へ）','建て終わった施設をアイコン付きでお知らせ（押すとその場所へ）','<b>ボスを倒したとき</b>：少し止まって揺れ、白く光り、「撃破！」の大きな文字と魔核がこぼれる','ダメージの数字（まとめて出す・重くならないよう30個まで）','<b>装備・道具を替える</b>：下のボタンから、替えられる道具と装備をまとめて替えられる。地図の上に緑の矢印、城のランクが上がったときにお知らせ','<b>襲撃の日</b>：「今夜の見込み（木材・鉄など）」と紫の「エンチャント付与」ボタンを出す。戦闘報告の消費も木材と鉄で','報告（ターンの報告・夜明け・戦闘報告）をリリアが話す形に','研究が終わったとき、リリアが動画つきで使い方を説明（エンチャント付与・駐屯地への夜襲・改造）','建物の間を歩く運び手をなくして、施設の前で働く人に（木を切る・石を割る・耕す・網を引く・金槌）。建設中は足場と金槌を打つ人','ボスが倒れたら、残りの魔物は街から離れる向きに逃げ、離れると消える（倒した数には入らない）','戦闘報告にアイコン（撃破＝魔物の幽霊・戦死・施設損失）と、手に入れた魔物の素材（魔核・小さな魔核・巨大魔核・龍鱗・飛膜）の内訳','エンチャントがかかった施設と兵士の絵の上に、紫の波がゆらゆら流れる','詳細の「改造」「エンチャント付与」にアイコン。研究前もグレーで出して、何ができるかを知らせる','<b>一括</b>：一括修理・一括補給・廃墟の建て直し・装備と道具・エンチャント付与を、下の「一括」のメニューにまとめた（使えないものはグレーで理由を出す）','演出の形：建った＝緑の輪・強化した＝黄色のひし形・改造が付いた＝水色の二重の輪（タイムラプスも同じ・控えめに）','前のセーブで、なくした研究（燃える岩・魔矢）が研究中だと研究の画面が開けなかったのを直した','襲撃のあと、エンチャントがはがれていなかったのを直した','空の「枯渇」のお知らせが、地図の右下に小さな枠だけ出ていたのを直した','タイムラプスで、人員不足などの印が出ていたのを直した','前のセーブで、研究の画面で最後に選んでいた研究が消した研究だと、研究の画面が開けなかったのを直した','置いたらすぐ完成する柵・壁も、その日のうちなら取り消せるように（取り消しボタン・Ctrl+Z）','「次の襲撃で足りない」「今夜の見込み」を押すと、何に（施設・部隊・篝火）どれだけ使う見込みかが見られる','英雄の部隊が、地図で英雄の共通の絵になっていたのを本人の絵に直した','メイジの塔・テスラタワー・ミスリルレイが、撃つときに撃つ絵になる','前哨砦の攻撃を、線（弾）から矢に','スマホ：詳細を開いたとき、右上に「×」を出して閉じられるように（下の「マップに戻る」が画面の外に出ていた）','<b>王都からの依頼</b>：街と守りの目標2つ（住民100・200・500・1000、研究の数、魔物の討伐数、城のランク、道具、英雄、改造、駐屯地への夜襲・つぶす、ゴブリンキング討伐）と、王都へ救援物資を送る依頼1つ。達成で金貨・銀貨・資材が届く。城か下の「依頼」で見られる。断るは1日1回','城の毎ターンの金貨を 18→12 に戻した（王都からの依頼で補う）','依頼は街と守り3つ＋送る1つに。依頼のアイコンを専用の絵に','【緊急】第19襲撃のあと、ゴブリンキング討伐の依頼（第20襲撃まで）','<b>襲撃のリプレイ</b>：一番新しい襲撃を、戦闘報告か街の記録の「リプレイ」から見られる（再生・一時停止・速さ・好きな位置へ。セーブには入らないので、読み込み直すと消える）','記録のタイムラプスを動画で保存できる（街の名前と日付入り）','前哨砦の絵の上が切れていたのを直した（切れていた旗を消して、かがり火の炎の先と旗竿の先を描き足した）','訓練所などに出ていた「海外調達」の表示をなくした（英雄は英雄の家から）','<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：画面の上の街の名前・戦いの結果・つづきから・前哨砦にも出る。地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','英雄の家・港・空港・グリフォンの厩舎・兵器工房の建設のアイコン、土地を選んだときの建設の一覧にもアイコン','アップグレードで増える働き手は、費用の「住民」として待機中の住民からすぐに入る（アップグレード直後に人手不足にならない）','倒れた魔物と兵は、その場で横に倒れて少しつぶれてから消える','武器工房の道具の段の絵（地図の絵と立ち絵）を入れた','道具の段の立ち絵を入れた（施設を選んだときの絵が、道具の段ごとに変わる）','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける','壁が2列並んでいるところの門が、横向き・縦向きを間違えて描かれていたのを直した','門も置いたらすぐ完成するように','英雄の部隊が3人に見えていたのを、英雄1人の絵にした','掘り尽くした石切り場・鉱山・採掘所は、森と同じように足元の丘・岩場・鉱脈・泉がなくなるように（解体したときも）','一括に「枯渇した施設を解体」：1軒ずつ絵・名前・何が尽きたか・城から見た場所を出し、チェックで選んで解体できる','襲撃の群れを、開いている方角に順番に割り振るように（同じ時間に1方向からだけ来ることがなくなる）','建設の「領地」は、はじめからある施設を上に、あとから開く施設を下に足す並びに','リリアの説明などを開いている間は、下の「枯渇」「足りない」の札を隠す','地図を引いて見るとき、「残り○T」の札が大きくなりすぎていたのを、地図と一緒に小さくなるように（かなり引くと出さない）','工業と魔法の分岐を入れた（1回目）：城がランクⅣになると、街の方針を「工業」か「魔法」に決める。違う方針のランクⅣ以上の研究は費用2倍','魔金属をやめて「エーテル金属」（水色）に。工業の街では、ランクⅤの金属は「黒鉄」になる（研究・アップグレード・道具・装備の素材が黒鉄に）','新しい施設：機械工房（工業・研究「蒸気機関」で開く。鉄と合金から歯車）、高炉（工業・ランクⅤ。合金・石炭・鉄から黒鉄）、錬金工房（魔法・ランクⅤ。合金とエーテルからエーテル金属）。絵ができるまでは前の絵で代わり','エーテル採掘所は魔法のランクⅣに（工業の街は研究で開く）。精錬所のエーテル金属の段はなくして、ランクⅦで竜晶を作れる段に','櫓台は建設のリストから外した（建ててあるものはそのまま）']],
  ['1.18（試作版だけ）','2026-11-18',['<b>大きな生産施設</b>（研究で建てる・4×4）：大農場・大伐採所・養殖場（ランクⅢ）、大採掘場（ランクⅣ・鉄3・石炭2・金1も取れる）。小さい施設4つ分より多く作る（4.5倍）。建てる資材は5倍、働き手は3倍。土地は4分の3が合っていれば建てられる。道具の段も使える。絵はまだないので小さい施設の絵を大きくして借りている','研究「魔核加工」をなくした','兵舎・馬小屋・竜舎・魔導院は、アップグレード1段ごとに入れられる部隊が1つ増える']],
  ['1.17（試作版だけ）','2026-11-18',['<b>道具の段は研究で開く</b>：はじめは木の道具。「石の道具」（Ⅰ）「鉄の道具」（Ⅱ）…「聖銀の道具」（Ⅵ）の研究で、全部の生産施設のその段が使えるようになる（鍛冶の心得はまとめた）','あとから建てる施設は、建てられるランクの道具を持って建つ（炭鉱なら鉄のつるはし）','<b>生産の技術</b>（%ではなく施設ごとの便利な効果）：石運びの道・輪作・網の繕い（Ⅰ）、植林・炭焼き・坑木の補強・夜釣り・魔矢づくり（Ⅱ）、発破・選鉱（Ⅲ）、換気坑（Ⅳ）','<b>魔矢</b>：武器工房で、矢と小さな魔核から作る。あるあいだは物見櫓とバリスタが先に使い、威力 +30%','<b>今夜のエンチャント</b>（研究「一夜の付与」）：小さな魔核で、防衛施設と部隊をその夜だけ強くする（火力 +30%・受ける被害 −15%）。朝にはがれる。まとめてかけるボタンもある','蒼い炎の篝火は、夜ごとに小さな魔核を燃やす','研究の費用に小さな魔核（ランクⅡから）と魔核（ランクⅣから）を使う','小さな魔核を魔核にまとめる仕組みは外した','道具の研究は、研究画面の各ランクのいちばん上に（黄色の枠）','研究「呪骸の柱」「夜狩り術」をなくした']],
  ['1.16（試作版だけ）','2026-11-18',['<b>魔物の種類で取れる素材が違う</b>：小型＝小さな魔核・大型＝魔核・竜型＝龍鱗・空を飛ぶ魔物＝飛膜・ボス＝巨大魔核','<b>巨大魔核の使い道を3つから1つ選ぶ</b>（城の画面）：竜哮砲（城に据える巨大な大砲。夜、20秒ごとに空へ撃ち上げて、いちばん魔物の多いところに落とす。龍鱗5も使う）・知恵の結晶（使うと5ターン研究が2倍の速さ）・英雄の目覚め（英雄1人が大きく強くなる）','<b>竜晶</b>：精錬所をランクⅦにすると、エーテル2・聖銀1・龍鱗1から竜晶を作れる。竜晶の武器と防具（ランクⅦ）に使う','龍鱗の壁は龍鱗を、風船爆弾とグリフォン騎兵は飛膜を、ランクⅦのアップグレードは龍鱗を使う','<b>占い師</b>：ブラッドムーンの3日前の夜に来て、不吉な予言を残す（幸福度 −10・3日間）','<b>まとめて建てる・替えるときは端から順番に</b>：柵や罠をドラッグで並べたとき、施設をまとめて替えたとき（施設の画面の「同じ施設をまとめて替える」）、パパパッと順番に出る。音の高さも少しずつ違う','英雄を付けられる生産施設は、資源を作る施設だけ（住居・研究室・酒場などはなし）']],
@@ -8677,7 +8703,7 @@ function showPolicy(pick){const L=k=>Object.keys(TECH_LINE).filter(id=>TECH_LINE
 /* 試作（2026-11-18）：城のランクが上がったときに、使えるようになったものをアイコン付きで並べる */
 function rankOpenList(rk){const G={'領地':[],'防衛':[],'部隊':[]};const seen=new Set();const add=(g,ic,n)=>{if(seen.has(g+n))return;seen.add(g+n);G[g].push({ic,n});};
   const bi=k=>kcImg(k)?`<img src="${kcImg(k)}" width="32" height="32" style="image-rendering:pixelated">`:icSvg(k,32);
-  for(const k of [...new Set(BUILD_GROUPS.flatMap(g=>g.list).concat(BUILD_ORDER))]){const r=B[k].req;if(r&&RANK_OPEN[r]===rk)add(B[k].grp==='def'?'防衛':'領地',bi(k),B[k].name+'（新しい施設）');}
+  for(const k of [...new Set(BUILD_GROUPS.flatMap(g=>g.list).concat(BUILD_ORDER))]){const r=B[k].req;if(r&&RANK_OPEN[r]===rk&&(!RANK_LINE[r]||has(r)))add(B[k].grp==='def'?'防衛':'領地',bi(k),B[k].name+'（新しい施設）');}
   const tl={};for(const k in KC){const st=KC[k].st;for(let i=1;i<st.length;i++){if(st[i][0]!==rk)continue;if(isTool({type:k})){continue;const m=TOOL_T[i][1];(tl[m]=tl[m]||{k,n:new Set()}).n.add(m+'の'+TOOL[k]);}else add(B[k].grp==='def'?'防衛':'領地',bi(k),st[i][1]+'（アップグレード）');}}
   for(const m in tl)add('領地',bi(tl[m].k),[...tl[m].n].join('・')+'（道具）');
   (IS_PROTO?W_REQ:[null,'heavyarms','alloyarms','eqw_3','eqw_4','eqw_5']).forEach((id,i)=>{if(id&&RANK_OPEN[id]===rk)add('部隊',eqIcon('w',i,32),W_MAT[i]+'の武器');});
