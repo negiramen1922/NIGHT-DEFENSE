@@ -104,7 +104,7 @@ QA=[
  ('q_i_iron','N領地',4,'蒸気ポンプ','鉱山','坑道の水をくみ出して深く掘る。鉄 +30%。毎日 石炭を少し使う','工',['q_i_steam','b_ironmine']),
  ('q_i_farm','N領地',4,'蒸気の鋤','農場','食料 +30%。毎日 石炭を少し使う','工',['q_i_steam','b_farm']),
  ('q_i_fish','N領地',4,'蒸気船','漁場','食料 +30%。毎日 石炭を少し使う','工',['q_i_steam','b_fishery']),
- ('q_i_smelt','N領地',5,'高炉','精錬所','精錬所のアップグレード：合金・石炭・鉄から重金属を作る（工業の金属）','工',['q_i_steam','b_smelter']),
+ ('q_i_smelt','N領地',5,'高炉','精錬所のアップグレード','精錬所のアップグレード：合金・石炭・鉄から重金属を作る（工業の金属）','工',['q_i_steam','b_smelter']),
  ('q_i_house','N領地',5,'高層住宅','住居','重金属の骨組みで高く建てる。住める人数 +50%','工',['q_i_smelt','b_barracks']),
  ('q_m_miner','N領地',4,'精霊の森','伐採所','木材 +20%。埋蔵の減り −30%','魔','b_miner'),
  ('q_m_quarry','N領地',4,'ノームの導き','石切り場','石材 +20%。ときどき魔金属が少し出る','魔','b_quarry'),
@@ -125,7 +125,7 @@ QA=[
  ('q_i_mor','N防衛',4,'クラスター','迫撃砲の改造','着弾した所に破片が飛び散る（今の改造を工業へ）','工','g_incend'),
  ('q_m_mor','N防衛',4,'凍結弾','迫撃砲の改造','着弾した所の魔物が遅くなる','魔','g_incend'),
  ('q_i_wire','N防衛',4,'鉄条網','柵・石の壁','触れた魔物が傷を受け続け、足が遅くなる','工',['q_i_steam','b_fence']),
- ('q_i_fort','N防衛',5,'重金属の壁','新しい壁','耐久は魔金属の壁と同じ。上に置いた防衛施設の耐久 +30%（魔金属の壁は、攻撃した魔物を押し返す）','工',['q_i_smelt','b_wall']),
+ ('q_i_fort','N防衛',5,'重金属の壁','新しい壁（ランクで開く）','耐久は魔金属の壁と同じ。上に置いた防衛施設の耐久 +30%（魔金属の壁は、攻撃した魔物を押し返す）','工',['q_i_smelt','b_wall']),
  ('q_i_hgun','N防衛',5,'重砲','大砲のアップグレード','重金属の砲身。射程・火力が大きい（魔導砲の工業版。新しい絵）','工',['q_i_smelt','g_cannontech']),
  ('q_i_flare','N防衛',6,'照明弾の発射台','新しい施設','夜の広い範囲を照らす（新しい絵）','工',['q_i_gas','b_brazier']),
  ('q_i_bigc','N防衛',7,'大要塞砲','新しい施設','城に据える切り札の大砲。一晩に数回、遠くの群れを吹き飛ばす（新しい絵）','工','q_i_hgun'),
@@ -196,6 +196,16 @@ addpre('k_mg_4','q_i_mg3');addpre('k_gate_4','q_i_gate');addpre('b_wall5','q_i_f
 addpre('e_a_4','q_i_arm');addpre('e_w_3','q_i_wpn');addpre('e_r_3','q_i_coat')
 for k in ['g_barrierst','g_teslat','g_gravityt','g_mrayt','g_dbreatht','g_meteort','g_magic','g_aebombt']:addpre(k,'b_well')   # 魔法の施設・兵はエーテル採掘から
 addpre('g_harpoont','q_i_smelt');addpre('g_artillery','q_i_steam')   # 工業の施設・兵は蒸気機関・高炉から
+# カードの種類（2026-11-20）：研究で取るもの／城のランクで開くもの を見分ける
+def kd(c):
+  tg=c.get('tg') or '';p=c.get('prop')
+  if c['cat']=='N素材' or tg=='素材':return 'mat'
+  if tg=='ランクⅣ':return 'pol'
+  if p=='新':return {'ランクで開く':'rank','はじめから':'start','改造':'mod'}.get(tg,'res')
+  if tg.endswith('改造'):return 'opt'
+  if 'アップグレード' in tg or '替える' in tg or 'ランクで開く' in tg:return 'rank'
+  return 'res'
+for c in cards:c['kd']=kd(c)
 d['T']+=cards
 RM=d.get('RANKMAT') or {}
 if 'elec' in RM.get('2',[]):RM['2']=[x for x in RM['2'] if x!='elec'];RM.setdefault('4',[]).append('elec')

@@ -9,6 +9,7 @@
       <span><i style="border:1px dashed #b89a4a"></i>案</span>
       <span><i style="border:1px solid var(--cyan)"></i>足したカード・つないだ線</span>
     </div>
+    <div class="legend kdleg" id="kdleg"></div>
     <span class="save" id="save" aria-live="polite"></span>
   </div>
   <div class="tabs" id="tabs" role="tablist"></div>
@@ -47,6 +48,17 @@ for(const n of BASE)n.pre=(n.pre||[]).map(p=>nodeById[p]?nodeById[p].id:p);
 const notes={},posO={},links={},custom={},lines={};let lnF='all';
 /* 方針（2026-11-20）：カードごとに 共通・工業・魔法 を決める（db の line）。決めていないカードは、ゲームの今の振り分け */
 const LNN={'共':'共通','工':'工業','魔':'魔法'};function lnOf(t){const v=lines[t.id];return v&&v.ln?v.ln:(t.ln||'共');}let db=null,canWrite=true;
+/* カードの種類（2026-11-20）：アイコンと名前で、研究で取るものと城のランクで開くものを分ける */
+const KS='<svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">';
+const KD={
+ res:['研究','研究室で研究して取る','#62c6d9',KS+'<path d="M6 1h4v1H9v4l4 7v2H3v-2l4-7V2H6z" fill="#1c2a30" stroke="#62c6d9"/><path d="M4 12h8v2H4z" fill="#62c6d9"/></svg>'],
+ mod:['改造の研究','研究すると、その施設の改造（2つから1つ）を選べる','#62c6d9',KS+'<path d="M3 13l6-6M9 7a3 3 0 1 0 3-4l-2 2-1-1 2-2a3 3 0 0 0-4 3" fill="none" stroke="#62c6d9" stroke-width="2"/></svg>'],
+ opt:['改造の選択肢','改造で選べるものの1つ（方針で変わる）','#9fd8e0',KS+'<path d="M8 14V8M8 8L3 3M8 8l5-5" fill="none" stroke="#9fd8e0" stroke-width="2"/><rect x="1" y="1" width="4" height="4" fill="#9fd8e0"/><rect x="11" y="1" width="4" height="4" fill="#9fd8e0"/></svg>'],
+ rank:['ランクで開く','研究はいらない。城のランクが上がると、アップグレードや道具・装備を替えられる','#f2b33d',KS+'<path d="M2 15V5h2v2h2V5h4v2h2V5h2v10z" fill="#2a2210" stroke="#f2b33d"/><rect x="7" y="10" width="2" height="5" fill="#f2b33d"/></svg>'],
+ start:['はじめから','はじめから建てられる・編成できる','#8aa48d',KS+'<path d="M2 15V5h2v2h2V5h4v2h2V5h2v10z" fill="#18201a" stroke="#8aa48d"/></svg>'],
+ mat:['素材','素材','#b08aff',KS+'<path d="M8 1l6 5-6 9-6-9z" fill="#2a2040" stroke="#b08aff"/></svg>'],
+ pol:['方針','ここで工業か魔法を選ぶ','#e8e0d0',KS+'<path d="M8 15V6M8 6L3 2M8 6l5-4" fill="none" stroke="#e8e0d0" stroke-width="2"/></svg>']};
+function kdOf(t){return t.kd||(t.custom?'res':'res');}
 let tab=D.tabs[0],sel=null,filt='all',showKc=false,linkMode=false,linkSrc=null,bandMode=true,BANDS=[];
 function allNodes(){const C=Object.entries(custom).map(([id,c])=>({id,cat:c.cat,r:c.r||1,n:c.n||'（名前なし）',e:c.e||'',pre:[],mx:1,custom:true,un:[],c:'',tt:0}));for(const c of C)nodeById[c.id]=c;return BASE.concat(C);}
 function stOf(id){const n=notes[id];return n&&n.st&&STX[n.st]?n.st:'';}
@@ -99,11 +111,11 @@ function cardHTML(t,p){const st=stOf(t.id),n=notes[t.id];const memo=n&&(n.note||
   if(t.mv&&!(t.lvk>1))tags.push(`<span class="tag mv">→ ${esc(t.mv)}</span>`);if(st)tags.push(`<span class="tag st" style="--stc:${STX[st][1]}">${STX[st][0]}</span>`);
   const xp=(t.pre||[]).filter(q=>nodeById[q]&&nodeById[q].cat!==t.cat).map(q=>nodeById[q].n+'（'+nodeById[q].cat+'）');
   const x=12+(p.col-C0())*(W+G),y=12+p.row*(CH+VG);
-  const LC=lnOf(t);return `<button class="card ln-${({'工':'ind','魔':'mag','共':'com'})[LC]}${lnF!=='all'&&LC!==lnF?' lndim':''}${t.kc?' kc':''}${t.stage?' stage':''}${t.prop&&t.prop!=='新'?' prop':''}${t.prop==='新'&&(t.tg==='ランクで開く'||t.tg==='はじめから')?' auto':''}${t.prop==='新'&&t.tg==='なくす'?' gone':''}${t.custom?' custom':''}${sel===t.id?' sel':''}${linkSrc===t.id?' src':''}" data-id="${t.id}" style="--stc:${st?STX[st][1]:'transparent'};left:${x}px;top:${y}px;width:${W}px;--ch:${CH}px">
-    <div class="tt">${t.ic&&D.IC[t.ic]?`<img class="ic" src="${D.IC[t.ic]}" alt="">`:''}<b>${esc(t.n)}</b><span class="lv"${off?' style="color:var(--amber)"':''}>${off?`ランク${RN[t.r]}→${RN[p.col]||p.col}`:'ランク'+RN[t.r]}</span></div>
+  const LC=lnOf(t);const K=KD[kdOf(t)];return `<button class="card k-${kdOf(t)} ln-${({'工':'ind','魔':'mag','共':'com'})[LC]}${lnF!=='all'&&LC!==lnF?' lndim':''}${t.kc?' kc':''}${t.stage?' stage':''}${t.prop&&t.prop!=='新'?' prop':''}${t.prop==='新'&&(t.tg==='ランクで開く'||t.tg==='はじめから')?' auto':''}${t.prop==='新'&&t.tg==='なくす'?' gone':''}${t.custom?' custom':''}${sel===t.id?' sel':''}${linkSrc===t.id?' src':''}" data-id="${t.id}" style="--stc:${st?STX[st][1]:'transparent'};left:${x}px;top:${y}px;width:${W}px;--ch:${CH}px">
+    <div class="tt">${t.ic&&D.IC[t.ic]?`<img class="ic" src="${D.IC[t.ic]}" alt="">`:''}<b>${esc(t.n)}</b><span class="kd" style="color:${K[2]}" title="${K[1]}">${K[3]}${K[0]}</span><span class="lv"${off?' style="color:var(--amber)"':''}>${off?`ランク${RN[t.r]}→${RN[p.col]||p.col}`:'ランク'+RN[t.r]}</span></div>
     <div class="e">${t.prop&&t.prop!=='見本'&&t.prop!=='新'?`${esc(t.tg)}：`:''}${esc(t.e)||'（効果を書いてください）'}</div>
     ${xp.length?`<div class="xp">← ${esc(xp.join('・'))}</div>`:''}${memo?`<div class="memo">✎ ${esc(memo)}</div>`:tags.length?`<div class="tags">${tags.join('')}</div>`:''}</button>`;}
-function render(){renderTabs();const AN=allNodes();
+function render(){renderTabs();{const lg=$('kdleg');if(lg&&!lg.innerHTML)lg.innerHTML=['res','mod','opt','rank','start'].map(k=>`<span style="color:${KD[k][2]}" title="${KD[k][1]}">${KD[k][3]}${KD[k][0]}</span>`).join('');}const AN=allNodes();
   const L=AN.filter(visible),E=edgesOf(L);const pos=layout(L,E);POS=pos;
   let maxRow=0,maxCol=7;for(const k in pos){maxRow=Math.max(maxRow,pos[k].row);maxCol=Math.max(maxCol,pos[k].col);}maxCol=Math.max(maxCol,7);
   const X=c=>12+(c-C0())*(W+G),Y=r=>12+r*(CH+VG);
@@ -157,7 +169,7 @@ function renderDet(){const t=nodeById[sel];if(!t)return;const n=notes[t.id]||{};
   const left=t.custom?`<div><label class="hint" for="cn">名前</label><input type="text" id="cn" value="${esc(t.n)}">
       <label class="hint" for="ce" style="display:block;margin-top:6px">効果</label><textarea id="ce" style="min-height:52px">${esc(t.e)}</textarea>
       <div class="row">ランク：<b>${p?RN[p.col]||p.col:RN[t.r]}</b>（カードを動かすと変わる）</div>__PRE__<button class="del" id="cdel">このカードを消す</button></div>`
-   :`<div><h2>${t.ic&&D.IC[t.ic]?`<img class="ic2" src="${D.IC[t.ic]}" alt="">`:''}${esc(t.n)}</h2><div class="meta">${(D.TABL&&D.TABL[t.cat])||t.cat}・ランク${RN[t.r]}${p&&p.col!==t.r?` <span class="moved">→ ランク${RN[p.col]||p.col}に動かした</span>`:''}${t.prop?`・${t.prop}（${esc(t.tg)}）`:''}${t.stage?'・改築の段':''}</div>
+   :`<div><h2>${t.ic&&D.IC[t.ic]?`<img class="ic2" src="${D.IC[t.ic]}" alt="">`:''}${esc(t.n)}</h2><div class="meta"><span style="color:${KD[kdOf(t)][2]}">${KD[kdOf(t)][3]} ${KD[kdOf(t)][0]}（${KD[kdOf(t)][1]}）</span>・${(D.TABL&&D.TABL[t.cat])||t.cat}・ランク${RN[t.r]}${p&&p.col!==t.r?` <span class="moved">→ ランク${RN[p.col]||p.col}に動かした</span>`:''}${t.prop?`・${t.prop}（${esc(t.tg)}）`:''}${t.stage?'・改築の段':''}</div>
     <div class="ef">${esc(t.e)}</div>
     __PRE__${t.by?`<div class="row">解放する研究：<b>${esc(t.by)}</b></div>`:''}${t.c?`<div class="row">費用：<b>${esc(t.c)}</b>・${t.tt}ターン</div>`:''}
     ${t.un&&t.un.length?`<div class="row">解放：<b>${t.un.map(esc).join('・')}</b></div>`:''}${t.mv?`<div class="row">魔核タブをなくすときの引っ越し先：<b>${esc(t.mv)}</b></div>`:''}${t.art?'<div class="row" style="color:var(--red)">新しい絵が必要</div>':''}
