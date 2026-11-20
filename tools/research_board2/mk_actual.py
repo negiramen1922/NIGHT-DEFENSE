@@ -234,6 +234,32 @@ for c in list(cards):
     cards.append(dict(c,id=nid,n=c['n'].replace('魔金属','重金属'),pre=[p for p in [c['pre'][0] if c['pre'] else None,'q_i_tool4'] if p],ln='工',prop='案',tg='道具を替える',e=c['e'].replace('魔金属','重金属').split('。',1)[-1]+'（すぐ・資材）'))
     byid[nid]=cards[-1]
     addpre('k_'+fac+'_5',nid)
+# 兵の施設の分け方（2026-11-20 試作版と合わせる）：人は兵舎、作るものは錬金工房（魔法）・蒸気の工場（工業）。竜騎兵・グリフォンは大きな厩舎。月光石は月光の祭壇
+def card(id,cat,r,n,tg,e,ln,pre):
+  c=dict(id=id,cat=cat,r=r,n=n,mx=1,pre=[p for p in pre if p in byid],c='',tt=0,e=e,kc=False,ln=ln,un=[],mv='',lv=False,prop='案',tg=tg,art=1 if '新しい絵' in e else 0);cards.append(c);byid[id]=c;return c
+for k in ['k_aerie_1','k_magic_1','k_train_2']:
+  if k in byid:cards.remove(byid.pop(k))
+if 'q_m_alch' in byid:
+  c=byid['q_m_alch'];c['n']='月光の祭壇';c['e']='新しい施設。夜のあいだに月の光を集めて、石材とエーテルから月光石を作る（昼は作らない。新しい絵）'
+sete('g_magic','兵舎で魔術師隊（3人・範囲魔法・エーテルを使う）を育てられる。魔法の街では、兵舎がランクⅣで「魔導院」になる')
+sete('g_dragon','馬小屋を「大きな厩舎」（ランクⅣ）にすると、竜騎兵を育てられる（大きな厩舎1軒につき1部隊）')
+sete('g_golemt','「錬金工房」を建設できる。エーテルゴーレム（とても硬い壁役）を作れる')
+if 'g_griffont' in byid:byid['g_griffont']['n']='グリフォン騎兵';sete('g_griffont','「大きな厩舎」でグリフォン騎兵を育てられる（空を飛んで移動し、降りて戦う）')
+sete('g_siegewt','「兵器工房」を建設できる。攻城兵器（工兵・破城槌・移動式投石機）を作る')
+card('q_stable','N部隊',4,'大きな厩舎','馬小屋のアップグレード','馬小屋の上の段。研究「竜騎兵」「グリフォン騎兵」のあと、ここで育てられる（新しい絵）','',['k_stable_1'])
+addpre('g_dragon','q_stable');addpre('g_griffont','q_stable')
+card('q_m_alchw','N部隊',5,'錬金工房','新しい施設（研究で開く）','ゴーレムや空飛ぶクジラを作る工房（エーテルゴーレム・巨大ゴーレム・空飛ぶクジラ）','魔',['g_golemt'])
+card('q_i_steamf','N部隊',5,'蒸気の工場','新しい施設（ランクで開く）','蒸気機兵・蒸気戦車・銃士の気球・爆撃飛行船を組み立てる工場（新しい絵）','工',['q_i_steam'])
+card('q_i_barr','N領地',4,'蒸気の兵舎','兵舎のアップグレード','兵舎のランクⅣの工業の段。人の兵（銃兵・砲兵・狙撃兵など）を育てる（新しい絵）','工',['k_train_1'])
+card('q_m_barr','N領地',4,'魔導院','兵舎のアップグレード','兵舎のランクⅣの魔法の段。魔術師・空の魔術師も育てる（新しい絵）','魔',['k_train_1'])
+card('q_m_barr2','N領地',6,'大魔導院','兵舎のアップグレード','兵舎のランクⅥの魔法の段（新しい絵）','魔',['q_m_barr'])
+for k in ['q_i_mech','q_i_balloon','q_i_spg','q_i_airship']:
+  if k in byid:byid[k]['e']=byid[k]['e'].replace('（新しい絵）','（蒸気の工場で作る）')
+  addpre(k,'q_i_steamf')
+for k in ['q_m_biggolem','q_m_core3']:
+  if k in byid:byid[k]['e']=byid[k]['e'].replace('（','（錬金工房で作る。',1) if '（' in byid[k]['e'] else byid[k]['e']+'（錬金工房で作る）'
+  addpre(k,'q_m_alchw')
+if 'q_m_owl' in byid:byid['q_m_owl']['e']=byid['q_m_owl']['e'].replace('（','（兵舎で育てる。',1)
 # 魔金属 → 月光石（魔法・夜に作る石）、重金属 → 黒鉄（2026-11-20）
 for c in cards:
   for k in ('n','e','tg'):
