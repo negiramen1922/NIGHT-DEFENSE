@@ -35,7 +35,7 @@ const D=JSON.parse(document.getElementById('data').textContent);
 const RN=['0','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ','Ⅸ'];
 const TC={'N素材':'var(--c-mat)','N領地':'var(--c-prod)','N防衛':'var(--c-def)','N部隊':'var(--c-army)','生産':'var(--c-prod)','内政':'var(--c-gov)','防衛':'var(--c-def)','部隊':'var(--c-army)','魔核':'var(--c-mat)'};
 const STX={keep:['残す','var(--green)'],change:['変える','var(--amber)'],drop:['消す','var(--red)'],adopt:['入れる','var(--green)'],reject:['やめる','var(--red)']};
-const W=212,G=46,CH=70,VG=10;
+const W=212,G=46,VG=10;let CH=70;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // もとのカード（Lvのある研究は Ⅰ・Ⅱ・Ⅲ に分ける）
@@ -58,15 +58,17 @@ function edgesOf(L){const ids=new Set(L.map(t=>t.id));const E=[];
   for(const [k,v] of Object.entries(links)){if(!v.on)continue;if(ids.has(v.from)&&ids.has(v.to)&&!E.some(e=>e.a===v.from&&e.b===v.to))E.push({a:v.from,b:v.to,kind:'u'});}
   return E;}
 /* 方針ごとに分けて並べる（2026-11-20）：共通・工業・魔法の帯に分け、帯の中で前提の木の形に並べる（保存した位置は使わない） */
-function layout(L,E){if(!bandMode){BANDS=[];return layout0(L,E);}const out={};BANDS=[];let base=0;
+function layout(L,E){CH=bandMode?46:70;$('tree').classList.toggle('compact',bandMode);if(!bandMode){BANDS=[];return layout0(L,E);}const out={};BANDS=[];let base=0;
   for(const k of ['共','工','魔']){const sub=L.filter(t=>lnOf(t)===k);if(!sub.length)continue;BANDS.push({ln:k,row:base,n:sub.length});const p=treeLay(sub);let mx=0;for(const id in p){out[id]={row:p[id].row+base+1,col:p[id].col};mx=Math.max(mx,p[id].row);}base+=mx+3;}
   return out;}
 function treeLay(L){const ids=new Set(L.map(t=>t.id));const kids={},hasPar=new Set();const inc=t=>incoming(t.id).filter(p=>ids.has(p));
   for(const t of L)for(const p of inc(t)){if(hasPar.has(t.id))continue;(kids[p]=kids[p]||[]).push(t);hasPar.add(t.id);}
   const roots=L.filter(t=>!hasPar.has(t.id)).sort((a,b)=>a.r-b.r||((kids[b.id]||[]).length-(kids[a.id]||[]).length));for(const k in kids)kids[k].sort((a,b)=>a.r-b.r);
-  const pos={};let next=0;const seen=new Set();
-  function place(t,row,pc){if(seen.has(t.id))return;seen.add(t.id);const col=Math.max(t.r,pc);pos[t.id]={row,col};next=Math.max(next,row+1);let r=row,first=true;for(const c of (kids[t.id]||[])){const same=Math.max(c.r,col)===col;if(!first||same)r=next;place(c,r,col);first=false;}next=Math.max(next,row+1);}
-  for(const t of roots)place(t,next,0);return pos;}
+  /* 列ごとに次に空いている行を覚えて、上から詰める（2026-11-20：縦に伸びすぎないように） */
+  const pos={},free={},seen=new Set();
+  function place(t,minRow,pc){if(seen.has(t.id))return;seen.add(t.id);const col=Math.max(t.r,pc);const row=Math.max(minRow,free[col]||0);pos[t.id]={row,col};free[col]=row+1;
+    for(const c of (kids[t.id]||[]))place(c,row,col);}
+  for(const t of roots)place(t,0,0);return pos;}
 function layout0(L,E){const ids=new Set(L.map(t=>t.id));const kids={},hasPar=new Set();
   for(const t of L)for(const p of t.pre){if(!ids.has(p)||hasPar.has(t.id))continue;(kids[p]=kids[p]||[]).push(t);hasPar.add(t.id);}
   const roots=L.filter(t=>!hasPar.has(t.id)).sort((a,b)=>((b.top?1:0)-(a.top?1:0))||a.r-b.r);
@@ -137,7 +139,10 @@ function clickCard(id){if(pickPre){const to=pickPre;pickPre=null;$('board').clas
     $('msg').textContent='前提に足した：'+nodeById[id].n+' → '+nodeById[to].n;sel=to;render();renderDet();return;}
   if(linkMode){if(!linkSrc){linkSrc=id;$('msg').textContent='「'+nodeById[id].n+'」から → つなぐ先のカードを押してください（同じカードを押すとやめる）';render();return;}
     if(linkSrc===id){linkSrc=null;$('msg').textContent='線をつなぐ：前のカード → 後のカードの順に押す';render();return;}const a=nodeById[linkSrc].n,c=nodeById[id].n;const on=toggleLink(linkSrc,id);linkSrc=null;$('msg').textContent=(on?'つないだ：':'線を消した：')+a+' → '+c+'（続けて次の線も引けます。終わったら「線をつなぐ」をもう一度）';return;}
+  if(sel===id){clearSel();return;}   /* 選んでいるカードをもう一度押すと外す */
   sel=id;render();renderDet();}
+const DET0=document.getElementById('det').innerHTML;
+function clearSel(){if(!sel)return;sel=null;render();$('det').innerHTML=DET0;}
 function incoming(id){const t=nodeById[id];const out=[];for(const p of (t.pre||[])){const l=links[p+'>'+id];if(!(l&&l.on===false))out.push(p);}
   for(const v of Object.values(links))if(v.on&&v.to===id&&!out.includes(v.from))out.push(v.from);return out;}
 let pickPre=null;
@@ -204,7 +209,8 @@ $('tree').addEventListener('click',ev=>{if(!addMode)return;ev.stopPropagation();
   if(Object.values(POS).some(p=>p.col===c.col&&p.row===c.row))return;
   const id='c'+Date.now().toString(36);custom[id]={cat:tab,r:c.col,n:'新しい研究',e:''};posO[id]={cat:tab,col:c.col,row:c.row};setAdd(false);
   put('custom',id,custom[id]).then(()=>put('pos',id,posO[id]));sel=id;render();renderDet();const ci=$('cn');if(ci){ci.focus();ci.select();}},true);
-document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(addMode){setAdd(false);return;}if(pickPre){pickPre=null;$('board').classList.remove('connect');$('msg').textContent='やめました';}else if(linkMode){$('linkBtn').click();}});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(addMode){setAdd(false);return;}if(pickPre){pickPre=null;$('board').classList.remove('connect');$('msg').textContent='やめました';}else if(linkMode){$('linkBtn').click();}else clearSel();});
+$('board').addEventListener('click',ev=>{if(addMode||linkMode||pickPre)return;if(ev.target.closest('.card'))return;clearSel();});   /* 何もないところを押すと、選んでいるのを外す */
 render();
 (async()=>{let to=setTimeout(()=>setSave('保存先につながりません','bad'),10000);
   try{db=window.claude&&await window.claude.use('db');}catch(e){db=null;}
