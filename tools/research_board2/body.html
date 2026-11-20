@@ -17,6 +17,7 @@
     <button data-f="prop">案だけ</button>
     <button data-f="note">書き込みあり</button>
     <button id="kcTg">改築の研究（まとめ）を出す</button>
+    <button id="bandTg" class="on">方針ごとに分けて並べる</button>
     <span class="sep"></span>
     <span class="lnf" id="lnf"></span>
     <span class="sep"></span>
@@ -46,7 +47,7 @@ for(const n of BASE)n.pre=(n.pre||[]).map(p=>nodeById[p]?nodeById[p].id:p);
 const notes={},posO={},links={},custom={},lines={};let lnF='all';
 /* 方針（2026-11-20）：カードごとに 共通・工業・魔法 を決める（db の line）。決めていないカードは、ゲームの今の振り分け */
 const LNN={'共':'共通','工':'工業','魔':'魔法'};function lnOf(t){const v=lines[t.id];return v&&v.ln?v.ln:(t.ln||'共');}let db=null,canWrite=true;
-let tab=D.tabs[0],sel=null,filt='all',showKc=false,linkMode=false,linkSrc=null;
+let tab=D.tabs[0],sel=null,filt='all',showKc=false,linkMode=false,linkSrc=null,bandMode=true,BANDS=[];
 function allNodes(){const C=Object.entries(custom).map(([id,c])=>({id,cat:c.cat,r:c.r||1,n:c.n||'（名前なし）',e:c.e||'',pre:[],mx:1,custom:true,un:[],c:'',tt:0}));for(const c of C)nodeById[c.id]=c;return BASE.concat(C);}
 function stOf(id){const n=notes[id];return n&&n.st&&STX[n.st]?n.st:'';}
 function hasNote(id){const n=notes[id];return !!(n&&(n.st||(n.note||'').trim()));}
@@ -56,7 +57,17 @@ function edgesOf(L){const ids=new Set(L.map(t=>t.id));const E=[];
   for(const t of L)for(const p of t.pre){if(!ids.has(p))continue;const k=p+'>'+t.id;if(links[k]&&links[k].on===false)continue;E.push({a:p,b:t.id,kind:t.prop&&t.prop!=='新'?'p':t.lvk>1?'lv':''});}
   for(const [k,v] of Object.entries(links)){if(!v.on)continue;if(ids.has(v.from)&&ids.has(v.to)&&!E.some(e=>e.a===v.from&&e.b===v.to))E.push({a:v.from,b:v.to,kind:'u'});}
   return E;}
-function layout(L,E){const ids=new Set(L.map(t=>t.id));const kids={},hasPar=new Set();
+/* 方針ごとに分けて並べる（2026-11-20）：共通・工業・魔法の帯に分け、帯の中で前提の木の形に並べる（保存した位置は使わない） */
+function layout(L,E){if(!bandMode){BANDS=[];return layout0(L,E);}const out={};BANDS=[];let base=0;
+  for(const k of ['共','工','魔']){const sub=L.filter(t=>lnOf(t)===k);if(!sub.length)continue;BANDS.push({ln:k,row:base,n:sub.length});const p=treeLay(sub);let mx=0;for(const id in p){out[id]={row:p[id].row+base+1,col:p[id].col};mx=Math.max(mx,p[id].row);}base+=mx+3;}
+  return out;}
+function treeLay(L){const ids=new Set(L.map(t=>t.id));const kids={},hasPar=new Set();const inc=t=>incoming(t.id).filter(p=>ids.has(p));
+  for(const t of L)for(const p of inc(t)){if(hasPar.has(t.id))continue;(kids[p]=kids[p]||[]).push(t);hasPar.add(t.id);}
+  const roots=L.filter(t=>!hasPar.has(t.id)).sort((a,b)=>a.r-b.r||((kids[b.id]||[]).length-(kids[a.id]||[]).length));for(const k in kids)kids[k].sort((a,b)=>a.r-b.r);
+  const pos={};let next=0;const seen=new Set();
+  function place(t,row,pc){if(seen.has(t.id))return;seen.add(t.id);const col=Math.max(t.r,pc);pos[t.id]={row,col};next=Math.max(next,row+1);let r=row,first=true;for(const c of (kids[t.id]||[])){const same=Math.max(c.r,col)===col;if(!first||same)r=next;place(c,r,col);first=false;}next=Math.max(next,row+1);}
+  for(const t of roots)place(t,next,0);return pos;}
+function layout0(L,E){const ids=new Set(L.map(t=>t.id));const kids={},hasPar=new Set();
   for(const t of L)for(const p of t.pre){if(!ids.has(p)||hasPar.has(t.id))continue;(kids[p]=kids[p]||[]).push(t);hasPar.add(t.id);}
   const roots=L.filter(t=>!hasPar.has(t.id)).sort((a,b)=>((b.top?1:0)-(a.top?1:0))||a.r-b.r);
   for(const k in kids)kids[k].sort((a,b)=>((b.lvk?1:0)-(a.lvk?1:0))||a.r-b.r);
@@ -98,13 +109,16 @@ function render(){renderTabs();const AN=allNodes();
     return `<div style="width:${W+G}px">${c<=7?(c===0?'ランク 0（はじめから）':'ランク '+RN[c]):''}${c<=7&&m.length?`<span class="rmat" title="このランクで使えるようになる素材">${first?'':'＋'}${m.map(k=>`<span><img src="${D.IC['r.'+k]}" alt="">${D.RESN[k]}</span>`).join('')}</span>`:''}</div>`;}).join('');
   const SAMEL={};{const se=E.filter(e=>pos[e.a]&&pos[e.b]&&pos[e.a].col===pos[e.b].col).map(e=>({k:e.a+'>'+e.b,c:pos[e.a].col,lo:Math.min(pos[e.a].row,pos[e.b].row),hi:Math.max(pos[e.a].row,pos[e.b].row)})).sort((a,b)=>a.lo-b.lo);const used={};for(const s of se){const L=used[s.c]=used[s.c]||[];let l=0;while(L.some(o=>o.l===l&&!(o.hi<s.lo||o.lo>s.hi)))l++;L.push({l,lo:s.lo,hi:s.hi});SAMEL[s.k]=l;}}   // 同じ列のつなぎ線が重ならないように、少しずつ左へずらす
   const DIFL={};{const de=E.filter(e=>pos[e.a]&&pos[e.b]&&pos[e.b].col>pos[e.a].col).map(e=>({k:e.a+'>'+e.b,a:e.a,c:pos[e.b].col,lo:Math.min(pos[e.a].row,pos[e.b].row),hi:Math.max(pos[e.a].row,pos[e.b].row)})).sort((a,b)=>a.lo-b.lo);const used={};for(const s of de){const L=used[s.c]=used[s.c]||[];const same=L.find(o=>o.a===s.a);let l=same?same.l:0;if(!same)while(L.some(o=>o.l===l&&o.a!==s.a&&!(o.hi<s.lo||o.lo>s.hi)))l++;L.push({l,a:s.a,lo:s.lo,hi:s.hi});DIFL[s.k]=Math.min(l,3);}}   // 別の親から同じ列に入る線は、縦の線を少しずつずらす（同じ親はまとめる）
-  let paths='';for(const e of E){const q=pos[e.a],p=pos[e.b];if(!q||!p)continue;const x1=X(q.col)+W,y1=Y(q.row)+CH/2,x2=X(p.col),y2=Y(p.row)+CH/2;
+  const CH_=new Set();if(sel&&pos[sel]){const up=id=>{if(CH_.has(id))return;CH_.add(id);for(const e of E)if(e.b===id)up(e.a);};const dn=id=>{for(const e of E)if(e.a===id&&!CH_.has(e.b)){CH_.add(e.b);dn(e.b);}};up(sel);dn(sel);}
+  const ek=e=>CH_.size?(CH_.has(e.a)&&CH_.has(e.b)?' hl':' dim'):'';
+  let paths='';for(const e of E){const q=pos[e.a],p=pos[e.b];if(!q||!p)continue;e.kind=(e.kind||'')+ek(e);const x1=X(q.col)+W,y1=Y(q.row)+CH/2,x2=X(p.col),y2=Y(p.row)+CH/2;
     if(q.col===p.col){const x0=X(q.col),lane=(SAMEL[e.a+'>'+e.b]||0),xo=x0-6-lane*6;paths+=`<path class="${e.kind}" d="M${x0} ${y1} H${xo} V${y2} H${x0}"/>`;paths+=`<path class="hit" data-a="${e.a}" data-b="${e.b}" d="M${x0} ${y1} H${xo} V${y2} H${x0}"><title>押すとこの線を切る</title></path>`;}
     else if(x2>x1+12){const mx=x2-G/2+12-(DIFL[e.a+'>'+e.b]||0)*6;paths+=`<path class="${e.kind}" d="M${x1} ${y1} H${mx} V${y2} H${x2}"/>`;paths+=`<path class="hit" data-a="${e.a}" data-b="${e.b}" d="M${x1} ${y1} H${mx} V${y2} H${x2}"><title>押すとこの線を切る</title></path>`;}
     else{const ym=Y(Math.max(q.row,p.row))+CH+VG/2,xa=x1+G/3,xb=x2-G/3;paths+=`<path class="${e.kind}" d="M${x1} ${y1} H${xa} V${ym} H${xb} V${y2} H${x2}"/>`;paths+=`<path class="hit" data-a="${e.a}" data-b="${e.b}" d="M${x1} ${y1} H${xa} V${ym} H${xb} V${y2} H${x2}"><title>押すとこの線を切る</title></path>`;}}
   const w=X(maxCol+1)+W+12,h=Y(maxRow+3);
   $('tree').style.width=w+'px';$('tree').style.height=h+'px';
-  $('tree').innerHTML=`<svg width="${w}" height="${h}">${paths}</svg>`+L.map(t=>cardHTML(t,pos[t.id])).join('');
+  $('tree').innerHTML=`<svg width="${w}" height="${h}">${paths}</svg>`+BANDS.map(b=>`<div class="band ln-${({'工':'ind','魔':'mag','共':'com'})[b.ln]}" style="top:${Y(b.row)+CH-26}px;width:${w-24}px">${LNN[b.ln]}<small>${b.n}枚</small></div>`).join('')+L.map(t=>cardHTML(t,pos[t.id])).join('');
+  if(CH_.size)$('tree').querySelectorAll('.card[data-id]').forEach(el=>{if(!CH_.has(el.dataset.id))el.classList.add('nochain');});
   $('tree').querySelectorAll('[data-id]').forEach(bindCard);
   $('tree').querySelectorAll('path.hit').forEach(p=>p.onclick=e=>{e.stopPropagation();if(!canWrite)return;const a=p.dataset.a,bb=p.dataset.b,na=(nodeById[a]||{}).n||a,nb=(nodeById[bb]||{}).n||bb;
     if(confirm(`「${na}」→「${nb}」の線を切りますか？（あとで「線をつなぐ」でもどせます）`)){toggleLink(a,bb);$('msg').textContent=`線を切った：${na} → ${nb}`;}});
@@ -113,7 +127,7 @@ function render(){renderTabs();const AN=allNodes();
 // ドラッグで動かす・押して選ぶ・線をつなぐ
 function bindCard(el){el.onpointerdown=ev=>{if(ev.button!==0||addMode)return;const id=el.dataset.id;const sx=ev.clientX,sy=ev.clientY,x0=parseFloat(el.style.left),y0=parseFloat(el.style.top);let drag=false;
   el.setPointerCapture(ev.pointerId);
-  el.onpointermove=e=>{const dx=e.clientX-sx,dy=e.clientY-sy;if(!drag&&Math.hypot(dx,dy)>10&&!linkMode&&canWrite){drag=true;el.classList.add('drag');}if(drag){el.style.left=(x0+dx)+'px';el.style.top=(y0+dy)+'px';}};
+  el.onpointermove=e=>{const dx=e.clientX-sx,dy=e.clientY-sy;if(!drag&&Math.hypot(dx,dy)>10&&!linkMode&&canWrite&&!bandMode){drag=true;el.classList.add('drag');}if(drag){el.style.left=(x0+dx)+'px';el.style.top=(y0+dy)+'px';}};
   el.onpointerup=e=>{el.onpointermove=null;el.onpointerup=null;try{el.releasePointerCapture(ev.pointerId);}catch(_){}
     if(drag){const col=Math.max(C0(),Math.min(9,Math.round((parseFloat(el.style.left)-12)/(W+G))+C0())),row=Math.max(0,Math.round((parseFloat(el.style.top)-12)/(CH+VG)));
       let r=row;const taken=new Set(Object.entries(POS).filter(([k])=>k!==id).map(([k,v])=>v.col+':'+v.row));while(taken.has(col+':'+r))r++;
@@ -174,6 +188,7 @@ async function del(col,id){if(!db)return;try{await db.collection(col).doc(id).de
 function putNote(id){const t=nodeById[id],n=notes[id]||{};put('notes',id,{st:n.st||'',note:n.note||'',name:t?t.n:'',cat:t?t.cat:'',rank:t?t.r:0,prop:(t&&t.prop)||''});}
 $('tools').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{filt=b.dataset.f;$('tools').querySelectorAll('[data-f]').forEach(x=>x.classList.toggle('on',x===b));render();});
 $('kcTg').onclick=()=>{showKc=!showKc;$('kcTg').classList.toggle('on',showKc);render();};
+$('bandTg').onclick=()=>{bandMode=!bandMode;$('bandTg').classList.toggle('on',bandMode);$('msg').textContent=bandMode?'方針ごとの並びです（カードを動かすときは、この並べ方を切ってください）':'カードはドラッグで動かせます（列を動かすと、取れるランクが変わる）';render();};
 $('linkBtn').onclick=()=>{linkMode=!linkMode;linkSrc=null;$('linkBtn').classList.toggle('on',linkMode);$('board').classList.toggle('connect',linkMode);
   $('msg').textContent=linkMode?'線をつなぐ：前のカード → 後のカードの順に押す（もとからある線を押すと消える。もう一度で戻る）':'カードはドラッグで動かせます（列を動かすと、取れるランクが変わる）';render();};
 let addMode=false;
