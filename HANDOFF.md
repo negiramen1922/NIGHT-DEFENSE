@@ -16,6 +16,8 @@
 
 ## 1. 進め方（このプロジェクトでの決まりごと）
 
+- **操作感の作り直し（UIリメイク）**：2026-11-20 に設計を決めた（マップを画面いっぱい・建設ボタンと一覧・押した物の上の半円のボタン）。引き継ぎ資料は **`docs/UI_REMAKE.md`**（まだ試作版にも入っていない）
+
 - **改良の参考（2026-11-15 ユーザーの指定）**：[kociden/sakurai-skill](https://github.com/kociden/sakurai-skill)（桜井政博氏の YouTube 全257本から作ったゲーム制作の原則の Agent Skill。非公式）。ライセンスの表記がないのでリポジトリには写していない。使うときは `git clone https://github.com/kociden/sakurai-skill.git && cp -r sakurai-skill/skills/sakurai ~/.claude/skills/`。このゲームに当てはめた改善案は `docs/SAKURAI_REVIEW.md`（優先度つき）
 
 - **今の作業の順番（2026-11-12 ユーザーの指定。この順で進める）**
