@@ -105,7 +105,7 @@ QA=[
  ('q_i_farm','N領地',4,'蒸気の鋤','農場','食料 +30%。毎日 石炭を少し使う','工',['q_i_steam','b_farm']),
  ('q_i_fish','N領地',4,'蒸気船','漁場','食料 +30%。毎日 石炭を少し使う','工',['q_i_steam','b_fishery']),
  ('q_i_smelt','N領地',5,'高炉','新しい施設（ランクで開く）','新しい施設。高い精錬の塔で、煙をもくもく上げて合金・石炭・鉄から黒鉄を作る（工業の金属。新しい絵）','工',['q_i_steam','b_smelter']),
- ('q_m_alch','N領地',5,'錬金工房','新しい施設（ランクで開く）','新しい施設。錬金術師が魔法も使って、合金（または金）とエーテルからエーテル金属を作る（黒鉄と同じくらいの費用。新しい絵）','魔',['b_well','b_smelter']),
+ ('q_m_alch','N領地',5,'錬金工房','新しい施設（ランクで開く）','新しい施設。錬金術師が魔法も使って、夜のあいだに石材とエーテルから月光石を作る（昼は作らない。新しい絵）','魔',['b_well','b_smelter']),
  ('q_i_house','N領地',5,'高層住宅','住居','重金属の骨組みで高く建てる。住める人数 +50%','工',['q_i_smelt','b_barracks']),
  ('q_m_miner','N領地',4,'精霊の森','伐採所','木材 +20%。埋蔵の減り −30%','魔','b_miner'),
  ('q_m_quarry','N領地',4,'ノームの導き','石切り場','石材 +20%。ときどき魔金属が少し出る','魔','b_quarry'),
@@ -234,16 +234,16 @@ for c in list(cards):
     cards.append(dict(c,id=nid,n=c['n'].replace('魔金属','重金属'),pre=[p for p in [c['pre'][0] if c['pre'] else None,'q_i_tool4'] if p],ln='工',prop='案',tg='道具を替える',e=c['e'].replace('魔金属','重金属').split('。',1)[-1]+'（すぐ・資材）'))
     byid[nid]=cards[-1]
     addpre('k_'+fac+'_5',nid)
-# 魔金属 → エーテル金属、重金属 → 黒鉄（2026-11-20）
+# 魔金属 → 月光石（魔法・夜に作る石）、重金属 → 黒鉄（2026-11-20）
 for c in cards:
   for k in ('n','e','tg'):
-    if isinstance(c.get(k),str):c[k]=c[k].replace('魔金属','エーテル金属').replace('重金属','黒鉄')
+    if isinstance(c.get(k),str):c[k]=c[k].replace('魔金属','月光石').replace('重金属','黒鉄')
 NI=json.load(open('newicons.json'));IC.update(NI)
-if 'res_mmetal' in byid:byid['res_mmetal']['e']='合金（または金）とエーテルから、錬金工房で作る（魔法の金属。黒鉄と同じくらいの費用）'
+if 'res_mmetal' in byid:byid['res_mmetal']['e']='錬金工房で、夜のあいだに石材とエーテルから作る（魔法の素材。黒鉄と同じランクⅤ）'
 if 'q_r_heavy' in byid:byid['q_r_heavy']['ic']='r.heavy'
 if 'q_r_gear' in byid:byid['q_r_gear']['ic']='r.gear'
 for k in ['q_i_miner','q_i_quarry','q_i_iron','q_i_farm','q_i_fish','q_i_spg','q_i_mech']:addpre(k,'q_i_gearfac')   # 蒸気の機械は歯車を使う
-d.setdefault('RESN',{})['mmetal']='エーテル金属';d['RESN']['heavy']='黒鉄';d['RESN']['gear']='歯車'
+d.setdefault('RESN',{})['mmetal']='月光石';d['RESN']['heavy']='黒鉄';d['RESN']['gear']='歯車'
 for c in cards:c['kd']=kd(c)
 d['T']+=cards
 RM=d.get('RANKMAT') or {}
