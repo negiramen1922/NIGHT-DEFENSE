@@ -71,14 +71,17 @@ function edgesOf(L){const ids=new Set(L.map(t=>t.id));const E=[];
   return E;}
 /* 方針ごとに分けて並べる（2026-11-20）：共通・工業・魔法の帯に分け、帯の中で前提の木の形に並べる（保存した位置は使わない） */
 function layout(L,E){CH=bandMode?46:70;$('tree').classList.toggle('compact',bandMode);if(!bandMode){BANDS=[];return layout0(L,E);}const out={};BANDS=[];let base=0;
-  for(const k of ['共','工','魔']){const sub=L.filter(t=>lnOf(t)===k);if(!sub.length)continue;BANDS.push({ln:k,row:base,n:sub.length});const p=treeLay(sub);let mx=0;for(const id in p){out[id]={row:p[id].row+base+1,col:p[id].col};mx=Math.max(mx,p[id].row);}base+=mx+3;}
+  for(const k of ['共','工','魔']){const sub=L.filter(t=>lnOf(t)===k);if(!sub.length)continue;BANDS.push({ln:k,row:base,n:sub.length});const fix={};for(const t of sub){const o=posO[t.id];if(o&&o.cat===tab&&o.brow!=null)fix[t.id]={row:o.brow,col:o.bcol};}const p=treeLay(sub,fix);let mx=0;for(const id in p){out[id]={row:p[id].row+base+1,col:p[id].col};mx=Math.max(mx,p[id].row);}base+=mx+3;}
   return out;}
-function treeLay(L){const ids=new Set(L.map(t=>t.id));const kids={},hasPar=new Set();const inc=t=>incoming(t.id).filter(p=>ids.has(p));
+function treeLay(L,fix){fix=fix||{};const ids=new Set(L.map(t=>t.id));const kids={},hasPar=new Set();const inc=t=>incoming(t.id).filter(p=>ids.has(p));
   for(const t of L)for(const p of inc(t)){if(hasPar.has(t.id))continue;(kids[p]=kids[p]||[]).push(t);hasPar.add(t.id);}
   const roots=L.filter(t=>!hasPar.has(t.id)).sort((a,b)=>a.r-b.r||((kids[b.id]||[]).length-(kids[a.id]||[]).length));for(const k in kids)kids[k].sort((a,b)=>a.r-b.r);
   /* 列ごとに次に空いている行を覚えて、上から詰める（2026-11-20：縦に伸びすぎないように） */
-  const pos={},free={},seen=new Set();
-  function place(t,minRow,pc){if(seen.has(t.id))return;seen.add(t.id);const col=Math.max(t.r,pc);const row=Math.max(minRow,free[col]||0);pos[t.id]={row,col};free[col]=row+1;
+  const pos={},taken=new Set(),seen=new Set();for(const id in fix)taken.add(fix[id].col+':'+fix[id].row);   /* 動かしたカードはその場所に置き、ほかは空いた所へ */
+  const top={};
+  function place(t,minRow,pc){if(seen.has(t.id))return;seen.add(t.id);let col,row;
+    if(fix[t.id]){col=fix[t.id].col;row=fix[t.id].row;pos[t.id]={row,col,moved:true};}
+    else{col=Math.max(t.r,pc);row=Math.max(minRow,top[col]||0);while(taken.has(col+':'+row))row++;taken.add(col+':'+row);pos[t.id]={row,col};top[col]=row+1;}
     for(const c of (kids[t.id]||[]))place(c,row,col);}
   for(const t of roots)place(t,0,0);return pos;}
 function layout0(L,E){const ids=new Set(L.map(t=>t.id));const kids={},hasPar=new Set();
@@ -96,8 +99,8 @@ function layout0(L,E){const ids=new Set(L.map(t=>t.id));const kids={},hasPar=new
    const occ=new Set();for(const t of L)if(fx.has(t.id))occ.add(pos[t.id].col+':'+pos[t.id].row);
    for(const t of L){if(fx.has(t.id))continue;const p=pos[t.id];while(occ.has(p.col+':'+p.row))p.row++;occ.add(p.col+':'+p.row);}}
   // 動かしていないカードは動かない。動かしたカードは、空いているマスに置く
-  const used=new Set();for(const t of L)if(!(posO[t.id]&&posO[t.id].cat===tab))used.add(pos[t.id].col+':'+pos[t.id].row);
-  for(const t of L){const o=posO[t.id];if(!(o&&o.cat===tab))continue;let r=o.row;while(used.has(o.col+':'+r))r++;pos[t.id]={row:r,col:o.col,moved:true};used.add(o.col+':'+r);}
+  const used=new Set();for(const t of L)if(!(posO[t.id]&&posO[t.id].cat===tab&&posO[t.id].col!=null))used.add(pos[t.id].col+':'+pos[t.id].row);
+  for(const t of L){const o=posO[t.id];if(!(o&&o.cat===tab&&o.col!=null))continue;let r=o.row;while(used.has(o.col+':'+r))r++;pos[t.id]={row:r,col:o.col,moved:true};used.add(o.col+':'+r);}
   return pos;}
 function renderTabs(){const AN=allNodes();$('tabs').innerHTML=D.tabs.map(c=>{const L=AN.filter(t=>t.cat===c&&!(t.kc&&!t.stage));const w=L.filter(t=>hasNote(t.id)).length;
   return `<button role="tab" data-tab="${c}" class="${c===tab?'on':''}" style="--tc:${TC[c]}" aria-selected="${c===tab}">${D.CATIC&&D.CATIC[c]?`<i class="catic" style="-webkit-mask-image:url(${D.CATIC[c]});mask-image:url(${D.CATIC[c]})"></i>`:''}${(D.TABL&&D.TABL[c])||c}<span class="n">${L.length}${w?`・書${w}`:''}</span></button>`;}).join('');
@@ -141,11 +144,15 @@ function render(){renderTabs();{const lg=$('kdleg');if(lg&&!lg.innerHTML)lg.inne
 // ドラッグで動かす・押して選ぶ・線をつなぐ
 function bindCard(el){el.onpointerdown=ev=>{if(ev.button!==0||addMode)return;const id=el.dataset.id;const sx=ev.clientX,sy=ev.clientY,x0=parseFloat(el.style.left),y0=parseFloat(el.style.top);let drag=false;
   el.setPointerCapture(ev.pointerId);
-  el.onpointermove=e=>{const dx=e.clientX-sx,dy=e.clientY-sy;if(!drag&&Math.hypot(dx,dy)>10&&!linkMode&&canWrite&&!bandMode){drag=true;el.classList.add('drag');}if(drag){el.style.left=(x0+dx)+'px';el.style.top=(y0+dy)+'px';}};
+  el.onpointermove=e=>{const dx=e.clientX-sx,dy=e.clientY-sy;if(!drag&&Math.hypot(dx,dy)>10&&!linkMode&&canWrite){drag=true;el.classList.add('drag');}if(drag){el.style.left=(x0+dx)+'px';el.style.top=(y0+dy)+'px';}};
   el.onpointerup=e=>{el.onpointermove=null;el.onpointerup=null;try{el.releasePointerCapture(ev.pointerId);}catch(_){}
     if(drag){const col=Math.max(C0(),Math.min(9,Math.round((parseFloat(el.style.left)-12)/(W+G))+C0())),row=Math.max(0,Math.round((parseFloat(el.style.top)-12)/(CH+VG)));
+      if(bandMode){/* 方針ごとの並びで動かした位置は、帯の中の位置として別に覚える（2026-11-20） */
+        const ln=lnOf(nodeById[id]);const b=BANDS.find(x=>x.ln===ln);const brow=Math.max(0,row-(b?b.row:0)-1);
+        const dropB=[...BANDS].reverse().find(x=>row>x.row);if(dropB&&dropB.ln!==ln)$('msg').textContent='方針を変えるときは、カードを押して下の「方針」で選んでください（帯の中に戻しました）';
+        posO[id]=Object.assign({},posO[id]||{cat:tab},{cat:tab,bcol:col,brow});render();put('pos',id,posO[id]);return;}
       let r=row;const taken=new Set(Object.entries(POS).filter(([k])=>k!==id).map(([k,v])=>v.col+':'+v.row));while(taken.has(col+':'+r))r++;
-      posO[id]={cat:tab,col,row:r};render();put('pos',id,posO[id]);return;}
+      posO[id]=Object.assign({},posO[id]||{},{cat:tab,col,row:r});render();put('pos',id,posO[id]);return;}
     clickCard(id);};};}
 function clickCard(id){if(pickPre){const to=pickPre;pickPre=null;$('board').classList.remove('connect');if(id!==to&&!incoming(to).includes(id))toggleLink(id,to);
     $('msg').textContent='前提に足した：'+nodeById[id].n+' → '+nodeById[to].n;sel=to;render();renderDet();return;}
@@ -205,7 +212,7 @@ async function del(col,id){if(!db)return;try{await db.collection(col).doc(id).de
 function putNote(id){const t=nodeById[id],n=notes[id]||{};put('notes',id,{st:n.st||'',note:n.note||'',name:t?t.n:'',cat:t?t.cat:'',rank:t?t.r:0,prop:(t&&t.prop)||''});}
 $('tools').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{filt=b.dataset.f;$('tools').querySelectorAll('[data-f]').forEach(x=>x.classList.toggle('on',x===b));render();});
 $('kcTg').onclick=()=>{showKc=!showKc;$('kcTg').classList.toggle('on',showKc);render();};
-$('bandTg').onclick=()=>{bandMode=!bandMode;$('bandTg').classList.toggle('on',bandMode);$('msg').textContent=bandMode?'方針ごとの並びです（カードを動かすときは、この並べ方を切ってください）':'カードはドラッグで動かせます（列を動かすと、取れるランクが変わる）';render();};
+$('bandTg').onclick=()=>{bandMode=!bandMode;$('bandTg').classList.toggle('on',bandMode);$('msg').textContent=bandMode?'方針ごとの並びです。カードはドラッグで動かせます（帯の中の場所として覚えます）':'カードはドラッグで動かせます（列を動かすと、取れるランクが変わる）';render();};
 $('linkBtn').onclick=()=>{linkMode=!linkMode;linkSrc=null;$('linkBtn').classList.toggle('on',linkMode);$('board').classList.toggle('connect',linkMode);
   $('msg').textContent=linkMode?'線をつなぐ：前のカード → 後のカードの順に押す（もとからある線を押すと消える。もう一度で戻る）':'カードはドラッグで動かせます（列を動かすと、取れるランクが変わる）';render();};
 let addMode=false;
