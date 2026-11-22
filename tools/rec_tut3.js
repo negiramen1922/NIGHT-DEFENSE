@@ -33,7 +33,7 @@ const which=process.argv[2];
    await camOn((I.hx+1.5)*Tz,(I.row+2)*Tz,1.6);await p.waitForTimeout(800);
    const a=await scr((I.hx-4+.5)*Tz,(I.row+.5)*Tz),z=await scr((I.hx+6+.5)*Tz,(I.row+.5)*Tz);
    await p.mouse.move(a[0]+150,a[1]+160);await p.waitForTimeout(500);mark('start');
-   await clickAt(await box('#u2Build'),30);await p.waitForTimeout(800);
+   await clickAt(await box('#u2Side [data-u2t="build"]'),30);await p.waitForTimeout(800);
    const bt=await p.$('#build button[data-k="fence"]');await bt.scrollIntoViewIfNeeded();const bb=await bt.boundingBox();await clickAt([bb.x+bb.width/2,bb.y+bb.height/2],25);await p.waitForTimeout(600);
    await p.mouse.move(a[0],a[1],{steps:30});await p.waitForTimeout(400);await p.mouse.down();await p.waitForTimeout(200);
    await p.mouse.move(z[0],z[1],{steps:45});await p.waitForTimeout(500);await p.mouse.up();await p.waitForTimeout(1300);
