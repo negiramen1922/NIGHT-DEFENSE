@@ -93,7 +93,7 @@ select{width:100%}
    ・「線を引く」は、点を順に押すとつながる。右クリック・Esc・ダブルクリックで終わり（筆の大きさが太さ）<br>
    ・「範囲を動かす」は、四角く囲んでから中をつかんで動かす。Esc でやめる<br>
    ・城を置ける範囲（黄色の円）の中で、遊ぶ人が城を動かせる。円の中の川・岩・山・浅瀬の近くには置けない<br>
-   ・森・岩場・沼は、かたまりの縁が1段目、内側ほど2段目・3段目（濃い色）。深いほど効き目が強い（森なら木が多く、敵も部隊もより遅い）。5マスより太いと真ん中が3段目<br>
+   ・森・岩場・沼は、かたまりの縁が1段目、内側ほど2段目・3段目（濃い色）。深いほど効き目が強い（森なら木が多く、敵も部隊もより遅い）。縁から1マスが1段目、3マス目までが2段目、その内側が3段目。巨大樹の森のとなりの森は3段目<br>
    ・1マスはゲームの 3×3 マス。描いている途中も、このブラウザに自動で保存されます<br>
    ・「書き出す」でできたファイルを作者に送ると、ゲームの本当の地図にできます
   </div>
@@ -104,7 +104,7 @@ select{width:100%}
 /* ===== 地図の道具（2026-11-25 作り直し）：地形9種・筆の形・線・スタンプ・反転・範囲を動かす・城1つ（置ける範囲つき）・巣4つ ===== */
 const TER=[ // [ゲームの番号, 文字, 名前, 色, 通れない]
  [0,'.','草地','#5a8c46',0],[14,'g','肥えた土（畑 +30%）','#6a5a30',0],
- [1,'h','岩場・高台（石・射程が伸びる）','#9a9a92',0],[3,'r','山（通れない）','#5e5c58',1],[2,'f','森（木）','#2c5a2a',0],[15,'F','巨大樹の森（木 +50%・明かりがほぼ届かない）','#163a16',0],
+ [1,'h','岩場（石・高いほど射程が伸びる）','#9a9a92',0],[3,'r','山（通れない）','#5e5c58',1],[2,'f','森（木）','#2c5a2a',0],[15,'F','巨大樹の森（木 +50%・明かりがほぼ届かない）','#163a16',0],
  [4,'m','沼（遅くなる）','#4a6a52',0],[9,'w','水（川・湖。通れない）','#3c6ec8',1],[10,'d','浅瀬（渡れる）','#9cc4e8',0]];
 const BY_CH={},BY_ID={};for(const t of TER){BY_CH[t[1]]=t;BY_ID[t[0]]=t;}
 const SITE_R=6;
@@ -157,7 +157,8 @@ function castleOK(x,y){const c=SITES[0];if(!c)return false;for(let yy=y-3;yy<=y+
 const DEEP={2:['#46783c','#2c5a2a','#163a16'],1:['#b4b4ac','#9a9a92','#7c7c74'],4:['#66866c','#4a6a52','#2e4e3a']};
 const LVN={2:['疎林','森林','密林'],1:['岩場（小）','岩場（中）','岩場（大）'],4:['ぬかるみ','湿地','沼']};
 let LV=null;
-function calcLv(){LV=new Uint8Array(W*H);for(const v of [1,2,4]){const el=new Uint8Array(W*H),q=[];for(let i=0;i<W*H;i++){if(TT[i]===v)el[i]=99;else q.push(i);}let h=0;while(h<q.length){const i=q[h++],x=i%W,y=(i/W)|0,d=el[i]===99?0:el[i];for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(el[j]===99){el[j]=d+1;q.push(j);}}}for(let i=0;i<W*H;i++)if(TT[i]===v)LV[i]=Math.min(3,el[i]===99?3:el[i]);}}
+function calcLv(){LV=new Uint8Array(W*H);for(const v of [1,2,4]){const el=new Uint8Array(W*H),q=[];for(let i=0;i<W*H;i++){if(TT[i]===v)el[i]=99;else q.push(i);}let h=0;while(h<q.length){const i=q[h++],x=i%W,y=(i/W)|0,d=el[i]===99?0:el[i];for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(el[j]===99){el[j]=d+1;q.push(j);}}}for(let i=0;i<W*H;i++)if(TT[i]===v){const d=el[i]===99?9:el[i];LV[i]=d<=1?1:d<=3?2:3;}}   /* 2026-11-25：ゲームと同じく段が上がるまでを深く（縁1マスがLv1、3マス目までLv2、その内側がLv3） */
+  for(let i=0;i<W*H;i++)if(TT[i]===15){const x=i%W,y=(i/W)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(TT[j]===2)LV[j]=3;}}}   /* 巨大樹の森のとなりの森は Lv3 */
 function roadConn(){const a=new Uint8Array(W*H),s=SITES[0];if(!s)return a;const cx=s.x+1.5,cy=s.y+1.5,R=5,q=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(TT[y*W+x]===13&&Math.hypot(x+.5-cx,y+.5-cy)<=R){a[y*W+x]=1;q.push(y*W+x);}
   while(q.length){const i=q.pop(),x=i%W,y=(i/W)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(!a[j]&&TT[j]===13){a[j]=1;q.push(j);}}}return a;}
 let RC=null;
