@@ -1925,7 +1925,7 @@ const BASE_MAX=7;
 // 大きさ（マス）：基本は2×2、大きい施設は3×3、城は4×4
 const BIG_SZ=3;
 // 柵・石の壁・城壁は1×1（門は2×2）
-const BSIZE={hq:4,fence:1,swall:1,wall:1,wall3:1,wall5:1,brazier:1,aebomb:1,gravity:1,stake:1,meteor:1};for(const k of ['magetower','tesla','mray','dbreath','smelter','bastion','outpost','how','cannon','mortar','mabou','field','hvy','rail','mlrs','market','lab','magic','aerie','hangar','tankf','airfield','furnace','apart','reactor','elecf','power'])BSIZE[k]=BIG_SZ;BSIZE.church=BIG_SZ;for(const k of ['spike','pit','bomb','landmine'])BSIZE[k]=1;   // 罠は1×1（たくさん並べて使う）   // 馬小屋・酒場・兵舎・火薬工房は2×2（ドット絵v2）
+const BSIZE={hq:4,road:1,road2:1,fence:1,swall:1,wall:1,wall3:1,wall5:1,brazier:1,aebomb:1,gravity:1,stake:1,meteor:1};for(const k of ['magetower','tesla','mray','dbreath','smelter','bastion','outpost','how','cannon','mortar','mabou','field','hvy','rail','mlrs','market','lab','magic','aerie','hangar','tankf','airfield','furnace','apart','reactor','elecf','power'])BSIZE[k]=BIG_SZ;BSIZE.church=BIG_SZ;for(const k of ['spike','pit','bomb','landmine'])BSIZE[k]=1;   // 罠は1×1（たくさん並べて使う）   // 馬小屋・酒場・兵舎・火薬工房は2×2（ドット絵v2）
 function newSz(t){return BSIZE[t]||U;}
 function bsz(b){return (b&&b.sz)||(b&&b.type?newSz(b.type):U);}
 function bcx(b){return (b.x+bsz(b)/2)*T;}
@@ -2009,7 +2009,8 @@ Object.assign(B,{
   pit:    {name:'落とし穴',glyph:'',hp:1,heat:0,cost:{steel:25},pop:0,power:0,spec:'工兵',isMine:true,kind:'pit',desc:'1×1。落ちた魔物に大ダメージを与え、しばらく動けなくする。一晩に3回使うと埋まる。襲撃のあとに木材8で自動で掘り直す（一括修理でも）'},
   bomb:   {name:'爆弾罠',glyph:'',hp:1,heat:0,cost:{steel:15,powder:8},pop:0,power:0,spec:'工兵',isMine:true,kind:'bomb',req:'bombtrap',desc:'火薬を詰めた使い切りの罠。踏んだ魔物の周り4マスを吹き飛ばし、大きなダメージを与える（空の敵には効かない）。領地の外にも置ける'},
   brazier:{name:'篝火',glyph:'',hp:35,heat:3,cost:{steel:20},pop:0,power:0,spec:'工兵',desc:'夜の闇を照らす（半径12マス。研究「松脂」+4・「蒼い炎」+4）。夜は照らされた敵しか狙えないので、防衛施設の射程の先まで照らすのが大事。魔物にわざわざ狙われることはないが、通り道にあると叩き壊される（耐久が低い。修理は安い）。火を怖がる小さな魔物（ゴブリン・ゴブリンライダー・レッドキャップ・シャーマン・アーチャー）は、篝火の4マス以内で足が40%遅くなる。燃料として夜ごとに木材を2使い、足りないと灯らない'},
-  road:   {name:'道',glyph:'',hp:1,heat:0,cost:{stone:6},pop:0,power:0,spec:'工兵',grp:'prod',isRoad:true,desc:'2×2。地面を石で固めて街道にする（すぐできる）。城とつながった道のとなりの生産施設は産出 +15%、味方の部隊は速く動ける。森・岩場・沼の上にも敷ける（そこの木や石は採れなくなる）。魔物には関係ない'},
+  road:   {name:'整地した道',glyph:'',hp:1,heat:0,cost:{steel:3},pop:0,power:0,spec:'工兵',grp:'prod',isRoad:1,desc:'1×1。土をならした道（すぐできる）。城とつながった道に面した生産施設は産出 +15%。味方の部隊は道の上で速く動ける。魔物には関係ない。上に施設を建てると道はなくなる'},
+  road2:  {name:'石畳の道',glyph:'',hp:1,heat:0,cost:{steel:1,stone:3},pop:0,power:0,spec:'工兵',grp:'prod',isRoad:2,req:'stoneroad',desc:'1×1。石を敷いた道。城とつながった道に面した生産施設は産出 +30%。整地した道の上に敷くと石畳に替わる（つながった道をまとめて替えられる）'},
   fence:  {name:'木の柵',glyph:'',hp:300,heat:0,cost:{steel:15},pop:0,power:0,spec:'工兵',grp:'def',desc:'安くて早く建つが、もろい'},
   swall:  {name:'石の壁',glyph:'',hp:600,heat:0,cost:{stone:25},pop:0,power:0,spec:'工兵',grp:'def',desc:'丈夫な石積みの壁。木の柵の上に重ねて建て替えられる',req:'masonry'},
   bastion:{name:'櫓台',glyph:'',hp:1600,heat:0,cost:{stone:120,steel:40,gold:30},pop:0,power:0,spec:'工兵',grp:'def',towerWall:true,req:'castle',desc:'石を高く積んだ2×2の台座。敵を通さず、上にバリスタ・投石機・大砲・迫撃砲などを1つ載せられる（2×2の物も可。台座を選んで「この上に建設」）。載せた施設は射程 +3・火力 +20%。敵はまず台座を壊す'},
@@ -2603,6 +2604,7 @@ if(IS_PROTO){const T=id=>TECH.find(t=>t.id===id),del=id=>{const i=TECH.findIndex
    ['p_plant',2,'植林','miner','伐採所の埋蔵の減りが半分'],['p_charcoal',2,'炭焼き','miner','伐採所で、木材と一緒に石炭も少し取れる（1ターン +1）'],['p_prop',2,'坑木の補強','ironmine','鉱山が夜も掘り続ける'],['p_nightfish',2,'夜釣り','fishery','漁場が夜も漁をする'],
    ['p_blast',3,'発破','quarry','石切り場で、石材と一緒に鉄も少し取れる（1ターン +2）'],['p_sort',3,'選鉱','ironmine','鉱山で、鉄と一緒に金も少し取れる（1ターン +1）'],['p_vent',4,'換気坑','coalmine','炭鉱・金鉱・聖銀鉱が夜も掘り続ける']])
    TECH.push({id,cat:'領地',tier,name,t:2+Math.floor(tier/2),cost:{steel:50+30*tier,stone:20+10*tier},pre:[],icon,eff});
+ TECH.push({id:'stoneroad',cat:'領地',tier:2,name:'石畳の道',t:2,cost:{steel:80,stone:60},pre:[],icon:'road2',eff:'「石畳の道」を敷ける（木材1・石材3）。城とつながった石畳に面した生産施設は産出 +30%（整地した道は +15%）。整地した道の上に敷くと替わる。つながった道をまとめて替えられる'});   /* 2026-11-25 */
  for(const [k,tier,name,icon] of [['bigfarm',3,'大農場','farm'],['bigminer',3,'大伐採所','miner'],['bigfish',3,'養殖場','fishery'],['bigquarry',4,'大採掘場','quarry']])TECH.push({id:'t_'+k,cat:'領地',tier,name,t:3,cost:{steel:120+40*tier,stone:80+30*tier,gold:40*tier},pre:[],icon,eff:`「${name}」を建設できる（4×4。小さい施設4つ分より多く作る。建てる資材も多い）`});
  TECH.push({id:'p_ench',cat:'防衛',tier:2,name:'防衛のエンチャント付与',t:2,cost:{steel:60,stone:30},pre:[],icon:'magetower',eff:'防衛施設に、小さな魔核で「エンチャント付与」をかけられる（その夜だけ火力 +30%・体力 +30%。朝にはがれる）'});
  /* 整理ボードの反映（2026-11-18 ユーザーの整理） */
@@ -2891,7 +2893,7 @@ function genSnow(){
 function freezeRivers(){let n=0;for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(S.ter[y][x]===9||S.ter[y][x]===10){S.ter[y][x]=12;n++;}
   S.frozen=true;S.flow.clear();for(const k in AF)delete AF[k];renderTerrain();log('❄ 寒さが極まり、川が凍りついた。魔物も歩いて渡ってくる！','warn');toast('❄ 川が凍りついた — 川を渡ってくる！','wave',5000);}
 function genCustomF(j){   /* 描いた地図から地形・資源・巣を作る。巣と城のまわりの整え方、巣から城へ通れるようにするのは genFantasy と同じ */
-  const D={'.':0,h:1,f:2,r:3,w:9,d:10,s:6,m:4,p:13,g:14};const t=[],oil=[],ore=[];
+  const D={'.':0,h:1,f:2,r:3,w:9,d:10,s:6,m:4,p:0,g:14};const t=[],oil=[],ore=[];
   for(let y=0;y<ROWS;y++){const r=j.t[y]||'',ro=(j.ore&&j.ore[y])||'',rl=(j.oil&&j.oil[y])||'';t.push([]);oil.push([]);ore.push([]);for(let x=0;x<COLS;x++){t[y].push(D[r[x]]??0);ore[y].push(ro[x]==='1');oil[y].push(rl[x]==='1');}}
   const hives={};for(const h of (j.hives||[]).slice(0,4))if(/^[ABCD]$/.test(h.k))hives[h.k]={x:Math.max(1,Math.min(COLS-2,h.x)),y:Math.max(1,Math.min(ROWS-2,h.y)),name:h.name||((h.s||'')+'のアビス'),s:h.s||''};
   for(const k in hives){const h=hives[k];for(let y=h.y-3;y<=h.y+3;y++)for(let x=h.x-3;x<=h.x+3;x++){if(x<0||y<0||x>=COLS||y>=ROWS)continue;const d=Math.hypot(x-h.x,y-h.y);if(d<=3){t[y][x]=d<=1.5?7:0;ore[y][x]=false;oil[y][x]=false;}}}
@@ -3291,6 +3293,14 @@ function pxTile(c,X,Y,v,lv,x,y,oil,ore,rich){
 }
 
 function abyssHid(x,y){return S.ter[y][x]===7&&S.mode==='campaign'&&!S.island;}   /* 巣（アビスの裂け目）はマップに描かない（2026-11-13） */
+/* 道（1×1）を地形の上に描く。となりに道がない辺は縁を濃く */
+function drawRoads(c){const R=S.road;const P=[null,['#8a7450','#7a6440','#a08a5e','#5e4c30'],['#8e8e88','#7e7e78','#a8a8a0','#4e4e4a']];
+  for(const k in R){const lv=R[k],i=+k,x=i%COLS,y=(i/COLS)|0,p=P[lv];if(!p)continue;const ox=x*T,oy=y*T;
+    c.fillStyle=p[0];c.fillRect(ox,oy,T,T);const h=(n)=>{const v=Math.sin(i*12.9898+n*78.233)*43758.5453;return v-Math.floor(v);};
+    if(lv===1){c.fillStyle=p[1];for(let n=0;n<4;n++)c.fillRect(ox+Math.floor(h(n)*(T-2)),oy+Math.floor(h(n+9)*(T-2)),2,1);c.fillStyle=p[2];for(let n=0;n<3;n++)c.fillRect(ox+Math.floor(h(n+20)*(T-1)),oy+Math.floor(h(n+30)*(T-1)),1,1);}
+    else{c.fillStyle=p[1];const q=Math.floor(T/2);c.fillRect(ox,oy+q,T,1);c.fillRect(ox+((y%2)?3:q+3),oy,1,q);c.fillRect(ox+((y%2)?q+3:3),oy+q,1,T-q);c.fillStyle=p[2];c.fillRect(ox+1,oy+1,2,1);c.fillRect(ox+q+1,oy+q+2,2,1);}
+    const nb=(dx,dy)=>{const nx=x+dx,ny=y+dy;return nx>=0&&ny>=0&&nx<COLS&&ny<ROWS&&R[ny*COLS+nx];};c.fillStyle=p[3];
+    if(!nb(0,-1))c.fillRect(ox,oy,T,1);if(!nb(0,1))c.fillRect(ox,oy+T-1,T,1);if(!nb(-1,0))c.fillRect(ox,oy,1,T);if(!nb(1,0))c.fillRect(ox+T-1,oy,1,T);}}
 function renderTerrain(){
   lblCv=null;
   terCv=document.createElement('canvas');terCv.width=W;terCv.height=H;const c=terCv.getContext('2d');
@@ -3312,6 +3322,7 @@ function renderTerrain(){
   for(let Y=0;Y<R0;Y++)for(let X=0;X<C0;X++){if(S.ter[Y*U][X*U]===3)pxMountain(lc,X,Y,pxH(X,Y,76)<0.55?3:2,X,Y);}
   for(let Y=0;Y<R0;Y++)for(let X=0;X<C0;X++){const x=X*U,y=Y*U;if(S.oil[y][x]||S.ore[y][x])pxOverlay(lc,X,Y,S.oil[y][x],S.ore[y][x],richAt(x,y));}
   c.imageSmoothingEnabled=false;c.drawImage(lo,0,0,W,H);
+  if(S.road)drawRoads(c);
   // マス目：細い線は1マスごと、濃い線は2マスごと
   c.lineWidth=1;
   for(let x=0;x<=COLS;x++){c.strokeStyle=x%U?'rgba(10,14,10,.13)':'rgba(10,14,10,.35)';c.beginPath();c.moveTo(x*T+.5,0);c.lineTo(x*T+.5,H);c.stroke();}
@@ -3319,7 +3330,7 @@ function renderTerrain(){
   miniCv=document.createElement('canvas');miniCv.width=MM.w;miniCv.height=MM.h;const m=miniCv.getContext('2d');
   const sx=MM.w/COLS,sy=MM.h/ROWS;const col={0:'#0b120d',1:'#24382a',2:'#11221a',3:'#4a4238',4:'#13282c',6:'#0a2236',7:'#6a1030',8:'#5a5030',9:'#1a4a6a',10:'#3a6a7a',13:'#4a3c24',14:'#1e2a12'};
   {const tc=document.createElement('canvas');tc.width=COLS;tc.height=ROWS;const tg=tc.getContext('2d'),id=tg.createImageData(COLS,ROWS),D=id.data;
-   for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const q=hexRGB(S.oil[y][x]?'#7a4fd0':S.ore[y][x]?'#4a3c1a':(col[abyssHid(x,y)?1:S.ter[y][x]]||'#0b120d')),o=(y*COLS+x)*4;D[o]=q[0];D[o+1]=q[1];D[o+2]=q[2];D[o+3]=255;}
+   for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const q=hexRGB(S.road&&S.road[y*COLS+x]?(S.road[y*COLS+x]===2?'#6a6a64':'#5a4a2c'):S.oil[y][x]?'#7a4fd0':S.ore[y][x]?'#4a3c1a':(col[abyssHid(x,y)?1:S.ter[y][x]]||'#0b120d')),o=(y*COLS+x)*4;D[o]=q[0];D[o+1]=q[1];D[o+2]=q[2];D[o+3]=255;}
    tg.putImageData(id,0,0);m.imageSmoothingEnabled=false;m.drawImage(tc,0,0,MM.w,MM.h);}
 }
 // ===== 霧（未探索）と支配圏 =====
@@ -3494,7 +3505,8 @@ const SHELL={he:{n:'榴弾',c:'#ffb14e',ammo:1},ap:{n:'徹甲弾',c:'#9fd0ff',am
 const mechSvg=(c,x)=>`<circle cx="12" cy="4.6" r="2.5" fill="${c}"/><path d="M8 7.5 H16 L17 15 H7Z" fill="${c}"/><rect x="4.8" y="8" width="2.6" height="8" rx="1" fill="${c}"/><rect x="16.6" y="8" width="2.6" height="8" rx="1" fill="${c}"/><rect x="8" y="15" width="3" height="7.5" fill="${c}"/><rect x="13" y="15" width="3" height="7.5" fill="${c}"/><rect x="10.5" y="9" width="3" height="2" fill="#0b1a20"/>${x||''}`;
 const tankSvg=(c,x)=>`<rect x="2" y="4.5" width="19" height="15" rx="2" fill="${c}"/><rect x="2" y="3" width="19" height="3" fill="#33452a"/><rect x="2" y="18" width="19" height="3" fill="#33452a"/>${x}`;
 const WICON={
-  road:`<rect x="1" y="1" width="22" height="22" fill="#3e5a2a"/><path d="M8 24 L10 0 H14 L16 24Z" fill="#8a7450"/><path d="M9.5 18 H14.5 M10 12 H14 M10.5 6 H13.5" stroke="#5e4c30" stroke-width="1.2"/><path d="M12 2 V5 M12 8 V11 M12 14 V17 M12 20 V23" stroke="#c8b48a" stroke-width="0.8"/>`,
+  road:`<rect x="1" y="1" width="22" height="22" fill="#3e5a2a"/><path d="M1 9 H23 V15 H1Z" fill="#8a7450"/><path d="M3 11 H5 M9 13 H11 M15 11 H17 M19 13 H21" stroke="#5e4c30" stroke-width="1.2"/><path d="M1 9 H23 M1 15 H23" stroke="#5e4c30" stroke-width="0.8"/>`,
+  road2:`<rect x="1" y="1" width="22" height="22" fill="#3e5a2a"/><path d="M1 8 H23 V16 H1Z" fill="#8e8e88"/><path d="M1 12 H23 M6 8 V12 M12 8 V12 M18 8 V12 M3 12 V16 M9 12 V16 M15 12 V16 M21 12 V16" stroke="#5a5a56" stroke-width="1"/><path d="M1 8 H23 M1 16 H23" stroke="#4a4a46" stroke-width="1"/>`,
   mg:`<rect x="3" y="9" width="10" height="6" rx="1" fill="#6a4a2a"/><path d="M8 3 Q15 12 8 21" stroke="#c8a070" stroke-width="2" fill="none"/><rect x="6" y="11" width="17" height="2" fill="#d8c8a8"/><path d="M23 12 L20 10 L20 14Z" fill="#ddd"/>`,
   how:`<rect x="2" y="6" width="14" height="12" rx="1" fill="#6a4a2a"/><circle cx="4.5" cy="18" r="2" fill="#3a2a1a"/><circle cx="13.5" cy="18" r="2" fill="#3a2a1a"/><path d="M7 12 L21 5" stroke="#a87a4a" stroke-width="2.2"/><circle cx="21" cy="5" r="2.6" fill="#9a9a96"/>`,
   tower:`<rect x="5" y="8" width="14" height="14" fill="#6a4a2a"/><path d="M3 9 L12 2 L21 9Z" fill="#8a5a32"/><rect x="9" y="12" width="6" height="4" fill="#1a1208"/><path d="M15 14 L23 11" stroke="#c8a070" stroke-width="1.2"/>`,
@@ -3791,8 +3803,10 @@ function litBuckets(){const L=S.lights||[];if(_lb&&_lbSrc===L&&_lbN===L.length)r
   for(const l of L){const x0=Math.max(0,Math.floor((l[0]-l[2])/LB_CELL)),x1=Math.min(gw-1,Math.floor((l[0]+l[2])/LB_CELL)),y0=Math.max(0,Math.floor((l[1]-l[2])/LB_CELL)),y1=Math.min(gh-1,Math.floor((l[1]+l[2])/LB_CELL));
     for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const k=y*gw+x;(g[k]||(g[k]=[])).push(l);}}
   _lb={g,gw,gh};_lbSrc=L;_lbN=L.length;return _lb;}
-function litAt(x,y){if(!S.waveActive)return true;const sh=S._groves&&S._groves.length&&inShade(x,y);const B_=litBuckets(),cx=Math.floor(x/LB_CELL),cy=Math.floor(y/LB_CELL);if(cx<0||cy<0||cx>=B_.gw||cy>=B_.gh)return false;
-  const Ls=B_.g[cy*B_.gw+cx];if(!Ls)return false;for(const l of Ls){if(sh&&!l[3])continue;const dx=x-l[0],dy=y-l[1];if(dx*dx+dy*dy<l[2]*l[2])return true;}return false;}
+/* 試作（2026-11-25）：森の中は明かりが届きにくい（森1・2・3で明かりの半径が 6割・45%・3割まで） */
+const FOREST_LK=[1,0.6,0.45,0.3];
+function litAt(x,y,noF){if(!S.waveActive)return true;const sh=S._groves&&S._groves.length&&inShade(x,y);const B_=litBuckets(),cx=Math.floor(x/LB_CELL),cy=Math.floor(y/LB_CELL);if(cx<0||cy<0||cx>=B_.gw||cy>=B_.gh)return false;
+  const Ls=B_.g[cy*B_.gw+cx];if(!Ls)return false;const k=noF||!IS_PROTO?1:FOREST_LK[forestAt(Math.floor(x/T),Math.floor(y/T))]||1;for(const l of Ls){if(sh&&!l[3])continue;const dx=x-l[0],dy=y-l[1],r=l[2]*k;if(dx*dx+dy*dy<r*r)return true;}return false;}
 let nightCv=null;
 function drawSnow(an){const bl=S.waveActive&&S.cur&&S.cur.blizzard,N=bl?260:70,sp=bl?1:0.35;ctx.fillStyle=bl?'rgba(235,242,250,.8)':'rgba(240,246,252,.65)';
   for(let i=0;i<N;i++){const a=Math.sin(i*127.1)*43758.5,b=Math.sin(i*311.7)*43758.5;const fx=a-Math.floor(a),fy=b-Math.floor(b);const x=((fx*VW+an*(bl?140:18)*sp*(0.6+fx))%VW+VW)%VW,y=((fy*VH+an*(bl?90:30)*(0.5+fy))%VH+VH)%VH;const z=bl?2+(i%3):1+(i%2);ctx.fillRect(x,y,z,z);}
@@ -3814,6 +3828,9 @@ function drawNight(an){
   for(const l of S.lights||[]){const x=(l[0]-cam.x)*cam.z,y=(l[1]-cam.y)*cam.z,r=l[2]*cam.z*(1+0.03*Math.sin(an*7+l[0]));if(x<-r||y<-r||x>VW+r||y>VH+r)continue;
     c.drawImage(LS,(x-r)*NQ,(y-r)*NQ,r*2*NQ,r*2*NQ);}
   c.globalCompositeOperation='source-over';
+  if(IS_PROTO&&S.waveActive&&S.flv){/* 森の中で、明かりの円の中なのに届いていないマスは暗いまま */const z=cam.z,x0=Math.max(0,Math.floor(cam.x/T)),y0=Math.max(0,Math.floor(cam.y/T)),x1=Math.min(COLS-1,Math.ceil((cam.x+VW/z)/T)),y1=Math.min(ROWS-1,Math.ceil((cam.y+VH/z)/T));
+    c.fillStyle=S.cur&&S.cur.blood?'rgba(26,2,4,.8)':'rgba(3,4,14,.8)';const s=T*z*NQ;
+    for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){if(!S.flv[y*COLS+x])continue;const px=(x+.5)*T,py=(y+.5)*T;if(!litAt(px,py,true)||litAt(px,py))continue;c.fillRect((x*T-cam.x)*z*NQ,(y*T-cam.y)*z*NQ,s+0.5,s+0.5);}}
   {const sm=ctx.imageSmoothingEnabled;ctx.imageSmoothingEnabled=true;ctx.drawImage(nightCv,0,0,nw/NQ,nh/NQ);ctx.imageSmoothingEnabled=sm;}
   drawNightRest(an);}
 // 闇の上に毎コマ描くもの：ブラッドムーンの印・篝火のゆらめき・闇の中の赤い目
@@ -3958,7 +3975,7 @@ function wallLineCells(a,b){const dx=b[0]-a[0],dy=b[1]-a[1],ax=Math.abs(dx),ay=M
   const n=Math.max(Math.abs(ex),Math.abs(ey)),L=[];for(let i=0;i<=n;i++)L.push([a[0]+Math.round(ex*i/Math.max(1,n)),a[1]+Math.round(ey*i/Math.max(1,n))]);return L;}
 // ドラッグで一列に置ける種類：柵・壁と罠（2026-11-14 罠も）。2×2 の罠は大きさの分だけ間を空けて並べる
 function lineType(t){return !!t&&(WALL_TYPES.includes(t)||!!(B[t]&&(B[t].isMine||B[t].isRoad)));}
-function lineCells(t,a,b){const L=wallLineCells(a,b),n=Math.max(1,newSz(t));if(B[t]&&B[t].isRoad){const out=[],sn=new Set();for(const [x,y] of L){const bx=x-x%U,by=y-y%U,k=bx+','+by;if(!sn.has(k)){sn.add(k);out.push([bx,by]);}}return out;}   /* 道は地形のマス目（2×2）にそろえて、通ったマス目を全部 */if(n===1)return L;const out=[];let last=null;for(const c of L){if(!last||Math.max(Math.abs(c[0]-last[0]),Math.abs(c[1]-last[1]))>=n){out.push(c);last=c;}}return out;}
+function lineCells(t,a,b){const L=wallLineCells(a,b),n=Math.max(1,newSz(t));if(n===1)return L;const out=[];let last=null;for(const c of L){if(!last||Math.max(Math.abs(c[0]-last[0]),Math.abs(c[1]-last[1]))>=n){out.push(c);last=c;}}return out;}
 /* 試作（2026-11-18）：まとめて建てる・替えるときは、端から順番にパパパッと出す。音は高さを少し上下にばらす（最後だけ少し高く） */
 function popSE(i,last){if(!AU.ctx||!AU.on)return;const t=AU.ctx.currentTime;const f=(last?1250:900)*(1+(Math.random()*0.24-0.12));tone(f,t,0.06,{type:'square',vol:0.035,to:f*1.4,lp:3200,a:0.002});}
 function popStage(list,fx,keep){const n=list.length;if(!n)return;const gap=Math.min(55,Math.max(12,1000/n));const t0=performance.now();
@@ -4023,10 +4040,11 @@ function clearUndo(){S.undo=[];}
 function undoLast(){if(S.waveActive||!S.undo||!S.undo.length){se('error');toast('取り消せるものはありません','warn');return;}
   const u=S.undo.pop();let n=0;const nm=u[0]&&B[u[0].type]?B[u[0].type].name:'';
   for(const r of u.slice().reverse()){
-    if(r.road){const R=r.road;let ok=true;for(let y=R.y;y<R.y+U&&ok;y++)for(let x=R.x;x<R.x+U;x++)if(S.ter[y][x]!==13||S.grid[y][x]||mineAt(x,y)){ok=false;break;}if(!ok)continue;unlayRoad(R.x,R.y,R.prev);u.roadDirty=true;}
+    if(r.road){const R=r.road,x=R.i%COLS,y=(R.i/COLS)|0;if((S.road&&S.road[R.i]||0)!==R.lv||S.grid[y][x])continue;setRoad(R.i,R.prev);u.roadDirty=true;}
     else if(r.mine){if(!S.mines.includes(r.mine))continue;S.mines=S.mines.filter(m=>m!==r.mine);}
     else{const b=r.b;if(!b||!S.blds.includes(b)||(!(b.bt>0)&&!INSTANT_B.has(b.type))||b.upg)continue;   /* すぐ完成する柵・壁も、その日のうちなら取り消せる（2026-11-19） */const c=cmdOf(b);if(c)assign(c,null);S.blds=S.blds.filter(x=>x!==b);gridSet(b,false);
-      for(const o of r.replaced||[]){if(!S.blds.includes(o)){S.blds.push(o);gridSet(o,true);}}}
+      for(const o of r.replaced||[]){if(!S.blds.includes(o)){S.blds.push(o);gridSet(o,true);}}
+      if(r.roadUnder){for(const [k,lv] of r.roadUnder)setRoad(k,lv);u.roadDirty=true;}}
     for(const k in r.paid)S[k]+=r.paid[k];S.pop+=r.pop||0;n++;}
   if(u.roadDirty){delete u.roadDirty;roadRedraw();}
   if(n){se('click');log(`取り消した：${nm}${u.length>1?' ×'+n:''}（資源は全額戻った）`);toast(`${nm}${n>1?' ×'+n:''} を取り消した`,'good');}else{se('error');toast('もう取り消せません（建設が終わったものなど）','warn');}
@@ -4066,8 +4084,9 @@ function spikesBroken(){return (S.mines||[]).filter(m=>(m.kind==='spike'||m.kind
 function placeB(type,x,y,free,szo){
   const d=B[type];
   let urec=null;if(!free){const c=costOf(type);for(const k in c)S[k]-=c[k];S.pop-=d.pop;se(BSND[type]||'build');urec={paid:Object.assign({},c),pop:d.pop,replaced:[]};}
-  if(d.isRoad){const bx=x-x%U,by=y-y%U,prev=layRoad(bx,by),o={kind:'road',x:bx,y:by,sz:U};if(urec){urec.road={x:bx,y:by,prev};urec.type=type;addUndo(urec);}if(!_ub)roadRedraw();else _ub.roadDirty=true;return o;}
+  if(d.isRoad){const k=y*COLS+x,prev=roadLv(x,y);setRoad(k,d.isRoad);if(urec){urec.road={i:k,prev,lv:d.isRoad};urec.type=type;addUndo(urec);}if(!_ub)roadRedraw();else _ub.roadDirty=true;return {kind:'road',x,y,sz:1};}
   if(d.isMine){const m={x,y,armed:true,kind:d.kind||'mine',sz:newSz(type)};if(m.kind==='spike'||m.kind==='abatis')m.dur=durOf(m);S.mines.push(m);if(urec){urec.mine=m;urec.type=type;addUndo(urec);}return null;}
+  let rUnder=null;if(S.road){for(const [cx,cy] of bCells(x,y,szo||newSz(type))){const k=cy*COLS+cx;if(S.road[k]){(rUnder=rUnder||[]).push([k,S.road[k]]);setRoad(k,0);}}if(rUnder){if(urec)urec.roadUnder=rUnder;if(!_ub)roadRedraw();else _ub.roadDirty=true;}}   /* 道の上に建てると、そのマスの道はなくなる */
   const mat=0;const hp=hpOf(type,1,mat);   /* 新しく建てると1段目（木）。石・城塞は改築で */
   const b={id:S.nextId++,kind:'b',type,x,y,sz:szo||newSz(type),lv:1,mat,hp,maxhp:hp,cd:0,cmd:null,queue:0,qt:0,xpT:0,absorbed:0,ang:-Math.PI/2+Math.random(),offOre:false,ym:YIELD[type]?yieldFp(type,x,y,szo||newSz(type)):1,res:YIELD[type]?Math.round(reserveOf(type,x,y)*yieldFp(type,x,y,szo||newSz(type))/Math.max(0.01,yieldAt(type,x,y))):null,res0:0,crew:d.pop,dmgAcc:0};
   const under=S.grid[y][x];
@@ -5259,7 +5278,7 @@ function stepTo(s,x,y,dt,firing){
   // 移動で食料を消費。切れると跳躍・走行できず40%の速さ
   const fuelOk=S.fuel>0;if(fuelOk)S.fuel=Math.max(0,S.fuel-(s.ut==='tank'?0.2:s.ut==='air'?0.5:0.15)*dt);
   const t=MT(s);let sp=(s.yugT>0?1.6:1)*(s.chg?2:1)*(s.ut==='cav'&&has('charge')?1.2:1)*(s.kind==='s'?eqP(s,'spd'):1)*t.spd*(s.ut==='mech'&&has('jump')?1.4:1)*(firing?0.5:1)*(fuelOk?1:0.4)*dt;
-  if(!t.fly){const fx=Math.floor(s.x/T),fy=Math.floor(s.y/T);sp*=[1,0.8,0.65,0.5][forestAt(fx,fy)]*[1,0.7,0.5,0.3][marshAt(fx,fy)]*(terAt(s.x,s.y)===10?0.5:terAt(s.x,s.y)===13?1.3:1);}
+  if(!t.fly){const fx=Math.floor(s.x/T),fy=Math.floor(s.y/T);sp*=[1,0.8,0.65,0.5][forestAt(fx,fy)]*[1,0.7,0.5,0.3][marshAt(fx,fy)]*(terAt(s.x,s.y)===10?0.5:(S.road&&S.road[fy*COLS+fx]?1.3:1));}
   let ux=dx/dd,uy=dy/dd;
   if(!t.fly){const gx=Math.max(0,Math.min(COLS-1,Math.floor(x/T))),gy=Math.max(0,Math.min(ROWS-1,Math.floor(y/T))),cx=Math.floor(s.x/T),cy=Math.floor(s.y/T);
     if(cx!==gx||cy!==gy){const f=allyFlow(gx,gy);const cur=f[cy*COLS+cx];
@@ -7560,13 +7579,16 @@ function prodOf(b){const f=prodOf0(b);if(!f||!IS_PROTO)return f;const o={},bo=is
 const MAIN_OUT={miner:'steel',quarry:'stone',ironmine:'iron',farm:'fuel',fishery:'fuel',well:'elec'},STEAM_R={miner:'i_saw',quarry:'i_drill',ironmine:'i_pump',farm:'i_plow',fishery:'i_boat'},MAG_P={miner:['m_forest',0.2],quarry:['m_gnome',0.2],farm:['m_circle',0.2],fishery:['m_nixie',0.2],well:['m_spring',0.5]};
 function steamTech(b){const t=BIG[b.type]||b.type;return IS_PROTO&&STEAM_R[t]&&has(STEAM_R[t])?STEAM_R[t]:null;}
 function prodOf0(b){const f=prodOfR(b);if(!f||!IS_PROTO||BIG[b.type])return f;const k=MAIN_OUT[b.type];if(!k||!(f[k]>0))return f;let m=1;if(steamTech(b)&&!b.noFuel)m+=0.3;const mp=MAG_P[b.type];if(mp&&has(mp[0]))m+=mp[1];if(m!==1)f[k]*=m;return f;}   /* 試作（2026-11-20）：蒸気の機械・魔法の改良の上乗せ */
-/* 街道（2026-11-25・街の道）：城のそば（城の中心から ROAD_R マス）まで来ている街道と、そこから続く街道が「城とつながっている」。そのとなりの生産施設は産出 +15% */
-const ROAD_R=15;let RN=null;
-function roadNet(){if(RN&&RN.S===S&&RN.ter===S.ter)return RN.a;const a=new Uint8Array(COLS*ROWS);const hq=hqOf();if(hq){const cx=hq.x+bsz(hq)/2,cy=hq.y+bsz(hq)/2,q=[];
-  for(let y=Math.max(0,Math.floor(cy-ROAD_R));y<=Math.min(ROWS-1,Math.ceil(cy+ROAD_R));y++)for(let x=Math.max(0,Math.floor(cx-ROAD_R));x<=Math.min(COLS-1,Math.ceil(cx+ROAD_R));x++)if(S.ter[y][x]===13&&Math.hypot(x+.5-cx,y+.5-cy)<=ROAD_R){a[y*COLS+x]=1;q.push(y*COLS+x);}
-  while(q.length){const i=q.pop(),x=i%COLS,y=(i/COLS)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=COLS||ny>=ROWS)continue;const j=ny*COLS+nx;if(!a[j]&&S.ter[ny][nx]===13){a[j]=1;q.push(j);}}}}
-  RN={S,ter:S.ter,a};return a;}
-function roadMul(b){if(!b||b.type==='hq'||!S||!S.ter)return 1;const a=roadNet(),n=bsz(b);for(let y=b.y-1;y<=b.y+n;y++)for(let x=b.x-1;x<=b.x+n;x++){if(x<0||y<0||x>=COLS||y>=ROWS)continue;if(a[y*COLS+x])return 1.15;}return 1;}
+/* 道（2026-11-25）：城のまわり（城のとなりのマス）から続いている道が「城とつながっている」（ななめもつながる）。
+   そこに面した生産施設は産出 +15%（整地した道）・+30%（石畳の道）。両方に面していたら高いほう */
+let RN=null;
+function roadNet(){if(RN&&RN.S===S&&RN.r===S.road)return RN.a;const a=new Uint8Array(COLS*ROWS);const hq=hqOf(),R=S.road||{};if(hq){const n=bsz(hq),q=[];
+  for(let y=hq.y-1;y<=hq.y+n;y++)for(let x=hq.x-1;x<=hq.x+n;x++){if(x<0||y<0||x>=COLS||y>=ROWS)continue;const i=y*COLS+x;if(R[i]&&!a[i]){a[i]=1;q.push(i);}}
+  while(q.length){const i=q.pop(),x=i%COLS,y=(i/COLS)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=COLS||ny>=ROWS)continue;const j=ny*COLS+nx;if(!a[j]&&R[j]){a[j]=1;q.push(j);}}}}
+  RN={S,r:S.road,a};return a;}
+const ROAD_MUL=[1,1.15,1.3];
+function roadBest(b){if(!b||b.type==='hq'||!S||!S.road)return 0;const a=roadNet(),n=bsz(b);let best=0;for(let y=b.y-1;y<=b.y+n;y++)for(let x=b.x-1;x<=b.x+n;x++){if(x<0||y<0||x>=COLS||y>=ROWS)continue;const i=y*COLS+x;if(a[i]&&S.road[i]>best)best=S.road[i];}return best;}
+function roadMul(b){return ROAD_MUL[roadBest(b)]||1;}
 function fertMul(b){if(!S||!S.ter)return 1;let n=0,a=0;try{for(const [cx,cy] of bCells(b.x,b.y,bsz(b))){if(cy<0||cx<0||cy>=ROWS||cx>=COLS)continue;a++;if(S.ter[cy][cx]===14)n++;}}catch(e){return 1;}return a?1+0.3*n/a:1;}   /* 肥えた土の上の畑は産出 +30%（割合で） */
 function prodOfR(b){if(BIG[b.type]){const f=prodOf0(Object.assign({},b,{type:BIG[b.type]}));if(!f)return f;for(const x in f)f[x]*=BIG_MUL;return f;}
   const k=TURN_SEC,bn=bonus(b),um=upProd(b)*eff(b)*happyMul()*roadMul(b);if(b.bt>0||b.dep||b.off)return null;
@@ -7590,14 +7612,23 @@ function depClear(b){if(!b||!b.dep)return;const t=BIG[b.type]||b.type,n=bsz(b);l
   else if(t==='well')blk((x,y)=>{if(S.oil[y]&&S.oil[y][x]){S.oil[y][x]=false;ch=true;}});
   if(ch){try{computeElev();renderTerrain();}catch(e){}}}
 const YNAME={coalmine:'炭鉱 → 石炭',goldmine:'金鉱 → 金',mithmine:'聖銀鉱 → 聖銀',miner:'伐採所 → 木材',quarry:'石切り場 → 石材',ironmine:'鉱山 → 鉄',farm:'農場 → 食料',fishery:'漁場 → 食料',well:'エーテル採掘所 → エーテル結晶'};
-/* 試作（2026-11-25）：道を敷く。地形のマス目（2×2）ごと。山・水・海・浅瀬・アビスの上と、建物・罠のある所はだめ。もう道の所もだめ */
-function roadOK(gx,gy){const bx=gx-gx%U,by=gy-gy%U;if(bx+U>COLS||by+U>ROWS)return false;let all=true;
-  for(let y=by;y<by+U;y++)for(let x=bx;x<bx+U;x++){const t=S.ter[y][x];if(t===3||(t>=6&&t<13))return false;if(t!==13)all=false;if(!isSeen(x,y)||!inTerritory(x,y))return false;if(S.grid[y][x]||mineAt(x,y))return false;}
-  return !all;}
-function layRoad(bx,by){const prev=[];for(let y=by;y<by+U;y++)for(let x=bx;x<bx+U;x++){prev.push([S.ter[y][x],!!(S.ore&&S.ore[y][x]),!!(S.oil&&S.oil[y][x])]);S.ter[y][x]=13;if(S.ore&&S.ore[y])S.ore[y][x]=false;if(S.oil&&S.oil[y])S.oil[y][x]=false;}
-  return prev;}
-function unlayRoad(bx,by,prev){let i=0;for(let y=by;y<by+U;y++)for(let x=bx;x<bx+U;x++){const p=prev[i++];S.ter[y][x]=p[0];if(S.ore&&S.ore[y])S.ore[y][x]=p[1];if(S.oil&&S.oil[y])S.oil[y][x]=p[2];}}
-function roadRedraw(){RN=null;if(S.flow)S.flow.clear();try{computeElev();renderTerrain();}catch(e){}}
+/* 試作（2026-11-25）：道（1×1）。地形はそのまま、上に S.road[マスの番号]＝1（整地した道）・2（石畳の道）を重ねる。
+   山・水・海・浅瀬・アビス・深い沼と、建物のある所はだめ。石畳は空いたマスか整地した道の上に（替える） */
+function roadLv(x,y){return S.road?(S.road[y*COLS+x]||0):0;}
+function roadOK(type,x,y){if(B[type].req&&!has(B[type].req))return false;const t=S.ter[y][x],lv=B[type].isRoad;
+  if(t===3||(t===4&&marshAt(x,y)>=2)||(t>=6&&t<13))return false;if(!isSeen(x,y)||!inTerritory(x,y))return false;if(S.grid[y][x])return false;
+  return roadLv(x,y)<lv;}
+function setRoad(i,lv){if(!S.road)S.road={};if(lv)S.road[i]=lv;else delete S.road[i];RN=null;}
+function roadGroup(x0,y0){const R=S.road||{},st=y0*COLS+x0,lv=R[st];if(!lv)return[];const seen=new Set([st]),q=[st];
+  while(q.length){const i=q.pop(),x=i%COLS,y=(i/COLS)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=COLS||ny>=ROWS)continue;const j=ny*COLS+nx;if(!seen.has(j)&&R[j]===lv){seen.add(j);q.push(j);}}}
+  return [...seen].map(i=>[i%COLS,(i/COLS)|0]);}
+/* つながった整地の道を、まとめて石畳に（払えるぶんだけ・城に近い順）。壁のまとめてアップグレードと同じ */
+function upRoadGroup(x0,y0){const hq=hqOf(),cx=hq?hq.x+2:x0,cy=hq?hq.y+2:y0;const G=roadGroup(x0,y0).sort((a,b)=>Math.hypot(a[0]-cx,a[1]-cy)-Math.hypot(b[0]-cx,b[1]-cy));let n=0,miss=0;beginUndo();const made=[];
+  for(const [x,y] of G){if(!placeOK('road2',x,y))continue;if(!canPlace('road2',x,y)){miss++;continue;}made.push(placeB('road2',x,y));n++;}endUndo();
+  if(n){se('upgrade');popStage(made.filter(Boolean),(o)=>S.fx.push({x:(o.x+.5)*T,y:(o.y+.5)*T,r:T*0.7,t:0,dur:0.3,c:'#cfcfc4'}));log(`道 ${n}マスを石畳にした（取り消し：Ctrl+Z か「取り消し」）`,'good');}
+  if(miss){se('error');toast(`資材が足りず、${miss}マスは替えられませんでした`,'warn');}
+  renderTop&&renderTop();}
+function roadRedraw(){RN=null;try{renderTerrain();}catch(e){}}
 function placeOKraw(type,gx,gy){const sv=S.seen;S.seen=null;const r=placeOK(type,gx,gy);S.seen=sv;return r;}
 function canPlace(type,gx,gy){return !S.waveActive&&S.phase!=='night'&&placeOK(type,gx,gy)&&canAfford(costOf(type),B[type].pop);}
 // その場所に建てられるか（費用は見ない）
@@ -7605,7 +7636,7 @@ const MOUNT_T=['mg','how','cannon','mortar','mabou','hisou'];
 function bastionAt(gx,gy){const o=S.grid[gy]&&S.grid[gy][gx];return o&&o.type==='bastion'?o:null;}
 function placeOK(type,gx,gy){
   if(gx<0||gy<0||gx>=COLS||gy>=ROWS)return false;
-  if(B[type].isRoad)return roadOK(gx,gy);
+  if(B[type].isRoad)return roadOK(type,gx,gy);
   if(MOUNT_T.includes(type)){const ex=bastionAt(gx,gy);if(ex){if(ex.x!==gx||ex.y!==gy||!ready(ex))return false;if(B[type].req&&!has(B[type].req))return false;if(capBlock(type))return false;return true;}}
   if(B[type].req&&!has(B[type].req))return false;
   if(capBlock(type))return false;
@@ -7723,7 +7754,7 @@ function terTip(x,y,t,lv,full){
 // 地形ごとのレベル効果（凡例と詳細表示で共通）
 function terEffect(t,lv){
   if(t===1)return `石切り場で石材が採れる（岩が多いほど多い）。防衛施設の射程 +${Math.round(0.8*lv*U)}・硬い敵への威力 +${25*lv}%・部隊の射程 +${0.5*lv*U}。敵の移動 -${[0,10,20,35][lv]}%。<span style="color:#ffe14e">敵の術師からも +${1.5*lv*U}マス遠くで狙われる</span>`;
-  if(t===2)return `敵の移動 -${Math.round((1-FOREST_SLOW[lv])*100)}%・部隊 -${[0,20,35,50][lv]}%。ここの施設と部隊は被害 -${10*lv}%（遮蔽）。建設可`;
+  if(t===2)return `敵の移動 -${Math.round((1-FOREST_SLOW[lv])*100)}%・部隊 -${[0,20,35,50][lv]}%。ここの施設と部隊は被害 -${10*lv}%（遮蔽）。${IS_PROTO?`夜の明かりが届きにくい（明かりの半径 ${Math.round(FOREST_LK[lv]*100)}%）。`:''}建設可`;
   if(t===4)return `敵の移動 -${Math.round((1-MARSH_SLOW[lv])*100)}%・部隊 -${[0,30,50,70][lv]}%。${lv===1?'建設可':'<span style="color:#ff8a7a">建設不可</span>'}`;
   return '';
 }
@@ -7738,7 +7769,7 @@ function showLegend(){
   for(let l=1;l<=3;l++)h+=row(cv(1,l),ELEV_NAME[l],'岩'+l,terEffect(1,l));
   for(let l=1;l<=3;l++)h+=row(cv(2,l),FOREST_NAME[l]+'（森'+l+'）','森'+l,terEffect(2,l));
   for(let l=1;l<=3;l++)h+=row(cv(4,l),MARSH_NAME[l]+'（沼'+l+'）','沼'+l,terEffect(4,l));
-  h+=row(cv(13,0),'街道','—',TER[13].d)+row(cv(14,0),'肥えた土','—',TER[14].d);
+  h+=row(cv(14,0),'肥えた土','—',TER[14].d);
   for(let l=1;l<=3;l++)h+=row(cv(0,0,0,1,l),'鉄鉱脈 '+['','貧','並','豊'][l],'鉱'+l,richEffect('ore',l));
   for(let l=1;l<=3;l++)h+=row(cv(0,0,1,0,l),'龍脈の泉 '+['','貧','並','豊'][l],'油'+l,richEffect('oil',l));
   h+=row(cv(3,0),'山','—','通行不可・建設不可。射線も通らない。天然の城壁')+row(cv(6,0),'海','—','通行不可・建設不可');
@@ -7809,7 +7840,7 @@ function setText(el,v){if(el&&el.textContent!==v)el.textContent=v;}
 const BUILD_GROUPS=[{id:'def',name:'防衛',keys:'',list:['fence','gate','swall','wall','wall3','wall5','bastion','mg','how','cannon','mortar','mabou','hisou','tower','magetower','barrier','tesla','harpoon','mray','dbreath','spike','abatis','pit','bomb','aebomb','gravity','stake','meteor','brazier','totem','outpost']},
   {id:'prod',name:IS_PROTO?'領地':'生産・街',keys:'⇧',list:['coalmine','goldmine','mithmine','smelter','miner','quarry','ironmine','farm','fishery','well',...(IS_PROTO?[]:['ammo']),'powder','furnace','barracks','apart','market','tavern','church','lab']},
   {id:'unit',name:'部隊',keys:'-',list:['train','stable','magic','aerie']}];
-if(IS_PROTO){{const g=BUILD_GROUPS.find(x=>x.id==='prod');const i=g.list.indexOf('smelter');g.list.splice(i+1,0,'gearw','blast','moonalt','corepow');g.list.push('road');const d=BUILD_GROUPS.find(x=>x.id==='def');d.list=d.list.filter(k=>k!=='bastion');}   /* 2026-11-20：工業と魔法の素材の施設・櫓台はやめた */WICON.gearw=WICON.ammo||WICON.smelter;WICON.blast=WICON.smelter;for(const [k,ak] of [['alchemy','alchemy_t1'],['moonalt','moon_altar'],['steamf','steam_factory_t1']]){const sp=SPR.buildings[ak];if(sp&&sp.img.idle){const c=sp.img.idle[0];try{WICON[k]=`<image href="${c.toDataURL()}" x="0" y="0" width="24" height="24" style="image-rendering:pixelated" preserveAspectRatio="xMidYMid meet"/>`;ICIMG[k]=c;}catch(e){}}}   /* 届いた絵からアイコン */{const u=BUILD_GROUPS.find(x=>x.id==='unit');u.list=u.list.filter(k=>!['magic','aerie','gstable'].includes(k));u.list.push('alchemy','steamf');}WICON.corepow=WICON.furnace||WICON.smelter;WICON.gunt=WICON.tower;WICON.flare=WICON.brazier;WICON.fortgun=WICON.cannon;WICON.imine=WICON.bomb;WICON.jaw=WICON.spike;{const d=BUILD_GROUPS.find(x=>x.id==='def');d.list.splice(d.list.indexOf('magetower')+1,0,'gunt','flare','fortgun');d.list.splice(d.list.indexOf('aebomb')+1,0,'imine','jaw');}const g=BUILD_GROUPS.find(x=>x.id==='prod');if(g&&!g.list.includes('herohouse'))g.list.push('herohouse');if(g)g.list.push('tport','tair');{const u=BUILD_GROUPS.find(x=>x.id==='unit');if(u){u.list.push('siegew');}}if(g)for(const k of ['bigfarm','bigminer','bigquarry','bigfish'])if(!g.list.includes(k)){g.list.push(k);BUILD_ORDER.push(k);B[k].cost.gold=(B[BIG[k]].cost.gold||5)*5;}}
+if(IS_PROTO){{const g=BUILD_GROUPS.find(x=>x.id==='prod');const i=g.list.indexOf('smelter');g.list.splice(i+1,0,'gearw','blast','moonalt','corepow');g.list.push('road','road2');const d=BUILD_GROUPS.find(x=>x.id==='def');d.list=d.list.filter(k=>k!=='bastion');}   /* 2026-11-20：工業と魔法の素材の施設・櫓台はやめた */WICON.gearw=WICON.ammo||WICON.smelter;WICON.blast=WICON.smelter;for(const [k,ak] of [['alchemy','alchemy_t1'],['moonalt','moon_altar'],['steamf','steam_factory_t1']]){const sp=SPR.buildings[ak];if(sp&&sp.img.idle){const c=sp.img.idle[0];try{WICON[k]=`<image href="${c.toDataURL()}" x="0" y="0" width="24" height="24" style="image-rendering:pixelated" preserveAspectRatio="xMidYMid meet"/>`;ICIMG[k]=c;}catch(e){}}}   /* 届いた絵からアイコン */{const u=BUILD_GROUPS.find(x=>x.id==='unit');u.list=u.list.filter(k=>!['magic','aerie','gstable'].includes(k));u.list.push('alchemy','steamf');}WICON.corepow=WICON.furnace||WICON.smelter;WICON.gunt=WICON.tower;WICON.flare=WICON.brazier;WICON.fortgun=WICON.cannon;WICON.imine=WICON.bomb;WICON.jaw=WICON.spike;{const d=BUILD_GROUPS.find(x=>x.id==='def');d.list.splice(d.list.indexOf('magetower')+1,0,'gunt','flare','fortgun');d.list.splice(d.list.indexOf('aebomb')+1,0,'imine','jaw');}const g=BUILD_GROUPS.find(x=>x.id==='prod');if(g&&!g.list.includes('herohouse'))g.list.push('herohouse');if(g)g.list.push('tport','tair');{const u=BUILD_GROUPS.find(x=>x.id==='unit');if(u){u.list.push('siegew');}}if(g)for(const k of ['bigfarm','bigminer','bigquarry','bigfish'])if(!g.list.includes(k)){g.list.push(k);BUILD_ORDER.push(k);B[k].cost.gold=(B[BIG[k]].cost.gold||5)*5;}}
 // 建設の分類タブ（防衛・生産・街・部隊）。押すとその見出しまで一覧をスクロールする
 function buildScroller(el){for(let p=el.parentElement;p;p=p.parentElement){const o=getComputedStyle(p).overflowY;if((o==='auto'||o==='scroll')&&p.scrollHeight>p.clientHeight+1)return p;}return document.scrollingElement;}
 function buildJump(id){const el=document.getElementById('build'),h=el&&el.querySelector(`.bh[data-g="${id}"]`);if(!h)return;
@@ -7861,7 +7892,7 @@ function tileDesc(x,y){
   L.push(`<div class="row"><span class="muted">地形</span><span>${lv?`${terName(x,y)}（Lv${lv}）`:TER[t].n}</span></div>`);
   if(lv)L.push(`<div class="muted" style="font-size:11px">${terEffect(t,lv)}</div>`);
   else if(TER[t].d)L.push(`<div class="muted" style="font-size:11px">${TER[t].d}</div>`);
-  if(t===13)L.push(roadNet()[y*COLS+x]?'<div style="font-size:11px;color:#e8c070">この街道は城とつながっています</div>':'<div class="muted" style="font-size:11px">この街道は城とつながっていません（城のそばまで続いていない）</div>');
+  {const rl=roadLv(x,y);if(rl)L.push(`<div class="row"><span class="muted">道</span><span>${icSvg(rl===2?'road2':'road',16)}${B[rl===2?'road2':'road'].name}</span></div>`+(roadNet()[y*COLS+x]?`<div style="font-size:11px;color:#e8c070">城とつながっている：面した生産施設 +${rl===2?30:15}%</div>`:'<div class="muted" style="font-size:11px">城とつながっていません（城のとなりまで続いていない）</div>'));}
   {const ys=Object.keys(YIELD).filter(k=>YNAME[k]).map(k=>[k,yieldAt(k,x,y)]).filter(a=>a[1]>0);   /* 大きな施設は小さい施設と同じ土地なので出さない */
    if(ys.length)L.push(`<div style="font-size:11px;color:#9fe39a">この土地で採れる：${ys.map(([k,v])=>`${ic(YIELD[k],12)}${YNAME[k]}${v!==1?` ×${v}`:''}`).join('　')}</div>`);
    else if(S.ter[y][x]!==6&&S.ter[y][x]!==3)L.push(`<div class="muted" style="font-size:11px">この土地で採れる資源はありません</div>`);}
@@ -8027,7 +8058,7 @@ function renderInfo(force){try{u2Sel();}catch(e){}if(S)document.body.classList.t
   if(S.buildMode&&!o){
     const key='bm'+S.buildMode;if(!force&&key===lastInfoKey)return;lastInfoKey=key;
     const d=B[S.buildMode];el.innerHTML=artOf({kind:'b',type:S.buildMode,lv:1,id:0})+`<b>${d.name}</b> を建設<div class="muted" style="margin-top:4px">${d.desc}</div><div class="muted">建設 ${buildTurns(S.buildMode)?buildTurns(S.buildMode)+'ターン':'すぐ完成'}　／　得意な英雄：${d.spec}　／　敵の注目度：${'■'.repeat(d.heat)||'なし'}</div><div class="muted" style="margin-top:4px">続けて置けます。${IS_TOUCH?'「建設をやめる」で建設モードを終了':'右クリック・Escで建設モードを終了'}</div><div class="muted">必要要員 ${d.pop}名${GUN_TYPES.includes(S.buildMode)?'　／　<span style="color:var(--green)">城壁の上にも建設できます</span>':''}</div>${flowHTML(S.buildMode,null)}<button id="bmEnd" style="margin-top:6px;width:100%">建設をやめる</button>`;document.getElementById('bmEnd').onclick=()=>{S.buildMode=null;renderBuild();renderInfo(true);};return;}
-  if(!o&&S.selTile){const {x,y}=S.selTile;const key='tile'+x+','+y+affordSig()+(S.grid[y][x]?1:0)+S.enemies.length%7+'r'+((S.ruins||[]).length);
+  if(!o&&S.selTile){const {x,y}=S.selTile;const key='tile'+x+','+y+affordSig()+'d'+roadLv(x,y)+(S.grid[y][x]?1:0)+S.enemies.length%7+'r'+((S.ruins||[]).length);
     if(!force&&key===lastInfoKey)return;lastInfoKey=key;
     let h=`<div class="row"><b>マス（${x}, ${y}）</b><button id="tClose" style="padding:0 6px">×</button></div>`+tileDesc(x,y);
     const rn=!S.grid[y][x]&&ruinAt(x,y);
@@ -8036,8 +8067,11 @@ function renderInfo(force){try{u2Sel();}catch(e){}if(S)document.body.classList.t
       <button id="ruinOne" style="margin-top:4px" ${!S.waveActive&&canAfford(c)?'':'disabled'}>建て直す（${costText(c)}）</button>
       ${all.length>1?`<button id="ruinAll" style="margin-top:4px" ${!S.waveActive?'':'disabled'}>廃墟をまとめて建て直す（${all.length}件・${costText(ac)}）</button>`:''}
       <button id="ruinClr" style="margin-top:4px">片付ける（建て直さない）</button></div>`;}
+    {const rl=roadLv(x,y);if(rl&&!S.grid[y][x]){const G=rl===1?roadGroup(x,y):[];const tc={};for(const k in costOf('road2'))tc[k]=costOf('road2')[k]*G.length;
+      h+=`<div class="upg" style="border-color:#8a7450">`+(rl===1?(has('stoneroad')?`<button id="rdUp" style="display:flex;align-items:center;gap:6px" ${!S.waveActive&&S.phase!=='night'&&canAfford(costOf('road2'))?'':'disabled'}>${icSvg('road',18)}→${icSvg('road2',18)} つながった整地の道をまとめて石畳に（${G.length}マス・${costText(tc)}）</button>`:`<div class="muted" style="font-size:11px">${icSvg('road2',14)} 研究「石畳の道」で石畳に替えられる</div>`):'')+`<button id="rdDel" style="margin-top:4px" ${S.waveActive?'disabled':''}>道をはがす（資材は戻らない）</button></div>`;}}
     /* 土地を選んだときの建設リストはなくした（建設は下の建設タブから・2026-11-19） */
-    el.innerHTML=h;bindTileBuild(el,x,y);document.getElementById('tClose').onclick=()=>{S.selTile=null;renderInfo(true);};
+    el.innerHTML=h;
+    {const a=document.getElementById('rdUp');if(a)a.onclick=()=>{upRoadGroup(x,y);renderInfo(true);};const d=document.getElementById('rdDel');if(d)d.onclick=()=>{setRoad(y*COLS+x,0);roadRedraw();se('click');renderInfo(true);};}bindTileBuild(el,x,y);document.getElementById('tClose').onclick=()=>{S.selTile=null;renderInfo(true);};
     {const a=document.getElementById('ruinOne');if(a)a.onclick=()=>{if(rebuildRuin(rn)){log(`${B[rn.type].name}を建て直した`,'good');S.sel=S.grid[y][x];S.selTile=null;}renderInfo(true);};
      const b2=document.getElementById('ruinAll');if(b2)b2.onclick=()=>{let n=0;for(const r of [...(S.ruins||[])].sort((p,q)=>(WALL_TYPES.includes(p.type)?1:0)-(WALL_TYPES.includes(q.type)?1:0)))if(rebuildRuin(r,true))n++;if(n){se('upgrade');log(`廃墟 ${n}件を建て直した`,'good');}else se('error');renderInfo(true);};
      const c2=document.getElementById('ruinClr');if(c2)c2.onclick=()=>{S.ruins=S.ruins.filter(r=>r!==rn);renderInfo(true);};}
@@ -8073,7 +8107,7 @@ function renderInfo(force){try{u2Sel();}catch(e){}if(S)document.body.classList.t
   if(!isS&&gunOf(o)&&o.type!=='hq'&&!(o.bt>0&&!o.upg))h+=brkHTML('火力（1発）',dmgBaseB(o),dmgPctB(o));
   if(!isS&&!gunOf(o)&&!(o.bt>0)){const po=prodOf(o);if(po){const k=Object.keys(po).find(x=>po[x]>0&&x!=='pop');if(k){const L=prodPctB(o);const base=po[k]/(1+pctSum(L));h+=brkHTML(`生産（${RES_NAME[k]||k}）`,base,L,'/T');}}}
   if(!isS&&gunOf(o)&&(elevRange(o)||wallRange(o)||elevAP(o))){const er=elevRange(o),wr=wallRange(o);h+=`<div class="row"><span class="muted">射程の内訳</span><span>${Math.round(rangeOf(o)*U)}マス${er||wr?`<span class="muted" style="font-size:11px">（${[er?'標高+'+Math.round(er*U):'',wr?(o.wall&&o.wall.bastion?'櫓台+':'城壁+')+Math.round(wr*U).replace(/\.0$/,''):''].filter(x=>x).join('・')}）</span>`:''}${elevAP(o)?`・<span class="muted" style="font-size:11px">高所：硬い敵に+${Math.round(elevAP(o)*100)}%</span>`:''}</span></div>`;}
-  if(!isS&&o.type!=='hq'&&roadMul(o)>1)h+=`<div style="font-size:11px;color:#e8c070">街道沿い（城とつながっている）：産出 +15%</div>`;
+  if(!isS&&o.type!=='hq'&&roadMul(o)>1){const rb=roadBest(o);h+=`<div style="font-size:11px;color:#e8c070">${icSvg(rb===2?'road2':'road',14)} 城とつながった道に面している：産出 +${rb===2?30:15}%</div>`;}
   if(!isS)h+=tileDesc(o.x,o.y).replace(/<div class="row">.*?<\/div>/,S.ter[o.y][o.x]?'$&':'');
   if(!isS&&CWALL.has(o.type)&&ready(o))h+=tileBuildHTML(o.x,o.y,'この城壁の上に防衛施設を建設');
   if(!isS&&o.type==='bastion'&&ready(o))h+=tileBuildHTML(o.x,o.y,'この櫓台の上に防衛施設を建設（射程 +3・火力 +20%）');
@@ -8559,7 +8593,7 @@ function resOrder(list){// 同じランク内で前提→派生の順に並べ�
 const RES_PRIO={coalt:'新しい素材：石炭',aethert:'新しい素材：エーテル',goldt:'新しい素材：金',smeltt:'新しい素材：合金',mitht:'新しい素材：聖銀',scout:'偵察：敵の数と種類が分かる',scouting:'斥候：駐屯地を探せる'};
 if(IS_PROTO)for(let i=1;i<=5;i++)RES_PRIO['tool_'+i]='道具：いちばん大事な研究';   /* 試作：道具の研究は各ランクのいちばん上に（2026-11-18 ユーザーの指定） */
 /* 試作（2026-11-18）：研究の画面は、整理ボードと同じ並び（行＝ボードで並べた順・列＝ランク）で、前提を線でつなぐ */
-const RES_POS={"prefab":[12,1],"brewing":[8,1],"overtime":[9,1],"allnight":[9,2],"apart":[7,3],"tool_1":[0,1],"tool_2":[0,2],"tool_3":[0,3],"tool_4":[0,5],"tool_5":[0,6],"p_road":[2,1],"p_rot":[4,1],"p_net":[5,1],"p_plant":[1,3],"p_charcoal":[1,2],"p_prop":[3,2],"p_nightfish":[5,2],"p_marrow":[6,2],"p_blast":[2,3],"p_sort":[3,3],"p_vent":[13,4],"t_bigfarm":[4,3],"t_bigminer":[1,4],"t_bigfish":[5,3],"t_bigquarry":[2,4],"p_ench_p":[14,3],"tportt":[10,5],"tairt":[11,7],"stakes":[0,1],"tower":[3,2],"heavymg":[2,2],"gunpowder":[8,3],"bighow":[7,2],"thorn":[1,2],"hisousha":[9,3],"yariana":[5,2],"resetpit":[6,2],"magetower":[12,4],"aebombt":[5,4],"gravityt":[5,5],"meteort":[5,7],"barrierst":[13,4],"teslat":[14,5],"harpoont":[15,5],"mrayt":[16,6],"dbreatht":[17,7],"cannontech":[10,3],"bombtrap":[5,3],"mortar":[11,3],"p_ench":[4,2],"firerock":[7,3],"incend":[11,4],"bigbore":[10,4],"cavalry":[4,2],"magic":[8,4],"dragon":[10,4],"heavyinf":[2,2],"formation":[0,1],"scout":[1,1],"bigquiver":[7,1],"shieldwall":[3,2],"charge":[5,3],"highmagic":[9,4],"fieldsup":[8,2],"snipert":[6,5],"musket":[6,3],"chariott":[4,3],"golemt":[9,5],"silvert":[12,6],"griffont":[4,6],"battalion":[0,3],"division":[0,5],"dragonscale":[11,5],"amulet":[8,3],"artillery":[6,4],"gunnery":[7,4],"p_ench_u":[12,3],"scout2":[1,2],"scout3":[1,3],"scout4":[1,4],"siegewt":[13,3],"ramt":[14,3],"mcatt":[15,3],"ironram":[14,5]};
+const RES_POS={"stoneroad":[2,2],"prefab":[12,1],"brewing":[8,1],"overtime":[9,1],"allnight":[9,2],"apart":[7,3],"tool_1":[0,1],"tool_2":[0,2],"tool_3":[0,3],"tool_4":[0,5],"tool_5":[0,6],"p_road":[2,1],"p_rot":[4,1],"p_net":[5,1],"p_plant":[1,3],"p_charcoal":[1,2],"p_prop":[3,2],"p_nightfish":[5,2],"p_marrow":[6,2],"p_blast":[2,3],"p_sort":[3,3],"p_vent":[13,4],"t_bigfarm":[4,3],"t_bigminer":[1,4],"t_bigfish":[5,3],"t_bigquarry":[2,4],"p_ench_p":[14,3],"tportt":[10,5],"tairt":[11,7],"stakes":[0,1],"tower":[3,2],"heavymg":[2,2],"gunpowder":[8,3],"bighow":[7,2],"thorn":[1,2],"hisousha":[9,3],"yariana":[5,2],"resetpit":[6,2],"magetower":[12,4],"aebombt":[5,4],"gravityt":[5,5],"meteort":[5,7],"barrierst":[13,4],"teslat":[14,5],"harpoont":[15,5],"mrayt":[16,6],"dbreatht":[17,7],"cannontech":[10,3],"bombtrap":[5,3],"mortar":[11,3],"p_ench":[4,2],"firerock":[7,3],"incend":[11,4],"bigbore":[10,4],"cavalry":[4,2],"magic":[8,4],"dragon":[10,4],"heavyinf":[2,2],"formation":[0,1],"scout":[1,1],"bigquiver":[7,1],"shieldwall":[3,2],"charge":[5,3],"highmagic":[9,4],"fieldsup":[8,2],"snipert":[6,5],"musket":[6,3],"chariott":[4,3],"golemt":[9,5],"silvert":[12,6],"griffont":[4,6],"battalion":[0,3],"division":[0,5],"dragonscale":[11,5],"amulet":[8,3],"artillery":[6,4],"gunnery":[7,4],"p_ench_u":[12,3],"scout2":[1,2],"scout3":[1,3],"scout4":[1,4],"siegewt":[13,3],"ramt":[14,3],"mcatt":[15,3],"ironram":[14,5]};
 if(IS_PROTO)Object.assign(RES_POS,{m_tower:[3,3],m_mage:[12,5]});
 Object.assign(RES_POS,{swordt:[2,1],bowt:[7,1],bigquiver:[7,1]});   /* 2026-11-22：剣士の訓練は重装歩兵の行、弓兵の訓練は大矢筒（ランクⅡ）の行 */   /* 改造の研究（2026-11-19） */
 function resTreeHTML(cat,L,nodeH){const RN=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ'],CW=232,CHh=100,GX=44,GY=12,TOP=58,X=c=>10+(c-1)*(CW+GX),Y=r=>TOP+r*(CHh+GY);
@@ -8783,6 +8817,7 @@ function loadGame(){let d;try{d=JSON.parse(localStorage.getItem(SAVE_KEY));}catc
   const m=d.meta;CUR_MAP=m.map;BLOOD_MODE=!!m.blood;setDims('campaign');upDims();squadNo=m.squadNo||1;tankNo=m.tankNo||1;
   S=d.S;protoRes(S);S.flow=new Map();
   if(S.ter&&S.ter.length&&(S.ter.length!==ROWS||S.ter[0].length!==COLS)){ROWS=S.ter.length;COLS=S.ter[0].length;W=COLS*T;H=ROWS*T;}
+  if(IS_PROTO&&S.ter)for(let y=0;y<S.ter.length;y++)for(let x=0;x<S.ter[y].length;x++)if(S.ter[y][x]===13){S.ter[y][x]=0;(S.road=S.road||{})[y*COLS+x]=1;}   /* 前の街道（地形13）は整地した道に（2026-11-25） */
   SITE='c';CASTLE_POS=S.castlePos||null;{const hq=S.blds&&S.blds.find(b=>b.type==='hq');if(hq){HQX=hq.x;HQY=hq.y;}}   /* 城の場所はセーブの城から（2026-11-25：場所を選べるようにした） */   /* 前のセーブの地図の大きさのまま（2026-11-25：グレイヴェル平原を下に広げた） */
   try{if(S.hives){for(const k in S.hives){const h=S.hives[k],m=/^アビス[αβγ]（(.+?)）$/.exec(h.name||'')||/^[αβγ]浜（(.+?)）$/.exec(h.name||'');if(m){const dir=m[1];h.name=/浜/.test(h.name)?dir+'の浜':dir+'のアビス';h.s=dir.replace('の谷','');}}   /* 2026-11-25：α・β・γ の呼び方をやめて方角で */
     if((S.mapId==='f'||S.mapId==='t')&&S.sideOrder&&(!S.hives.D||S.hives.D.s==='北西')){const big=ROWS>64*MF,p=upPt(big?{x:34,y:73}:{x:30,y:62});S.hives.D={x:p.x,y:p.y,name:'南南西のアビス',s:'南南西'};   /* 前のセーブ：地図の下のはし（川の向こう）に4つ目の巣 */if(!S.sideOrder.includes('D'))S.sideOrder.push('D');if(S.lanes)S.lanes.D=.5;}}}catch(e){console.error(e);}
@@ -8887,7 +8922,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['2.2（試作版だけ）','2026-11-25',['<b>城を置く場所</b>：候補は真ん中の1か所に。そのまわり（半径6マス）なら、地図を押して城を動かせる。川・岩・山・浅瀬にかかる所は赤く出て置けない','<b>新しい土地</b>：街道（城とつながっている街道のとなりに建てた生産施設は産出 +15%。味方の部隊は +30% の速さ。魔物には関係ない）と、肥えた土（畑の産出 +30%）。地形の凡例にも','<b>道を敷ける</b>：建設の「領地」の一番うしろに「道」（2×2で石材6・すぐできる）。柵のようにドラッグで一列に敷ける。森・岩場・沼の上にも敷ける（そこの木や石は採れなくなる）。城とつながった道は街道と同じ（となりの生産施設 +15%・味方の部隊が速い）。その日のうちなら取り消しで石材が全部戻る','地図の道具：地形を9つに（草地・肥えた土・街道・岩場・山・森・沼・水・浅瀬。岩場は灰色、山は濃い灰色）。筆の形（四角・丸・でこぼこ）、線を引く道具（川・街道・山並み）、スタンプ（森・岩場・山並み・湖・沼・肥えた土）、左右・上下の反転、範囲を動かす。城は1つで、置ける範囲を地図に出す。巣と城はどの道具でもつまんで動かせて、右の一覧から消して置き直せる']],
+ ['2.2（試作版だけ）','2026-11-25',['<b>城を置く場所</b>：候補は真ん中の1か所に。そのまわり（半径6マス）なら、地図を押して城を動かせる。川・岩・山・浅瀬にかかる所は赤く出て置けない','<b>新しい土地</b>：肥えた土（畑の産出 +30%）。地形の凡例にも','<b>道</b>：建設の「領地」の一番うしろ。はじめは整地した道（1×1・木材3）、研究「石畳の道」で石畳の道（木材1・石材3）。柵のようにドラッグで一列に敷ける。城のとなりから続いている道に面した生産施設は産出 +15%（石畳は +30%）。味方の部隊は道の上で速い。整地した道を選ぶと、つながった道をまとめて石畳に替えられる。はじめからある街道はなくした','<b>森は暗い</b>：夜、森の中は明かりが届きにくい（森1・2・3で明かりの半径が 60%・45%・30%）','地図の道具：地形を8つに（草地・肥えた土・岩場・山・森・沼・水・浅瀬。岩場は灰色、山は濃い灰色）。筆の形（四角・丸・でこぼこ）、線を引く道具（川・山並み）、スタンプ（森・岩場・山並み・湖・沼・肥えた土）、左右・上下の反転、範囲を動かす。城は1つで、置ける範囲を地図に出す。巣と城はどの道具でもつまんで動かせて、右の一覧から消して置き直せる']],
  ['2.1','2026-11-25',['<b>地図の道具</b>（proto/mapedit.html）：グレイヴェル平原の地図を、草地・丘・森・岩・水・浅瀬を塗って描ける。鉄鉱脈・龍脈の泉・魔物の巣（攻めてくる順番つき）・城の候補を置ける。巣から城の候補への攻めてくる道と、候補のまわりの資源の数をその場で確かめられる。書き出したファイルを作者に送る／「ゲームで試す」でその地図で遊べる','<b>城を置く場所を決められる</b>（グレイヴェル平原）：真ん中のまわり（半径6マス）なら地図を押して城を動かせる。地図に魔物の巣と攻めてくる道、木・石・鉄・食料の多さと、はじめの襲撃・あとの襲撃の近さをアイコンで出す','巣の呼び方を α・β・γ から方角に（北のアビス・南西のアビスなど）','グレイヴェル平原と廃村エルムの地図を下に広げて、4つ目の巣（南南西。下の川の向こう）を足した。第16襲撃からは4方向から来る。南西の巣を北へ寄せて、湖の西の浅瀬から渡ってくるように。新しい巣は湖の南の浅瀬を渡ってくる（地図が広がるのは新しく始めた街から）','<b>襲撃と波のお知らせ</b>を作り直し：ドット絵の大きな帯に、何波目か（■の数）・来る魔物の絵と数・来る方向の矢印をアイコンで出す。襲撃のはじめにも出る','タイトルの画面を作り直し：いちばん上に大きく「つづきから」「はじめから」、その下に世界の歴史・モンスター図鑑・アップデート情報、その下に設定。どのボタンにもアイコン。右下は遊び方とお問い合わせ','<b>設定の画面</b>：全体の音量・BGM・効果音・音を消す、ダメージの数字・画面の揺れ・FPS の上限（30・60・なし）・FPS の表示・全画面、言語、音楽室・クレジット・ホーム画面に追加。どの項目にもアイコン。ゲーム中は「表示・設定」の中の「設定」から','襲撃中の上のお知らせ（城が攻撃されている・英雄の戦死・ブラッドムーンなど）をドット絵の見た目に（太い段のふち・ドットのアイコン・カクッと出る）','タイトルの右下に「お問い合わせ・不具合報告」の手紙のボタン：種類（不具合・要望・その他）と内容を書いて送れる。プレイヤーごとに ID（ND-XXXX-XXXX）をつけ、版・画面の大きさ・端末・セーブの進み具合・直前のエラーをいっしょに送る。届いた報告は作者が見て対応します']],
  ['2.0','2026-11-21',['<b>新しい操作</b>：マップが画面いっぱいに。施設や部隊を押すと、まわりに半円のボタン（見る・強化・訓練・迎撃／固守・改造・エンチャントなど）。押すと「キュイ」と寄って拡大し、「戻る」で元の画角へ。PC・iPadは左下に「夜へ」、右に建設・研究・軍事・内政を縦に並べた（「街」は「内政」に）。スマホは横持ちで、右の帯にまとめた','上の資源は1段に。次の襲撃までに足りなくなりそうな資源は赤く光り、毎日減っている資源には▼。押すと全部の資源の一覧。通信ログはふだん隠して、「ログ」に新しい知らせの数','<b>研究の作り直し</b>：領地・防衛・部隊の3つに整理して、前提を線でつないだ。施設のアップグレードと道具（石→鉄→合金→月光石→聖銀）は城のランクで開く。改造・エンチャント付与・斥候Ⅰ〜Ⅳを追加','<b>工業と魔法の道</b>：城のランクⅣで、街の方針を工業か魔法から選ぶ（違うほうの研究は費用2倍）。工業：歯車・黒鉄、機械工房・高炉、蒸気の工場（蒸気機兵・蒸気戦車・銃士の気球・爆撃飛行船）、銃士の塔・重砲・ガス灯。魔法：月光石（夜に月光の祭壇で作る）、錬金工房（エーテルゴーレム・巨大ゴーレム・空飛ぶクジラ）、空の魔術師、魔核の守り石。兵舎は方針で見た目と育てる兵が変わる','新しい守り：照明弾の発射台（夜の闇を照らす）・大要塞砲（ひと晩に3発）・地雷・トラバサミ。馬小屋の上の段「大きな厩舎」で竜騎兵とグリフォン騎兵','強化・エンチャントは、確認の画面（数字と見た目の 今 → あと、使う資源）を出してから。城の強化では新しく使えるものも並べる。解体は2回押す','<b>武器工房をなくした</b>：矢と剣は使うたびに木材と鉄で払う（前のセーブの武器工房は消して建設費を戻す）。鋼は合金にまとめた。精錬所・海外調達・熟練度・魔矢もなくした','<b>英雄</b>：英雄の家を建ててから。戦いの英雄は名簿から（名前とスキルは英雄ごと）。1人で1部隊として戦う。内政・守備の英雄は施設に配属','新しい兵：銃兵・砲兵の英雄・チャリオット・グリフォン騎兵・攻城兵器（破城槌・移動式投石機）。新しい施設：大農場・大伐採所・交易所・小さな港・小さな空港・兵器工房・エーテル火薬工房など','<b>王都からの依頼</b>：街と守りの目標と、救援物資を送る依頼。達成で金貨・銀貨・資材','領地の旗（形・色・紋章を選べる）、襲撃のリプレイ、タイムラプスを動画で保存、ボス撃破の演出、ダメージの数字、倒れた魔物が横に倒れる','報告と研究の完了をリリアが話す形に。チュートリアルも新しい操作に合わせた','タブレットも横持ちだけに','部隊の「装備」を押したとき、装備の欄を開いて見せる。スマホで欄を開くと「戻る」が隠れて押せなかったのを直した','チュートリアルの研究のミッションを「大工組合」と「斥候」に','ランクⅠの研究を追加：剣士の訓練・弓兵の訓練・逆茂木（新しい罠）。大矢筒はランクⅡへ。「街」のエーテルはランクⅣから','ターンの報告の「完成しました」を、アイコン・名前・×N の一覧に','王都からの依頼は、第1襲撃（10日目）をしのいでから届く。スマホでチュートリアルの「次へ」が隠れていたのを直した','チュートリアルの動画と画像を新しい画面で撮り直した。「街」の欄に、もう在庫を持たない矢と剣が出ていたのを消した','タイトルの画面でページを閉じたり読み込み直したりすると、つづきからのセーブが消えていた不具合を直した']],
  ['1.19（試作版だけ）','2026-11-18',['PC・iPad：建設・研究・軍事・内政を右に縦に並べた（アイコンと文字）。研究は研究の画面をすぐ開く。下の段はログ・一括・依頼など。「街」の名前を「内政」に','部隊の半円の「装備」などで欄を開いたとき、たたまれた欄（装備）を開いて見せる。スマホで欄の下に半円の「戻る」が隠れて押せなかったのを直した（半円を欄の左に寄せる）','チュートリアルの研究のミッション：「醸造」をやめて「斥候」に（襲撃の方角が分かる）','ランクⅠの研究を追加：剣士の訓練・弓兵の訓練（剣士と弓兵は研究してから訓練できる。歩兵・弓兵の英雄も）・逆茂木（新しい罠。足を遅くする・木材だけ）。大矢筒はランクⅡへ','「街」の欄のエーテルは、城のランクⅣ（エーテル採掘所が建てられる）から出す','ターンの報告の「完成しました」を、アイコン・名前・×N の一覧に','王都からの依頼は、第1襲撃（10日目）をしのいでから届くようにした（1日目から出ていた）','スマホ：チュートリアルのリリアの話で「次へ」が欄の下に隠れていたのを直した（欄を横に広げ、ボタンを欄の下に貼りつけた）','「街」の欄に、もう在庫を持たない矢と剣が出ていたのを消した','チュートリアルの動画（柵・部隊の移動・エンチャント付与・駐屯地への夜襲）と画像（街・英雄）を新しい画面で撮り直した','タイトルの画面でページを閉じたり読み込み直したりすると、つづきからのセーブが消えて新しい地図になっていた不具合を直した','チュートリアル（リリアのミッション・説明・画面の説明）を新しい操作に合わせて書き直した。「選択中パネル」「右のタブ」→ 押すとまわりに出るボタン・下のボタン（スマホは右の帯）。「場所を示す」が新しい操作のボタンを光らせるようにした','スマホ：新しい操作で、右の帯の「建設」「軍事」「街」を押しても欄が開かなかった不具合を直した','前の操作に戻す切り替えをなくした（いつも新しい操作）','タブレットも横持ちだけにした（縦にすると「横にしてください」）','新しい操作：上の資源の段を1段に。増減の数は出さず、次の襲撃までに足りなくなりそうな資源は赤く光り、毎日減っている資源には▼。押すと全部の資源の数と増減の一覧','新しい操作：通信ログはふだん隠し、下の「ログ」ボタン（スマホは「その他」）に新しい記録の数を出す。戦死などの悪い知らせがあると赤い札。押すと最近の50行を新しい順に出す','スマホでは、ミニマップをはじめから「小」にした（自分で大きさを変えていたら、その大きさのまま）','新しい操作：半円の「戻る」を押したあと、ほかの物を押しても選べなくなっていたのを直した','新しい操作：部隊の半円の「迎撃」と「固守」を1つのボタンにした。押すたびに切り替わり、ボタンには今のモードが出る（まとめて選んだ部隊も同じ）','新しい操作：スマホ横で、閉じる×が2つ3つ出ていたのを、右の帯の「閉じる」だけにした','新しい操作：スマホ横で、右の縦の帯（夜へ・建設・研究など）が画面の右はしで切れていたのを直した','新しい操作：施設や部隊を選ぶと、「キュイ」と音がしてその物へ寄って拡大する。半円の「戻る」で選ぶ前の画角に戻る（ほかの物を続けて選んでも、戻るのは最初の画角）','柵などをまとめて建てたあと、セーブして読み込み直すと見えなくなることがあったのを直した','下の一括のところに「廃墟を建て直す」ボタンを追加','英雄の号令などのスキルの途中で襲撃が終わると、光や文字が残ったままになるのを直した','土地を選んだときの建設リストをなくした（建設は下の建設タブから）','一括修理・一括補給などの確認で、使う量をはっきり出すようにした（「矢 76 使う（671 → 595）」）','闇の中の大きい魔物（トロールなど）の赤い目が、お腹の位置に出ていたのを頭の高さに直した','夜狩りで持ち帰るのは、主に小さな魔核に（魔核は5つに1つ）','「海外調達」（買う部隊）をなくした','英雄は英雄の家を建ててから（始めの2人をなくした。チュートリアルも合わせた）','投石機の威力 70→40（範囲の中のゴブリンがすべて一撃だったので）','金貨：城の毎ターンの金貨 12→18、道具を替える費用から金貨をなくした','修理は建てたときの素材で払うように（石の壁は石材、城壁は石材と鉄など。前はどれも木材だった）','襲撃の方向の増え方をゆっくりに（1方向：第1〜4・2方向：第5〜9・3方向：第10〜15・4方向：第16から）','鎧の補給は、その鎧の素材で（鉄の鎧・鎖帷子なら鉄、合金の鎧なら合金…）。武器工房の「鎧」作りはなくした','守備（ブラム・セレナ・ドルフ）と内政（エマ・オットー）の英雄も名簿に。絵が届くまでは今の見た目','街の記録の書き出しに、上の資源欄に出ている資源（銀貨・小さな魔核・龍鱗・魔金属・聖銀など）も出てきたら入るように','英雄の一覧・候補・詳細の絵を、名簿の英雄の絵に','武器工房の道具の段の絵を、描き直した黒い炉の絵に（石・鉄・合金・魔金属・聖銀の金槌）','守備と内政の英雄5人（ブラム・セレナ・ドルフ・エマ・オットー）の絵を入れた。施設に付いた英雄も、地図の上で名簿の絵で出る','<b>武器工房をなくした</b>：矢と剣は在庫を持たず、使うたびに資材から払う（矢10本＝木材5・鉄1、剣1つ＝鉄1）。費用の表示も木材と鉄で出る。前のセーブの武器工房は消して建設費を戻し、残っていた矢と剣は資材に戻す','魔矢をなくした','チュートリアルの「軍需」を、鉱山を建てて鉄をためる内容に','生産施設に付けた英雄が、施設のまわりをうろうろ歩くように','一括エンチャントで、種類ごとにチェックを外してかけないようにできる（前哨砦だけ外す、など）','<b>改造</b>：施設の種類ごとに1つ選ぶ形に（街のその施設すべてに効く）。バリスタ（鋭い矢・連弩）・物見櫓（照明台・2連物見櫓）・投石機（大岩・燃える岩）・大砲（大口径砲・連射砲）・メイジの塔（火炎・凍結）・迫撃砲（クラスター・焼夷）。付け替えは2ターン。改造ごとに、撃つたびに使う物が増える（足りないときは改造なしで撃つ）','研究は「〇〇の改造」に（物見櫓とメイジの塔の改造を追加・燃える岩の研究は投石機の改造にまとめた）','弾の消費の表示を木材と鉄で','<b>枯渇</b>：枯渇した施設に空のかごの印（点滅）、あと3日で枯渇する施設に「残りNT」の札。下に「枯渇 N軒・もうすぐ枯渇 N軒」のボタン（押すとその施設へ）','建て終わった施設をアイコン付きでお知らせ（押すとその場所へ）','<b>ボスを倒したとき</b>：少し止まって揺れ、白く光り、「撃破！」の大きな文字と魔核がこぼれる','ダメージの数字（まとめて出す・重くならないよう30個まで）','<b>装備・道具を替える</b>：下のボタンから、替えられる道具と装備をまとめて替えられる。地図の上に緑の矢印、城のランクが上がったときにお知らせ','<b>襲撃の日</b>：「今夜の見込み（木材・鉄など）」と紫の「エンチャント付与」ボタンを出す。戦闘報告の消費も木材と鉄で','報告（ターンの報告・夜明け・戦闘報告）をリリアが話す形に','研究が終わったとき、リリアが動画つきで使い方を説明（エンチャント付与・駐屯地への夜襲・改造）','建物の間を歩く運び手をなくして、施設の前で働く人に（木を切る・石を割る・耕す・網を引く・金槌）。建設中は足場と金槌を打つ人','ボスが倒れたら、残りの魔物は街から離れる向きに逃げ、離れると消える（倒した数には入らない）','戦闘報告にアイコン（撃破＝魔物の幽霊・戦死・施設損失）と、手に入れた魔物の素材（魔核・小さな魔核・巨大魔核・龍鱗・飛膜）の内訳','エンチャントがかかった施設と兵士の絵の上に、紫の波がゆらゆら流れる','詳細の「改造」「エンチャント付与」にアイコン。研究前もグレーで出して、何ができるかを知らせる','<b>一括</b>：一括修理・一括補給・廃墟の建て直し・装備と道具・エンチャント付与を、下の「一括」のメニューにまとめた（使えないものはグレーで理由を出す）','演出の形：建った＝緑の輪・強化した＝黄色のひし形・改造が付いた＝水色の二重の輪（タイムラプスも同じ・控えめに）','前のセーブで、なくした研究（燃える岩・魔矢）が研究中だと研究の画面が開けなかったのを直した','襲撃のあと、エンチャントがはがれていなかったのを直した','空の「枯渇」のお知らせが、地図の右下に小さな枠だけ出ていたのを直した','タイムラプスで、人員不足などの印が出ていたのを直した','前のセーブで、研究の画面で最後に選んでいた研究が消した研究だと、研究の画面が開けなかったのを直した','置いたらすぐ完成する柵・壁も、その日のうちなら取り消せるように（取り消しボタン・Ctrl+Z）','「次の襲撃で足りない」「今夜の見込み」を押すと、何に（施設・部隊・篝火）どれだけ使う見込みかが見られる','英雄の部隊が、地図で英雄の共通の絵になっていたのを本人の絵に直した','メイジの塔・テスラタワー・ミスリルレイが、撃つときに撃つ絵になる','前哨砦の攻撃を、線（弾）から矢に','スマホ：詳細を開いたとき、右上に「×」を出して閉じられるように（下の「マップに戻る」が画面の外に出ていた）','<b>王都からの依頼</b>：街と守りの目標2つ（住民100・200・500・1000、研究の数、魔物の討伐数、城のランク、道具、英雄、改造、駐屯地への夜襲・つぶす、ゴブリンキング討伐）と、王都へ救援物資を送る依頼1つ。達成で金貨・銀貨・資材が届く。城か下の「依頼」で見られる。断るは1日1回','城の毎ターンの金貨を 18→12 に戻した（王都からの依頼で補う）','依頼は街と守り3つ＋送る1つに。依頼のアイコンを専用の絵に','【緊急】第19襲撃のあと、ゴブリンキング討伐の依頼（第20襲撃まで）','<b>襲撃のリプレイ</b>：一番新しい襲撃を、戦闘報告か街の記録の「リプレイ」から見られる（再生・一時停止・速さ・好きな位置へ。セーブには入らないので、読み込み直すと消える）','記録のタイムラプスを動画で保存できる（街の名前と日付入り）','前哨砦の絵の上が切れていたのを直した（切れていた旗を消して、かがり火の炎の先と旗竿の先を描き足した）','訓練所などに出ていた「海外調達」の表示をなくした（英雄は英雄の家から）','<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：画面の上の街の名前・戦いの結果・つづきから・前哨砦にも出る。地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','英雄の家・港・空港・グリフォンの厩舎・兵器工房の建設のアイコン、土地を選んだときの建設の一覧にもアイコン','アップグレードで増える働き手は、費用の「住民」として待機中の住民からすぐに入る（アップグレード直後に人手不足にならない）','倒れた魔物と兵は、その場で横に倒れて少しつぶれてから消える','武器工房の道具の段の絵（地図の絵と立ち絵）を入れた','道具の段の立ち絵を入れた（施設を選んだときの絵が、道具の段ごとに変わる）','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける','壁が2列並んでいるところの門が、横向き・縦向きを間違えて描かれていたのを直した','門も置いたらすぐ完成するように','英雄の部隊が3人に見えていたのを、英雄1人の絵にした','掘り尽くした石切り場・鉱山・採掘所は、森と同じように足元の丘・岩場・鉱脈・泉がなくなるように（解体したときも）','一括に「枯渇した施設を解体」：1軒ずつ絵・名前・何が尽きたか・城から見た場所を出し、チェックで選んで解体できる','襲撃の群れを、開いている方角に順番に割り振るように（同じ時間に1方向からだけ来ることがなくなる）','建設の「領地」は、はじめからある施設を上に、あとから開く施設を下に足す並びに','リリアの説明などを開いている間は、下の「枯渇」「足りない」の札を隠す','地図を引いて見るとき、「残り○T」の札が大きくなりすぎていたのを、地図と一緒に小さくなるように（かなり引くと出さない）','工業と魔法の分岐を入れた（1回目）：城がランクⅣになると、街の方針を「工業」か「魔法」に決める。違う方針のランクⅣ以上の研究は費用2倍','魔金属をやめて、魔法の街のランクⅤの素材は「月光石」（水色に光る石。夜に作る）に。工業の街では、ランクⅤの金属は「黒鉄」になる（研究・アップグレード・道具・装備の素材が黒鉄に）','新しい施設：機械工房（工業・研究「蒸気機関」で開く。鉄と合金から歯車）、高炉（工業・ランクⅤ。合金・石炭・鉄から黒鉄）、錬金工房（魔法・ランクⅤ。夜のあいだに石材とエーテルから月光石を作る）。絵ができるまでは前の絵で代わり','エーテル採掘所は魔法のランクⅣに（工業の街は研究で開く）。精錬所の月光石の段はなくして、ランクⅦで竜晶を作れる段に','櫓台は建設のリストから外した（建ててあるものはそのまま）','工業と魔法の分岐（2回目・生産）：工業は蒸気の機械（製材機・蒸気のドリル・蒸気ポンプ・蒸気の鋤・蒸気船）で産出 +30%。そのかわり1軒につき毎日 石炭1（足りないと上乗せなし）','工業：魔核のボイラー（石炭が足りないとき魔核で動かす）・高層住宅（住める人数 +50%）・蒸気のトロッコ（働き手 −1）・魔核の動力炉（まわりの機械は石炭いらず。毎日 魔核2）','魔法：精霊の森（木材 +20%・埋蔵の減り −30%）・ノームの導き（石材 +20%・ときどき月光石）・鉱脈探知（鉱山の埋蔵が長持ち）・実りの魔法陣（食料 +20%・幸福度 +3）・水妖の網（食料 +20%・ときどき小さな魔核）','魔法：魔力の泉（エーテル +50%・ときどき小さな魔核）・浮遊の館（住める人数 +20%・幸福度 +5）・運搬ゴーレム（働き手 −1）','工業の街では、研究所の上の段が「技術研究所」になる','工業と魔法の分岐（3回目・防衛）：改造の選択肢を方針で分けた。工業は連弩・2連物見櫓・大岩・連射砲（ランクⅤ）・クラスター、魔法は新しく光の矢・魔眼・重力の岩・エーテル弾（ランクⅤ）・凍結弾','工業：銃士の塔（銃兵が上で撃つ石の塔。空も撃てる。火薬を使う。絵は城塞の物見櫓で代わり）・地雷（一晩に2回爆発）・トラバサミ（5秒動けなくする）・鉄条網（柵・壁を叩いた魔物に傷と足止め）・魔核の砲弾（大砲・迫撃砲の火力 +30%）','魔法：魔核の守り石（防衛施設が耐久3割以下で、小さな魔核1を使って5秒 傷を受けない。一晩に1軒1回）','工業の街では、魔導砲→重砲・蒼い炎→ガス灯・エーテル火薬工房→火薬の工場（火薬を2倍作る）・エーテル風船→大きな風船爆弾・月光石の壁→黒鉄の壁。ランクⅣのアップグレードはエーテルの代わりに歯車を使う','工業と魔法の分岐（4回目・部隊）：工業は兵器工房で、蒸気機兵（Ⅴ・とても硬い壁役）・銃士の気球（Ⅴ・空を飛び、空も地上も撃つ）・蒸気戦車（Ⅵ・装甲の大砲車）・爆撃飛行船（Ⅶ・空から爆弾）','魔法は魔導院で、空の魔術師（Ⅴ・空を飛び、空も地上も撃つ）・巨大ゴーレム（Ⅵ・巨大な手で薙ぎ払う壁役）・空飛ぶクジラ（Ⅶ・空から範囲魔法）。絵ができるまでは近い兵の絵で代わり','魔核の宝珠（魔法・Ⅳ）：エーテルが足りないとき、魔術師の補給に小さな魔核も使える。工業の街では、エーテルローブが「鉄板入りの外套」（鉄を使う）になる','巨大ゴーレムの攻撃を、叩きつけ（狙った所で爆発）から薙ぎ払い（前の半円の魔物をまとめて打ち、小さな魔物を払いのける）に','届いた絵を入れた：月光石の段（水色）と黒鉄の段（大弩・迫撃砲・門・壁・道具）、機械工房・高炉・錬金工房・魔核の動力炉・銃士の塔・ガス灯・重砲、地雷・トラバサミ、蒸気機兵・蒸気戦車・銃士の気球・爆撃飛行船・空の魔術師・巨大ゴーレム・空飛ぶクジラ・狙撃兵（ライフル）、歯車・黒鉄・合金・武器と鎧のアイコン','兵の施設を「人」と「作るもの」に分けた：人（魔術師・空の魔術師も）は兵舎、魔法のゴーレム・空飛ぶクジラは錬金工房（研究「エーテルゴーレム」で開く）、工業の蒸気機兵・蒸気戦車・気球・飛行船は蒸気の工場（工業のランクⅤ）','兵舎はランクⅣから方針で変わる：工業は「蒸気の兵舎」、魔法は「魔導院」（ランクⅥで「大魔導院」）。魔導院・竜舎・グリフォンの厩舎は建設のリストから外した（建ててあるものはそのまま使える）','馬小屋の上の段「大きな厩舎」（ランクⅣ）：研究「竜騎兵」「グリフォン騎兵」で、竜騎兵（1軒につき1部隊）とグリフォン騎兵を育てられる','月光石は「月光の祭壇」（魔法のランクⅤ）で夜に作る。前の錬金工房（月光石を作っていたもの）は月光の祭壇になる。新しい施設の絵は届くまで仮の絵','工業の新しい防衛施設：照明弾の発射台（ランクⅥ。暗い所の魔物の群れの上に照明弾を打ち上げて広く照らす。1発 火薬1）、大要塞砲（ランクⅦ。とても遠くの、いちばん固まった群れを吹き飛ばす。一晩に3発・1発 火薬5と鉄5）','魔核の守り石を1軒ずつはめる形に：防衛施設の詳しい欄の「はめる」（小さな魔核1・昼だけ）か、一括の「魔核の守り石をはめる」で。はめた施設には水色の印。耐久が3割以下になったとき5秒 傷を受けず、効いたら割れる','新しい操作（UIリメイク1回目）：マップを画面いっぱいに。右の欄は、施設や部隊を選んだときと「建設」を押したときだけ出る。右下に大きな「夜へ」と「建設」。下のボタンの「前の操作にする」で前の画面に戻せる','届いた絵を入れた：兵舎の段（兵舎→石の兵舎→銃兵の兵舎→工業は砲兵の兵舎・狙撃兵の兵舎／魔法は魔導院・大魔導院）、蒸気の工場（蒸気戦車か爆撃飛行船の研究で絵が変わる）、錬金工房（巨大ゴーレム・空飛ぶクジラの研究で絵が変わる）、大きな厩舎（竜騎兵の研究で竜の絵に）、月光の祭壇（夜は光る）。兵舎の段は銃兵の兵舎（ランクⅢ）が増えた','新しい操作（UIリメイク2回目）：施設や部隊を押すと、その上に半円のボタンが出る（見る・強化・改造・作るもの・兵を作る・エンチャント・守り石・修理・解体／部隊は 迎撃・固守・帰還・補給・装備）。まだ使えないものは灰色で、押すと理由が出る。画面の端だと、ボタンが見えるところまで画面が動く。詳しい欄は「見る」で出す','新しい操作（UIリメイク3回目）：マップを本当に画面いっぱいに（上の段の下や、スマホ横持ちの下の余白にもマップ）。「見る」の欄は選んだものの中身だけ、「建設」の欄は一覧とタブだけ。PCは下に「研究」「軍事」「街」のボタン（もう一度押すと閉じる）。右の欄の左上の×で閉じる。タブレット縦では、閉じているときの引き出しを隠した','新しい操作（UIリメイク4回目）：半円の「解体」は1回目で赤い「もう一度で解体」に変わる。「強化」「エンチャント」は確認画面（使う量、数字が今→あとでどう良くなるか、見た目が今→あと）を出してから進む。「兵を作る」は「訓練」に。「見る」で開いた欄に閉じるボタン（右向きの矢印）。「夜へ」は左下、「建設」は右下に大きく','新しい操作：部隊の半円にもエンチャント。城の強化の確認画面に「新しく使えるようになるもの」を絵で並べ、研究ランクはフラスコ Ⅰ→Ⅱ、施設のアップグレードは◆の数で見せる（文字の説明を減らした）。強化の数字にもアイコン']],
@@ -10309,7 +10344,7 @@ function exitBuild(){S.buildMode=null;S.buildPick=false;bGhost=null;renderBuild(
 let bGhost=null;
 function padMode(){return isNarrow();}
 // 指した地点から、施設が占めるマス（左上と大きさ）を求める
-function footAt(px,py){let NS=newSz(S.buildMode),gx=Math.floor(px/T-(NS-1)/2),gy=Math.floor(py/T-(NS-1)/2);if(B[S.buildMode]&&B[S.buildMode].isRoad){gx=Math.floor(px/T);gy=Math.floor(py/T);gx-=gx%U;gy-=gy%U;}
+function footAt(px,py){let NS=newSz(S.buildMode),gx=Math.floor(px/T-(NS-1)/2),gy=Math.floor(py/T-(NS-1)/2);
   const ub=MOUNT_T.includes(S.buildMode)&&bastionAt(Math.floor(px/T),Math.floor(py/T));if(ub){gx=ub.x;gy=ub.y;NS=bsz(ub);}return {gx,gy,NS};}
 function tryBuildAt(px,py){const {gx,gy,NS}=footAt(px,py);
   if(!canPlace(S.buildMode,gx,gy)){se('error');const cb=capBlock(S.buildMode);const lk=lackNames(costOf(S.buildMode),B[S.buildMode].pop);if(cb)toast(cb,'warn');else if(lk)toast(lk,'warn');return false;}
