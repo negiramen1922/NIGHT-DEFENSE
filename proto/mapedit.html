@@ -104,7 +104,7 @@ select{width:100%}
 /* ===== 地図の道具（2026-11-25 作り直し）：地形9種・筆の形・線・スタンプ・反転・範囲を動かす・城1つ（置ける範囲つき）・巣4つ ===== */
 const TER=[ // [ゲームの番号, 文字, 名前, 色, 通れない]
  [0,'.','草地','#5a8c46',0],[14,'g','肥えた土（畑 +30%）','#6a5a30',0],
- [1,'h','岩場・高台（石・射程が伸びる）','#9a9a92',0],[3,'r','山（通れない）','#5e5c58',1],[2,'f','森（木）','#2c5a2a',0],
+ [1,'h','岩場・高台（石・射程が伸びる）','#9a9a92',0],[3,'r','山（通れない）','#5e5c58',1],[2,'f','森（木）','#2c5a2a',0],[15,'F','巨大樹の森（木 ×1.5・明かりがほぼ届かない）','#163a16',0],
  [4,'m','沼（遅くなる）','#4a6a52',0],[9,'w','水（川・湖。通れない）','#3c6ec8',1],[10,'d','浅瀬（渡れる）','#9cc4e8',0]];
 const BY_CH={},BY_ID={};for(const t of TER){BY_CH[t[1]]=t;BY_ID[t[0]]=t;}
 const SITE_R=6;
@@ -199,7 +199,7 @@ function liftSel(){const r=normR(selR);const T=[],O=[],P=[];const b=document.cre
 function dropSel(){const r=normR(selR),dx=selR.mvx||0,dy=selR.mvy||0;const {T,O,P}=selR.cells;let k=0;for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++,k++){if(T[k]<0)continue;const gx=r.x+x+dx,gy=r.y+y+dy;if(gx<0||gy<0||gx>=W||gy>=H)continue;const i=gy*W+gx;TT[i]=T[k];ORE[i]=O[k];OIL[i]=P[k];}selR=null;changed();}
 /* ---- 右の欄 ---- */
 function stats(){const box=document.getElementById('stats');const s=SITES[0];if(!s){box.innerHTML='<div class="small">城を置くと出ます</div>';}
-  else{const c={wood:0,stone:0,iron:0,spring:0,water:0,fert:0,road:0,marsh:0};for(let y=s.y-12;y<=s.y+14;y++)for(let x=s.x-12;x<=s.x+14;x++){if(x<0||y<0||x>=W||y>=H||Math.hypot(x-s.x-1,y-s.y-1)>12)continue;const j=y*W+x,v=TT[j];if(v===2)c.wood++;if(v===1||v===3)c.stone++;if(v===9)c.water++;if(v===14)c.fert++;if(v===13)c.road++;if(v===4)c.marsh++;if(ORE[j])c.iron++;if(OIL[j])c.spring++;}
+  else{const c={wood:0,stone:0,iron:0,spring:0,water:0,fert:0,road:0,marsh:0};for(let y=s.y-12;y<=s.y+14;y++)for(let x=s.x-12;x<=s.x+14;x++){if(x<0||y<0||x>=W||y>=H||Math.hypot(x-s.x-1,y-s.y-1)>12)continue;const j=y*W+x,v=TT[j];if(v===2||v===15)c.wood++;if(v===1||v===3)c.stone++;if(v===9)c.water++;if(v===14)c.fert++;if(v===13)c.road++;if(v===4)c.marsh++;if(ORE[j])c.iron++;if(OIL[j])c.spring++;}
     const ds=HIVES.map(hv=>{const d=FLOW?FLOW[hv.y*W+hv.x]:1e9;return `<div class="row"><span>${'ABCD'.indexOf(hv.k)+1}番目 ${hv.name||hv.s}から</span><span class="${d>=1e9?'warn':''}">${d>=1e9?'行けない':Math.round(d/10)+'マス'}</span></div>`;}).join('');
     box.innerHTML=`<div class="stat"><div class="row"><span>森（木）</span><span>${c.wood}</span></div><div class="row"><span>岩場・山（石）</span><span>${c.stone}</span></div><div class="row"><span>鉄鉱脈</span><span>${c.iron}</span></div><div class="row"><span>龍脈の泉</span><span>${c.spring}</span></div><div class="row"><span>水（魚）</span><span>${c.water}</span></div><div class="row"><span>肥えた土</span><span>${c.fert}</span></div><div class="row"><span>沼</span><span>${c.marsh}</span></div>${ds}</div>`;}
   const ck=[];if(!SITES.length)ck.push('<div class="warn">城がありません（置くもの → 城）</div>');if(HIVES.length<4)ck.push(`<div class="small">巣は${HIVES.length}つです（ゲームは4つまで使います）</div>`);
