@@ -64,13 +64,14 @@ select{width:100%}
   <div class="row3" id="sizes" style="margin-top:3px"></div>
   <h3>地形</h3>
   <div id="pal"></div>
-  <h3>スタンプ（押すと置く）</h3>
+  <h3>スタンプ（形を整えて、まとめて置く）</h3>
   <div id="stamps"></div>
   <h3>資源の印（筆で塗る）</h3>
   <div id="pal2"></div>
   <h3>置くもの</h3>
   <div id="pal3"></div>
   <h3>表示</h3>
+  <label class="ck"><input type="checkbox" id="cDeep" checked>森・岩場・沼の深さ（濃いほど深い）</label>
   <label class="ck"><input type="checkbox" id="cGrid" checked>マス目</label>
   <label class="ck"><input type="checkbox" id="cRoute" checked>攻めてくる道</label>
   <label class="ck"><input type="checkbox" id="cRange" checked>城を置ける範囲・まわり12マス</label>
@@ -92,6 +93,7 @@ select{width:100%}
    ・「線を引く」は、点を順に押すとつながる。右クリック・Esc・ダブルクリックで終わり（筆の大きさが太さ）<br>
    ・「範囲を動かす」は、四角く囲んでから中をつかんで動かす。Esc でやめる<br>
    ・城を置ける範囲（黄色の円）の中で、遊ぶ人が城を動かせる。円の中の川・岩・山・浅瀬の近くには置けない<br>
+   ・森・岩場・沼は、かたまりの縁が1段目、内側ほど2段目・3段目（濃い色）。深いほど効き目が強い（森なら木が多く、敵も部隊もより遅い）。5マスより太いと真ん中が3段目<br>
    ・1マスはゲームの 3×3 マス。描いている途中も、このブラウザに自動で保存されます<br>
    ・「書き出す」でできたファイルを作者に送ると、ゲームの本当の地図にできます
   </div>
@@ -122,7 +124,7 @@ const ICON={brush:SV('<path d="M11 1h3v3l-6 6-3-3z" fill="currentColor"/><path d
  sel:SV('<path d="M1 1h3v1H2v2H1zM6 1h4v1H6zM12 1h3v3h-1V2h-2zM1 6h1v4H1zM14 6h1v4h-1zM1 12h1v2h2v1H1zM6 14h4v1H6zM14 12h1v3h-3v-1h2z" fill="currentColor"/><path d="M7 5h2v2h2v2H9v2H7V9H5V7h2z" fill="currentColor"/>'),
  hand:SV('<path d="M5 3h2v5h1V2h2v6h1V3h2v7l-1 4H6L3 10V7h2z" fill="currentColor"/>')};
 const TOOLS=[['brush','筆','B'],['fill','塗りつぶし','G'],['line','線を引く（川・街道・山並み）','L'],['stamp','スタンプ','S'],['pick','スポイト（地形を拾う）','I'],['sel','範囲を動かす','R'],['hand','手のひら（画面を動かす）','H']];
-const STAMPS=[['forest','森のかたまり','#2c5a2a'],['hill','岩場（まん中に山）','#9a9a92'],['ridgeH','山並み（横）','#5e5c58'],['ridgeV','山並み（縦）','#5e5c58'],['lake','湖（ふちに浅瀬なし）','#3c6ec8'],['marsh','沼','#4a6a52'],['fert','肥えた土','#6a5a30']];
+const STAMPS=[['forest','森（かたまりで置く）','#2c5a2a'],['hill','岩場（かたまり・まん中に山）','#9a9a92'],['ridgeH','山並み（横長・まわりに岩場）','#5e5c58'],['ridgeV','山並み（縦長・まわりに岩場）','#5e5c58'],['lake','湖（かたまりで置く）','#3c6ec8'],['marsh','沼（かたまりで置く）','#4a6a52'],['fert','肥えた土（かたまりで置く）','#6a5a30']];
 function blank(w,h){W=w;H=h;TT=new Uint8Array(W*H);ORE=new Uint8Array(W*H);OIL=new Uint8Array(W*H);HIVES=[];SITES=[];}
 function fromJSON(j){blank(j.w,j.h);for(let y=0;y<H;y++){const r=j.t[y]||'';for(let x=0;x<W;x++){const t=BY_CH[r[x]];TT[y*W+x]=t?t[0]:0;if(j.ore&&j.ore[y]&&j.ore[y][x]==='1')ORE[y*W+x]=1;if(j.oil&&j.oil[y]&&j.oil[y][x]==='1')OIL[y*W+x]=1;}}
   HIVES=(j.hives||[]).slice(0,4).map(h=>({k:h.k,x:h.x,y:h.y,name:h.name||'',s:h.s||'',_named:true}));SITES=(j.sites||[]).slice(0,1).map(s=>({id:'c',x:s.x,y:s.y,n:s.n||'城',food:s.food||2}));}
@@ -151,7 +153,12 @@ let ROUTES=[],FLOW=null;
 function calcRoutes(){const s=SITES[0];FLOW=s?flowFrom(s.x+1,s.y+1):null;ROUTES=s?HIVES.map(h=>({h,P:pathOf(FLOW,h.x,h.y)})):[];}
 function castleOK(x,y){const c=SITES[0];if(!c)return false;for(let yy=y-3;yy<=y+3;yy++)for(let xx=x-3;xx<=x+3;xx++){if(xx<0||yy<0||xx>=W||yy>=H)return false;const v=TT[yy*W+xx];if(v===3||v===9||v===10)return false;}return true;}
 /* ---- 描く ---- */
-function drawBase(){base.width=W;base.height=H;const im=bctx.createImageData(W,H);for(let i=0;i<W*H;i++){const c=(BY_ID[TT[i]]||TER[0])[3];const n=parseInt(c.slice(1),16);let r=n>>16,g=(n>>8)&255,b=n&255;const ch=(((i%W)+((i/W)|0))%2);if((TT[i]===2||TT[i]===4||TT[i]===14)&&ch)r*=0.86,g*=0.86,b*=0.86;if(TT[i]===13&&ch)r*=0.94,g*=0.94,b*=0.94;im.data[i*4]=r;im.data[i*4+1]=g;im.data[i*4+2]=b;im.data[i*4+3]=255;}bctx.putImageData(im,0,0);}
+/* 森・岩場・沼の深さ（ゲームと同じ：かたまりの縁が1段目、内側ほど2段目・3段目。深いほど効き目が強い） */
+const DEEP={2:['#46783c','#2c5a2a','#163a16'],1:['#b4b4ac','#9a9a92','#7c7c74'],4:['#66866c','#4a6a52','#2e4e3a']};
+const LVN={2:['疎林','森林','密林'],1:['岩場（小）','岩場（中）','岩場（大）'],4:['ぬかるみ','湿地','沼']};
+let LV=null;
+function calcLv(){LV=new Uint8Array(W*H);for(const v of [1,2,4]){const el=new Uint8Array(W*H),q=[];for(let i=0;i<W*H;i++){if(TT[i]===v)el[i]=99;else q.push(i);}let h=0;while(h<q.length){const i=q[h++],x=i%W,y=(i/W)|0,d=el[i]===99?0:el[i];for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(el[j]===99){el[j]=d+1;q.push(j);}}}for(let i=0;i<W*H;i++)if(TT[i]===v)LV[i]=Math.min(3,el[i]===99?3:el[i]);}}
+function drawBase(){base.width=W;base.height=H;calcLv();const im=bctx.createImageData(W,H);for(let i=0;i<W*H;i++){const c=DEEP[TT[i]]&&document.getElementById('cDeep').checked?DEEP[TT[i]][Math.max(1,LV[i])-1]:(BY_ID[TT[i]]||TER[0])[3];const n=parseInt(c.slice(1),16);let r=n>>16,g=(n>>8)&255,b=n&255;const ch=(((i%W)+((i/W)|0))%2);if((TT[i]===2||TT[i]===4||TT[i]===14)&&ch)r*=0.9,g*=0.9,b*=0.9;if(TT[i]===13&&ch)r*=0.94,g*=0.94,b*=0.94;im.data[i*4]=r;im.data[i*4+1]=g;im.data[i*4+2]=b;im.data[i*4+3]=255;}bctx.putImageData(im,0,0);}
 function resize(){cv.width=wrap.clientWidth;cv.height=wrap.clientHeight;draw();}
 function brushCells(x,y,r,shp){const L=[];const c=(r-1)/2;const x0=x-Math.floor(c),y0=y-Math.floor(c);for(let yy=y0;yy<y0+r;yy++)for(let xx=x0;xx<x0+r;xx++){if(shp!=='square'){const d=Math.hypot(xx-(x0+c),yy-(y0+c));let lim=r/2+0.15;if(shp==='rough')lim+=(rnd(xx,yy,7)-0.5)*Math.max(1,r*0.45);if(d>lim)continue;}L.push([xx,yy]);}return L;}
 function draw(){const z=zoom;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#050706';ctx.fillRect(0,0,cv.width,cv.height);ctx.imageSmoothingEnabled=false;ctx.drawImage(base,ox,oy,W*z,H*z);
@@ -239,7 +246,7 @@ cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const c=
     selR={x0:c.x,y0:c.y,x1:c.x,y1:c.y,done:false};drag={selmk:true};draw();return;}
   push();drag={paint:true,any:false};if(paintAt(c.x,c.y)){drag.any=true;drawBase();draw();}});
 cv.addEventListener('pointermove',e=>{const c=cellAt(e);hov=(c.x>=0&&c.y>=0&&c.x<W&&c.y<H)?c:null;
-  document.getElementById('hud').textContent=hov?`(${c.x}, ${c.y})　${(BY_ID[TT[c.y*W+c.x]]||TER[0])[2]}${ORE[c.y*W+c.x]?'・鉄鉱脈':''}${OIL[c.y*W+c.x]?'・龍脈の泉':''}　拡大 ${zoom}`:`拡大 ${zoom}`;
+  document.getElementById('hud').textContent=hov?`(${c.x}, ${c.y})　${(BY_ID[TT[c.y*W+c.x]]||TER[0])[2]}${LVN[TT[c.y*W+c.x]]&&LV?'・'+LVN[TT[c.y*W+c.x]][Math.max(1,LV[c.y*W+c.x])-1]+'（'+Math.max(1,LV[c.y*W+c.x])+'段目）':''}${ORE[c.y*W+c.x]?'・鉄鉱脈':''}${OIL[c.y*W+c.x]?'・龍脈の泉':''}　拡大 ${zoom}`:`拡大 ${zoom}`;
   if(drag&&drag.pan){ox=drag.ox+e.clientX-drag.sx;oy=drag.oy+e.clientY-drag.sy;draw();return;}
   if(drag&&drag.mv&&hov){const m=drag.mv,nx=Math.max(0,Math.min(W-1,c.x-drag.dx)),ny=Math.max(0,Math.min(H-1,c.y-drag.dy));if(nx!==m.x||ny!==m.y){m.x=nx;m.y=ny;drag.moved=true;if(HIVES.includes(m)&&!m._named)hiveAuto(m);if(m===SITES[0])for(const h of HIVES)if(!h._named)hiveAuto(h);selUi();calcRoutes();stats();draw();}return;}
   if(drag&&drag.selmk&&hov){selR.x1=c.x;selR.y1=c.y;draw();return;}
@@ -287,7 +294,7 @@ document.getElementById('bUndo').onclick=undo;document.getElementById('bRedo').o
 document.getElementById('bFlipH').onclick=()=>flip(true);document.getElementById('bFlipV').onclick=()=>flip(false);
 document.getElementById('bPlay').onclick=()=>{if(!SITES.length||!HIVES.length){msg('城と魔物の巣を置いてください');return;}try{localStorage.setItem('nd_map_f',JSON.stringify(toJSON()));}catch(e){msg('保存できませんでした');return;}msg('この地図をゲームで使うようにしました。グレイヴェル平原を「はじめから」で始めてください',4000);window.open('index.html','_blank');};
 document.getElementById('bStop').onclick=()=>{try{localStorage.removeItem('nd_map_f');}catch(e){}msg('ゲームはもとの地図に戻りました');};
-for(const id of ['cGrid','cRoute','cRange'])document.getElementById(id).onchange=draw;
+for(const id of ['cGrid','cRoute','cRange'])document.getElementById(id).onchange=draw;document.getElementById('cDeep').onchange=()=>{drawBase();draw();};
 addEventListener('resize',resize);
 /* ---- はじめ ---- */
 uiTools();uiSizes();uiPal();selUi();
