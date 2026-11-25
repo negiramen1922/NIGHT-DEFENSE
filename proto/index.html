@@ -140,6 +140,21 @@ select{background:#0e1510;color:var(--text);border:1px solid var(--line);font:in
 .ttl .tgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;max-width:440px;margin:0 auto}.ttl .tgrid button,.ttl .tmoreL button{padding:7px 6px;font-size:13px}.ttl .tarr{margin-left:4px;font-size:10px}.ttl .tmoreL{display:flex;flex-wrap:wrap;gap:6px;max-width:440px;margin:6px auto 0;padding-top:6px;border-top:1px dashed #5a4a2a}.ttl .tmoreL button{flex:1 1 40%}   /* 数が奇数のときは最後の1つが横いっぱい */.ttl .tmoreL[hidden]{display:none}
 .ttl .tfoot{font-size:11px;margin-top:10px}
 .tcorner{position:fixed;right:14px;bottom:14px;z-index:5;display:flex;gap:8px}.tcorner button{padding:8px 12px;font-size:14px;background:rgba(14,12,8,.9)}.tcorner #tSet{font-size:20px;line-height:1;padding:6px 11px}.tcorner #tRep{display:flex;align-items:center;padding:5px 10px;color:var(--amber)}
+.ttl .tmain2{display:flex;flex-direction:column;gap:8px;max-width:440px;margin:0 auto 10px}.ttl .tmain2 button.big{display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 16px;font-size:20px;min-height:58px;text-align:left}.ttl .tmain2 button.big svg{width:30px;height:30px;flex-shrink:0}.ttl .tmain2 b{font-family:var(--px-font);font-weight:400;font-size:21px;letter-spacing:.06em}.ttl .tmain2 small{display:block;font-size:11px;color:#c8b890}.ttl .tmain2 span{display:flex;flex-direction:column}
+.ttl .tgrid2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;max-width:440px;margin:0 auto 6px}.ttl .tgrid2 button{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;font-size:12.5px}.ttl .tgrid2 svg{width:28px;height:28px;color:#e8c070}.ttl .tnew{position:absolute;top:2px;right:4px;font-size:10px;color:#1c1824;background:#f2b33d;padding:0 4px;font-family:var(--px-font);font-weight:400}
+.ttl .tdev{display:flex;gap:6px;max-width:440px;margin:6px auto 0}.ttl .tdev:empty{display:none}.ttl .tdev button{flex:1;padding:3px 6px;font-size:11px;opacity:.75}
+@media (max-height:520px){.ttl .tmain2{gap:5px;margin-bottom:6px}.ttl .tmain2 button.big{min-height:40px;padding:6px 12px}.ttl .tmain2 b{font-size:17px}.ttl .tmain2 button.big svg{width:22px;height:22px}.ttl .tgrid2 button{flex-direction:row;justify-content:center;padding:5px 4px;gap:6px}.ttl .tgrid2 svg{width:20px;height:20px}.ttl .tcfg{padding:4px}.ttl .tdev{margin-top:4px}}
+.ttl .tcfg{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:440px;margin:0 auto;padding:7px;font-size:14px}.ttl .tcfg svg{width:22px;height:22px;color:#e8c070}
+.tcorner button{display:flex;align-items:center;gap:6px}.tcorner button svg{width:22px;height:22px}.tcorner #tRep{padding:5px 10px;color:var(--amber)}
+.cfg{max-height:62vh;overflow-y:auto;padding-right:4px}.cfh{display:flex;align-items:center;gap:6px;margin:10px 0 4px;color:var(--amber);font-family:var(--px-font);font-size:15px;border-bottom:1px dashed #5a4a2a;padding-bottom:3px}.cfh svg{width:18px;height:18px}
+.cfr{display:flex;align-items:center;gap:10px;padding:5px 2px;min-height:38px}.cfr>i{width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:#e8c070;flex-shrink:0}.cfn{min-width:110px;font-size:14px}.cfr input[type=range]{flex:1;accent-color:#f2b33d}.cfr>b{width:34px;text-align:right;font-family:var(--px-font);font-weight:400}
+.cfsw{margin-left:auto;min-width:64px;padding:5px 10px;font-family:var(--px-font);background:#2a2420;color:#9a8a70}.cfsw.on{background:#3a7a3a;color:#fff}.cfseg{margin-left:auto;display:flex;gap:2px}.cfseg button{min-width:48px;padding:5px 8px;font-family:var(--px-font)}.cfseg button.on{background:var(--amber);color:#1c1824}.cfv{margin-left:auto;font-size:13px}.cfv small{color:#aab;margin-left:4px}
+.cfbtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.cfbtns button{flex:1 1 30%;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;font-size:12.5px}.cfbtns svg{width:24px;height:24px;color:#e8c070}
+#fpsBox{position:fixed;left:6px;bottom:72px;z-index:70;font-family:var(--px-font);font-size:13px;color:#9f9;background:rgba(0,0,0,.6);padding:1px 6px;pointer-events:none}
+/* 画面の上のお知らせ（2026-11-25）：ドット絵に合わせる。ふちは段の太い線、光のぼかしなし、ドットのアイコン、出るときはカクッと */
+#alertTop{font-family:var(--px-font);font-weight:400;letter-spacing:.04em;background:#120d0b;border:none;border-radius:0;padding:8px 18px 8px 12px;box-shadow:0 0 0 2px #000,0 0 0 4px var(--ac,#ff8a3a),0 0 0 6px #000,inset 0 2px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.5);text-shadow:2px 2px 0 #000;transition:none}
+#alertTop.on{animation:alIn .24s steps(3) both,alFl .5s steps(2) 3 .24s}@keyframes alIn{from{transform:translate(-50%,-16px);opacity:0}to{transform:translate(-50%,0);opacity:1}}@keyframes alFl{50%{box-shadow:0 0 0 2px #000,0 0 0 4px #fff,0 0 0 6px #000,inset 0 2px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.5)}}
+body #alertTop>i{font-style:normal;font-size:0;display:flex;align-items:center;justify-content:center;width:30px;height:30px;background:var(--ac,#ff8a3a);color:#120d0b;box-shadow:0 0 0 2px #000}body #alertTop>i svg{width:24px;height:24px}#alertTop small{display:block;font-family:inherit}
 .tsetP{position:fixed;right:14px;bottom:62px;z-index:6;width:min(320px,calc(100vw - 28px));background:rgba(18,15,10,.97);box-shadow:0 0 0 2px #c8a070,0 8px 24px #000c;padding:10px 12px;text-align:left}.tsetP[hidden]{display:none}
 .tsetH{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}.tsetH b{color:#e8c070;letter-spacing:.1em}.tsetH button{padding:0 8px}
 .tvol{display:flex;flex-direction:column;gap:6px;padding-bottom:8px;margin-bottom:8px;border-bottom:1px dashed #5a4a2a;font-size:13px}.tvol label{display:flex;align-items:center;gap:8px}.tvol input{accent-color:#f2b33d}.tvol input{flex:1}.tvol b{width:28px;text-align:right}.tvol button{align-self:flex-start;padding:3px 10px}
@@ -1751,6 +1766,7 @@ body.tabUI #build .bchips button{min-height:40px!important;padding:6px 16px;font
       <button id="bSave">セーブ（自動でも保存）</button>
       <button id="bTitle">タイトルへ</button>
       <button id="bHelp">遊び方</button>
+      <button id="bCfg">設定（音・画面）</button>
       <button id="bGuide">ミッション（リリアの案内）を表示</button>
       <button id="bRetry" class="danger">やり直す</button>
       <button id="bMute">♪ 音あり [M]</button>
@@ -6406,7 +6422,7 @@ const BFX={t:-1,stop:0,parts:[]};
 /* 試作（2026-11-19）：ダメージの数字。1体ごとに0.3秒ぶんをまとめて1つ・同時に30個まで（重くしないため） */
 const DMGN=[];let _dmgT=0;
 function dmgNumTick(dt){_dmgT+=dt;for(const d of DMGN)d.t+=dt;while(DMGN.length&&DMGN[0].t>0.9)DMGN.shift();if(_dmgT<0.3)return;_dmgT=0;
-  for(const e of S.enemies){if(!(e._dAcc>=1))continue;const v=Math.round(e._dAcc);e._dAcc=0;if(DMGN.length>=30||(S.dmgNum===false))continue;if(!seenE(e))continue;DMGN.push({x:e.x+(Math.random()-.5)*8,y:e.y-(e._sz||16)*0.45,v,t:0,big:v>=150});}}
+  for(const e of S.enemies){if(!(e._dAcc>=1))continue;const v=Math.round(e._dAcc);e._dAcc=0;if(DMGN.length>=30||(S.dmgNum===false)||!CFG.dmgNum)continue;if(!seenE(e))continue;DMGN.push({x:e.x+(Math.random()-.5)*8,y:e.y-(e._sz||16)*0.45,v,t:0,big:v>=150});}}
 function dmgNumDraw(){if(!DMGN.length)return;ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';for(const d of DMGN){const k=d.t/0.9,yy=d.y-k*14-(k<0.15?(0.15-k)*20:0);ctx.globalAlpha=k<0.6?1:1-(k-0.6)/0.4;ctx.font=`bold ${d.big?13:9}px sans-serif`;ctx.lineWidth=2.5;ctx.strokeStyle='#120808';ctx.strokeText(d.v,d.x,yy);ctx.fillStyle=d.big?'#ffd060':'#ffffff';ctx.fillText(d.v,d.x,yy);}ctx.restore();}
 /* 試作（2026-11-19）：襲撃のリプレイ（一番新しい襲撃だけ・セーブには入れない）。0.2秒ごとに魔物・兵士・弾・演出・施設の体力を記録して、地図の上で再生する */
 let RPL=null,RPV=null;const RPL_DT=0.2,RPL_MAX=4000;
@@ -6448,7 +6464,7 @@ function draw(){
   if(IS_PROTO)applyFlag();
   const an=nowS();if(viewKey!==curView())syncView();
   ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#050706';ctx.fillRect(0,0,VW,VH);
-  {const sh=IS_PROTO&&BFX.t>=0&&BFX.t<0.7?(0.7-BFX.t)*14:0;ctx.setTransform(cam.z,0,0,cam.z,-cam.x*cam.z+(Math.random()-.5)*sh,-cam.y*cam.z+(Math.random()-.5)*sh);}
+  {const sh=IS_PROTO&&CFG.shake&&BFX.t>=0&&BFX.t<0.7?(0.7-BFX.t)*14:0;ctx.setTransform(cam.z,0,0,cam.z,-cam.x*cam.z+(Math.random()-.5)*sh,-cam.y*cam.z+(Math.random()-.5)*sh);}
   const VR=viewRect();   /* 見えている範囲（ワールド座標）。画面外は描かない（2026-11-14 軽量化） */
   if(terCv){const sx=Math.max(0,Math.floor(VR[0])),sy=Math.max(0,Math.floor(VR[1])),ex=Math.min(terCv.width,Math.ceil(VR[0]+VR[2])),ey=Math.min(terCv.height,Math.ceil(VR[1]+VR[3]));if(ex>sx&&ey>sy)ctx.drawImage(terCv,sx,sy,ex-sx,ey-sy,sx,sy,ex-sx,ey-sy);}
   if(S.showLv)drawLabels();
@@ -7548,6 +7564,10 @@ function placeOK(type,gx,gy){
 document.addEventListener('keydown',ev=>{
   if(document.body.classList.contains('siegeOn'))return;   // 駐屯地襲撃の画面では本編のキーを使わない
   if(ev.target.tagName==='SELECT')return;
+  if(ev.target&&/INPUT|TEXTAREA/.test(ev.target.tagName)&&ev.target.type!=='range'){if(ev.key==='Escape'&&S.overlay==='contact'){const b=document.getElementById('rpNo');if(b)b.click();}return;}   /* 文字を書いているあいだは、ゲームのキーを使わない（WASD で画面が動く・Enter で閉じるなど） */
+  if(S&&S.overlay==='contact'&&ev.key==='Escape'){const b=document.getElementById('rpNo');if(b)b.click();return;}
+  if(S&&S.overlay==='cfg'&&ev.key==='Escape'){const b=document.getElementById('cfX');if(b)b.click();return;}
+  if(S&&S.overlay==='u2ask'&&(ev.key==='Enter'||ev.key==='Escape')){ev.preventDefault();const b=document.getElementById(ev.key==='Enter'?'u2Yes':'u2No');if(b&&!b.disabled)b.click();return;}
   if(TLP&&ev.key==='Escape'){stopTimelapse();return;}
   if((ev.ctrlKey||ev.metaKey)&&!ev.shiftKey&&ev.key.toLowerCase()==='z'&&S&&!S.overlay&&!(ev.target&&/INPUT|TEXTAREA/.test(ev.target.tagName))){ev.preventDefault();undoLast();return;}   // 取り消し
   const kl=ev.key.toLowerCase();if(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown'].includes(kl)){keysDown.add(kl);if(kl.startsWith('arrow'))ev.preventDefault();}
@@ -7702,6 +7722,7 @@ function bulkMenu(){let m=document.getElementById('bulkMenu');if(m&&m.style.disp
   m.querySelectorAll('[data-bk]').forEach(x=>x.onclick=()=>{m.style.display='none';L[+x.dataset.bk][5]();});}
 document.getElementById('bBulk').onclick=()=>bulkMenu();document.getElementById('bOrd').onclick=()=>showOrders();document.getElementById('bEnchN').onclick=()=>{S._nek=null;askNEnchAll();};document.getElementById('bSupAll').onclick=()=>askSupplyAll();
 document.getElementById('bHelp').onclick=()=>{if(!S.overlay)showHelp(false);};
+{const cb=document.getElementById('bCfg');if(cb)cb.onclick=()=>{const m=document.getElementById('more');if(m)m.open=false;if(!S.overlay)showSettings(false);};}
 document.getElementById('bNaval').onclick=toggleNaval;
 document.getElementById('bMute').onclick=auToggle;
 document.getElementById('vBgm').oninput=e=>auSetBgm(+e.target.value);
@@ -8785,7 +8806,7 @@ function showWorldOne(r){const mn=MAPS[r.map]?MAPS[r.map].name:'';
   document.getElementById('wdBack').onclick=showWorld;}
 // ===== アップデート情報（タイトルの「アップデート情報」。新しい版が上） =====
 const UPDATES=[
- ['2.1（試作版だけ）','2026-11-24',['タイトルの右下に「お問い合わせ・不具合報告」の手紙のボタン：種類（不具合・要望・その他）と内容を書いて送れる。プレイヤーごとに ID（ND-XXXX-XXXX）をつけ、版・画面の大きさ・端末・街の状態・直前のエラーをいっしょに送る。届いた報告は作者が見て対応します']],
+ ['2.1（試作版だけ）','2026-11-24',['タイトルの画面を作り直し：いちばん上に大きく「つづきから」「はじめから」、その下に世界の歴史・モンスター図鑑・アップデート情報、その下に設定。どのボタンにもアイコン。右下は遊び方とお問い合わせ','<b>設定の画面</b>：全体の音量・BGM・効果音・音を消す、ダメージの数字・画面の揺れ・FPS の上限（30・60・なし）・FPS の表示・全画面、言語、音楽室・クレジット・ホーム画面に追加。どの項目にもアイコン。ゲーム中は「表示・設定」の中の「設定」から','襲撃中の上のお知らせ（城が攻撃されている・英雄の戦死・ブラッドムーンなど）をドット絵の見た目に（太い段のふち・ドットのアイコン・カクッと出る）','タイトルの右下に「お問い合わせ・不具合報告」の手紙のボタン：種類（不具合・要望・その他）と内容を書いて送れる。プレイヤーごとに ID（ND-XXXX-XXXX）をつけ、版・画面の大きさ・端末・街の状態・直前のエラーをいっしょに送る。届いた報告は作者が見て対応します']],
  ['2.0','2026-11-21',['<b>新しい操作</b>：マップが画面いっぱいに。施設や部隊を押すと、まわりに半円のボタン（見る・強化・訓練・迎撃／固守・改造・エンチャントなど）。押すと「キュイ」と寄って拡大し、「戻る」で元の画角へ。PC・iPadは左下に「夜へ」、右に建設・研究・軍事・内政を縦に並べた（「街」は「内政」に）。スマホは横持ちで、右の帯にまとめた','上の資源は1段に。次の襲撃までに足りなくなりそうな資源は赤く光り、毎日減っている資源には▼。押すと全部の資源の一覧。通信ログはふだん隠して、「ログ」に新しい知らせの数','<b>研究の作り直し</b>：領地・防衛・部隊の3つに整理して、前提を線でつないだ。施設のアップグレードと道具（石→鉄→合金→月光石→聖銀）は城のランクで開く。改造・エンチャント付与・斥候Ⅰ〜Ⅳを追加','<b>工業と魔法の道</b>：城のランクⅣで、街の方針を工業か魔法から選ぶ（違うほうの研究は費用2倍）。工業：歯車・黒鉄、機械工房・高炉、蒸気の工場（蒸気機兵・蒸気戦車・銃士の気球・爆撃飛行船）、銃士の塔・重砲・ガス灯。魔法：月光石（夜に月光の祭壇で作る）、錬金工房（エーテルゴーレム・巨大ゴーレム・空飛ぶクジラ）、空の魔術師、魔核の守り石。兵舎は方針で見た目と育てる兵が変わる','新しい守り：照明弾の発射台（夜の闇を照らす）・大要塞砲（ひと晩に3発）・地雷・トラバサミ。馬小屋の上の段「大きな厩舎」で竜騎兵とグリフォン騎兵','強化・エンチャントは、確認の画面（数字と見た目の 今 → あと、使う資源）を出してから。城の強化では新しく使えるものも並べる。解体は2回押す','<b>武器工房をなくした</b>：矢と剣は使うたびに木材と鉄で払う（前のセーブの武器工房は消して建設費を戻す）。鋼は合金にまとめた。精錬所・海外調達・熟練度・魔矢もなくした','<b>英雄</b>：英雄の家を建ててから。戦いの英雄は名簿から（名前とスキルは英雄ごと）。1人で1部隊として戦う。内政・守備の英雄は施設に配属','新しい兵：銃兵・砲兵の英雄・チャリオット・グリフォン騎兵・攻城兵器（破城槌・移動式投石機）。新しい施設：大農場・大伐採所・交易所・小さな港・小さな空港・兵器工房・エーテル火薬工房など','<b>王都からの依頼</b>：街と守りの目標と、救援物資を送る依頼。達成で金貨・銀貨・資材','領地の旗（形・色・紋章を選べる）、襲撃のリプレイ、タイムラプスを動画で保存、ボス撃破の演出、ダメージの数字、倒れた魔物が横に倒れる','報告と研究の完了をリリアが話す形に。チュートリアルも新しい操作に合わせた','タブレットも横持ちだけに','部隊の「装備」を押したとき、装備の欄を開いて見せる。スマホで欄を開くと「戻る」が隠れて押せなかったのを直した','チュートリアルの研究のミッションを「大工組合」と「斥候」に','ランクⅠの研究を追加：剣士の訓練・弓兵の訓練・逆茂木（新しい罠）。大矢筒はランクⅡへ。「街」のエーテルはランクⅣから','ターンの報告の「完成しました」を、アイコン・名前・×N の一覧に','王都からの依頼は、第1襲撃（10日目）をしのいでから届く。スマホでチュートリアルの「次へ」が隠れていたのを直した','チュートリアルの動画と画像を新しい画面で撮り直した。「街」の欄に、もう在庫を持たない矢と剣が出ていたのを消した','タイトルの画面でページを閉じたり読み込み直したりすると、つづきからのセーブが消えていた不具合を直した']],
  ['1.19（試作版だけ）','2026-11-18',['PC・iPad：建設・研究・軍事・内政を右に縦に並べた（アイコンと文字）。研究は研究の画面をすぐ開く。下の段はログ・一括・依頼など。「街」の名前を「内政」に','部隊の半円の「装備」などで欄を開いたとき、たたまれた欄（装備）を開いて見せる。スマホで欄の下に半円の「戻る」が隠れて押せなかったのを直した（半円を欄の左に寄せる）','チュートリアルの研究のミッション：「醸造」をやめて「斥候」に（襲撃の方角が分かる）','ランクⅠの研究を追加：剣士の訓練・弓兵の訓練（剣士と弓兵は研究してから訓練できる。歩兵・弓兵の英雄も）・逆茂木（新しい罠。足を遅くする・木材だけ）。大矢筒はランクⅡへ','「街」の欄のエーテルは、城のランクⅣ（エーテル採掘所が建てられる）から出す','ターンの報告の「完成しました」を、アイコン・名前・×N の一覧に','王都からの依頼は、第1襲撃（10日目）をしのいでから届くようにした（1日目から出ていた）','スマホ：チュートリアルのリリアの話で「次へ」が欄の下に隠れていたのを直した（欄を横に広げ、ボタンを欄の下に貼りつけた）','「街」の欄に、もう在庫を持たない矢と剣が出ていたのを消した','チュートリアルの動画（柵・部隊の移動・エンチャント付与・駐屯地への夜襲）と画像（街・英雄）を新しい画面で撮り直した','タイトルの画面でページを閉じたり読み込み直したりすると、つづきからのセーブが消えて新しい地図になっていた不具合を直した','チュートリアル（リリアのミッション・説明・画面の説明）を新しい操作に合わせて書き直した。「選択中パネル」「右のタブ」→ 押すとまわりに出るボタン・下のボタン（スマホは右の帯）。「場所を示す」が新しい操作のボタンを光らせるようにした','スマホ：新しい操作で、右の帯の「建設」「軍事」「街」を押しても欄が開かなかった不具合を直した','前の操作に戻す切り替えをなくした（いつも新しい操作）','タブレットも横持ちだけにした（縦にすると「横にしてください」）','新しい操作：上の資源の段を1段に。増減の数は出さず、次の襲撃までに足りなくなりそうな資源は赤く光り、毎日減っている資源には▼。押すと全部の資源の数と増減の一覧','新しい操作：通信ログはふだん隠し、下の「ログ」ボタン（スマホは「その他」）に新しい記録の数を出す。戦死などの悪い知らせがあると赤い札。押すと最近の50行を新しい順に出す','スマホでは、ミニマップをはじめから「小」にした（自分で大きさを変えていたら、その大きさのまま）','新しい操作：半円の「戻る」を押したあと、ほかの物を押しても選べなくなっていたのを直した','新しい操作：部隊の半円の「迎撃」と「固守」を1つのボタンにした。押すたびに切り替わり、ボタンには今のモードが出る（まとめて選んだ部隊も同じ）','新しい操作：スマホ横で、閉じる×が2つ3つ出ていたのを、右の帯の「閉じる」だけにした','新しい操作：スマホ横で、右の縦の帯（夜へ・建設・研究など）が画面の右はしで切れていたのを直した','新しい操作：施設や部隊を選ぶと、「キュイ」と音がしてその物へ寄って拡大する。半円の「戻る」で選ぶ前の画角に戻る（ほかの物を続けて選んでも、戻るのは最初の画角）','柵などをまとめて建てたあと、セーブして読み込み直すと見えなくなることがあったのを直した','下の一括のところに「廃墟を建て直す」ボタンを追加','英雄の号令などのスキルの途中で襲撃が終わると、光や文字が残ったままになるのを直した','土地を選んだときの建設リストをなくした（建設は下の建設タブから）','一括修理・一括補給などの確認で、使う量をはっきり出すようにした（「矢 76 使う（671 → 595）」）','闇の中の大きい魔物（トロールなど）の赤い目が、お腹の位置に出ていたのを頭の高さに直した','夜狩りで持ち帰るのは、主に小さな魔核に（魔核は5つに1つ）','「海外調達」（買う部隊）をなくした','英雄は英雄の家を建ててから（始めの2人をなくした。チュートリアルも合わせた）','投石機の威力 70→40（範囲の中のゴブリンがすべて一撃だったので）','金貨：城の毎ターンの金貨 12→18、道具を替える費用から金貨をなくした','修理は建てたときの素材で払うように（石の壁は石材、城壁は石材と鉄など。前はどれも木材だった）','襲撃の方向の増え方をゆっくりに（1方向：第1〜4・2方向：第5〜9・3方向：第10〜15・4方向：第16から）','鎧の補給は、その鎧の素材で（鉄の鎧・鎖帷子なら鉄、合金の鎧なら合金…）。武器工房の「鎧」作りはなくした','守備（ブラム・セレナ・ドルフ）と内政（エマ・オットー）の英雄も名簿に。絵が届くまでは今の見た目','街の記録の書き出しに、上の資源欄に出ている資源（銀貨・小さな魔核・龍鱗・魔金属・聖銀など）も出てきたら入るように','英雄の一覧・候補・詳細の絵を、名簿の英雄の絵に','武器工房の道具の段の絵を、描き直した黒い炉の絵に（石・鉄・合金・魔金属・聖銀の金槌）','守備と内政の英雄5人（ブラム・セレナ・ドルフ・エマ・オットー）の絵を入れた。施設に付いた英雄も、地図の上で名簿の絵で出る','<b>武器工房をなくした</b>：矢と剣は在庫を持たず、使うたびに資材から払う（矢10本＝木材5・鉄1、剣1つ＝鉄1）。費用の表示も木材と鉄で出る。前のセーブの武器工房は消して建設費を戻し、残っていた矢と剣は資材に戻す','魔矢をなくした','チュートリアルの「軍需」を、鉱山を建てて鉄をためる内容に','生産施設に付けた英雄が、施設のまわりをうろうろ歩くように','一括エンチャントで、種類ごとにチェックを外してかけないようにできる（前哨砦だけ外す、など）','<b>改造</b>：施設の種類ごとに1つ選ぶ形に（街のその施設すべてに効く）。バリスタ（鋭い矢・連弩）・物見櫓（照明台・2連物見櫓）・投石機（大岩・燃える岩）・大砲（大口径砲・連射砲）・メイジの塔（火炎・凍結）・迫撃砲（クラスター・焼夷）。付け替えは2ターン。改造ごとに、撃つたびに使う物が増える（足りないときは改造なしで撃つ）','研究は「〇〇の改造」に（物見櫓とメイジの塔の改造を追加・燃える岩の研究は投石機の改造にまとめた）','弾の消費の表示を木材と鉄で','<b>枯渇</b>：枯渇した施設に空のかごの印（点滅）、あと3日で枯渇する施設に「残りNT」の札。下に「枯渇 N軒・もうすぐ枯渇 N軒」のボタン（押すとその施設へ）','建て終わった施設をアイコン付きでお知らせ（押すとその場所へ）','<b>ボスを倒したとき</b>：少し止まって揺れ、白く光り、「撃破！」の大きな文字と魔核がこぼれる','ダメージの数字（まとめて出す・重くならないよう30個まで）','<b>装備・道具を替える</b>：下のボタンから、替えられる道具と装備をまとめて替えられる。地図の上に緑の矢印、城のランクが上がったときにお知らせ','<b>襲撃の日</b>：「今夜の見込み（木材・鉄など）」と紫の「エンチャント付与」ボタンを出す。戦闘報告の消費も木材と鉄で','報告（ターンの報告・夜明け・戦闘報告）をリリアが話す形に','研究が終わったとき、リリアが動画つきで使い方を説明（エンチャント付与・駐屯地への夜襲・改造）','建物の間を歩く運び手をなくして、施設の前で働く人に（木を切る・石を割る・耕す・網を引く・金槌）。建設中は足場と金槌を打つ人','ボスが倒れたら、残りの魔物は街から離れる向きに逃げ、離れると消える（倒した数には入らない）','戦闘報告にアイコン（撃破＝魔物の幽霊・戦死・施設損失）と、手に入れた魔物の素材（魔核・小さな魔核・巨大魔核・龍鱗・飛膜）の内訳','エンチャントがかかった施設と兵士の絵の上に、紫の波がゆらゆら流れる','詳細の「改造」「エンチャント付与」にアイコン。研究前もグレーで出して、何ができるかを知らせる','<b>一括</b>：一括修理・一括補給・廃墟の建て直し・装備と道具・エンチャント付与を、下の「一括」のメニューにまとめた（使えないものはグレーで理由を出す）','演出の形：建った＝緑の輪・強化した＝黄色のひし形・改造が付いた＝水色の二重の輪（タイムラプスも同じ・控えめに）','前のセーブで、なくした研究（燃える岩・魔矢）が研究中だと研究の画面が開けなかったのを直した','襲撃のあと、エンチャントがはがれていなかったのを直した','空の「枯渇」のお知らせが、地図の右下に小さな枠だけ出ていたのを直した','タイムラプスで、人員不足などの印が出ていたのを直した','前のセーブで、研究の画面で最後に選んでいた研究が消した研究だと、研究の画面が開けなかったのを直した','置いたらすぐ完成する柵・壁も、その日のうちなら取り消せるように（取り消しボタン・Ctrl+Z）','「次の襲撃で足りない」「今夜の見込み」を押すと、何に（施設・部隊・篝火）どれだけ使う見込みかが見られる','英雄の部隊が、地図で英雄の共通の絵になっていたのを本人の絵に直した','メイジの塔・テスラタワー・ミスリルレイが、撃つときに撃つ絵になる','前哨砦の攻撃を、線（弾）から矢に','スマホ：詳細を開いたとき、右上に「×」を出して閉じられるように（下の「マップに戻る」が画面の外に出ていた）','<b>王都からの依頼</b>：街と守りの目標2つ（住民100・200・500・1000、研究の数、魔物の討伐数、城のランク、道具、英雄、改造、駐屯地への夜襲・つぶす、ゴブリンキング討伐）と、王都へ救援物資を送る依頼1つ。達成で金貨・銀貨・資材が届く。城か下の「依頼」で見られる。断るは1日1回','城の毎ターンの金貨を 18→12 に戻した（王都からの依頼で補う）','依頼は街と守り3つ＋送る1つに。依頼のアイコンを専用の絵に','【緊急】第19襲撃のあと、ゴブリンキング討伐の依頼（第20襲撃まで）','<b>襲撃のリプレイ</b>：一番新しい襲撃を、戦闘報告か街の記録の「リプレイ」から見られる（再生・一時停止・速さ・好きな位置へ。セーブには入らないので、読み込み直すと消える）','記録のタイムラプスを動画で保存できる（街の名前と日付入り）','前哨砦の絵の上が切れていたのを直した（切れていた旗を消して、かがり火の炎の先と旗竿の先を描き足した）','訓練所などに出ていた「海外調達」の表示をなくした（英雄は英雄の家から）','<b>研究の並びを整理</b>：教会は「小さな教会」から（教会はランクⅢ）・集合住宅と植林はランクⅢ・大伐採所はランクⅣ・騎馬突撃はランクⅢ・竜鱗はランクⅤ・石の門はランクⅠ・鉄の門はランクⅡ・エーテル風船はランクⅤ','前提の見直し：チャリオットは騎兵から・砲兵は銃兵から・狙撃兵は砲兵から・エーテルゴーレムは魔術から・大工組合は前提なし。毒の鏃・聖銀の杭・魔弾砲はなくした','<b>斥候Ⅰ〜Ⅳ</b>：Ⅰ 襲撃の方向・Ⅱ 駐屯地のだいたいの場所と数のめやす・Ⅲ 種類ごとの数と駐屯地の場所（駐屯地を押すと夜襲）・Ⅳ 方面ごとの構成','<b>英雄の家</b>は1軒だけ。アップグレードで雇える人数が増える：英雄の家3人・大きな英雄の家6人・英雄の館9人・英雄の殿堂12人（城のランクの上限はなし）','<b>交易</b>：交易市場・交易所・小さな港（ランクⅤ・水に面した所）・小さな空港（ランクⅦ・竜晶は売り買いしない）。どれも1軒だけ。段が上がると金貨が増え、売り買いできる品がそのランクの素材まで増える','<b>エンチャント付与</b>を3つに：防衛（Ⅱ）・部隊（Ⅲ）・生産（Ⅲ・その日だけ産出 +30%）','改造：燃える岩（投石機）・焼夷砲弾（迫撃砲。魔金属の迫撃砲に要る）・大口径砲（大砲。押し戻す）','前哨砦が弱い矢を撃つ。鉄の前哨砦・魔金属の前哨砦で硬くなる','<b>エーテル火薬</b>：エーテル火薬工房で火薬とエーテルから作る。エーテル爆弾に使う','グリフォン騎兵は「グリフォンの厩舎」（ランクⅥ・別の建物）で育てる。竜舎1軒で竜騎兵1部隊（竜晶の竜舎で +1）','漁場の道具は「銛」に。聖銀鉱は魔金属の道具・金鉱は鉄の道具で建つ','<b>研究の画面</b>を整理ボードと同じ並びにして、前提を線でつないだ','届いた絵を入れた：生産施設の道具の段（地図の絵）、建物の段（二階建ての家・石の兵舎・大兵舎・書庫・研究所・魔導研究所・交易所・宿屋・エーテル火薬工房・英雄の家の4段・戦車の馬小屋・大魔導院・竜晶の竜舎・鉄の前哨砦・魔金属の前哨砦）の地図の絵と立ち絵','届いた絵を入れた（2回目）：爆弾罠・兵器工房・小さな港・グリフォンの厩舎・小さな空港・英雄の家・大農場・養殖場・大伐採所・大採掘場・聖堂・竜晶を作れる精錬所、銃兵・チャリオット、英雄14人','<b>領地の旗</b>：画面の上の街の名前・戦いの結果・つづきから・前哨砦にも出る。地の色と紋章の色は自由に選べる。記録の一覧にも旗が出る。街の名前を決めるときに、形（縦長で下が三角・二股・まっすぐ・丸い）・地の色・紋章・紋章の色を選べる（あとから「記録」の画面で変えられる）。城の上と英雄の家の垂れ幕に出る','「石の家」は「二階建ての家」に','兵器工房と爆弾罠の絵を入れた','閉じるボタンはどの画面でも右下にそろえた','研究の中止は、研究中のカードの上の赤い枠のボタンに移した','英雄の家・港・空港・グリフォンの厩舎・兵器工房の建設のアイコン、土地を選んだときの建設の一覧にもアイコン','アップグレードで増える働き手は、費用の「住民」として待機中の住民からすぐに入る（アップグレード直後に人手不足にならない）','倒れた魔物と兵は、その場で横に倒れて少しつぶれてから消える','武器工房の道具の段の絵（地図の絵と立ち絵）を入れた','道具の段の立ち絵を入れた（施設を選んだときの絵が、道具の段ごとに変わる）','倒れた英雄は、その街ではもう候補に出ない。残っていない兵科は英雄の候補の画面に出る','<b>砲兵と銃兵の英雄</b>を1人ずつ足した（砲兵のバルド：砲撃、銃兵のノエル：狙撃）','弓兵のスキル「照明矢」とシエラはなくした。騎兵の「遊撃」は 移動の速さ +60%・体力 +30%（5秒）','<b>英雄は名簿から</b>：戦いの英雄は兵科ごとに、スキルの数だけ（剣・魔導は3人、弓・騎兵・竜騎は2人、砲兵・銃兵は1人）。名前とスキルは英雄ごとに決まっている。同じ英雄は2人出ない（2人目・3人目の絵ができるまでは兵科の絵）','<b>鋼をなくして合金にまとめた</b>：道具は木→石→鉄→合金（Ⅲ）→魔金属→聖銀。武器は鉄→合金（Ⅲ）、鎧は革→鉄→合金（Ⅲ）','破城槌は木材と鉄・移動式投石機は石材で補給（装備は使わない）','エンチャント付与は 火力 +30%・体力 +30%（受ける被害を減らす形はやめた）。施設にかけるほうが高い','竜鱗の研究は「竜鎧」（竜騎兵の体力 +40%）','<b>戦車の馬小屋</b>（馬小屋のアップグレード・ランクⅢ）でチャリオットを作る。騎兵はそのまま残る','小さな港：まとめ買いで安くなる（50個から1割引・100個から2割引）。1日に買える量 +150','<b>精製炉をなくした</b>：エーテルは龍脈の泉から。城の近めに泉を2つ足した','<b>攻城兵器</b>：兵器工房（ランクⅢ・工兵）・破城槌・移動式投石機（ランクⅢ）・鉄張りの破城槌（ランクⅤ）。兵器工房で作り、駐屯地の夜襲に連れて行ける','壁が2列並んでいるところの門が、横向き・縦向きを間違えて描かれていたのを直した','門も置いたらすぐ完成するように','英雄の部隊が3人に見えていたのを、英雄1人の絵にした','掘り尽くした石切り場・鉱山・採掘所は、森と同じように足元の丘・岩場・鉱脈・泉がなくなるように（解体したときも）','一括に「枯渇した施設を解体」：1軒ずつ絵・名前・何が尽きたか・城から見た場所を出し、チェックで選んで解体できる','襲撃の群れを、開いている方角に順番に割り振るように（同じ時間に1方向からだけ来ることがなくなる）','建設の「領地」は、はじめからある施設を上に、あとから開く施設を下に足す並びに','リリアの説明などを開いている間は、下の「枯渇」「足りない」の札を隠す','地図を引いて見るとき、「残り○T」の札が大きくなりすぎていたのを、地図と一緒に小さくなるように（かなり引くと出さない）','工業と魔法の分岐を入れた（1回目）：城がランクⅣになると、街の方針を「工業」か「魔法」に決める。違う方針のランクⅣ以上の研究は費用2倍','魔金属をやめて、魔法の街のランクⅤの素材は「月光石」（水色に光る石。夜に作る）に。工業の街では、ランクⅤの金属は「黒鉄」になる（研究・アップグレード・道具・装備の素材が黒鉄に）','新しい施設：機械工房（工業・研究「蒸気機関」で開く。鉄と合金から歯車）、高炉（工業・ランクⅤ。合金・石炭・鉄から黒鉄）、錬金工房（魔法・ランクⅤ。夜のあいだに石材とエーテルから月光石を作る）。絵ができるまでは前の絵で代わり','エーテル採掘所は魔法のランクⅣに（工業の街は研究で開く）。精錬所の月光石の段はなくして、ランクⅦで竜晶を作れる段に','櫓台は建設のリストから外した（建ててあるものはそのまま）','工業と魔法の分岐（2回目・生産）：工業は蒸気の機械（製材機・蒸気のドリル・蒸気ポンプ・蒸気の鋤・蒸気船）で産出 +30%。そのかわり1軒につき毎日 石炭1（足りないと上乗せなし）','工業：魔核のボイラー（石炭が足りないとき魔核で動かす）・高層住宅（住める人数 +50%）・蒸気のトロッコ（働き手 −1）・魔核の動力炉（まわりの機械は石炭いらず。毎日 魔核2）','魔法：精霊の森（木材 +20%・埋蔵の減り −30%）・ノームの導き（石材 +20%・ときどき月光石）・鉱脈探知（鉱山の埋蔵が長持ち）・実りの魔法陣（食料 +20%・幸福度 +3）・水妖の網（食料 +20%・ときどき小さな魔核）','魔法：魔力の泉（エーテル +50%・ときどき小さな魔核）・浮遊の館（住める人数 +20%・幸福度 +5）・運搬ゴーレム（働き手 −1）','工業の街では、研究所の上の段が「技術研究所」になる','工業と魔法の分岐（3回目・防衛）：改造の選択肢を方針で分けた。工業は連弩・2連物見櫓・大岩・連射砲（ランクⅤ）・クラスター、魔法は新しく光の矢・魔眼・重力の岩・エーテル弾（ランクⅤ）・凍結弾','工業：銃士の塔（銃兵が上で撃つ石の塔。空も撃てる。火薬を使う。絵は城塞の物見櫓で代わり）・地雷（一晩に2回爆発）・トラバサミ（5秒動けなくする）・鉄条網（柵・壁を叩いた魔物に傷と足止め）・魔核の砲弾（大砲・迫撃砲の火力 +30%）','魔法：魔核の守り石（防衛施設が耐久3割以下で、小さな魔核1を使って5秒 傷を受けない。一晩に1軒1回）','工業の街では、魔導砲→重砲・蒼い炎→ガス灯・エーテル火薬工房→火薬の工場（火薬を2倍作る）・エーテル風船→大きな風船爆弾・月光石の壁→黒鉄の壁。ランクⅣのアップグレードはエーテルの代わりに歯車を使う','工業と魔法の分岐（4回目・部隊）：工業は兵器工房で、蒸気機兵（Ⅴ・とても硬い壁役）・銃士の気球（Ⅴ・空を飛び、空も地上も撃つ）・蒸気戦車（Ⅵ・装甲の大砲車）・爆撃飛行船（Ⅶ・空から爆弾）','魔法は魔導院で、空の魔術師（Ⅴ・空を飛び、空も地上も撃つ）・巨大ゴーレム（Ⅵ・巨大な手で薙ぎ払う壁役）・空飛ぶクジラ（Ⅶ・空から範囲魔法）。絵ができるまでは近い兵の絵で代わり','魔核の宝珠（魔法・Ⅳ）：エーテルが足りないとき、魔術師の補給に小さな魔核も使える。工業の街では、エーテルローブが「鉄板入りの外套」（鉄を使う）になる','巨大ゴーレムの攻撃を、叩きつけ（狙った所で爆発）から薙ぎ払い（前の半円の魔物をまとめて打ち、小さな魔物を払いのける）に','届いた絵を入れた：月光石の段（水色）と黒鉄の段（大弩・迫撃砲・門・壁・道具）、機械工房・高炉・錬金工房・魔核の動力炉・銃士の塔・ガス灯・重砲、地雷・トラバサミ、蒸気機兵・蒸気戦車・銃士の気球・爆撃飛行船・空の魔術師・巨大ゴーレム・空飛ぶクジラ・狙撃兵（ライフル）、歯車・黒鉄・合金・武器と鎧のアイコン','兵の施設を「人」と「作るもの」に分けた：人（魔術師・空の魔術師も）は兵舎、魔法のゴーレム・空飛ぶクジラは錬金工房（研究「エーテルゴーレム」で開く）、工業の蒸気機兵・蒸気戦車・気球・飛行船は蒸気の工場（工業のランクⅤ）','兵舎はランクⅣから方針で変わる：工業は「蒸気の兵舎」、魔法は「魔導院」（ランクⅥで「大魔導院」）。魔導院・竜舎・グリフォンの厩舎は建設のリストから外した（建ててあるものはそのまま使える）','馬小屋の上の段「大きな厩舎」（ランクⅣ）：研究「竜騎兵」「グリフォン騎兵」で、竜騎兵（1軒につき1部隊）とグリフォン騎兵を育てられる','月光石は「月光の祭壇」（魔法のランクⅤ）で夜に作る。前の錬金工房（月光石を作っていたもの）は月光の祭壇になる。新しい施設の絵は届くまで仮の絵','工業の新しい防衛施設：照明弾の発射台（ランクⅥ。暗い所の魔物の群れの上に照明弾を打ち上げて広く照らす。1発 火薬1）、大要塞砲（ランクⅦ。とても遠くの、いちばん固まった群れを吹き飛ばす。一晩に3発・1発 火薬5と鉄5）','魔核の守り石を1軒ずつはめる形に：防衛施設の詳しい欄の「はめる」（小さな魔核1・昼だけ）か、一括の「魔核の守り石をはめる」で。はめた施設には水色の印。耐久が3割以下になったとき5秒 傷を受けず、効いたら割れる','新しい操作（UIリメイク1回目）：マップを画面いっぱいに。右の欄は、施設や部隊を選んだときと「建設」を押したときだけ出る。右下に大きな「夜へ」と「建設」。下のボタンの「前の操作にする」で前の画面に戻せる','届いた絵を入れた：兵舎の段（兵舎→石の兵舎→銃兵の兵舎→工業は砲兵の兵舎・狙撃兵の兵舎／魔法は魔導院・大魔導院）、蒸気の工場（蒸気戦車か爆撃飛行船の研究で絵が変わる）、錬金工房（巨大ゴーレム・空飛ぶクジラの研究で絵が変わる）、大きな厩舎（竜騎兵の研究で竜の絵に）、月光の祭壇（夜は光る）。兵舎の段は銃兵の兵舎（ランクⅢ）が増えた','新しい操作（UIリメイク2回目）：施設や部隊を押すと、その上に半円のボタンが出る（見る・強化・改造・作るもの・兵を作る・エンチャント・守り石・修理・解体／部隊は 迎撃・固守・帰還・補給・装備）。まだ使えないものは灰色で、押すと理由が出る。画面の端だと、ボタンが見えるところまで画面が動く。詳しい欄は「見る」で出す','新しい操作（UIリメイク3回目）：マップを本当に画面いっぱいに（上の段の下や、スマホ横持ちの下の余白にもマップ）。「見る」の欄は選んだものの中身だけ、「建設」の欄は一覧とタブだけ。PCは下に「研究」「軍事」「街」のボタン（もう一度押すと閉じる）。右の欄の左上の×で閉じる。タブレット縦では、閉じているときの引き出しを隠した','新しい操作（UIリメイク4回目）：半円の「解体」は1回目で赤い「もう一度で解体」に変わる。「強化」「エンチャント」は確認画面（使う量、数字が今→あとでどう良くなるか、見た目が今→あと）を出してから進む。「兵を作る」は「訓練」に。「見る」で開いた欄に閉じるボタン（右向きの矢印）。「夜へ」は左下、「建設」は右下に大きく','新しい操作：部隊の半円にもエンチャント。城の強化の確認画面に「新しく使えるようになるもの」を絵で並べ、研究ランクはフラスコ Ⅰ→Ⅱ、施設のアップグレードは◆の数で見せる（文字の説明を減らした）。強化の数字にもアイコン']],
  ['1.18（試作版だけ）','2026-11-18',['<b>大きな生産施設</b>（研究で建てる・4×4）：大農場・大伐採所・養殖場（ランクⅢ）、大採掘場（ランクⅣ・鉄3・石炭2・金1も取れる）。小さい施設4つ分より多く作る（4.5倍）。建てる資材は5倍、働き手は3倍。土地は4分の3が合っていれば建てられる。道具の段も使える。絵はまだないので小さい施設の絵を大きくして借りている','研究「魔核加工」をなくした','兵舎・馬小屋・竜舎・魔導院は、アップグレード1段ごとに入れられる部隊が1つ増える']],
@@ -8826,55 +8847,52 @@ function showUpdates(){try{localStorage.setItem('nd_upd_seen',UPD()[0][0]);}catc
   openOverlay('title',`<div style="display:flex;justify-content:space-between;align-items:baseline"><h2>アップデート情報</h2><button id="upBack">タイトルへ</button></div>
   <div style="max-height:62vh;overflow:auto;line-height:1.8">${UPD().map(([v,d,L],i)=>`<div style="margin:0 0 12px"><h3 style="margin:0 0 4px;color:${i?'var(--dim)':'#f2b33d'}">ver ${v}${d?`<small class="muted" style="margin-left:8px">${d}</small>`:''}</h3><ul style="margin:0;padding-left:18px">${L.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('')}</div>`,true);
   document.getElementById('upBack').onclick=showTitle;}
+const TI=b=>`<svg width="26" height="26" viewBox="0 0 16 16" shape-rendering="crispEdges">${b}</svg>`;   /* タイトルのボタンのアイコン（2026-11-25） */
+const TTL_IC={
+  cont:TI('<path d="M4 2l10 6-10 6z" fill="currentColor"/>'),
+  neu:TI('<path d="M3 1h2v14H3z" fill="currentColor"/><path d="M5 2h9l-2 3 2 3H5z" fill="currentColor"/>'),
+  world:TI('<path d="M1 3h6v11H1zM9 3h6v11H9z" fill="currentColor"/><path d="M7 3h2v11H7z" fill="#6a5030"/><path d="M2 5h4v1H2zM2 7h4v1H2zM10 5h4v1h-4zM10 7h4v1h-4z" fill="#1c1824"/>'),
+  dex:TI('<path d="M4 2h8v2h2v8h-2v2H4v-2H2V4h2z" fill="currentColor"/><path d="M5 6h2v2H5zM9 6h2v2H9zM5 10h6v1H5z" fill="#1c1824"/><path d="M3 1h2v2H3zM11 1h2v2h-2z" fill="currentColor"/>'),
+  upd:TI('<path d="M3 1h10v14H3z" fill="currentColor"/><path d="M5 4h6v1H5zM5 7h6v1H5zM5 10h4v1H5z" fill="#1c1824"/>'),
+  help:TI('<path d="M5 2h6v2h2v4h-2v1H9v2H7V8h2V7h2V4H5v2H3V4h2z" fill="currentColor"/><rect x="7" y="12" width="2" height="2" fill="currentColor"/>'),
+  mail:TI('<path d="M1 3h14v10H1z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M1.5 3.5L8 9l6.5-5.5" fill="none" stroke="currentColor" stroke-width="1.6"/>')};
 function showTitle(){{const b=document.getElementById('boot');if(b)b.classList.add('off');}const sv=saveInfo();
   const dt=sv?new Date(sv.date):null;const when=dt?`${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`:'';
   /* タイトル（2026-11-16）：後ろに夜の襲撃の動画（tut/title.mp4）、ボタンは2列にしてPCでスクロールしないように */
   openOverlay('title',`<div class="ttl">
     <div class="tlogo">${pixelLogo()}</div>
     <div class="tsub">〜 ${GAME_SUB} 〜</div>
-    <div class="tmain">
-      ${sv?`<button id="tContinue" class="on"><b>つづきから</b>${sv.name?`<small>${sv.flag&&typeof flagImg==='function'?flagImg(sv.flag,12)+' ':''}${sv.name}　第${(sv.wave||0)+1}襲撃の前</small>`:''}</button>`:''}
-      <button id="tNew" ${sv?'':'class="on"'}><b>はじめから</b></button>
+    <div class="tmain2">
+      ${sv?`<button id="tContinue" class="on big">${TTL_IC.cont}<span><b>つづきから</b>${sv.name?`<small>${sv.flag&&typeof flagImg==='function'?flagImg(sv.flag,12)+' ':''}${sv.name}　第${(sv.wave||0)+1}襲撃の前</small>`:''}</span></button>`:''}
+      <button id="tNew" class="${sv?'':'on '}big">${TTL_IC.neu}<span><b>はじめから</b></span></button>
     </div>
-    <div class="tgrid">
-      <button id="tDex">モンスター図鑑</button>
-      <button id="tUpd">アップデート情報${updSeen()?'':' <b style="color:#f2b33d">NEW</b>'}</button>
-      <button id="tWorld">世界の歴史</button>
+    <div class="tgrid2">
+      <button id="tWorld">${TTL_IC.world}<span>世界の歴史</span></button>
+      <button id="tDex">${TTL_IC.dex}<span>モンスター図鑑</span></button>
+      <button id="tUpd">${TTL_IC.upd}<span>アップデート情報</span>${updSeen()?'':'<b class="tnew">NEW</b>'}</button>
     </div>
-    <div class="tcorner"><button id="tRep" title="お問い合わせ・不具合報告" aria-label="お問い合わせ・不具合報告"><svg width="22" height="22" viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="M1 3h14v10H1z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M1.5 3.5L8 9l6.5-5.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button><button id="tHelp" title="遊び方">？ 遊び方</button><button id="tSet" title="設定">⚙</button></div>
-    <div class="tsetP" hidden>
-      <div class="tsetH"><b>設定</b><button id="tSetX" class="ghost">×</button></div>
-      <div class="tvol"><label>BGM<input type="range" id="tVB" min="0" max="1" step="0.05" value="${AU.bgmVol}"><b id="tVBn">${Math.round(AU.bgmVol*100)}</b></label>
-        <label>効果音<input type="range" id="tVS" min="0" max="1" step="0.05" value="${AU.seVol}"><b id="tVSn">${Math.round(AU.seVol*100)}</b></label>
-        <button id="tMute">${AU.on?'消音にする':'音を出す'}</button></div>
-      <div class="tsetL">
-        <button id="tMusic">♪ 音楽室</button>
-        <button id="tCredit">クレジット</button>
-        ${isAppMode()?'':'<button id="tInstall">ホーム画面に追加</button>'}
-      </div>
-    </div>
+    <button id="tCfg" class="tcfg">${CFG_IC.gear}<span>設定</span></button>
+    <div class="tdev"></div>
+    <div class="tcorner"><button id="tHelp" title="遊び方">${TTL_IC.help}<span>遊び方</span></button><button id="tRep" title="お問い合わせ・不具合報告" aria-label="お問い合わせ・不具合報告">${TTL_IC.mail}</button></div>
     <div class="muted tfoot">ver ${GAME_VER}　・　PC・スマホ（横持ち）で遊べます　・　進行はブラウザに自動保存されます</div></div>`);
   const c=document.getElementById('tContinue');if(c)c.onclick=()=>{closeOverlay();withLoading('セーブを読み込んでいます…',()=>{if(!loadGame())toast('セーブデータを読み込めませんでした','bad');});};
   document.getElementById('tNew').onclick=()=>{if(sv&&!confirmNew())return;showIntro();};
   document.getElementById('tHelp').onclick=()=>showHelp(true);
-  /* 右下の設定（⚙）：音量・音楽室・クレジット・ホーム画面に追加（2026-11-16） */
-  {const sb=document.getElementById('tSet'),sp=document.querySelector('.tsetP');const tog=v=>{sp.hidden=v==null?!sp.hidden:!v;sb.classList.toggle('on',!sp.hidden);};
-   if(sb&&sp){sb.onclick=()=>{tog();se('click');};document.getElementById('tSetX').onclick=()=>tog(false);}
-   const vb=document.getElementById('tVB'),vs=document.getElementById('tVS');
-   if(vb)vb.oninput=()=>{auSetBgm(+vb.value);document.getElementById('tVBn').textContent=Math.round(vb.value*100);};
-   if(vs)vs.oninput=()=>{auSetSe(+vs.value);document.getElementById('tVSn').textContent=Math.round(vs.value*100);};
-   if(vs)vs.onchange=()=>se('click');
-   const mu=document.getElementById('tMute');if(mu)mu.onclick=()=>{auToggle();mu.textContent=AU.on?'消音にする':'音を出す';};
-   {const rb=document.getElementById('tRep');if(rb)rb.onclick=()=>{se('click');showReport(true);};}
-   const ms=document.getElementById('tMusic');if(ms)ms.onclick=()=>{if(typeof window.openMusic==='function')window.openMusic();else toast('音楽室を読み込めませんでした','bad');};}
+  document.getElementById('tCfg').onclick=()=>{se('click');showSettings(true);};
+  {const rb=document.getElementById('tRep');if(rb)rb.onclick=()=>{se('click');showReport(true);};}
   document.getElementById('tDex').onclick=()=>{se('click');showDex(true);};
   document.getElementById('tUpd').onclick=()=>{se('click');showUpdates();};
   document.getElementById('tWorld').onclick=()=>{se('click');lilLoad('歴史の帳簿をひらいています',showWorld);};
-  {const ti=document.getElementById('tInstall');if(ti)ti.onclick=()=>doInstall(true);}
-  document.getElementById('tCredit').onclick=()=>openOverlay('title',`<h2>クレジット</h2><div style="line-height:1.9">${GAME_TITLE} — ${GAME_SUB}　ver ${GAME_VER}<br>企画・ゲームデザイン：ねぎらーめん<br>プログラム・ドット絵・効果音・音楽：Claude と共同制作<br><span class="muted">すべてのドット絵と音はこのゲームのために作られたものです</span></div><div style="margin-top:12px"><button id="crBack">タイトルへ</button></div>`)&&(document.getElementById('crBack').onclick=showTitle);}
+  }
+function showCredit(){openOverlay('title',`<h2>クレジット</h2><div style="line-height:1.9">${GAME_TITLE} — ${GAME_SUB}　ver ${GAME_VER}<br>企画・ゲームデザイン：ねぎらーめん<br>プログラム・ドット絵・効果音・音楽：Claude と共同制作<br><span class="muted">すべてのドット絵と音はこのゲームのために作られたものです</span></div><div style="margin-top:12px"><button id="crBack">戻る</button></div>`);document.getElementById('crBack').onclick=()=>showSettings();}
 // 画面の上のお知らせ（2026-11-16）：英雄の戦死・城への攻撃・山場（ブラッドムーン・ボス）の予告。通信ログに加えて、上に大きく出す
-const ALERT_K={kia:['#ff5a4e','†'],castle:['#ff8a3a','⚠'],moon:['#ff4a5e','☾'],boss:['#d8a0ff','★'],good:['#6fe08a','✔']};
-ALERT_K.news=['#f2c84a','✦'];
+const ALI=b=>`<svg viewBox="0 0 16 16" shape-rendering="crispEdges">${b}</svg>`;   /* お知らせのドットのアイコン（2026-11-25） */
+const ALERT_K={kia:['#ff5a4e',ALI('<path d="M4 2h8v2h1v5h-2v2h-1v2H6v-2H5V9H3V4h1z" fill="currentColor"/><path d="M5 5h2v2H5zM9 5h2v2H9zM7 8h2v1H7z" fill="#ff5a4e"/><path d="M6 12h1v1H6zM9 12h1v1H9z" fill="#ff5a4e"/>')],
+  castle:['#ff8a3a',ALI('<path d="M1 7h2V5h2v2h2V5h2v2h2V5h2v2h2v8H1z" fill="currentColor"/><path d="M6 11h4v4H6z" fill="#ff8a3a"/><path d="M11 1h2v1h1v2h-1v1h-2V4h-1V2h1z" fill="currentColor"/>')],
+  moon:['#ff4a5e',ALI('<path d="M6 1h5v1h2v2h1v3h-1v-1h-2v-1H8v1H7v3h1v1h3v-1h2v-1h1v3h-1v2h-2v1H6v-1H4v-2H3V5h1V3h2z" fill="currentColor"/>')],
+  boss:['#d8a0ff',ALI('<path d="M2 2h2v2h2V2h4v2h2V2h2v5h-1v4h-2v2H5v-2H3V7H2z" fill="currentColor"/><path d="M5 7h2v2H5zM9 7h2v2H9z" fill="#d8a0ff"/>')],
+  good:['#6fe08a',ALI('<path d="M2 8h3v2h2V8h1V6h2V4h2V2h2v3h-1v2h-2v2H9v2H7v2H5v-2H3v-1H2z" fill="currentColor"/>')]};
+ALERT_K.news=['#f2c84a',ALI('<path d="M7 1h2v4h4v2h-2v2h2v2H9v4H7v-4H3V9h2V7H3V5h4z" fill="currentColor"/>')];
 // 新しくできるようになったことの知らせ（城のレベル・研究で建てられる施設）。アイコンつき・2行。続けて来たら順番に出す
 const NEWSQ=[];function newsTop(title,sub,icon,go){NEWSQ.push({title,sub,icon,go});if(NEWSQ.length===1)newsNext();}
 function newsNext(){const n=NEWSQ[0];if(!n)return;alertTop(`<b>${n.title}</b><small>${n.sub}</small>`,'news',5500,n.icon,()=>{if(n.go)n.go();});setTimeout(()=>{NEWSQ.shift();newsNext();},5800);}
@@ -9554,6 +9572,55 @@ function tabBadges(){const t=document.querySelector('#rtabs button[data-rt="econ
 function renderAll(){renderArmyBox(true);renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(true);renderCmds(true);renderTop();}
 
 // ===== サウンド（Web Audio で合成。外部ファイルなし） =====
+// ===== 設定（2026-11-25）：音・画面と演出・そのほか。どの項目にもアイコン（文字が読めなくても分かるように） =====
+const CFG=Object.assign({master:1,dmgNum:true,shake:true,fps:0,showFps:false},(()=>{try{return JSON.parse(localStorage.getItem('nd_cfg')||'{}');}catch(e){return {};}})());
+function cfgSave(){try{localStorage.setItem('nd_cfg',JSON.stringify(CFG));}catch(e){}}
+const CI=b=>`<svg width="22" height="22" viewBox="0 0 16 16" shape-rendering="crispEdges">${b}</svg>`;
+const CFG_IC={
+  master:CI('<path d="M1 6h3l4-4v12l-4-4H1z" fill="currentColor"/><path d="M10 5h1v6h-1zM12 3h1v10h-1zM14 6h1v4h-1z" fill="currentColor"/>'),
+  bgm:CI('<path d="M5 2h9v9h-2V5H7v8H3v-3h2z" fill="currentColor"/><rect x="10" y="10" width="4" height="3" fill="currentColor"/>'),
+  se:CI('<path d="M7 1h2v2h2v1h1v5l2 2v1H2v-1l2-2V4h1V3h2z" fill="currentColor"/><rect x="6" y="13" width="4" height="2" fill="currentColor"/>'),
+  mute:CI('<path d="M1 6h3l4-4v12l-4-4H1z" fill="currentColor"/><path d="M10 5l5 6M15 5l-5 6" stroke="currentColor" stroke-width="1.8"/>'),
+  dmg:CI('<path d="M1 4h3v8H3V6H1zM5 4h4v2H7v1h2v5H5v-2h2V9H5zM10 4h5v8h-5v-2h3V9h-2V7h2V6h-3z" fill="currentColor"/>'),
+  shake:CI('<path d="M5 3h6v10H5z" fill="currentColor"/><path d="M2 5h1v6H2zM13 5h1v6h-1zM0 7h1v2H0zM15 7h1v2h-1z" fill="currentColor"/>'),
+  fps:CI('<path d="M2 12a6 6 0 1 1 12 0h-2a4 4 0 1 0-8 0z" fill="currentColor"/><path d="M8 11l3-4" stroke="currentColor" stroke-width="1.8"/>'),
+  fpsShow:CI('<path d="M1 3h14v10H1z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 5h3v1H4v1h2v1H4v2H3zM7 5h3v1H8v1h2v1H8v2H7z" fill="currentColor"/>'),
+  full:CI('<path d="M1 1h5v2H3v3H1zM10 1h5v5h-2V3h-3zM1 10h2v3h3v2H1zM13 10h2v5h-5v-2h3z" fill="currentColor"/>'),
+  music:CI('<path d="M4 1h10v10h-1V4H6v9H2v-3h2z" fill="currentColor"/><path d="M10 9h3v3h-3z" fill="currentColor"/>'),
+  credit:CI('<path d="M8 1l2 5h5l-4 3 2 6-5-4-5 4 2-6-4-3h5z" fill="currentColor"/>'),
+  install:CI('<path d="M4 1h8v14H4z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7 4h2v4h2l-3 3-3-3h2z" fill="currentColor"/>'),
+  lang:CI('<path d="M8 1a7 7 0 1 1 0 14A7 7 0 1 1 8 1z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M1 8h14M8 1c-3 3-3 11 0 14M8 1c3 3 3 11 0 14" fill="none" stroke="currentColor" stroke-width="1.2"/>'),
+  gear:CI('<path d="M7 0h2v2h2l1-1 2 2-1 1v2h2v2h-2v2l1 1-2 2-1-1h-2v2H7v-2H5l-1 1-2-2 1-1V9H1V7h2V5L2 4l2-2 1 1h2z" fill="currentColor"/><rect x="6" y="6" width="4" height="4" fill="#1c1824"/>')};
+let CFG_FROM_TITLE=false;
+function showSettings(fromTitle){if(fromTitle!=null)CFG_FROM_TITLE=!!fromTitle;const v=x=>Math.round(x*100);
+  const sl=(id,ic,n,val)=>`<label class="cfr"><i>${ic}</i><span class="cfn">${n}</span><input type="range" id="${id}" min="0" max="1" step="0.05" value="${val}"><b id="${id}N">${v(val)}</b></label>`;
+  const tg=(k,ic,n,on)=>`<div class="cfr"><i>${ic}</i><span class="cfn">${n}</span><button data-cft="${k}" class="cfsw${on?' on':''}"><span>${on?'ON':'OFF'}</span></button></div>`;
+  const fs=!!document.fullscreenElement;
+  openOverlay('cfg',`<h2 style="margin:0 0 6px;display:flex;align-items:center;gap:8px">${CFG_IC.gear}設定</h2>
+   <div class="cfg"><div class="cfh">${CFG_IC.master}音</div>
+    ${sl('cfM',CFG_IC.master,'全体の音量',CFG.master)}${sl('cfB',CFG_IC.bgm,'BGM',AU.bgmVol)}${sl('cfS',CFG_IC.se,'効果音',AU.seVol)}${tg('mute',CFG_IC.mute,'音を消す',!AU.on)}
+   <div class="cfh">${CFG_IC.shake}画面と演出</div>
+    ${tg('dmgNum',CFG_IC.dmg,'ダメージの数字',CFG.dmgNum)}${tg('shake',CFG_IC.shake,'画面の揺れ',CFG.shake)}
+    <div class="cfr"><i>${CFG_IC.fps}</i><span class="cfn">FPS の上限</span><span class="cfseg">${[[30,'30'],[60,'60'],[0,'なし']].map(([x,n])=>`<button data-cff="${x}" class="${CFG.fps===x?'on':''}">${n}</button>`).join('')}</span></div>
+    ${tg('showFps',CFG_IC.fpsShow,'FPS を表示',CFG.showFps)}${document.fullscreenEnabled?tg('full',CFG_IC.full,'全画面',fs):''}
+   <div class="cfh">${CFG_IC.gear}そのほか</div>
+    <div class="cfr"><i>${CFG_IC.lang}</i><span class="cfn">言語</span><span class="cfv">日本語<small>（ほかの言語は準備中）</small></span></div>
+    <div class="cfbtns"><button id="cfMusic">${CFG_IC.music}<span>音楽室</span></button><button id="cfCredit">${CFG_IC.credit}<span>クレジット</span></button>${isAppMode()?'':`<button id="cfInstall">${CFG_IC.install}<span>ホーム画面に追加</span></button>`}</div></div>
+   <div class="nfoot"><button id="cfX" class="on">閉じる [Esc]</button></div>`,false);
+  const on=(id,f)=>{const e=document.getElementById(id);if(e)e.oninput=()=>{f(+e.value);document.getElementById(id+'N').textContent=v(+e.value);};};
+  on('cfM',x=>{CFG.master=x;cfgSave();auMasterApply();});on('cfB',x=>auSetBgm(x));on('cfS',x=>auSetSe(x));{const s=document.getElementById('cfS');if(s)s.onchange=()=>se('click');}
+  document.querySelectorAll('[data-cft]').forEach(b=>b.onclick=()=>{const k=b.dataset.cft;
+    if(k==='mute')auToggle();else if(k==='full'){try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen();}catch(e){}setTimeout(()=>showSettings(),300);return;}
+    else{CFG[k]=!CFG[k];cfgSave();if(k==='showFps')fpsBoxUi();}showSettings();});
+  document.querySelectorAll('[data-cff]').forEach(b=>b.onclick=()=>{CFG.fps=+b.dataset.cff;cfgSave();showSettings();});
+  document.getElementById('cfMusic').onclick=()=>{if(typeof window.openMusic==='function')window.openMusic();else toast('音楽室を読み込めませんでした','bad');};
+  document.getElementById('cfCredit').onclick=()=>showCredit();
+  {const ti=document.getElementById('cfInstall');if(ti)ti.onclick=()=>doInstall(true);}
+  document.getElementById('cfX').onclick=()=>{closeOverlay();if(CFG_FROM_TITLE)showTitle();};}
+function auMasterApply(){if(AU.ctx&&AU.master)AU.master.gain.setTargetAtTime(AU.on?CFG.master:0,AU.ctx.currentTime,0.05);}
+let _fpsN=0,_fpsT=0,_fpsL=0;
+function fpsBoxUi(){let e=document.getElementById('fpsBox');if(!CFG.showFps){if(e)e.remove();return;}if(!e){e=document.createElement('div');e.id='fpsBox';document.body.appendChild(e);}}
+function fpsCount(now){_fpsN++;if(now-_fpsT>=1000){const f=Math.round(_fpsN*1000/(now-_fpsT));_fpsN=0;_fpsT=now;const e=CFG.showFps&&document.getElementById('fpsBox');if(e)e.textContent=f+' FPS';}}
 const AU={ctx:null,on:true,bgmVol:0.5,seVol:0.6,track:null,step:0,nextT:0,last:{},intensity:0};
 try{const sv=JSON.parse(localStorage.getItem('bd_audio')||'null');if(sv){AU.on=sv.on;AU.bgmVol=sv.bgm;AU.seVol=sv.se;}}catch(e){}
 function auSave(){try{localStorage.setItem('bd_audio',JSON.stringify({on:AU.on,bgm:AU.bgmVol,se:AU.seVol}));}catch(e){}}
@@ -9562,7 +9629,7 @@ function auInit(){
   if(AU.ctx){if(AU.ctx.state==='suspended')AU.ctx.resume();return;}
   const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
   const c=AU.ctx=new AC();
-  AU.master=c.createGain();AU.master.gain.value=AU.on?1:0;
+  AU.master=c.createGain();AU.master.gain.value=AU.on?CFG.master:0;
   const comp=c.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=4;
   AU.master.connect(comp);comp.connect(c.destination);
   AU.music=c.createGain();AU.music.gain.value=AU.bgmVol*0.9;AU.music.connect(AU.master);
@@ -10021,7 +10088,7 @@ function playBoss(st,t){const M=AU.music,s=st%16,bar=Math.floor(st/16)%8,b=BOSS_
   if(bar>=4&&s%8===4)tone(mt(b+36+(bar%2?1:0)),t,sp*3,{type:'square',vol:0.037,lp:1600,dest:M,send:true});}
 function auSetBgm(v){AU.bgmVol=v;if(AU.ctx)AU.music.gain.setTargetAtTime(v*0.9,AU.ctx.currentTime,0.05);auSave();}
 function auSetSe(v){AU.seVol=v;if(AU.ctx)AU.sfx.gain.setTargetAtTime(v,AU.ctx.currentTime,0.05);auSave();}
-function auToggle(){AU.on=!AU.on;if(AU.ctx)AU.master.gain.setTargetAtTime(AU.on?1:0,AU.ctx.currentTime,0.05);auSave();auUi();}
+function auToggle(){AU.on=!AU.on;if(AU.ctx)AU.master.gain.setTargetAtTime(AU.on?CFG.master:0,AU.ctx.currentTime,0.05);auSave();auUi();}
 function auUi(){const b=document.getElementById('bMute');if(b){b.textContent=AU.on?'♪ 音あり [M]':'♪ 消音中 [M]';b.classList.toggle('on',!AU.on);}
   const a=document.getElementById('vBgm'),c=document.getElementById('vSe');if(a)a.value=AU.bgmVol;if(c)c.value=AU.seVol;}
 document.addEventListener('pointerdown',auInit);
@@ -10254,7 +10321,7 @@ let RP_IC0=null;function rpIc(x){if(!RP_IC0)RP_IC0={bug:U2SV('<path d="M5 3h6v2h
   other:U2SV('<path d="M1 2h14v9H7l-4 4v-4H1z" fill="currentColor"/>')};return RP_IC0[x];}
 let RP={kind:'bug',last:0,fromTitle:true};
 function showReport(fromTitle){if(fromTitle!=null)RP.fromTitle=!!fromTitle;const id=playerId(),k=RP.kind,ok=!!REPORT_CFG.url;
-  openOverlay('report',`<h2 style="margin:0 0 8px">お問い合わせ・不具合報告</h2>
+  openOverlay('contact',`<h2 style="margin:0 0 8px">お問い合わせ・不具合報告</h2>
    <div class="rpid"><small>あなたのID</small><b id="rpId">${id}</b><button id="rpCp" class="ghost">コピー</button></div>
    <div class="rpk">${[['bug','不具合'],['idea','要望・感想'],['other','その他']].map(([x,n])=>`<button data-rpk="${x}" class="${k===x?'on':''}">${rpIc(x)}<span>${n}</span></button>`).join('')}</div>
    <textarea id="rpTx" maxlength="2000" rows="6" placeholder="${k==='bug'?'何をしたら、どうなったか（例：夜へを押したら画面が止まった）':'ご意見・ご感想をどうぞ'}" style="width:100%;box-sizing:border-box">${RP.text||''}</textarea>
@@ -10439,6 +10506,8 @@ let last=performance.now(),uiT=0,drawErr=0;
 {const di=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(im){if(!im){if(!drawErr++)console.warn('drawImage: 絵がありません',new Error().stack);return;}return di.apply(this,arguments);};}
 function loop(now){
   requestAnimationFrame(loop);   // 先に次のコマを予約（途中でエラーが出ても止まらない）
+  if(CFG.fps){if(now-_fpsL<1000/CFG.fps-2)return;_fpsL=now;}   /* 設定：FPS の上限 */
+  if(CFG.showFps)fpsCount(now);
   let dt=Math.min(0.05,(now-last)/1000);last=now;
   panCam(dt);
   if(!S.overlay&&!S.over){
@@ -10455,7 +10524,7 @@ function loop(now){
   uiT+=dt;if(uiT>0.2){uiT=0;try{storyTick();}catch(e){}try{tipTick();}catch(e){}try{ordTick();}catch(e){console.error(e);}
     if(IS_PROTO&&S.phase==='night'&&!S.waveActive&&!S.overlay&&!S.over&&!S.night&&!S.nightPending&&!TLP&&!RPV){try{showNight();}catch(e){console.error(e);}}   /* 夜に入ったのに夜の画面が出ていなければ出す（保険） */stripKeyHints();renderTop();renderMode();renderEcon();renderIntel();renderResBox();renderBuild();renderInfo(false);renderCmds(false);renderArmyBox(false);tabBadges();}
 }
-auUi();newState();S.backdrop=true;renderAll();resizeView();setTimeout(resizeView,300);showTitle();requestAnimationFrame(loop);
+auUi();fpsBoxUi();newState();S.backdrop=true;renderAll();resizeView();setTimeout(resizeView,300);showTitle();requestAnimationFrame(loop);
 </script>
 <script>
 // 本体のスクリプトは、読み込み画面を一度描いてから動かす（大きいので、先に動かすと再読み込みのときなどに読み込み画面が出ないまま固まって見える）
