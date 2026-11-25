@@ -94,6 +94,7 @@ select{width:100%}
    ・「範囲を動かす」は、四角く囲んでから中をつかんで動かす。Esc でやめる<br>
    ・城を置ける範囲（黄色の円）の中で、遊ぶ人が城を動かせる。円の中の川・岩・山・浅瀬の近くには置けない<br>
    ・森・岩場・沼は、かたまりの縁が1段目、内側ほど2段目・3段目（濃い色）。深いほど効き目が強い（森なら木が多く、敵も部隊もより遅い）。5マスより太いと真ん中が3段目<br>
+   ・街道は、城のそば（城の中心から5マス以内）まで来ていて、そこから続いている所が「城とつながっている」（明るい色）。そのとなりのゲームの生産施設は産出 +15%。つながっていない街道は暗い色<br>
    ・1マスはゲームの 3×3 マス。描いている途中も、このブラウザに自動で保存されます<br>
    ・「書き出す」でできたファイルを作者に送ると、ゲームの本当の地図にできます
   </div>
@@ -103,7 +104,7 @@ select{width:100%}
 "use strict";
 /* ===== 地図の道具（2026-11-25 作り直し）：地形9種・筆の形・線・スタンプ・反転・範囲を動かす・城1つ（置ける範囲つき）・巣4つ ===== */
 const TER=[ // [ゲームの番号, 文字, 名前, 色, 通れない]
- [0,'.','草地','#5a8c46',0],[14,'g','肥えた土（畑 +30%）','#6a5a30',0],[13,'p','街道（魔物が通りたがる）','#b89a6a',0],
+ [0,'.','草地','#5a8c46',0],[14,'g','肥えた土（畑 +30%）','#6a5a30',0],[13,'p','街道（城とつながると沿いの施設 +15%）','#b89a6a',0],
  [1,'h','岩場・高台（石・射程が伸びる）','#9a9a92',0],[3,'r','山（通れない）','#5e5c58',1],[2,'f','森（木）','#2c5a2a',0],
  [4,'m','沼（遅くなる）','#4a6a52',0],[9,'w','水（川・湖。通れない）','#3c6ec8',1],[10,'d','浅瀬（渡れる）','#9cc4e8',0]];
 const BY_CH={},BY_ID={};for(const t of TER){BY_CH[t[1]]=t;BY_ID[t[0]]=t;}
@@ -141,12 +142,12 @@ const rnd=(x,y,s)=>{const n=Math.sin(x*12.9898+y*78.233+s*37.719)*43758.5453;ret
 const DIR8=['東','南東','南','南西','西','北西','北','北東'];
 function dirOf(x,y){const s=SITES[0]||{x:W/2,y:H/2};const a=Math.atan2(y-(s.y+1),x-(s.x+1));return DIR8[((Math.round(a/(Math.PI/4))%8)+8)%8];}
 function hiveAuto(h){const d=dirOf(h.x,h.y);h.s=d;h.name=d+'のアビス';}
-/* ---- 攻めてくる道（ゲームと同じ：山と水は通れない、斜めは1.4倍、街道は短く数える、角はすり抜けない） ---- */
+/* ---- 攻めてくる道（ゲームと同じ：山と水は通れない、斜めは1.4倍、角はすり抜けない） ---- */
 function blocked(i){const v=TT[i];return v===3||v===9;}
 function flowFrom(x0,y0){const f=new Float64Array(W*H).fill(1e9);if(x0<0||y0<0||x0>=W||y0>=H)return f;const k0=y0*W+x0;f[k0]=0;const hp=[[0,k0]];
   const pushH=(d,i)=>{hp.push([d,i]);let c=hp.length-1;while(c>0){const p=(c-1)>>1;if(hp[p][0]<=hp[c][0])break;[hp[p],hp[c]]=[hp[c],hp[p]];c=p;}};
   const popH=()=>{const top=hp[0],l=hp.pop();if(hp.length){hp[0]=l;let c=0;for(;;){const a=c*2+1,b=a+1;let m=c;if(a<hp.length&&hp[a][0]<hp[m][0])m=a;if(b<hp.length&&hp[b][0]<hp[m][0])m=b;if(m===c)break;[hp[m],hp[c]]=[hp[c],hp[m]];c=m;}}return top;};
-  while(hp.length){const [d,i]=popH();if(d>f[i])continue;const x=i%W,y=(i/W)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(blocked(j))continue;if(dx&&dy&&(blocked(y*W+nx)||blocked(ny*W+x)))continue;const nd=d+(dx&&dy?14:10)*(TT[j]===13?0.6:1);if(nd<f[j]){f[j]=nd;pushH(nd,j);}}}
+  while(hp.length){const [d,i]=popH();if(d>f[i])continue;const x=i%W,y=(i/W)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(blocked(j))continue;if(dx&&dy&&(blocked(y*W+nx)||blocked(ny*W+x)))continue;const nd=d+(dx&&dy?14:10);if(nd<f[j]){f[j]=nd;pushH(nd,j);}}}
   return f;}
 function pathOf(f,x,y){const P=[];if(f[y*W+x]>=1e9)return null;for(let n=0;n<W*H;n++){P.push([x,y]);let best=f[y*W+x],bx=x,by=y;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const v=f[ny*W+nx];if(v<best){best=v;bx=nx;by=ny;}}if(bx===x&&by===y)break;x=bx;y=by;}return P;}
 let ROUTES=[],FLOW=null;
@@ -158,7 +159,10 @@ const DEEP={2:['#46783c','#2c5a2a','#163a16'],1:['#b4b4ac','#9a9a92','#7c7c74'],
 const LVN={2:['疎林','森林','密林'],1:['岩場（小）','岩場（中）','岩場（大）'],4:['ぬかるみ','湿地','沼']};
 let LV=null;
 function calcLv(){LV=new Uint8Array(W*H);for(const v of [1,2,4]){const el=new Uint8Array(W*H),q=[];for(let i=0;i<W*H;i++){if(TT[i]===v)el[i]=99;else q.push(i);}let h=0;while(h<q.length){const i=q[h++],x=i%W,y=(i/W)|0,d=el[i]===99?0:el[i];for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(el[j]===99){el[j]=d+1;q.push(j);}}}for(let i=0;i<W*H;i++)if(TT[i]===v)LV[i]=Math.min(3,el[i]===99?3:el[i]);}}
-function drawBase(){base.width=W;base.height=H;calcLv();const im=bctx.createImageData(W,H);for(let i=0;i<W*H;i++){const c=DEEP[TT[i]]&&document.getElementById('cDeep').checked?DEEP[TT[i]][Math.max(1,LV[i])-1]:(BY_ID[TT[i]]||TER[0])[3];const n=parseInt(c.slice(1),16);let r=n>>16,g=(n>>8)&255,b=n&255;const ch=(((i%W)+((i/W)|0))%2);if((TT[i]===2||TT[i]===4||TT[i]===14)&&ch)r*=0.9,g*=0.9,b*=0.9;if(TT[i]===13&&ch)r*=0.94,g*=0.94,b*=0.94;im.data[i*4]=r;im.data[i*4+1]=g;im.data[i*4+2]=b;im.data[i*4+3]=255;}bctx.putImageData(im,0,0);}
+function roadConn(){const a=new Uint8Array(W*H),s=SITES[0];if(!s)return a;const cx=s.x+1.5,cy=s.y+1.5,R=5,q=[];for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(TT[y*W+x]===13&&Math.hypot(x+.5-cx,y+.5-cy)<=R){a[y*W+x]=1;q.push(y*W+x);}
+  while(q.length){const i=q.pop(),x=i%W,y=(i/W)|0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=H)continue;const j=ny*W+nx;if(!a[j]&&TT[j]===13){a[j]=1;q.push(j);}}}return a;}
+let RC=null;
+function drawBase(){base.width=W;base.height=H;calcLv();RC=roadConn();const im=bctx.createImageData(W,H);for(let i=0;i<W*H;i++){const c=DEEP[TT[i]]&&document.getElementById('cDeep').checked?DEEP[TT[i]][Math.max(1,LV[i])-1]:(BY_ID[TT[i]]||TER[0])[3];const n=parseInt(c.slice(1),16);let r=n>>16,g=(n>>8)&255,b=n&255;const ch=(((i%W)+((i/W)|0))%2);if((TT[i]===2||TT[i]===4||TT[i]===14)&&ch)r*=0.9,g*=0.9,b*=0.9;if(TT[i]===13){if(!RC[i])r*=0.72,g*=0.72,b*=0.72;else if(ch)r*=0.94,g*=0.94,b*=0.94;}im.data[i*4]=r;im.data[i*4+1]=g;im.data[i*4+2]=b;im.data[i*4+3]=255;}bctx.putImageData(im,0,0);}
 function resize(){cv.width=wrap.clientWidth;cv.height=wrap.clientHeight;draw();}
 function brushCells(x,y,r,shp){const L=[];const c=(r-1)/2;const x0=x-Math.floor(c),y0=y-Math.floor(c);for(let yy=y0;yy<y0+r;yy++)for(let xx=x0;xx<x0+r;xx++){if(shp!=='square'){const d=Math.hypot(xx-(x0+c),yy-(y0+c));let lim=r/2+0.15;if(shp==='rough')lim+=(rnd(xx,yy,7)-0.5)*Math.max(1,r*0.45);if(d>lim)continue;}L.push([xx,yy]);}return L;}
 function draw(){const z=zoom;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#050706';ctx.fillRect(0,0,cv.width,cv.height);ctx.imageSmoothingEnabled=false;ctx.drawImage(base,ox,oy,W*z,H*z);
@@ -246,7 +250,7 @@ cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const c=
     selR={x0:c.x,y0:c.y,x1:c.x,y1:c.y,done:false};drag={selmk:true};draw();return;}
   push();drag={paint:true,any:false};if(paintAt(c.x,c.y)){drag.any=true;drawBase();draw();}});
 cv.addEventListener('pointermove',e=>{const c=cellAt(e);hov=(c.x>=0&&c.y>=0&&c.x<W&&c.y<H)?c:null;
-  document.getElementById('hud').textContent=hov?`(${c.x}, ${c.y})　${(BY_ID[TT[c.y*W+c.x]]||TER[0])[2]}${LVN[TT[c.y*W+c.x]]&&LV?'・'+LVN[TT[c.y*W+c.x]][Math.max(1,LV[c.y*W+c.x])-1]+'（'+Math.max(1,LV[c.y*W+c.x])+'段目）':''}${ORE[c.y*W+c.x]?'・鉄鉱脈':''}${OIL[c.y*W+c.x]?'・龍脈の泉':''}　拡大 ${zoom}`:`拡大 ${zoom}`;
+  document.getElementById('hud').textContent=hov?`(${c.x}, ${c.y})　${(BY_ID[TT[c.y*W+c.x]]||TER[0])[2]}${LVN[TT[c.y*W+c.x]]&&LV?'・'+LVN[TT[c.y*W+c.x]][Math.max(1,LV[c.y*W+c.x])-1]+'（'+Math.max(1,LV[c.y*W+c.x])+'段目）':''}${ORE[c.y*W+c.x]?'・鉄鉱脈':''}${OIL[c.y*W+c.x]?'・龍脈の泉':''}${TT[c.y*W+c.x]===13?(RC&&RC[c.y*W+c.x]?'・城とつながっている':'・城とつながっていない（暗い色）'):''}　拡大 ${zoom}`:`拡大 ${zoom}`;
   if(drag&&drag.pan){ox=drag.ox+e.clientX-drag.sx;oy=drag.oy+e.clientY-drag.sy;draw();return;}
   if(drag&&drag.mv&&hov){const m=drag.mv,nx=Math.max(0,Math.min(W-1,c.x-drag.dx)),ny=Math.max(0,Math.min(H-1,c.y-drag.dy));if(nx!==m.x||ny!==m.y){m.x=nx;m.y=ny;drag.moved=true;if(HIVES.includes(m)&&!m._named)hiveAuto(m);if(m===SITES[0])for(const h of HIVES)if(!h._named)hiveAuto(h);selUi();calcRoutes();stats();draw();}return;}
   if(drag&&drag.selmk&&hov){selR.x1=c.x;selR.y1=c.y;draw();return;}
