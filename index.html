@@ -281,6 +281,7 @@ body.ui2.land #u2X,body.ui2.land #tClose,body.ui2.land #sheetX{display:none!impo
   body.ui2 #right.u2tab #info,body.ui2 #right.u2tab #infoSplit,body.ui2 #right.u2tab #infoClose{display:none!important}
   body.ui2 #right.u2sel{padding-top:46px}body.ui2 #right.u2sel #infoClose{display:none!important}
   body.ui2 #right.u2tab #u2X,body.ui2 #right.u2sel #u2X{display:flex;align-items:center;justify-content:center;position:absolute;top:10px;right:10px;width:34px;height:30px;padding:0;z-index:3;background:rgba(18,26,20,.95);border:1px solid var(--amber);color:var(--amber)}
+  body.ui2 #right.u2tab{padding-top:48px}body.ui2 #right.u2tab #u2Ttl{display:flex}#u2Ttl{display:none;position:absolute;top:10px;left:12px;right:52px;height:30px;align-items:center;gap:8px;color:var(--amber);font-size:16px;font-weight:bold;border-bottom:1px solid #5a4a2a}#u2Ttl svg,#u2Ttl img{width:22px;height:22px}   /* 2026-11-26：見出しの段（閉じるボタンが中身に重ならないように） */
   body.ui2 #right.u2tab #rtabs{margin-right:40px}body.ui2 #right:not(.open) #u2X{display:none}body.ui2 #u2X svg{width:14px;height:14px}
 }
 @media (max-width:900px){body.ui2:not(.land) #u2Tabs{display:none}body.ui2.land #u2Tabs{display:none}body.ui2.fullmap:not(.land) #right:not(.open){transform:translateY(100%)}}
@@ -679,7 +680,7 @@ body.night #intel .lbl{background:#5a1a14;color:#ffb0a8}
 #rtabs button.on{background:var(--amber-bg);box-shadow:inset 0 -3px 0 var(--amber)}
 
 /* ---------- 建設メニュー ---------- */
-.fcap{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:transparent;border:none;padding:0;margin:0 0 8px}
+.fcap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;background:transparent;border:none;padding:0;margin:0 0 8px}.fcap .cpk{display:flex;align-items:center;gap:3px;white-space:nowrap;overflow:hidden}.fcap .cpk svg{flex-shrink:0}.fcap .cap .row{gap:4px}.fcap .cap .row b{white-space:nowrap}.fcap small{grid-column:1/-1}
 .fcap .cap{display:flex;flex-direction:column;gap:3px}   /* 【追加】施設 17/70 をバー表示 */
 .fcap .cap .ebar{height:4px;margin:0}.fcap .cap .ebar i{background:var(--amber)}
 .fcap.full .cap .ebar i{background:var(--red)}
@@ -977,7 +978,7 @@ body.night #wave .pi{filter:drop-shadow(0 0 4px #ff5a4e88)}
 #rtabs button:not(.on) .tcnt{color:var(--dim)}
 
 /* 建設メニュー */
-.fcap{grid-template-columns:1fr 1fr;box-shadow:none}
+.fcap{grid-template-columns:repeat(3,minmax(0,1fr));box-shadow:none}
 .fcap .cap .row{font-size:11px;color:var(--dim);margin:0}
 .fcap .cap .row b{font-family:var(--px-font);font-weight:400;color:var(--text);font-size:12px}
 .fcap .cap.full .row b{color:var(--red)}
@@ -7809,8 +7810,8 @@ let buildSig='',bgClosed={};try{bgClosed=JSON.parse(localStorage.getItem('bd_bgr
 function renderBuild(){
   const el=document.getElementById('build');
   {const fb=document.getElementById('facCapBox');if(fb&&S&&S.blds){const n=facCount(),cp=facCap(),full=n>=cp;
-    const bar=(lab,v,m)=>`<div class="cap${v>=m?' full':''}"><div class="row"><span>${lab}</span><b>${v} / ${m}</b></div><div class="ebar"><i style="width:${Math.round(Math.min(1,v/Math.max(1,m))*100)}%"></i></div></div>`;
-    setHTML(fb,`<div class="fcap${full?' full':n>=cp-5?' near':''}" title="柵・壁・門・罠・篝火は数えません。前哨砦か城の強化で上限が増えます">${bar('施設',n,cp)}${S.mode==='campaign'?bar('前哨砦',outpostN(),outpostCap()):''}${bar('罠',trapCount(),trapCap())}${full?'<small>上限です。前哨砦か城の強化で増えます</small>':''}</div>`);}}
+    const bar=(lab,v,m,ik)=>`<div class="cap${v>=m?' full':''}" title="${lab}"><div class="row"><span class="cpk">${ik?icSvg(ik,18):''}${lab}</span><b>${v}/${m}</b></div><div class="ebar"><i style="width:${Math.round(Math.min(1,v/Math.max(1,m))*100)}%"></i></div></div>`;
+    setHTML(fb,`<div class="fcap${full?' full':n>=cp-5?' near':''}" title="柵・壁・門・罠・篝火は数えません。前哨砦か城の強化で上限が増えます">${bar('施設',n,cp,'apart')}${S.mode==='campaign'?bar('前哨砦',outpostN(),outpostCap(),'outpost'):''}${bar('罠',trapCount(),trapCap(),'pit')}${full?'<small>上限です。前哨砦か城の強化で増えます</small>':''}</div>`);}}
   const sig=BUILD_GROUPS.map(g=>groupList(g).join()).join('|');
   if(sig!==buildSig){
     buildSig=sig;el.innerHTML='';
@@ -10398,7 +10399,7 @@ function setUI2(on,quiet){if(!IS_PROTO)return;const b=document.body;try{localSto
      const mi=id=>{const m=document.querySelector('#'+id+' .mic');return m?m.innerHTML:'';};
      sd.innerHTML=[['build','建設','bBuild'],['res','研究','bRes'],['army','軍事','bArmyTab'],['econ','内政','bTown']].map(([t,n,id])=>`<button data-u2t="${t}" title="${t==='res'?'研究の画面を開く [R]':n+'の欄を出す（もう一度押すと閉じる）'}"><span class="mic">${mi(id)}</span><span>${n}</span></button>`).join('');
      sd.querySelectorAll('[data-u2t]').forEach(x=>x.onclick=()=>{se('click');const t=x.dataset.u2t;if(t==='build')u2BuildToggle();else if(t==='res')showResearch();else u2Tab(t);});document.body.appendChild(sd);}
-   const r=document.getElementById('right');if(r&&!document.getElementById('u2X')){const x=document.createElement('button');x.id='u2X';x.title='この欄を閉じる（マップを広く）';x.innerHTML=U2SV('<path d="M4 2h3l6 6-6 6H4l6-6z" fill="currentColor"/>');x.title='この欄を閉じる（マップを広く）';x.onclick=e=>{e.stopPropagation();se('click');u2Close();};r.appendChild(x);}}
+   const r=document.getElementById('right');if(r&&!document.getElementById('u2X')){const x=document.createElement('button');x.id='u2X';x.title='この欄を閉じる（マップを広く）';x.innerHTML=U2SV('<path d="M4 2h3l6 6-6 6H4l6-6z" fill="currentColor"/>');x.title='この欄を閉じる（マップを広く）';x.onclick=e=>{e.stopPropagation();se('click');u2Close();};r.appendChild(x);}if(r&&!document.getElementById('u2Ttl')){const t=document.createElement('div');t.id='u2Ttl';r.appendChild(t);}}
   u2Mode(null);
   let tg=document.getElementById('bUI2');const ctl=document.getElementById('controls');if(!tg&&ctl){tg=document.createElement('button');tg.id='bUI2';tg.onclick=()=>{se('click');setUI2(!b.classList.contains('ui2'));};ctl.appendChild(tg);}if(tg)setText(tg,on?'前の操作にする':'新しい操作（試し）');
   if(!on){setText(document.getElementById('bFull'),'全画面 [Z]');document.getElementById('bPanel').style.display='none';}
@@ -10407,7 +10408,7 @@ function u2Mode(m){const r=document.getElementById('right');r.classList.toggle('
 function u2Close(){const r=document.getElementById('right');r.classList.remove('open');r._ui2why=null;u2Mode(null);u2TabBtns();}
 function u2Tab(t){const r=document.getElementById('right');const cur=r.classList.contains('open')&&r._ui2why==='tab'&&r._ui2t===t;   /* 3回目：建設・研究・軍事・街。もう一度押すと閉じる */
   if(cur){u2Close();return;}if(t==='build'&&S&&S.buildMode&&typeof exitBuild==='function')try{exitBuild();}catch(e){}
-  r.classList.add('open');r._ui2why='tab';r._ui2t=t;u2Mode('tab');if(t==='army'&&typeof openArmyTab==='function')openArmyTab(S.armySub||'list');else setRT(t);u2TabBtns();}
+  r.classList.add('open');r._ui2why='tab';r._ui2t=t;u2Mode('tab');{const tt=document.getElementById('u2Ttl'),sb=document.querySelector(`#u2Side [data-u2t="${t}"]`);if(tt&&sb){const ic=sb.querySelector('.mic');tt.innerHTML=(ic?ic.innerHTML:'')+'<span>'+sb.innerText.trim()+'</span>';}}if(t==='army'&&typeof openArmyTab==='function')openArmyTab(S.armySub||'list');else setRT(t);u2TabBtns();}
 function u2BuildToggle(){u2Tab('build');}
 function u2TabBtns(){const r=document.getElementById('right'),on=r.classList.contains('open')&&r._ui2why==='tab'?r._ui2t:null;const b=document.getElementById('u2Build');if(b)b.classList.toggle('on',on==='build');document.querySelectorAll('[data-u2t]').forEach(x=>x.classList.toggle('tabOn',x.dataset.u2t===on));}
 function u2Sel(){if(!IS_PROTO||!document.body.classList.contains('ui2')||!S)return;const r=document.getElementById('right');   /* 2回目：施設・部隊を選んだときは半円のボタン。右の欄は「見る」で出す。土地や英雄を選んだときは今までどおり右の欄 */
